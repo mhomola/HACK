@@ -3,6 +3,7 @@
 import matplotlib.pyplot as plt
 #import matplotlib.axes as ax
 import numpy as np
+import fuel_constants
 
 def kerosene_vol():
 
