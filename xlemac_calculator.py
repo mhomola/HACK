@@ -6,21 +6,26 @@ import math
 
 MAC = 4.29
 
-total_length = 28.55
+total_length = 37.57
 
 
 
-S = 77.3 #m^2
+S = 122.4 #m^2
 
-b = 26.21
+b = 33.91
 
-AR = 8.89 * 1.15
+AR = 9.39
 
-taper_ratio = 0.356
+taper_ratio = 0.24
 
-qc_sweep = 15
+qc_sweep = 25
 
-x_wing = 10.34 #mat
+x_wing = 11.817 #mat
+
+# as a fraction of MAC
+fwd_cg_limit = 0.17
+aft_cg_limit = 0.368
+cg_OEW_frac = 0.265
 
 
 
@@ -41,7 +46,10 @@ y_lemac = (b/6)*((1+2*taper_ratio)/(1+taper_ratio))
 x_lemac = y_lemac * tan_le_sweep
 
 
-
 X_MAC = x_lemac + x_wing #leading edge
 
-cg_OEW = X_MAC + MAC*0.25 - 0.6
+print(X_MAC)
+
+fwd_cg = X_MAC + fwd_cg_limit*MAC
+aft_cg = X_MAC + aft_cg_limit*MAC
+cg_OEW = X_MAC + cg_OEW_frac*MAC
