@@ -20,7 +20,7 @@ taper_ratio = 0.24
 
 qc_sweep = 25
 
-x_wing = 11.817 #mat
+x_wing = 11.65 #mat
 
 # as a fraction of MAC
 fwd_cg_limit = 0.17
@@ -35,7 +35,7 @@ Preliminary calculations
 
 """
 
-tan_le_sweep = math.tan(qc_sweep * math.pi/180)-(4/8.89)*(0-0.25)*((1-taper_ratio)/(1+taper_ratio))
+tan_le_sweep = math.tan(qc_sweep * math.pi/180)-(4/9.39)*(0-0.25)*((1-taper_ratio)/(1+taper_ratio))
 
 root_chord = 2*S/((1+taper_ratio)*b)
 
