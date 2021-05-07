@@ -10,7 +10,7 @@ from pylab import meshgrid,cm,imshow,contour,clabel,colorbar,axis,title,show
 #Approximation of the wing podded tank sizes for various volumes and tank radii
 
 def l_func(x,y):
-    return (x-(4/3)*np.pi*y**3)/(np.pi*y*y)
+    return (x-(4/3)*np.pi*y**3)/(np.pi*y*y)+2*y
 
 VH2 = H2calc.VH2_calc()/2000
 r = np.arange(0.5,1.6,0.01)

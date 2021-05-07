@@ -13,8 +13,8 @@ from pylab import meshgrid,cm,imshow,contour,clabel,colorbar,axis,title,show
 from sympy.solvers import solve
 from sympy import Symbol
 
-def l_solver(V,r):
-    return (V-(8/3)*np.pi*r**3)/(2*np.pi*r**2)
+def l_solver(V,r,n=1):
+    return (V-(8/3)*np.pi*r**3)/(n*np.pi*r**2)+2*r
 
 VH2 = H2calc.VH2_calc()/1000
 r = np.arange(0.56,1.5,0.01)
@@ -39,3 +39,19 @@ fig.colorbar(surf, shrink=0.5, aspect=5)
 plt.show()
 
 plt.plot(r,l_solver(max(H2calc.VH2_calc()/1000),r))
+plt.title('One tank')
+plt.xlabel('Radius [m]')
+plt.ylabel('Tank length [m]')
+plt.show()
+
+plt.plot(r,l_solver(max(H2calc.VH2_calc()/1000),r,n=2))
+plt.title('Two tanks')
+plt.xlabel('Radius [m]')
+plt.ylabel('Tank length [m]')
+plt.show()
+
+plt.plot(r,l_solver(max(H2calc.VH2_calc()/1000),r,n=3))
+plt.title('Three tanks')
+plt.xlabel('Radius [m]')
+plt.ylabel('Tank length [m]')
+plt.show()
