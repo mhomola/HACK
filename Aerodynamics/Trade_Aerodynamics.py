@@ -86,3 +86,29 @@ l_cabin = 29.53 - l_cockpit # [m]
 l_tail = lf - 29.53 #[m]
 
 S_w_fus = fus_wet_surface(l_cockpit,l_cabin,l_tail,df) #wetted surface area of the standard configuration
+
+def mgc(ct,cr,sweep,df):
+    """
+    This function calculates the mean geometrical chord of the exposed wing.
+    :param ct: tip chord in [m]
+    :param cr: root chord in [m]
+    :param sweep: sweep angle in [deg]
+    :param df: fuselage diameter in [m]
+    :return: mean geometrical chord in [m]
+    """
+
+    delta_cr = df/2/m.tan(m.radians(90-sweep)) #difference between root chord and exposed root chord
+    exposed_cr = cr + delta_cr
+    exposed_taper = ct/exposed_cr
+    #Formula for mean geometric chord obtained from ADSEEII course
+
+    exposed_mgc = 2/3 * exposed_cr * (1 + exposed_taper + exposed_taper**2)/(1+exposed_taper)
+
+    return exposed_mgc
+
+ct = 1.64 # [m] obtained from top view drawing
+cr = 6.07 # [m] pbtained from top view drawing
+sweep = 25 # [deg] wing sweep obtained from Elsevier data base
+
+exposed_mgc = mgc(ct,cr,sweep,df)
+
