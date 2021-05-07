@@ -6,11 +6,16 @@ from scipy import interpolate
 """ Concept 1: Cargo Hold"""
 # Aerodynamic impact is 0
 
-""" Concept 2: """
 
-""" Concept 3: """
+""" Concept 3: Longer Fuselage """
 
 """ Concept 4: """
+
+""" Concept 5: Wing Pods """
+
+""" Concept 6: Beluga """
+
+
 def graph_method(lf,df,new_df):
     """
 
@@ -60,6 +65,3 @@ df = 3.96  #fuselage maximum diameter in [m]
 new_df = 5 #modified maximum diameter in [m]
 
 cd_var_graph = graph_method(lf,df,new_df) #cd variation calculated with the garphical drag
-""" Concept 5: """
-
-""" Concept 6: """
