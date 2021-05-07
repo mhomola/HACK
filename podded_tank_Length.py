@@ -10,7 +10,7 @@ from pylab import meshgrid,cm,imshow,contour,clabel,colorbar,axis,title,show
 #Approximation of the wing podded tank sizes for various volumes and tank radii
 
 def l_func(x,y):
-    return (x-(4/3)*np.pi*y**3)/(np.pi*y*y)
+    return (x-(4/3)*np.pi*y**3)/(np.pi*y*y)+2*y
 
 VH2 = H2calc.VH2_calc()/2000
 r = np.arange(0.5,1.6,0.01)
@@ -22,7 +22,7 @@ print(L)
 
 fig = plt.figure()
 ax = fig.gca(projection='3d')
-surf = ax.plot_surface(X, Y, L, rstride=1, cstride=1, 
+surf = ax.plot_surface(X, Y, L, rstride=1, cstride=1,
                       cmap=cm.RdBu,linewidth=0, antialiased=False)
 
 ax.zaxis.set_major_locator(LinearLocator(10))
@@ -34,3 +34,5 @@ fig.colorbar(surf, shrink=0.5, aspect=5)
 
 plt.show()
 
+plt.plot(r, l_func(max(H2calc.VH2_calc()/2000),r))
+plt.show()

@@ -60,6 +60,6 @@ plt.show()
 '''
 
 def VH2_calc():
-    e_ratios = np.arange(0.1,0.3,0.001)
+    e_ratios = np.arange(0.1,0.5,0.001)
     return fuel_volume_calc(d_LH2=LH2_d, d_GH2= GH2_d, d_k=k_d, Ed_H2=H2_ed, Ed_k=k_ed, tot_vol_k=fuel_capacity_a320neo,
                              e_ratio=e_ratios)[1]
