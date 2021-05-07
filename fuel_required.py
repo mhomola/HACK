@@ -44,6 +44,7 @@ V_k, V_H2 = fuel_volume_calc(d_LH2=LH2_d, d_GH2= GH2_d, d_k=k_d, Ed_H2=H2_ed, Ed
                              e_ratio=e_ratios)
 V_tot = V_k+V_H2
 
+'''
 f1 = plt.figure()
 ax1 = f1.add_subplot(311)
 ax1.plot(e_ratios,V_H2)
@@ -56,3 +57,9 @@ ax3.plot(e_ratios, V_tot)
 ax3.set_xlabel('Fuel Energy Ratio [-]')
 ax3.set_ylabel('Total Fuel Volume [l]')
 plt.show()
+'''
+
+def VH2_calc():
+    e_ratios = np.arange(0.1,0.3,0.001)
+    return fuel_volume_calc(d_LH2=LH2_d, d_GH2= GH2_d, d_k=k_d, Ed_H2=H2_ed, Ed_k=k_ed, tot_vol_k=fuel_capacity_a320neo,
+                             e_ratio=e_ratios)[1]
