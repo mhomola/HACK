@@ -31,7 +31,7 @@ def fuel_volume_calc(d_LH2, d_GH2, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio, y = 0.9
 
 # Compute volumes
 
-E_ratio = 0.15 # [-]
+E_ratio = 0.5 # [-]
 fuel_capacity_a320neo = 26730 # [l]
 V_k, V_H2 = fuel_volume_calc(d_LH2=LH2_d, d_GH2= GH2_d, d_k=k_d, Ed_H2=H2_ed, Ed_k=k_ed, tot_vol_k=fuel_capacity_a320neo,
                              e_ratio=E_ratio)
