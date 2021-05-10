@@ -72,15 +72,21 @@ roskam = drag_coefficient_estimation_Roskam.Roskam_drag_coefficient(visc=visc, u
                                                                     S=S)
 R_wf, C_f_fus, C_D_o_fus = roskam.run_Roskam_drag_coefficient_functions(l_cockpit=l_cockpit, l_cabin=l_cabin+l_extra,
                                                                         l_tail=l_tail, S_fus=S_fus, S_b_fus=S_b_fus,
-                                                                        S_wet_fus=)
+                                                                        S_wet_fus=S_wet_fus)
 
 """ Concept 4: Flat Bottom """
-S_fus = 0.5 * np.pi * (df/2)**2 + 2 * (2.07 * 2.17 - 0.6**2 + 0.25 * np.pi * 0.6**2)
-S_wet_fus =
+
+S_wet_fus_belly = S_wet_estimation.S_wet_estimation_belly(l_cockpit=l_cockpit,l_cabin=l_cabin,l_tail=l_tail,
+                                                          df1=df, dh=0.1, rb=0.6)
+S_wet_fus_belly.calculate_volume()
+S_wet_fus_belly.S_wet()
+S_fus = S_wet_fus_belly.cross_section
+S_wet_fus = S_wet_fus_belly.S_wet_fus
+
 roskam = drag_coefficient_estimation_Roskam.Roskam_drag_coefficient(visc=visc, u1=u1, air_d=air_d, l_f=lf, M=M, S=S)
 R_wf, C_f_fus, C_D_o_fus = roskam.run_Roskam_drag_coefficient_functions(l_cockpit=l_cockpit, l_cabin=l_cabin,
                                                                         l_tail=l_tail, S_fus=S_fus, S_b_fus=S_b_fus,
-                                                                        S_wet_fus=)
+                                                                        S_wet_fus=S_wet_fus)
 
 """ Concept 5: Wing Pods """
 
