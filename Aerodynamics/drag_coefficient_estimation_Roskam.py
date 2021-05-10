@@ -1,4 +1,5 @@
 import numpy as np
+import math as m
 import matplotlib.pyplot as plt
 
 class Roskam_drag_coefficient():
@@ -18,16 +19,46 @@ class Roskam_drag_coefficient():
         self.M = M
         self.S = S
 
-    def run_Roskam_drag_coefficient_functions(self, exp_mgc, S_fus, S_wet_fus, S_b_fus, ):
-        self.wing_fus_interference(exp_mgc)
+    def run_Roskam_drag_coefficient_functions(self, l_cockpit, l_cabin, l_tail, df, S_fus, S_b_fus, ):
+        self.fus_wet_surface(l_cockpit, l_cabin, l_tail, df)
+        self.wing_fus_interference()
         self.turbulent_flat_plate_skin_friction()
-        self.zero_lift_drag_fus(S_fus, S_wet_fus, S_b_fus)
+        self.zero_lift_drag_fus(S_fus, S_b_fus)
 
         return self.R_wf, self.C_f_fus, self.C_D_o_fus
 
-    def wing_fus_interference(self, exp_mgc, ):
+    '''
+    def exposed_mgc(self, ct, cr, sweep, d_fus, ):
+        """
+        This function calculates the mean geometrical chord of the exposed wing.
+        :param ct: tip chord in [m]
+        :param cr: root chord in [m]
+        :param sweep: sweep angle in [deg]
+        :param d_fus: fuselage diameter in [m]
+        :return: exp_mgc, the mean geometric chord in [m]
+        """
+        delta_cr = d_fus/2/m.tan(m.radians(90-sweep)) # difference between root chord and exposed root chord
+        exposed_cr = cr + delta_cr
+        exposed_taper = ct/exposed_cr
+
+        #Formula for mean geometric chord obtained from ADSEEII course
+        self.exp_mgc = 2/3 * exposed_cr * (1 + exposed_taper + exposed_taper**2)/(1+exposed_taper)
+    '''
+
+    def fus_wet_surface(self, l_cockpit, l_cabin, l_tail, S_fus):
+        """
+        :param l_cockpit: length of the cockpit in [m]
+        :param l_cabin: length of the cabin in [m]
+        :param l_tail: length of the tail in [m]
+        :param S_fus: Largest cross sectional area of the fuselage [m^2]
+        :return: Wet surface of the fuselage in [m^2]
+        """
+        self.d_f = np.sqrt(4 / np.pi * S_fus)
+        self.S_wet_fus = m.pi * self.d_f/4 * (1/3/ l_cockpit **2 * ((4*l_cockpit**2+self.d_f**2/4)-self.d_f**3/8)
+                                              - self.d_f + 4* l_cabin + 2 * m.sqrt(l_tail**2+ self.d_f**2/4))
+
+    def wing_fus_interference(self, ):
         '''
-        :param exp_mgc: mean geometric chord of the exposed wing
         :return: R_wf, the wing/fuselage iterference factor as derived from Figure 4.1 in Roskam-VI
         '''
         self.R_n_fus = self.air_d * self.u1 * self.l_f / self.visc
@@ -53,16 +84,14 @@ class Roskam_drag_coefficient():
         plt.show()
         self.C_f_fus = np.float(input('Input C_f: '))
 
-    def zero_lift_drag_fus(self, S_fus, S_wet_fus, S_b_fus, ):
+    def zero_lift_drag_fus(self, S_b_fus, S_fus):
         '''
-        :param S_fus: Largest cross sectional area of the fuselage
-        :param S_wet_fus: Wetted area of the fuselage
         :param S_b_fus: Base area (at the end of the fuselage)
+        :param S_fus: Largest cross sectional area of the fuselage [m^2]
         :return: C_D_o_fus, the subsonic fuselage zero-lift drag coefficient
         '''
-        self.d_f = np.sqrt(4 / np.pi * S_fus)
         ld = self.l_f / self.d_f
-        self.C_D_o_fus_exc_base = self.R_wf * self.C_f_fus * ((1 + 60 / ld**3) + 0.0025 * ld) * S_wet_fus / self.S
+        self.C_D_o_fus_exc_base = self.R_wf * self.C_f_fus * ((1 + 60 / ld**3) + 0.0025 * ld) * self.S_wet_fus / self.S
         bf = np.sqrt(4 / np.pi * S_b_fus) / self.d_f
         self.C_D_b_fus = (0.029 * bf**3 / ((self.C_D_o_fus_exc_base * self.S / S_fus)**0.5)) * S_fus / self.S
         self.C_D_o_fus = self.C_D_o_fus_exc_base + self.C_D_b_fus
