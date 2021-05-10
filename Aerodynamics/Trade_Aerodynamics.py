@@ -3,6 +3,7 @@ import numpy as np
 from scipy import interpolate
 import math as m
 import drag_coefficient_estimation_Roskam
+import S_wet_estimation
 
 
 def fus_wet_surface(l_cockpit, l_cabin, l_tail, df):
@@ -42,12 +43,31 @@ sweep = 25 # [deg] wing sweep obtained from Elsevier data base
 
 """ Concept 1: Cargo Hold"""
 # Aerodynamic impact is 0
+S_fus = np.pi * (df/2)**2
+
+S_wet_fus_st = S_wet_estimation.S_wet_estimation_standard(l_cockpit=l_cockpit,l_cabin=l_cabin,l_tail=l_tail,df1=df,
+                                                          df2=df)
+S_wet_fus_st.calculate_volume()
+S_wet_fus_st.S_wet()
+S_wet_fus = S_wet_fus_st.S_wet_fus
+
+roskam = drag_coefficient_estimation_Roskam.Roskam_drag_coefficient(visc=visc, u1=u1, air_d=air_d, l_f=lf, M=M,
+                                                                    S=S)
+R_wf, C_f_fus, C_D_o_fus = roskam.run_Roskam_drag_coefficient_functions(l_cockpit=l_cockpit, l_cabin=l_cabin,
+                                                                        l_tail=l_tail, S_fus=S_fus, S_b_fus=S_b_fus,
+                                                                        S_wet_fus=S_wet_fus)
 
 
 """ Concept 3: Longer Fuselage """
 l_extra = 1 # m
 S_fus = np.pi * (df/2)**2
-S_wet_fus =
+
+S_wet_fus_lg = S_wet_estimation.S_wet_estimation_standard(l_cockpit=l_cockpit,l_cabin=l_cabin+l_extra,l_tail=l_tail,
+                                                          df1=df, df2=df)
+S_wet_fus_lg.calculate_volume()
+S_wet_fus_lg.S_wet()
+S_wet_fus = S_wet_fus_lg.S_wet_fus
+
 roskam = drag_coefficient_estimation_Roskam.Roskam_drag_coefficient(visc=visc, u1=u1, air_d=air_d, l_f=lf+l_extra, M=M,
                                                                     S=S)
 R_wf, C_f_fus, C_D_o_fus = roskam.run_Roskam_drag_coefficient_functions(l_cockpit=l_cockpit, l_cabin=l_cabin+l_extra,
