@@ -41,8 +41,6 @@ pods_contrib_cdo = pods_cdo*pods_interf*S_w_pods #todo: divide by wet surface of
 """ Concept 6: Beluga """
 
 
-def graph_method(lf, df, new_df):
-    """
 
     :param lf: fuselage length in [m]
     :param df: initial maximum fuselage diameter in [m]
@@ -86,39 +84,18 @@ def graph_method(lf, df, new_df):
     cd_var = (new_cd-curr_cd)/curr_cd*100 # [%]
     return cd_var, curr_cd, new_cd
 
+
 #######INSERT HERE DESIRED PARAMETERS
 
 lf = 37.57 #fuselage length in [m]
 df = 4.14  #fuselage maximum diameter in [m]
 new_df = 5 #modified maximum diameter in [m]
 
-cd_var_graph, curr_cd_graph, new_cd_graph = graph_method(lf, df, new_df) #cd variation calculated with the garphical drag
 
 l_cockpit = 5.04 #[m]
 l_cabin = 29.53 - l_cockpit # [m]
 l_tail = lf - 29.53 #[m]
 
-S_w_fus = fus_wet_surface(l_cockpit, l_cabin, l_tail, df) #wetted surface area of the standard configuration
-
-
-def mgc(ct,cr,sweep,df):
-    """
-    This function calculates the mean geometrical chord of the exposed wing.
-    :param ct: tip chord in [m]
-    :param cr: root chord in [m]
-    :param sweep: sweep angle in [deg]
-    :param df: fuselage diameter in [m]
-    :return: mean geometrical chord in [m]
-    """
-
-    delta_cr = df/2/m.tan(m.radians(90-sweep)) #difference between root chord and exposed root chord
-    exposed_cr = cr + delta_cr
-    exposed_taper = ct/exposed_cr
-    #Formula for mean geometric chord obtained from ADSEEII course
-
-    exposed_mgc = 2/3 * exposed_cr * (1 + exposed_taper + exposed_taper**2)/(1+exposed_taper)
-
-    return exposed_mgc
 
 ct = 1.64 # [m] obtained from top view drawing
 cr = 6.07 # [m] pbtained from top view drawing
