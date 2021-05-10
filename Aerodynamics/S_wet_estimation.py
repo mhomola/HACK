@@ -70,8 +70,8 @@ class S_wet_estimation_beluga():
         self.l_cockpit = l_cockpit
         self.l_cabin = l_cabin
         self.l_tail = l_tail
-        self.beluga = beluga/100
-        self.l_beluga = self.l_cabin*beluga
+        self.beluga = beluga
+        self.l_beluga = self.l_cabin*beluga/100
         self.df = df
         self.dfb = dfb
 
@@ -79,7 +79,7 @@ class S_wet_estimation_beluga():
         """
         :return: Cross-sectional area of Beluga section.
         """
-        factor = 0.6 #how much of the upper beluga circile is not overlapped with the main fuselage
+        factor = 0.6 #how much of the upper beluga circle is not overlapped with the main fuselage
         self.S_beluga = m.pi * (self.df/2)**2 + m.pi * (self.dfb/2)**2 * factor
 
     def cockpit_volume(self):
@@ -131,9 +131,9 @@ if __name__ == '__main__':
     #trial for a normal configuration
     design1 = S_wet_estimation_standard(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,df1=4.14,df2=4.14)
     design1.calculate_volume()
-    print(design1.volume)
+    print(design1.V_cabin)
     design1.S_wet()
-    design2 = S_wet_estimation_beluga(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,beluga=35,df=4.14,dfb=4.14*0.3)
+    design2 = S_wet_estimation_beluga(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,beluga=35,df=4.14,dfb=4.14*0.5)
     design2.calculate_volume()
-    print(design2.volume)
+    print(design2.V_cabin)
     design2.S_wet()
