@@ -188,7 +188,7 @@ if __name__ == '__main__':
     design1.calculate_volume()
     print(design1.volume)
     design1.S_wet()
-    design2 = S_wet_estimation_beluga(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,beluga=35,df=4.14,dfb=4.14*0.5)
+    design2 = S_wet_estimation_beluga(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,beluga=100,df=4.14,dfb=1.968)
     design2.calculate_volume()
     print(design2.volume)
     design2.S_wet()

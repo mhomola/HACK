@@ -109,8 +109,10 @@ print(C_D_o_fus_belly)
 
 """ Concept 6: Beluga """
 
-S_wet_fus_beluga = S_wet_estimation.S_wet_estimation_beluga(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,beluga=35,
-                                                            df=4.14,dfb=4.14*0.5)
+# S_wet_fus_beluga = S_wet_estimation.S_wet_estimation_beluga(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,beluga=35,
+#                                                             df=4.14,dfb=4.14*0.5)
+S_wet_fus_beluga = S_wet_estimation.S_wet_estimation_beluga(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,beluga=100,
+                                                            df=4.14,dfb=1.968)
 S_wet_fus_beluga.calculate_volume()
 S_wet_fus_beluga.S_wet()
 S_fus = S_wet_fus_beluga.S_beluga
