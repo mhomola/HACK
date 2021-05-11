@@ -16,7 +16,7 @@ VH2 = H2calc.VH2_calc()/2000
 r = np.arange(0.5,1.6,0.01)
 
 X,Y = meshgrid(VH2,r)
-print(X,Y)
+print(X, Y)
 L = l_func(X,Y)
 print(L)
 
