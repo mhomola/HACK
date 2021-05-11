@@ -56,6 +56,61 @@ class S_wet_estimation_standard():
         ft = 0.3048 #1 ft in [m]
         self.S_wet_fus = 13.6 * (self.volume/ft**3)**0.668 * ft**2 # in [m2]
 
+class S_wet_estimation_belly():
+    def __init__(self,l_cockpit,l_cabin,l_tail,df1,dh,rb):
+        """
+
+        :param l_cockpit: cockpit length in [m]
+        :param l_cabin: cabin length in [m]
+        :param l_tail: tail length in [m]
+        :param df1: diameter 1 fuselage-vertical [m]
+        :param dh: distance between belly and lower part of circular fuselage [m]
+        :param rb: the radius of the curved part at the belly [m]
+        """
+        self.l_cockpit = l_cockpit
+        self.l_cabin = l_cabin
+        self.l_tail = l_tail
+        self.df1 = df1
+        self.dh = dh
+        self.rb = rb
+
+    def cockpit_volume(self):
+        """
+        The cockpit is modelled as half an ellipsoid cut along the vertical plane.
+        :return: Cockpit volume in [m^3]
+        """
+        self.V_cockpit = (4/3*m.pi*(self.l_cockpit/2)*(self.df1/2)**2)/2
+
+    def cabin_volume(self):
+        """
+        The cabin is modelled as a cylinder with ellipse base
+        :return: Cabin volume in [m^3]
+        """
+        self.cross_section = 0.5 * np.pi * (self.df1/2)**2 + 2 * (self.df1/2 * (self.df1/2 + self.dh) -
+                                                                  self.rb**2 + 0.25 * np.pi * self.rb**2)
+        self.V_cabin = self.cross_section * self.l_cabin
+
+    def tail_volume(self):
+        """
+        The tail is modelled as a cone
+        :return: Tail volume in [m^3]
+        """
+        self.V_tail = 1.3*m.pi*(self.df1/2)**2*self.l_tail
+
+    def calculate_volume(self):
+        self.cockpit_volume()
+        self.cabin_volume()
+        self.tail_volume()
+        self.volume = self.V_cockpit + self.V_cabin + self.V_tail
+
+    def S_wet(self):
+        """
+        We use linear regression of the graph which shows the relation between the volume of the aircraft and the wet surface area.
+        The relation uses feet dimensions so we need to convert.
+        """
+        ft = 0.3048 #1 ft in [m]
+        self.S_wet_fus = 13.6 * (self.volume/ft**3)**0.668 * ft**2 # in [m2]
+
 class S_wet_estimation_beluga():
     def __init__(self,l_cockpit,l_cabin,l_tail,beluga,df,dfb):
         """
