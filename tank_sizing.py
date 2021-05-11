@@ -3,7 +3,7 @@
 
 import numpy as np
 from fuel_constants import *
-from fuel_required import fuel_mass_calc
+from fuel_required import fuel_mass_calc, fuel_volume_calc
 import matplotlib.pyplot as plt
 import Constants
 import matplotlib.pyplot as plt
@@ -137,6 +137,8 @@ def gas_H_tanks(H2_vol):
         H_mass_frac = 7 - 1/350 * p
         #d = 4 +17/350 * p
         d = -3.552714e-15 + 0.07845238*p - 0.00004285714*p**2 + 1.190476e-8*p**3
+        H2_vol = fuel_volume_calc(d_LH2=LH2_d, d_GH2= GH2_d, d_GH2_g= d, d_k=k_d, Ed_H2=H2_ed, Ed_k=k_ed, tot_vol_k=fuel_capacity_a320neo,
+                             e_ratio=0.3,state='gas')
         H2_mass = H2_vol*0.001*d
         tank_mass = (H2_mass*100)/H_mass_frac
         mass.append(tank_mass)
