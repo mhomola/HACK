@@ -1,6 +1,7 @@
 import numpy as np
 import math as m
 import matplotlib.pyplot as plt
+import skimage.io as io
 
 class Roskam_drag_coefficient():
     def __init__(self, visc, u1, air_d, l_f, M, S):
@@ -54,7 +55,8 @@ class Roskam_drag_coefficient():
         print('Next you will get a figure from which you can obtain the wing/fuselage iterference factor R_wf \n '
               'as a function of R_n_fus and M. \n'
               'Find this value and once the tab closes you can input the value.')
-        plt.imshow('fuselage_Re.PNG')
+        fus_RE = io.imread('fuselage_Re.PNG')
+        plt.imshow(fus_RE)
         plt.show()
         self.R_wf = np.float(input('Input R_wf: '))
 
@@ -67,7 +69,8 @@ class Roskam_drag_coefficient():
         print('Next you will get a figure from which you can obtain the turbulent flat plate skin \n '
               'friction coefficient C_f as a function of R_n_fus and M. \n'
               'Find this value and once the tab closes you can input the value.')
-        plt.imshow('flat_plate_skin_friction.PNG')
+        flat_plate = io.imread('flat_plate_skin_friction.PNG')
+        plt.imshow(flat_plate)
         plt.show()
         self.C_f_fus = np.float(input('Input C_f: '))
 
