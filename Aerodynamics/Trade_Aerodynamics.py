@@ -82,7 +82,7 @@ print((C_D_o_fus_lg/C_D_o_fus_st - 1)*100, 'CD_0 increase in %', '\n \n')
 """ Concept 4: Flat Bottom """
 
 S_wet_fus_belly = S_wet_estimation.S_wet_estimation_belly(l_cockpit=l_cockpit,l_cabin=l_cabin,l_tail=l_tail,
-                                                          df1=df, dh=0.1, rb=0.6, pc=10/l_cabin)
+                                                          df1=df, dh=0.1, rb=0.6, pc=12.25/l_cabin)
 S_wet_fus_belly.calculate_volume()
 S_wet_fus_belly.S_wet()
 S_fus = S_wet_fus_belly.cross_section
