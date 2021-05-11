@@ -16,7 +16,7 @@ def hydrogen_tank_mass(State):
 
         Grav_eff = np.arange(0.25,0.38,0.05)                            #Gravimetric efficiency if we choose liquid H2
         H2_mass = fuel_mass_calc(State=State,                           #Array of H2 masses for all
-                                 d_k=k_d, d_LH2=LH2_d, d_GH2=GH2_d)[1]  #feasible volumes of H2
+                                 d_k=k_d, d_LH2=LH2_d, d_GH2_g=GH2_d_g)[1]  #feasible volumes of H2
         System_mass = np.ones((len(H2_mass),len(Grav_eff)))
         Tank_mass = np.ones((len(H2_mass),len(Grav_eff)))
 
@@ -72,7 +72,15 @@ plotting_sys_mass(State='liquid')
 def liquid_H_tanks(H2_vol):
     #input: volume available to store H2
     #output: tank mass, system mass and H2 mass
-    Grav_eff = np.arange(0.25, 0.38, 0.05)                              # Gravimetric efficiency if we choose liquid H2
+    Grav_eff = 0.25                                         # Gravimetric efficiency if we choose liquid H2
+    H2_mass = H2_vol * 0.001 * LH2_d                        # Mass of Liquid hydrogen
+    Tank_mass = H2_mass/Grav_eff                            # Tank's mass
+    Tot_mass = H2_mass + Tank_mass                          # Total system mass
+
+    return H2_mass,Tank_mass,Tot_mass
+
+
+
 
 
 
