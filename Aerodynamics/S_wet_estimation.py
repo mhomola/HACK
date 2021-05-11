@@ -186,9 +186,9 @@ if __name__ == '__main__':
     #trial for a normal configuration
     design1 = S_wet_estimation_standard(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,df1=4.14,df2=4.14)
     design1.calculate_volume()
-    print(design1.V_cabin)
+    print(design1.volume)
     design1.S_wet()
     design2 = S_wet_estimation_beluga(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,beluga=35,df=4.14,dfb=4.14*0.5)
     design2.calculate_volume()
-    print(design2.V_cabin)
+    print(design2.volume)
     design2.S_wet()
