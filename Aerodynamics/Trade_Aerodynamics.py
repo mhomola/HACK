@@ -82,7 +82,7 @@ print((C_D_o_fus_lg/C_D_o_fus_st - 1)*100, 'CD_0 increase in %', '\n \n')
 """ Concept 4: Flat Bottom """
 
 S_wet_fus_belly = S_wet_estimation.S_wet_estimation_belly(l_cockpit=l_cockpit,l_cabin=l_cabin,l_tail=l_tail,
-                                                          df1=df, dh=0.1, rb=0.6)
+                                                          df1=df, dh=0.1, rb=0.6, pc=10/l_cabin)
 S_wet_fus_belly.calculate_volume()
 S_wet_fus_belly.S_wet()
 S_fus = S_wet_fus_belly.cross_section
@@ -93,6 +93,7 @@ R_wf_belly, C_f_fus_belly, C_D_o_fus_belly = roskam.run_Roskam_drag_coefficient_
                                                                         l_tail=l_tail, S_fus=S_fus, S_b_fus=S_b_fus,
                                                                         S_wet_fus=S_wet_fus)
 print('Concept 4: Flat Bottom')
+print('Max cross sectional area: ', S_fus)
 print('Flat Bottom CD_0 = ', C_D_o_fus_belly)
 print((C_D_o_fus_belly/C_D_o_fus_st - 1)*100, 'CD_0 increase in %', '\n \n')
 

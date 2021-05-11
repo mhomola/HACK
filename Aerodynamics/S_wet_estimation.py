@@ -58,7 +58,7 @@ class S_wet_estimation_standard():
 
 
 class S_wet_estimation_belly():
-    def __init__(self,l_cockpit,l_cabin,l_tail,df1,dh,rb):
+    def __init__(self,l_cockpit,l_cabin,l_tail,df1,dh,rb,pc):
         """
 
         :param l_cockpit: cockpit length in [m]
@@ -67,6 +67,7 @@ class S_wet_estimation_belly():
         :param df1: diameter 1 fuselage-vertical [m]
         :param dh: distance between belly and lower part of circular fuselage [m]
         :param rb: the radius of the curved part at the belly [m]
+        :param pc: the ratio between the length of flat belly over length of the cabin [-]
         """
         self.l_cockpit = l_cockpit
         self.l_cabin = l_cabin
@@ -74,6 +75,7 @@ class S_wet_estimation_belly():
         self.df1 = df1
         self.dh = dh
         self.rb = rb
+        self.pc = pc
 
     def cockpit_volume(self):
         """
@@ -87,9 +89,9 @@ class S_wet_estimation_belly():
         The cabin is modelled as a cylinder with ellipse base
         :return: Cabin volume in [m^3]
         """
-        self.cross_section = 0.5 * np.pi * (self.df1/2)**2 + 2 * (self.df1/2 * (self.df1/2 + self.dh) -
-                                                                  self.rb**2 + 0.25 * np.pi * self.rb**2)
-        self.V_cabin = self.cross_section * self.l_cabin
+        self.cross_section = 0.5 * np.pi * (self.df1/2)**2 + self.df1 * (self.df1 / 2 + self.dh) +\
+                             np.pi / 2 * self.rb**2 + self.rb * (self.df1 / 2 + self.dh - self.rb)
+        self.V_cabin = (self.pc * self.cross_section + (1 - self.pc) * np.pi * (self.df1/2)**2) * self.l_cabin
 
     def tail_volume(self):
         """
