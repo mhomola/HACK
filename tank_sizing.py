@@ -10,10 +10,11 @@ import matplotlib.pyplot as plt
 
 
 def hydrogen_tank_mass(State):
-
+    #This function takes the state of the hydrogen: 'liquid' or 'gas'; and computes the mass of the tank's mass
+    #for different fuel ratios (ratio between kerosene and H2) and different gravimetric efficiencies
     if State == 'liquid':
 
-        Grav_eff = np.arange(0.25,0.38,0.05)                             #Gravimetric efficiency if we choose liquid H2
+        Grav_eff = np.arange(0.25,0.38,0.05)                            #Gravimetric efficiency if we choose liquid H2
         H2_mass = fuel_mass_calc(State=State,                           #Array of H2 masses for all
                                  d_k=k_d, d_LH2=LH2_d, d_GH2=GH2_d)[1]  #feasible volumes of H2
         System_mass = np.ones((len(H2_mass),len(Grav_eff)))
@@ -68,7 +69,10 @@ def plotting_sys_mass(State):
 
 plotting_sys_mass(State='liquid')
 
-
+def liquid_H_tanks(H2_vol):
+    #input: volume available to store H2
+    #output: tank mass, system mass and H2 mass
+    Grav_eff = np.arange(0.25, 0.38, 0.05)                              # Gravimetric efficiency if we choose liquid H2
 
 
 
@@ -132,3 +136,5 @@ def gas_H_tanks(H2_vol):
     plt.show()
 
     return None
+
+gas_H_tanks(41743.13)
