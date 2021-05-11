@@ -113,7 +113,7 @@ class S_wet_estimation_belly():
         self.S_wet_fus = 13.6 * (self.volume/ft**3)**0.668 * ft**2 # in [m2]
 
 class S_wet_estimation_beluga():
-    def __init__(self, l_cockpit, l_cabin, l_tail, beluga, df, dfb):
+    def __init__(self, l_cockpit, l_cabin, l_tail, beluga, df, dfb,h1,h2):
         """
 
         :param l_cockpit: cockpit length in [m]
@@ -130,13 +130,22 @@ class S_wet_estimation_beluga():
         self.l_beluga = self.l_cabin*beluga/100
         self.df = df
         self.dfb = dfb
+        self.h1 = h1
+        self.h2 = h2
 
     def beluga_area(self):
-        """
-        :return: Cross-sectional area of Beluga section.
-        """
-        factor = 0.6 #how much of the upper beluga circle is not overlapped with the main fuselage
-        self.S_beluga = m.pi * (self.df/2)**2 + m.pi * (self.dfb/2)**2 * factor
+        alfa = m.acos(2 * self.h2 / self.df - 1)
+        beta = m.acos((1 - self.df / self.h2 + (self.h1 / self.h2 - 1) ** 2) / (1 - self.df / self.h2 - (self.h1 / self.h2 - 1) ** 2))
+        self.S_beluga = m.pi / 4 * self.df ** 2 * (
+                    1 - (alfa / m.pi - m.sin(2 * alfa) / 2 / m.pi) + (beta / m.pi - m.sin(2 * beta) / 2 / m.pi) * (
+                        m.sin(alfa) / m.sin(beta) ** 2))
+
+    # def beluga_area(self):
+    #     """
+    #     :return: Cross-sectional area of Beluga section.
+    #     """
+    #     factor = 0.6 #how much of the upper beluga circle is not overlapped with the main fuselage
+    #     self.S_beluga = m.pi * (self.df/2)**2 + m.pi * (self.dfb/2)**2 * factor
 
     def cockpit_volume(self):
         """
@@ -183,13 +192,20 @@ class S_wet_estimation_beluga():
         ft = 0.3048 #1 ft in [m]
         self.S_wet_fus = 13.6 * (self.volume/ft**3)**0.668 * ft**2 # in [m2]
 
+# def S_double_bubble(b,h1,h2):
+#     alfa = m.acos(2*h2/b-1)
+#     beta = m.acos((1-b/h2+(h1/h2-1)**2)/(1-b/h2-(h1/h2-1)**2))
+#     area = m.pi/4*b**2*(1-(alfa/m.pi-m.sin(2*alfa)/2/m.pi)+ (beta/m.pi-m.sin(2*beta)/2/m.pi)*(m.sin(alfa)/m.sin(beta)**2))
+#     return area
+
 if __name__ == '__main__':
     #trial for a normal configuration
     design1 = S_wet_estimation_standard(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,df1=4.14,df2=4.14)
     design1.calculate_volume()
     print(design1.volume)
     design1.S_wet()
-    design2 = S_wet_estimation_beluga(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,beluga=100,df=4.14,dfb=1.968)
+    design2 = S_wet_estimation_beluga(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,beluga=48,df=4.14,dfb=1.968,h1=5.67,h2=3.376)
     design2.calculate_volume()
+    print(design2.S_beluga)
     print(design2.volume)
     design2.S_wet()
