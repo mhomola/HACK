@@ -53,9 +53,11 @@ S_wet_fus = S_wet_fus_st.S_wet_fus
 
 roskam = drag_coefficient_estimation_Roskam.Roskam_drag_coefficient(visc=visc, u1=u1, air_d=air_d, l_f=lf, M=M,
                                                                     S=S)
-R_wf, C_f_fus, C_D_o_fus = roskam.run_Roskam_drag_coefficient_functions(l_cockpit=l_cockpit, l_cabin=l_cabin,
+R_wf_st, C_f_fus_st, C_D_o_fus_st = roskam.run_Roskam_drag_coefficient_functions(l_cockpit=l_cockpit, l_cabin=l_cabin,
                                                                         l_tail=l_tail, S_fus=S_fus, S_b_fus=S_b_fus,
                                                                         S_wet_fus=S_wet_fus)
+print('\n Concept 1: Cargo Hold')
+print(C_D_o_fus_st, '\n \n')
 
 
 """ Concept 3: Longer Fuselage """
@@ -70,9 +72,11 @@ S_wet_fus = S_wet_fus_lg.S_wet_fus
 
 roskam = drag_coefficient_estimation_Roskam.Roskam_drag_coefficient(visc=visc, u1=u1, air_d=air_d, l_f=lf+l_extra, M=M,
                                                                     S=S)
-R_wf, C_f_fus, C_D_o_fus = roskam.run_Roskam_drag_coefficient_functions(l_cockpit=l_cockpit, l_cabin=l_cabin+l_extra,
+R_wf_lg, C_f_fus_lg, C_D_o_fus_lg = roskam.run_Roskam_drag_coefficient_functions(l_cockpit=l_cockpit, l_cabin=l_cabin+l_extra,
                                                                         l_tail=l_tail, S_fus=S_fus, S_b_fus=S_b_fus,
                                                                         S_wet_fus=S_wet_fus)
+print('Concept 3: Longer Fuselage')
+print(C_D_o_fus_lg)
 
 """ Concept 4: Flat Bottom """
 
@@ -84,30 +88,41 @@ S_fus = S_wet_fus_belly.cross_section
 S_wet_fus = S_wet_fus_belly.S_wet_fus
 
 roskam = drag_coefficient_estimation_Roskam.Roskam_drag_coefficient(visc=visc, u1=u1, air_d=air_d, l_f=lf, M=M, S=S)
-R_wf, C_f_fus, C_D_o_fus = roskam.run_Roskam_drag_coefficient_functions(l_cockpit=l_cockpit, l_cabin=l_cabin,
+R_wf_belly, C_f_fus_belly, C_D_o_fus_belly = roskam.run_Roskam_drag_coefficient_functions(l_cockpit=l_cockpit, l_cabin=l_cabin,
                                                                         l_tail=l_tail, S_fus=S_fus, S_b_fus=S_b_fus,
                                                                         S_wet_fus=S_wet_fus)
+print('Concept 4: Flat Bottom')
+print(C_D_o_fus_belly)
 
 """ Concept 5: Wing Pods """
 
-pods_number = 2
-pods_cdo = 0.025
-pods_interf = 1.3
-
-pods_L1 = 0.5
-pods_main_length = 5
-pods_L3 = 0.5
-
-S_w_pods = fus_wet_surface(pods_L1, pods_main_length, pods_L3)
-pods_contrib_cdo = pods_cdo*pods_interf*S_w_pods #todo: divide by wet surface of the plane and by Cdo of A320
+# pods_number = 2
+# pods_cdo = 0.025
+# pods_interf = 1.3
+#
+# pods_L1 = 0.5
+# pods_main_length = 5
+# pods_L3 = 0.5
+#
+# S_w_pods = fus_wet_surface(pods_L1, pods_main_length, pods_L3)
+# pods_contrib_cdo = pods_cdo*pods_interf*S_w_pods #todo: divide by wet surface of the plane and by Cdo of A320
 
 """ Concept 6: Beluga """
-S_fus =
-S_wet_fus =
+
+S_wet_fus_beluga = S_wet_estimation.S_wet_estimation_beluga(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,beluga=35,
+                                                            df=4.14,dfb=4.14*0.5)
+S_wet_fus_beluga.calculate_volume()
+S_wet_fus_beluga.S_wet()
+S_fus = S_wet_fus_beluga.S_beluga
+S_wet_fus = S_wet_fus_beluga.S_wet_fus
+
 roskam = drag_coefficient_estimation_Roskam.Roskam_drag_coefficient(visc=visc, u1=u1, air_d=air_d, l_f=lf, M=M, S=S)
-R_wf, C_f_fus, C_D_o_fus = roskam.run_Roskam_drag_coefficient_functions(l_cockpit=l_cockpit, l_cabin=l_cabin,
+R_wf_beluga, C_f_fus_beluga, C_D_o_fus_beluga = roskam.run_Roskam_drag_coefficient_functions(l_cockpit=l_cockpit,
+                                                                                             l_cabin=l_cabin,
                                                                         l_tail=l_tail, S_fus=S_fus, S_b_fus=S_b_fus,
-                                                                        S_wet_fus=)
+                                                                        S_wet_fus=S_wet_fus)
+print('Concept 6: Beluga')
+print(C_D_o_fus_beluga)
 
 
 
