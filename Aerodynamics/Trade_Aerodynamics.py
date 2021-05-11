@@ -105,18 +105,12 @@ L2_pods= 5
 L3_pods = 0.01
 d_pods = 1.6 #[m]
 
-S_wet_podded = S_wet_estimation.S_wet_estimation_standard(l_cockpit=L1_pods, l_cabin=L2_pods, l_tail=L3_pods, df1=d_pods,
-                                                        df2=d_pods)
-S_wet_podded.calculate_volume()
-S_wet_podded.S_wet()
-S_wet_pods = S_wet_podded.S_wet_fus
-
+S_wet_pods = fus_wet_surface(L1_pods, L2_pods, L3_pods, d_pods)
 C_D_o_pods = N_pods * C_D_o_pods_init * Interf_pods * S_wet_pods/S_wet_fus
-#todo: divide by wet surface of the plane and by Cdo of A320
 
 print('Concept 5: Wing Pods')
 print(C_D_o_pods)
-print(C_D_o_pods/C_D_o_fus_st, ' %')
+print(C_D_o_pods/C_D_o_fus_st, ' increase  %')
 print('Plane CD_0 = ', C_D_o_pods+C_D_o_fus_st, '\n \n')
 
 """ Concept 6: Beluga """
