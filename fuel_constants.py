@@ -14,7 +14,7 @@ R = 8.314                                         # Gas constant                
 GH2_d = gas_law(p_tank, T_tank)
 k_d = 810.0                                       # Mass density of kerosene                           [kg/m^3]
 y = 0.95                                          # LH2 volume ratio (from Winnefeld et al.)           [-]
-
+fuel_capacity_a320neo = 26730                     # Fuel capacity of A320neo                           [l]
 
 
 #Engine performance Constants (estimate)

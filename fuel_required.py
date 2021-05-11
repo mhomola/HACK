@@ -121,7 +121,7 @@ def VH2_calc():
                              e_ratio=e_ratios,state='liquid')[1]
 
 e_ratios = np.arange(0.1,0.3,0.001)
-fuel_capacity_a320neo = 26730 # [l]
+fuel_capacity_a320neo = 23860 # [l]
 #plotting_vol_mass()
 
 # Compute volumes
