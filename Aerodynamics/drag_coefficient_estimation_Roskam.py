@@ -2,6 +2,9 @@ import numpy as np
 import math as m
 import matplotlib.pyplot as plt
 import skimage.io as io
+import sys
+
+
 
 class Roskam_drag_coefficient():
     def __init__(self, visc, u1, air_d, l_f, M, S):
@@ -55,10 +58,11 @@ class Roskam_drag_coefficient():
         print('Next you will get a figure from which you can obtain the wing/fuselage iterference factor R_wf \n '
               'as a function of R_n_fus and M. \n'
               'Find this value and once the tab closes you can input the value.')
-        fus_RE = io.imread('fuselage_Re.PNG')
-        plt.imshow(fus_RE)
-        plt.show()
-        self.R_wf = np.float(input('Input R_wf: '))
+
+        # fus_RE = io.imread('fuselage_Re.PNG')
+        # plt.imshow(fus_RE)
+        # plt.show()
+        self.R_wf = 1.015
 
     def turbulent_flat_plate_skin_friction(self, ):
         '''
@@ -69,10 +73,11 @@ class Roskam_drag_coefficient():
         print('Next you will get a figure from which you can obtain the turbulent flat plate skin \n '
               'friction coefficient C_f as a function of R_n_fus and M. \n'
               'Find this value and once the tab closes you can input the value.')
-        flat_plate = io.imread('flat_plate_skin_friction.PNG')
-        plt.imshow(flat_plate)
-        plt.show()
-        self.C_f_fus = np.float(input('Input C_f: '))
+
+        # flat_plate = io.imread('flat_plate_skin_friction.PNG')
+        # plt.imshow(flat_plate)
+        # plt.show()
+        self.C_f_fus = 0.002
 
     def zero_lift_drag_fus(self, S_b_fus, S_fus, S_wet_fus):
         '''
