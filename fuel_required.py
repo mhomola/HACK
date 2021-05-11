@@ -116,17 +116,17 @@ def plotting_vol_mass():
     plt.show()
 
 def VH2_calc():
-    e_ratios = np.arange(0.1,0.3,0.001)
+    e_ratios = np.arange(0.1,0.5,0.001)
     return fuel_volume_calc(d_LH2=LH2_d, d_GH2= GH2_d, d_GH2_g= GH2_d_g,d_k=k_d, Ed_H2=H2_ed, Ed_k=k_ed
                             , tot_vol_k=fuel_capacity_a320neo,e_ratio=e_ratios,state='liquid')[1]
 
-e_ratios = np.arange(0.1,0.3,0.001)
+e_ratios = np.arange(0.1,0.5,0.001) #ratio of energy stored in H2 to kerosene (NOT GLOBAL!)
 
 plotting_vol_mass()
 
 # Compute volumes
 
-E_ratio = 0.3 # [-]
+E_ratio = 0.5 # [-] #ratio of energy stored in H2 to kerosene (NOT GLOBAL!)
 
 V_k, V_H2 = fuel_volume_calc(d_LH2=LH2_d, d_GH2= GH2_d, d_GH2_g= GH2_d_g, d_k=k_d, Ed_H2=H2_ed, Ed_k=k_ed, tot_vol_k=fuel_capacity_a320neo,
                              e_ratio=E_ratio,state='liquid')
