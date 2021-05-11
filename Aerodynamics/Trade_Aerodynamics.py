@@ -119,8 +119,8 @@ print('Plane CD_0 = ', C_D_o_pods+C_D_o_fus_st, '\n \n')
 
 # S_wet_fus_beluga = S_wet_estimation.S_wet_estimation_beluga(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,beluga=35,
 #                                                             df=4.14,dfb=4.14*0.5)
-S_wet_fus_beluga = S_wet_estimation.S_wet_estimation_beluga(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,beluga=48,
-                                                            df=4.14,dfb=1.968,h1=5.67,h2=3.376)
+S_wet_fus_beluga = S_wet_estimation.S_wet_estimation_beluga(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,beluga=100,
+                                                            df=4.14,dfb=1.968,h1=5.175,h2=3.88)
 S_wet_fus_beluga.calculate_volume()
 S_wet_fus_beluga.S_wet()
 S_fus = S_wet_fus_beluga.S_beluga
