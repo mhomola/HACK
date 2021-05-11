@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from fuel_constants import *
 
-def fuel_volume_calc(d_LH2, d_GH2, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio,state,y = 0.95):
+def fuel_volume_calc(d_LH2, d_GH2, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio, state,y = 0.95):
     """
 
     :param d_LH2: density of liquid hydrogen [kg/m^3]
