@@ -57,11 +57,11 @@ R_wf_st, C_f_fus_st, C_D_o_fus_st = roskam.run_Roskam_drag_coefficient_functions
                                                                         l_tail=l_tail, S_fus=S_fus, S_b_fus=S_b_fus,
                                                                         S_wet_fus=S_wet_fus)
 print('\n Concept 1: Cargo Hold')
-print(C_D_o_fus_st, '\n \n')
+print('Cargo Hold CD_0 = ', C_D_o_fus_st, '\n \n')
 
 
 """ Concept 3: Longer Fuselage """
-l_extra = 1.06 # m #todo: fill the right value
+l_extra = 1.06  # m #todo: fill the right value
 S_fus = np.pi * (df/2)**2
 
 S_wet_fus_lg = S_wet_estimation.S_wet_estimation_standard(l_cockpit=l_cockpit,l_cabin=l_cabin+l_extra,l_tail=l_tail,
@@ -76,7 +76,8 @@ R_wf_lg, C_f_fus_lg, C_D_o_fus_lg = roskam.run_Roskam_drag_coefficient_functions
                                                                         l_tail=l_tail, S_fus=S_fus, S_b_fus=S_b_fus,
                                                                         S_wet_fus=S_wet_fus)
 print('Concept 3: Longer Fuselage')
-print(C_D_o_fus_lg, '\n \n')
+print('Longer Fuselage CD_0 = ', C_D_o_fus_lg)
+print((C_D_o_fus_lg/C_D_o_fus_st - 1)*100, 'CD_0 increase in %', '\n \n')
 
 """ Concept 4: Flat Bottom """
 
@@ -92,7 +93,8 @@ R_wf_belly, C_f_fus_belly, C_D_o_fus_belly = roskam.run_Roskam_drag_coefficient_
                                                                         l_tail=l_tail, S_fus=S_fus, S_b_fus=S_b_fus,
                                                                         S_wet_fus=S_wet_fus)
 print('Concept 4: Flat Bottom')
-print(C_D_o_fus_belly, '\n \n')
+print('Flat Bottom CD_0 = ', C_D_o_fus_belly)
+print((C_D_o_fus_belly/C_D_o_fus_st - 1)*100, 'CD_0 increase in %', '\n \n')
 
 """ Concept 5: Wing Pods """
 
@@ -101,16 +103,16 @@ C_D_o_pods_init = 0.025
 Interf_pods = 1.3
 
 L1_pods = 0.5
-L2_pods= 5
-L3_pods = 0.01
-d_pods = 1.6 #[m]
+L2_pods = 3.8
+L3_pods = 0.25
+d_pods = 2.2   #[m]
 
 S_wet_pods = fus_wet_surface(L1_pods, L2_pods, L3_pods, d_pods)
 C_D_o_pods = N_pods * C_D_o_pods_init * Interf_pods * S_wet_pods/S_wet_fus
 
 print('Concept 5: Wing Pods')
-print(C_D_o_pods)
-print(C_D_o_pods/C_D_o_fus_st, ' increase  %')
+print('Pods CD_0 = ', C_D_o_pods)
+print(C_D_o_pods/C_D_o_fus_st*100, ' increase in %')
 print('Plane CD_0 = ', C_D_o_pods+C_D_o_fus_st, '\n \n')
 
 """ Concept 6: Beluga """
@@ -130,8 +132,8 @@ R_wf_beluga, C_f_fus_beluga, C_D_o_fus_beluga = roskam.run_Roskam_drag_coefficie
                                                                         l_tail=l_tail, S_fus=S_fus, S_b_fus=S_b_fus,
                                                                         S_wet_fus=S_wet_fus)
 print('Concept 6: Beluga')
-print(C_D_o_fus_beluga, '\n \n')
-
+print('Beluga CD_0 = ', C_D_o_fus_beluga)
+print((C_D_o_fus_beluga/C_D_o_fus_st - 1)*100, 'CD_0 increase in %')
 
 
 
