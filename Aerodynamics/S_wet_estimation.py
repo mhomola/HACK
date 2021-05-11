@@ -6,7 +6,7 @@ import math as m
 import numpy as np
 
 class S_wet_estimation_standard():
-    def __init__(self,l_cockpit,l_cabin,l_tail,df1,df2):
+    def __init__(self, l_cockpit, l_cabin, l_tail, df1, df2):
         """
 
         :param l_cockpit: cockpit length in [m]
@@ -55,6 +55,7 @@ class S_wet_estimation_standard():
         """
         ft = 0.3048 #1 ft in [m]
         self.S_wet_fus = 13.6 * (self.volume/ft**3)**0.668 * ft**2 # in [m2]
+
 
 class S_wet_estimation_belly():
     def __init__(self,l_cockpit,l_cabin,l_tail,df1,dh,rb):
@@ -112,7 +113,7 @@ class S_wet_estimation_belly():
         self.S_wet_fus = 13.6 * (self.volume/ft**3)**0.668 * ft**2 # in [m2]
 
 class S_wet_estimation_beluga():
-    def __init__(self,l_cockpit,l_cabin,l_tail,beluga,df,dfb):
+    def __init__(self, l_cockpit, l_cabin, l_tail, beluga, df, dfb):
         """
 
         :param l_cockpit: cockpit length in [m]
