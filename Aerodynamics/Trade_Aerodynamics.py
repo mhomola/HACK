@@ -6,18 +6,18 @@ import drag_coefficient_estimation_Roskam
 import S_wet_estimation
 
 
-# def fus_wet_surface(l_cockpit, l_cabin, l_tail, df):
-#     """
-#     :param l_cockpit: length of the cockpit in [m]
-#     :param l_cabin: length of the cabin in [m]
-#     :param l_tail: length of the tail in [m]
-#     :param df: diameter length in [m]
-#     :return: Wet surface of the fuselage in [m^2]
-#     """
-#
-#     S_w_fus = m.pi * df/4 * (1/3/ l_cockpit **2 * ((4*l_cockpit**2+df**2/4)-df**3/8) - df + 4 * l_cabin + 2 * m.sqrt(l_tail**2+ df**2/4))
-#
-#     return S_w_fus
+def fus_wet_surface(l_cockpit, l_cabin, l_tail, df):
+    """
+    :param l_cockpit: length of the cockpit in [m]
+    :param l_cabin: length of the cabin in [m]
+    :param l_tail: length of the tail in [m]
+    :param df: diameter length in [m]
+    :return: Wet surface of the fuselage in [m^2]
+    """
+
+    S_w_fus = m.pi * df/4 * (1/3/ l_cockpit **2 * ((4*l_cockpit**2+df**2/4)-df**3/8) - df + 4 * l_cabin + 2 * m.sqrt(l_tail**2+ df**2/4))
+
+    return S_w_fus
 
 #######INSERT HERE DESIRED PARAMETERS
 
