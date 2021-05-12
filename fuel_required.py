@@ -6,7 +6,7 @@ def fuel_volume_calc(d_LH2, d_GH2,d_GH2_g, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio,
     """
 
     :param d_LH2: density of liquid hydrogen [kg/m^3]
-    :param d_LH2: density of gaseous hydrogen [kg/m^3]
+    :param d_GH2: density of gaseous hydrogen [kg/m^3]
     :param d_k: density of kerosene [kg/m^3]
     :param Ed_H2: energy density of hydrogen [kWh/kg]
     :param Ed_k: energy density of kerosene [kWh/kg]
