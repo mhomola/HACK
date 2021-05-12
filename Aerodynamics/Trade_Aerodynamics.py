@@ -108,6 +108,8 @@ L2_pods = 4.5
 L3_pods = 1
 d_pods = 2.1   # [m]
 
+
+
 S_wet_pods = fus_wet_surface(L1_pods, L2_pods, L3_pods, d_pods)
 C_D_o_pods = N_pods * C_D_o_pods_init * Interf_pods * S_wet_pods/S_wet_fus
 
