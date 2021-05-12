@@ -61,7 +61,7 @@ print('Cargo Hold CD_0 = ', C_D_o_fus_st, '\n \n')
 
 
 """ Concept 3: Longer Fuselage """
-l_extra = 1.06  # m #todo: fill the right value
+l_extra = 2.76  # m #todo: fill the right value
 S_fus = np.pi * (df/2)**2
 
 S_wet_fus_lg = S_wet_estimation.S_wet_estimation_standard(l_cockpit=l_cockpit,l_cabin=l_cabin+l_extra,l_tail=l_tail,
@@ -104,9 +104,11 @@ C_D_o_pods_init = 0.025
 Interf_pods = 1.3
 
 L1_pods = 0.5
-L2_pods = 3.8
-L3_pods = 0.25
-d_pods = 2.2   #[m]
+L2_pods = 4.5
+L3_pods = 1
+d_pods = 2.1   # [m]
+
+
 
 S_wet_pods = fus_wet_surface(L1_pods, L2_pods, L3_pods, d_pods)
 C_D_o_pods = N_pods * C_D_o_pods_init * Interf_pods * S_wet_pods/S_wet_fus
@@ -121,7 +123,7 @@ print('Plane CD_0 = ', C_D_o_pods+C_D_o_fus_st, '\n \n')
 # S_wet_fus_beluga = S_wet_estimation.S_wet_estimation_beluga(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,beluga=35,
 #                                                             df=4.14,dfb=4.14*0.5)
 S_wet_fus_beluga = S_wet_estimation.S_wet_estimation_beluga(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,beluga=100,
-                                                            df=4.14,dfb=1.968,h1=5.175,h2=3.88)
+                                                            df=4.14,dfb=1.968,h1 =5.283,h2=3.8187)
 S_wet_fus_beluga.calculate_volume()
 S_wet_fus_beluga.S_wet()
 S_fus = S_wet_fus_beluga.S_beluga
