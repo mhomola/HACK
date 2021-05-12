@@ -33,7 +33,7 @@ def fuel_volume_calc(d_LH2, d_GH2,d_GH2_g, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio,
         V_LH2 = (E_H2/Ed_H2)*(1/(d_LH2+d_GH2*(1-y)/y))
         V_H2 = V_LH2*(1+(1-y)/y)*1000
 
-    return V_k, V_H2
+    return V_k, V_H2/0.8
 
 
 def fuel_mass_calc(State, d_k, d_LH2,d_GH2_g):
