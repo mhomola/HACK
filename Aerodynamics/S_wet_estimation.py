@@ -26,7 +26,7 @@ class S_wet_estimation_standard():
         The cockpit is modelled as half an ellipsoid cut along the vertical plane.
         :return: Cockpit volume in [m^3]
         """
-        self.V_cockpit = (4/3*m.pi*(self.l_cockpit/2)*(self.df1/2)*(self.df2/2))/2
+        self.V_cockpit = (4/3*m.pi*self.l_cockpit*(self.df1/2)*(self.df2/2))/2
 
     def cabin_volume(self):
         """
@@ -40,7 +40,7 @@ class S_wet_estimation_standard():
         The tail is modelled as a cone
         :return: Tail volume in [m^3]
         """
-        self.V_tail = 1.3*m.pi*(self.df1/2)*(self.df2/2)*self.l_tail
+        self.V_tail = 1/3*m.pi*(self.df1/2)*(self.df2/2)*self.l_tail
 
     def calculate_volume(self):
         self.cockpit_volume()
@@ -82,7 +82,7 @@ class S_wet_estimation_belly():
         The cockpit is modelled as half an ellipsoid cut along the vertical plane.
         :return: Cockpit volume in [m^3]
         """
-        self.V_cockpit = (4/3*m.pi*(self.l_cockpit/2)*(self.df1/2)**2)/2
+        self.V_cockpit = (4/3*m.pi*self.l_cockpit*(self.df1/2)**2)/2
 
     def cabin_volume(self):
         """
@@ -98,7 +98,7 @@ class S_wet_estimation_belly():
         The tail is modelled as a cone
         :return: Tail volume in [m^3]
         """
-        self.V_tail = 1.3*m.pi*(self.df1/2)**2*self.l_tail
+        self.V_tail = 1/3*m.pi*(self.df1/2)**2*self.l_tail
 
     def calculate_volume(self):
         self.cockpit_volume()
@@ -155,7 +155,7 @@ class S_wet_estimation_beluga():
         to be a circle whose readius results in the surface of the beluga cross-section.
         :return: Cockpit volume in [m^3]
         """
-        self.V_cockpit = (4/3*m.pi*(self.l_cockpit/2)*self.S_beluga/m.pi)/2
+        self.V_cockpit = (4/3*m.pi*self.l_cockpit*self.S_beluga/m.pi)/2
 
     def beluga_cabin_volume(self):
         """
@@ -176,7 +176,7 @@ class S_wet_estimation_beluga():
         The tail is modelled as a cone with circular base.
         :return: Tail volume in [m^3]
         """
-        self.V_tail = 1.3*m.pi*(self.df/2)**2*self.l_tail
+        self.V_tail = 1/3*m.pi*(self.df/2)**2*self.l_tail
 
     def calculate_volume(self):
         self.beluga_area()
@@ -206,7 +206,8 @@ if __name__ == '__main__':
     design1.calculate_volume()
     print(design1.volume)
     design1.S_wet()
-    design2 = S_wet_estimation_beluga(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,beluga=100,df=4.14,dfb=1.968,h1 =5.283,h2=3.8187)
+    design2 = S_wet_estimation_beluga(l_cockpit=5.04,l_cabin=24.49,l_tail=8.04,beluga=100,df=4.14,dfb=1.968,h1 =5.283,
+                                      h2=3.8187)
     design2.calculate_volume()
     print(design2.S_beluga)
     print(design2.volume)
