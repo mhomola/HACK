@@ -1,4 +1,4 @@
-def regressor(p): #T):
+def regressor(p): #T): # Regressor to approximate the H desnity in gas form between 350 and 700 bar
     p = p * 1 * 10**-5
     return -3.552714e-15 + 0.07845238*p - 0.00004285714*p**2 + 1.190476e-8*p**3#p*M_H2/(R*T)
 

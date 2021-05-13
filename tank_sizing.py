@@ -135,7 +135,6 @@ def gas_H_tanks(H2_vol):
 
     for p in p_ran:
         H_mass_frac = 7 - 1/350 * p
-        #d = 4 +17/350 * p
         d = -3.552714e-15 + 0.07845238*p - 0.00004285714*p**2 + 1.190476e-8*p**3
         H2_vol = fuel_volume_calc(d_LH2=LH2_d, d_GH2= GH2_d, d_GH2_g= d, d_k=k_d, Ed_H2=H2_ed, Ed_k=k_ed, tot_vol_k=fuel_capacity_a320neo,
                              e_ratio=0.3,state='gas')[1]
@@ -144,10 +143,7 @@ def gas_H_tanks(H2_vol):
         mass.append(tank_mass)
         massH.append(H2_mass)
 
-    for p in p_ran:
         H_vol_frac = 92 - 11/350 * p
-        #d = 4 +17/350 * p
-        #d = -3.552714e-15 + 0.07845238*p - 0.00004285714*p**2 + 1.190476e-8*p**3
         tank_vol = (H2_vol*100)/H_vol_frac
         volH = (H_vol_frac/100)*tank_vol
         volume.append(tank_vol)
@@ -186,9 +182,6 @@ def gas_H_tanks(H2_vol):
     plt.show()
 
     return None
-
-gas_H_tanks(297)
-gas_H_tanks(41743.13)
 
 # Visualize stuff for the gas tanks given the max available volume
 
@@ -248,4 +241,15 @@ def gas_H_tanks_VOL(tot_Vol):
 
     return None 
 
-#gas_H_tanks_VOL(500)  
+#Option 1: cargo + optional tanks
+gas_H_tanks_VOL(43220)
+#Option 2: raising aisle
+gas_H_tanks_VOL(0)
+#Option 3: A321
+gas_H_tanks_VOL(263400)
+#Option 4: flat bottom (upper bound)
+gas_H_tanks_VOL(4875)
+#Option 5: wing podded
+gas_H_tanks(78779.62111365213)
+#Option 6: beluga
+gas_H_tanks(78779.62111365213)  
