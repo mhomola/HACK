@@ -6,10 +6,9 @@ class Example(Constants):
     def compute_something(self):
         return self.p_0 / self.p
 
-# Try out the class
 
-if __name__ == '__main__':
-    x = Example()
-    x.define_altitude(h=20000)
-    r = x.compute_something()
-    print(x.p_0, '/', x.p, ' = ', r)
+
+x = Example()
+x.define_altitude(h=20000)
+r = x.compute_something()
+print(x.p_0, '/', x.p, ' = ', r)
