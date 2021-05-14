@@ -2,7 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from fuel_constants import *
 
-def fuel_volume_calc(d_LH2, d_GH2,d_GH2_g, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio, state,y = 0.95):
+
+def fuel_volume_calc(d_LH2, d_GH2, d_GH2_g, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio, state, y = 0.95):
+
     """
 
     :param d_LH2: density of liquid hydrogen [kg/m^3]
@@ -22,11 +24,11 @@ def fuel_volume_calc(d_LH2, d_GH2,d_GH2_g, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio,
     E_k = E_tot * r
     E_H2 = e_ratio * E_k
 
-    V_k = E_k / Ed_k / d_k * 1000
+    V_k = (E_k / Ed_k) / d_k * 1000
 
     if state == 'gas':
 
-        V_H2 = (E_H2/Ed_H2)/d_GH2_g *1000
+        V_H2 = (E_H2/Ed_H2)/d_GH2_g * 1000
 
     if state == 'liquid':
 
@@ -36,14 +38,13 @@ def fuel_volume_calc(d_LH2, d_GH2,d_GH2_g, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio,
     return V_k, V_H2/0.8
 
 
-def fuel_mass_calc(State, d_k, d_LH2,d_GH2_g):
+def fuel_mass_calc(State, d_k, d_LH2, d_GH2_g):
 
     #Function to compute mass of kerosene and H2, both for the case in which the hydrogen is stored
     #in liquid state, as well as when it is stored in gas (compressed) state.
 
-
     if State == 'liquid':
-        Vk, VH2 = fuel_volume_calc(d_LH2=LH2_d, d_GH2=GH2_d,d_GH2_g=GH2_d_g, d_k=k_d, # Volume of kerosene and Liquid H2[l]
+        Vk, VH2 = fuel_volume_calc(d_LH2=LH2_d, d_GH2=GH2_d, d_GH2_g=GH2_d_g, d_k=k_d, # Volume of kerosene and Liquid H2[l]
                                          Ed_H2=H2_ed, Ed_k=k_ed,
                                          tot_vol_k=fuel_capacity_a320neo,
                                          e_ratio=e_ratios, state=State)
@@ -53,7 +54,7 @@ def fuel_mass_calc(State, d_k, d_LH2,d_GH2_g):
         m_tot = m_k + m_H2                                                            #Total mass
 
     if State == 'gas':
-        Vk, VH2 = fuel_volume_calc(d_LH2=LH2_d, d_GH2=GH2_d,d_GH2_g=GH2_d_g, d_k=k_d,  # Volume of kerosene and Liquid H2[l]
+        Vk, VH2 = fuel_volume_calc(d_LH2=LH2_d, d_GH2=GH2_d, d_GH2_g=GH2_d_g, d_k=k_d,  # Volume of kerosene and Liquid H2[l]
                                          Ed_H2=H2_ed, Ed_k=k_ed,
                                          tot_vol_k=fuel_capacity_a320neo,
                                          e_ratio=e_ratios, state=State)
