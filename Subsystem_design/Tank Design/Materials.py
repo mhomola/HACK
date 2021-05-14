@@ -1,6 +1,6 @@
 
 class Material():
-    def __init__(self,E,yield_strength,ult_strength,density,conductivity):
+    def __init__(self, E, yield_strength, ult_strength, density, conductivity):
         self.E = E
         self.yield_strength = yield_strength
         self.ult_strength = ult_strength
