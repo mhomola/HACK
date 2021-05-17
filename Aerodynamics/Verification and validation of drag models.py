@@ -41,7 +41,7 @@ roskam = drag_coefficient_estimation_Roskam.Roskam_drag_coefficient(visc=visc, u
 _, _, C_D_o_fus_st = roskam.run_Roskam_drag_coefficient_functions(l_cockpit=l_cockpit, l_cabin=l_cabin,
                                                                                  l_tail=l_tail, S_fus=S_fus, S_b_fus=S_b_fus,
                                                                                  S_wet_fus=S_wet_fus)
-_, _, C_D_o_fus_st2 = roskam.run_Roskam_drag_coefficient_functions(l_cockpit=l_cockpit, l_cabin=l_cabin,
+_, C_D_b, C_D_o_fus_st2 = roskam.run_Roskam_drag_coefficient_functions(l_cockpit=l_cockpit, l_cabin=l_cabin,
                                                                                  l_tail=l_tail, S_fus=S_fus, S_b_fus=S_b_fus,
                                                                                  S_wet_fus=S_wet_fus_2)
 
@@ -53,8 +53,8 @@ print('\n For the standard configuration: '
       '\n Wetted area of the fuselage according to regression = ', S_wet_fus, 'm^2',
       '\n Wetted area of the fuselage according to ADSEE simplification = ', S_wet_fus_2, 'm^2',
       '\n C_D_0 using wetted area from regression = ', C_D_o_fus_st,
-      '\n C_D_0 using adsee wetted area = ', C_D_o_fus_st2)
-
+      '\n C_D_0 using adsee wetted area = ', C_D_o_fus_st2,
+      '\n C_D_b using adsee wetted area = ', C_D_b)
 # 1. Elongated fuselage configuration
 
 S_wet_fus_lg = S_wet_estimation.S_wet_estimation_standard(l_cockpit=l_cockpit, l_cabin=l_cabin + 2.76, l_tail=l_tail,
@@ -81,7 +81,7 @@ _, _, C_D_o_fus_lg2 = roskam.run_Roskam_drag_coefficient_functions(l_cockpit=l_c
                                                                                   S_b_fus=S_b_fus,
                                                                                   S_wet_fus=S_wet_fus_2)
 
-print('\n For the standard configuration: '
+print('\n For the longer configuration: '
       '\n The volume fo the cockpit is = ', V_cpit, ' m^3',
       '\n The volume of the cabin is = ', V_cab, ' m^3',
       '\n The volume of the tail is = ', V_tail, ' m^3',
@@ -144,15 +144,22 @@ S_wet_pods_2 = Trade_Aerodynamics.fus_wet_surface(L1_pods, L2_pods, L3_pods, d_p
 
 C_D_o_pods = N_pods * C_D_o_pods_init * Interf_pods * S_wet_pods_2/S_wet_fus
 C_D_o_pods2 = N_pods * C_D_o_pods_init * Interf_pods * S_wet_pods_2/S_wet_fus_2
+_, _, C_D_o_pods3 = roskam.run_Roskam_drag_coefficient_functions(l_cockpit=L1_pods, l_cabin=L2_pods,
+                                                                   l_tail=L3_pods, S_fus=np.pi/4*d_pods**2, S_b_fus=0,
+                                                                   S_wet_fus=S_wet_pods_2)
 
 print('\n For wing podded configuration: '
       '\n Total volume of one podded tank is = ', V_1 + V_2 + V_3, ' m^3',
       '\n Wetted area of one tank according to regression = ', S_wet_pods, 'm^2',
       '\n Wetted area of one tank according to ADSEE simplification = ', S_wet_pods_2, 'm^2'
       '\n Fuselage + tanks CD_0 using the regression method = ', C_D_o_pods + C_D_o_fus_st,
-      '\n Fuselage + tanks CD_0 using the adsee method = ',C_D_o_pods2,'+',C_D_o_fus_st2,'=',C_D_o_pods2+C_D_o_fus_st2,
+      '\n Fuselage + tanks CD_0 using the adsee and Torenbeek method = ', C_D_o_pods2, '+', C_D_o_fus_st2, '=',
+      C_D_o_pods2 + C_D_o_fus_st2,
+      '\n Fuselage + tanks CD_0 using the adsee method and Roskam = 2 x ', C_D_o_pods3, '+', C_D_o_fus_st2, '=',
+      2 * C_D_o_pods3 + C_D_o_fus_st2,
       '\n', (C_D_o_pods/C_D_o_fus_st)*100, 'CD_0 increase in % for regression method',
-      '\n', (C_D_o_pods2/C_D_o_fus_st2)*100, 'CD_0 increase in % for adsee method \n \n')
+      '\n', (C_D_o_pods2/C_D_o_fus_st2)*100, 'CD_0 increase in % for adsee adn Torenbeek method'
+      '\n', (2*C_D_o_pods3/C_D_o_fus_st2)*100, 'CD_0 increase in % for adsee and Roskam method \n \n')
 
 # 4. Beluga configuration
 

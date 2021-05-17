@@ -17,6 +17,15 @@ class Constants():
         self.gamma = 1.4  # Heat capacity ratio of air [-]
         self.a_0 = 340.294  # Sea level speed of sound [m/s]
 
+        self.S = 122.6  #  Wing surface area [m^2]
+        self.l_f = 37.57  # Fuselage length in [m] :todo: Change this value to account for H2
+        self.d_f = 4.14  # Fuselage maximum diameter in [m]
+        self.l_cockpit = 5.04  # Length of the cockpit [m]
+        self.l_cabin = 29.53 - self.l_cockpit  # Length of the cabin [m] :todo: Change this value to account for H2
+        self.l_tail = self.l_f - 29.53  # Length of the tail [m] :todo: Change this value to account for H2
+        self.S_b_fus = np.pi * 0.3/2 * 0.45/2  # Base surface area [m^2]
+        self.sweep = 27  # Wing sweep [deg]
+
     def speed_of_sound(self, T):
         """
         Compute the speed of sound in air for any temperature
