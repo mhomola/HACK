@@ -5,12 +5,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math as m
 
-#Hydrogen tank storage data
+# Hydrogen tank storage data
 p_outside = 0.19028  # [bar] at 12100 [m] of altitude
 p_tank = 3           # [bar]
 t_outside = 216.65   # [k]
 t_tank = 20          # [k]
-d_0 = 4              # [m] outside diameter -- dummy
+d_0 = 3              # [m] outside diameter -- dummy
+d_e = 4              # [m] elipse minor axis diameter -- dummy
 e_w = 0.8            # weld efficiency from Barron, 1985
 s_a = 200            # [MPa] allowable stress dummy value for now!!
 
@@ -56,8 +57,3 @@ class Tank():
     self.inner_volume = m.pi * (dp/2-self.t_wall)**2 * self.length + 4/3* m.pi * (self.d_0/2-self.t_caps)**3 #volume which will be occupied by
                                                                                                              #LH2 and insulation
     self.wall_volume = self.outer_volume - self.inner_volume #this will determine the mass of the tank
-
-
-
-
-
