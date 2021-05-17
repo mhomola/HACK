@@ -1,11 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from fuel_constants import *
-import fuel_required as H2calc
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
+from Subsystem_design import fuel_required as H2calc
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from pylab import meshgrid,cm,imshow,contour,clabel,colorbar,axis,title,show
+from pylab import meshgrid,cm
+
 
 #Approximation of the wing podded tank sizes for various volumes and tank radii
 

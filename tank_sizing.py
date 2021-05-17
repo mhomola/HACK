@@ -3,9 +3,7 @@
 
 import numpy as np
 from fuel_constants import *
-from fuel_required import fuel_mass_calc, fuel_volume_calc
-import matplotlib.pyplot as plt
-import Constants
+from Subsystem_design.fuel_required import fuel_mass_calc, fuel_volume_calc
 import matplotlib.pyplot as plt
 
 
@@ -35,7 +33,7 @@ def hydrogen_tank_mass(State):
 
 def plotting_sys_mass(State):
 
-    e_ratios = np.arange(0.1,0.3,0.001)
+    e_ratios = np.arange(0.11,0.5,0.001)
     Sys_mass,mass_H2,Mass_tank = hydrogen_tank_mass(State)
 
     fig1, ax1 = plt.subplots(3, 3,sharex = True,sharey = True)
@@ -67,12 +65,12 @@ def plotting_sys_mass(State):
     ax1[2, 2].set_xlabel('Fuel Energy Ratio [-]')
     plt.show()
 
-#plotting_sys_mass(State='liquid')
+plotting_sys_mass(State='liquid')
 
 def liquid_H_tanks(H2_vol):
     #input: volume available to store H2
     #output: tank mass, system mass and H2 mass
-    Grav_eff = 0.3                                         # Gravimetric efficiency if we choose liquid H2
+    Grav_eff = 0.5                                         # Gravimetric efficiency if we choose liquid H2
     H2_mass = H2_vol * 0.001 * LH2_d                        # Mass of Liquid hydrogen
     Tank_mass = H2_mass/Grav_eff                            # Tank's mass
     Tot_mass = H2_mass + Tank_mass                          # Total system mass
@@ -82,7 +80,7 @@ def liquid_H_tanks(H2_vol):
 def liquid_H_tanks_2(Vol_avl):
     # input: volume available to store H2
     # output: tank mass, system mass and H2 mass
-    Grav_eff = 0.3                                        # Gravimetric efficiency if we choose liquid H2
+    Grav_eff = 0.5                                        # Gravimetric efficiency if we choose liquid H2
     rho_tank = 2266.248                                    # ASSUMED density of tank (based on density of
                                                            # insulation + wall, weighted average)
     H2_vol = (-Grav_eff * rho_tank / LH2_d * Vol_avl) / (-Grav_eff * rho_tank / LH2_d + Grav_eff - 1)
@@ -95,17 +93,17 @@ def liquid_H_tanks_2(Vol_avl):
 def compare_des_liquid():
 
     #Cargo + Optional Tanks
-    H2_mass_1, Tank_mass_1, Tot_mass_1 = liquid_H_tanks(28978.68)
+    H2_mass_1, Tank_mass_1, Tot_mass_1 = liquid_H_tanks(11640)
     #Raising aisle
     H2_mass_2, Tank_mass_2, Tot_mass_2 = 0,0,0
     #A321
-    H2_mass_3, Tank_mass_3, Tot_mass_3 = liquid_H_tanks(28978.68)
+    H2_mass_3, Tank_mass_3, Tot_mass_3 = liquid_H_tanks(37261.17)
     #Flat Bottom
-    H2_mass_4, Tank_mass_4, Tot_mass_4 = liquid_H_tanks_2(3250)#4875
+    H2_mass_4, Tank_mass_4, Tot_mass_4 = liquid_H_tanks_2(4875)#4875 3250
     #Wing podded
-    H2_mass_5, Tank_mass_5, Tot_mass_5 = liquid_H_tanks(28978.68)
+    H2_mass_5, Tank_mass_5, Tot_mass_5 = liquid_H_tanks(37261.17)
     #Beluga
-    H2_mass_6, Tank_mass_6, Tot_mass_6 = liquid_H_tanks(28978.68)
+    H2_mass_6, Tank_mass_6, Tot_mass_6 = liquid_H_tanks(37261.17)
 
     H2Mass_array = np.array([H2_mass_1,H2_mass_2,H2_mass_3,H2_mass_4,H2_mass_5,H2_mass_6])
     TMass_array = np.array([Tank_mass_1, Tank_mass_2, Tank_mass_3, Tank_mass_4, Tank_mass_5, Tank_mass_6])
@@ -125,7 +123,7 @@ def compare_des_liquid():
 compare_des_liquid()
 
 # Visulize some stuff about gas H2 tank given H2 volume as input
-def gas_H_tanks(H2_vol):
+def gas_H_tanks():
 
     mass = []
     volume = []
@@ -134,31 +132,27 @@ def gas_H_tanks(H2_vol):
     p_ran = np.arange(350,705,5)
 
     for p in p_ran:
+        H_vol_frac = 92 - 11 / 350 * p
         H_mass_frac = 7 - 1/350 * p
-        #d = 4 +17/350 * p
         d = -3.552714e-15 + 0.07845238*p - 0.00004285714*p**2 + 1.190476e-8*p**3
         H2_vol = fuel_volume_calc(d_LH2=LH2_d, d_GH2= GH2_d, d_GH2_g= d, d_k=k_d, Ed_H2=H2_ed, Ed_k=k_ed, tot_vol_k=fuel_capacity_a320neo,
                              e_ratio=0.3,state='gas')[1]
         H2_mass = H2_vol*0.001*d
         tank_mass = (H2_mass*100)/H_mass_frac
+        tank_vol = (H2_vol * 100) / H_vol_frac
+        volH = (H_vol_frac / 100) * tank_vol
         mass.append(tank_mass)
         massH.append(H2_mass)
-
-    for p in p_ran:
-        H_vol_frac = 92 - 11/350 * p
-        #d = 4 +17/350 * p
-        #d = -3.552714e-15 + 0.07845238*p - 0.00004285714*p**2 + 1.190476e-8*p**3
-        tank_vol = (H2_vol*100)/H_vol_frac
-        volH = (H_vol_frac/100)*tank_vol
         volume.append(tank_vol)
         volumeH.append(volH)
+
 
     plt.figure()
 
     plt.subplot(411)
     plt.plot(p_ran, mass, color='tab:blue', marker='x',label='total mass')
     plt.xlabel("Pressure [bar]")
-    plt.ylabel("Tank mass [kg]")
+    plt.ylabel("Total mass [kg]")
     plt.legend()
     plt.grid()
 
@@ -172,7 +166,7 @@ def gas_H_tanks(H2_vol):
     plt.subplot(413)
     plt.plot(p_ran, volume, color='tab:orange', marker='x',label='total volume')
     plt.xlabel("Pressure [bar]")
-    plt.ylabel("Tank volume [l]")
+    plt.ylabel("Total volume [l]")
     plt.legend()
     plt.grid()
 
@@ -186,9 +180,6 @@ def gas_H_tanks(H2_vol):
     plt.show()
 
     return None
-
-gas_H_tanks(297)
-gas_H_tanks(41743.13)
 
 # Visualize stuff for the gas tanks given the max available volume
 
@@ -219,7 +210,7 @@ def gas_H_tanks_VOL(tot_Vol):
     plt.subplot(411)
     plt.plot(p_ran, mass, color='tab:blue', marker='x',label='total mass')
     plt.xlabel("Pressure [bar]")
-    plt.ylabel("Tank mass [kg]")
+    plt.ylabel("Total mass [kg]")
     plt.legend()
     plt.grid()
 
@@ -233,7 +224,7 @@ def gas_H_tanks_VOL(tot_Vol):
     plt.subplot(413)
     plt.plot(p_ran, volume, color='tab:orange', marker='x',label='total volume')
     plt.xlabel("Pressure [bar]")
-    plt.ylabel("Tank volume [l]")
+    plt.ylabel("Total volume [l]")
     plt.legend()
     plt.grid()
 
@@ -248,4 +239,15 @@ def gas_H_tanks_VOL(tot_Vol):
 
     return None 
 
-#gas_H_tanks_VOL(500)  
+#Option 1: cargo + optional tanks
+#gas_H_tanks_VOL(43220)
+#Option 2: raising aisle
+#gas_H_tanks_VOL(0)
+#Option 3: A321
+#gas_H_tanks_VOL(263400)
+#Option 4: flat bottom (upper bound)
+#gas_H_tanks_VOL(4875)
+#Option 5: wing podded
+gas_H_tanks()
+#Option 6: beluga
+gas_H_tanks()

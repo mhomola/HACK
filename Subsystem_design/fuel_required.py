@@ -2,7 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from fuel_constants import *
 
-def fuel_volume_calc(d_LH2, d_GH2,d_GH2_g, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio, state,y = 0.95):
+
+def fuel_volume_calc(d_LH2, d_GH2, d_GH2_g, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio, state, y = 0.95):
+
     """
 
     :param d_LH2: density of liquid hydrogen [kg/m^3]
@@ -22,11 +24,11 @@ def fuel_volume_calc(d_LH2, d_GH2,d_GH2_g, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio,
     E_k = E_tot * r
     E_H2 = e_ratio * E_k
 
-    V_k = E_k / Ed_k / d_k * 1000
+    V_k = (E_k / Ed_k) / d_k * 1000
 
     if state == 'gas':
 
-        V_H2 = (E_H2/Ed_H2)/d_GH2_g *1000
+        V_H2 = (E_H2/Ed_H2)/d_GH2_g * 1000
 
     if state == 'liquid':
 
@@ -36,14 +38,13 @@ def fuel_volume_calc(d_LH2, d_GH2,d_GH2_g, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio,
     return V_k, V_H2/0.8
 
 
-def fuel_mass_calc(State, d_k, d_LH2,d_GH2_g):
+def fuel_mass_calc(State, d_k, d_LH2, d_GH2_g):
 
     #Function to compute mass of kerosene and H2, both for the case in which the hydrogen is stored
     #in liquid state, as well as when it is stored in gas (compressed) state.
 
-
     if State == 'liquid':
-        Vk, VH2 = fuel_volume_calc(d_LH2=LH2_d, d_GH2=GH2_d,d_GH2_g=GH2_d_g, d_k=k_d, # Volume of kerosene and Liquid H2[l]
+        Vk, VH2 = fuel_volume_calc(d_LH2=LH2_d, d_GH2=GH2_d, d_GH2_g=GH2_d_g, d_k=k_d, # Volume of kerosene and Liquid H2[l]
                                          Ed_H2=H2_ed, Ed_k=k_ed,
                                          tot_vol_k=fuel_capacity_a320neo,
                                          e_ratio=e_ratios, state=State)
@@ -53,7 +54,7 @@ def fuel_mass_calc(State, d_k, d_LH2,d_GH2_g):
         m_tot = m_k + m_H2                                                            #Total mass
 
     if State == 'gas':
-        Vk, VH2 = fuel_volume_calc(d_LH2=LH2_d, d_GH2=GH2_d,d_GH2_g=GH2_d_g, d_k=k_d,  # Volume of kerosene and Liquid H2[l]
+        Vk, VH2 = fuel_volume_calc(d_LH2=LH2_d, d_GH2=GH2_d, d_GH2_g=GH2_d_g, d_k=k_d,  # Volume of kerosene and Liquid H2[l]
                                          Ed_H2=H2_ed, Ed_k=k_ed,
                                          tot_vol_k=fuel_capacity_a320neo,
                                          e_ratio=e_ratios, state=State)
@@ -116,15 +117,24 @@ def plotting_vol_mass():
     plt.show()
 
 def VH2_calc():
-    e_ratios = np.arange(0.1, 0.5, 0.001)
+    e_ratios = np.arange(0.11,0.5,0.001)
     return fuel_volume_calc(d_LH2=LH2_d, d_GH2= GH2_d, d_GH2_g= GH2_d_g,d_k=k_d, Ed_H2=H2_ed, Ed_k=k_ed
                             , tot_vol_k=fuel_capacity_a320neo,e_ratio=e_ratios,state='liquid')[1]
 
-e_ratios = np.arange(0.1,0.5,0.001) #ratio of energy stored in H2 to kerosene (NOT GLOBAL!)
+'''
+def optimum_e_ratio():
+    _,_,_, Vk, VH2,V_tot = fuel_mass_calc(State='liquid',d_k=k_d,d_LH2=LH2_d,d_GH2_g=GH2_d_g)
+    Vol_H2_cargo = 0.3 * 37420
+    E_ratio_good = []
+    for v in VH2:
+'''
+
+e_ratios = np.arange(0.11,0.5,0.001) #ratio of energy stored in H2 to kerosene (NOT GLOBAL!)
 
 plotting_vol_mass()
 
 # Compute volumes
+
 
 E_ratio = 0.5 # [-] #ratio of energy stored in H2 to kerosene (NOT GLOBAL!)
 
@@ -133,5 +143,6 @@ V_k, V_H2 = fuel_volume_calc(d_LH2=LH2_d, d_GH2= GH2_d, d_GH2_g= GH2_d_g, d_k=k_
 
 print('Volume of H2 is ', V_H2, ' l')
 print('Volume of kerosene is ', V_k, ' l')
+plotting_vol_mass()
 
 

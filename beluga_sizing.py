@@ -4,14 +4,10 @@ This piece of code helps to evaluate the feasibility of a beluga configutation
 
 import numpy as np
 import matplotlib.pyplot as plt
-from fuel_constants import *
-import fuel_required as H2calc
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
+from Subsystem_design import fuel_required as H2calc
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
-from pylab import meshgrid,cm,imshow,contour,clabel,colorbar,axis,title,show
-from sympy.solvers import solve
-from sympy import Symbol
+from pylab import meshgrid,cm
+
 
 def l_solver(V,r,n=1):
     return (V-(8/3)*np.pi*r**3)/(n*np.pi*r**2)+2*r
