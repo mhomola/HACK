@@ -8,6 +8,7 @@ class AerodynamicCharacteristics(Constants):
         self.M = 0.78  # Cruising Mach number
         self.cruise_alt = 11280  # Initial cruising altitude [m]
         self.visc = 1.458 * 10**(-5)  # Air viscosity N*s/m^2
+        
 
 
 
