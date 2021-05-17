@@ -9,23 +9,40 @@ design. It may also contain some simple functions to compute constants derived f
 
 class Constants():
     def __init__(self):
-        self.rho_0= 1.225  # Sea level density [kg/m^3]
-        self.p_0 = 101325  # Sea level pressure [Pa]
-        self.T_0 = 288.15  # Sea level temperature [K]
-        self.g_0 = 9.80665  # Gravity at sea level [m/s^2]
-        self.R = 287.0  # Specific gas constant of air [J/(kg*K)]
-        self.gamma = 1.4  # Heat capacity ratio of air [-]
-        self.a_0 = 340.294  # Sea level speed of sound [m/s]
+        self.rho_0= 1.225                                           # Sea level density                         [kg/m^3]
+        self.p_0 = 101325                                           # Sea level pressure                           [Pa]
+        self.T_0 = 288.15                                           # Sea level temperature                        [K]
+        self.g_0 = 9.80665                                          # Gravity at sea level                       [m/s^2]
+        self.R = 287.0                                              # Specific gas constant of air            [J/(kg*K)]
+        self.gamma = 1.4                                            # Heat capacity ratio of air                   [-]
+        self.a_0 = 340.294                                          # Sea level speed of sound                     [m/s]
 
-        self.S = 122.6  #  Wing surface area [m^2]
-        self.l_f = 37.57  # Fuselage length in [m] :todo: Change this value to account for H2
-        self.d_f = 4.14  # Fuselage maximum diameter in [m]
-        self.l_cockpit = 5.04  # Length of the cockpit [m]
-        self.l_cabin = 29.53 - self.l_cockpit  # Length of the cabin [m] :todo: Change this value to account for H2
-        self.l_tail = self.l_f - 29.53  # Length of the tail [m] :todo: Change this value to account for H2
-        self.S_b_fus = np.pi * 0.3/2 * 0.45/2  # Base surface area [m^2]
-        self.sweep = 27  # Wing sweep [deg]
+        ''' Dimensions of A320HACK'''
+        self.S = 122.6                                              #  Wing surface area                           [m^2]
+        self.l_f = 37.57                                            # Fuselage length                               [m] :todo: Change this value to account for H2
+        self.d_f = 4.14                                             # Fuselage maximum diameter in                  [m]
+        self.l_cockpit = 5.04                                       # Length of the cockpit                         [m]
+        self.l_cabin = 29.53 - self.l_cockpit                       # Length of the cabin                           [m] :todo: Change this value to account for H2
+        self.l_tail = self.l_f - 29.53                              # Length of the tail                            [m] :todo: Change this value to account for H2
+        self.S_b_fus = np.pi * 0.3/2 * 0.45/2                       # Base surface area                            [m^2]
+        self.sweep = 27                                             # Wing sweep                                   [deg]
 
+        self.MTOW_320neo = 73900                                    # Maximum Take-Off weight of A320neo            [kg]
+        self.MLW_320neo = 66300                                     # Maximum Landing weight of A320neo             [kg]
+        self.MRW_320neo = 73900                                     # Maximum Ramp weight of A320neo                [kg]
+        self.MZFW_320neo = 62800                                    # Maximu Zero fuel weight of A320neo            [kg]
+        self.MPLW_320neo = 18240                                    # Maximum Payload weight of A320neo             [kg]
+        self.OEW_320neo = self.MZFW_320neo - self.MPLW_320neo       # Operational Empty weight of A320neo           [kg]
+
+        self.MTOW_321neo = 89000                                    # Maximum Take-Off weight of A321neo            [kg]
+        self.MLW_321neo = 77300                                     # Maximum Landing weight of A321neo             [kg]
+        self.MRW_321neo = 89400                                     # Maximum Ramp weight of A321neo                [kg]
+        self.MZFW_321neo = 73300                                    # Maximu Zero fuel weight of A321neo            [kg]
+        self.MPLW_321neo = 22910                                    # Maximum Payload weight of A321neo             [kg]
+        self.OEW_321neo = self.MZFW_321neo - self.MPLW_321neo       # Operational Empty weight of A320neo           [kg]
+
+        self.l_f_321neo= 44.51                                      # Fuselage length of A321neo                    [m]
+        self.l_f_320neo = 37.57                                     # Fuselage length of A320neo                    [m
     def speed_of_sound(self, T):
         """
         Compute the speed of sound in air for any temperature

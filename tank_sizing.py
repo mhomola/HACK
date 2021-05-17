@@ -7,6 +7,8 @@ from Subsystem_design.fuel_required import fuel_mass_calc, fuel_volume_calc
 import matplotlib.pyplot as plt
 
 
+
+
 def hydrogen_tank_mass(State):
     #This function takes the state of the hydrogen: 'liquid' or 'gas'; and computes the mass of the tank's mass
     #for different fuel ratios (ratio between kerosene and H2) and different gravimetric efficiencies
@@ -65,45 +67,64 @@ def plotting_sys_mass(State):
     ax1[2, 2].set_xlabel('Fuel Energy Ratio [-]')
     plt.show()
 
-plotting_sys_mass(State='liquid')
+#plotting_sys_mass(State='liquid')
+
+def plot_tank_mass(State):
+
+    e_ratios = np.arange(0.11, 0.5, 0.001)
+    Sys_mass, mass_H2, Mass_tank = hydrogen_tank_mass(State)
+
+    plt.plot(e_ratios, Mass_tank[:,0], label= 'Gravimetric index = 0.25',color = 'tab:blue')
+    plt.plot(e_ratios, Mass_tank[:, 1],label= 'Gravimetric index = 0.3',color = 'tab:orange')
+    plt.plot(e_ratios, Mass_tank[:, 2],label= 'Gravimetric index = 0.35',color = 'tab:red')
+    plt.ylabel('Tank mass [kg]')
+    plt.xlabel('Fuel Energy Ratio [-]')
+    plt.legend()
+    plt.show()
+
+#plot_tank_mass(State='liquid')
 
 def liquid_H_tanks(H2_vol):
     #input: volume available to store H2
     #output: tank mass, system mass and H2 mass
     Grav_eff = 0.5                                         # Gravimetric efficiency if we choose liquid H2
-    H2_mass = H2_vol * 0.001 * LH2_d                        # Mass of Liquid hydrogen
-    Tank_mass = H2_mass/Grav_eff                            # Tank's mass
-    Tot_mass = H2_mass + Tank_mass                          # Total system mass
+    H2_mass = H2_vol * 0.001 * LH2_d                       # Mass of Liquid hydrogen
+    Tot_mass = H2_mass/Grav_eff                            # Total system mass
+    Tank_mass = Tot_mass - H2_mass                         # Tank's mass
 
     return H2_mass,Tank_mass,Tot_mass
+print(liquid_H_tanks(41918.81799273565))
+# print(liquid_H_tanks(12702.67))
+# print(liquid_H_tanks(32245.24))
+# print(liquid_H_tanks(46576.46))
 
 def liquid_H_tanks_2(Vol_avl):
     # input: volume available to store H2
     # output: tank mass, system mass and H2 mass
-    Grav_eff = 0.5                                        # Gravimetric efficiency if we choose liquid H2
+    Grav_eff = 0.5                                         # Gravimetric efficiency if we choose liquid H2
     rho_tank = 2266.248                                    # ASSUMED density of tank (based on density of
                                                            # insulation + wall, weighted average)
     H2_vol = (-Grav_eff * rho_tank / LH2_d * Vol_avl) / (-Grav_eff * rho_tank / LH2_d + Grav_eff - 1)
     H2_mass = H2_vol * LH2_d * 0.001
-    Tank_mass = H2_mass/Grav_eff
-    Tot_mass = H2_mass + Tank_mass
+    Tot_mass = H2_mass / Grav_eff                          # Total system mass
+    Tank_mass = Tot_mass - H2_mass                         # Tank's mass
 
     return H2_mass,Tank_mass,Tot_mass
 
 def compare_des_liquid():
 
     #Cargo + Optional Tanks
-    H2_mass_1, Tank_mass_1, Tot_mass_1 = liquid_H_tanks(11640)
+    H2_mass_1, Tank_mass_1, Tot_mass_1 = liquid_H_tanks(12960)
     #Raising aisle
     H2_mass_2, Tank_mass_2, Tot_mass_2 = 0,0,0
     #A321
-    H2_mass_3, Tank_mass_3, Tot_mass_3 = liquid_H_tanks(37261.17)
+    H2_mass_3, Tank_mass_3, Tot_mass_3 = liquid_H_tanks(46576.46443)
     #Flat Bottom
     H2_mass_4, Tank_mass_4, Tot_mass_4 = liquid_H_tanks_2(4875)#4875 3250
     #Wing podded
-    H2_mass_5, Tank_mass_5, Tot_mass_5 = liquid_H_tanks(37261.17)
+    H2_mass_5, Tank_mass_5, Tot_mass_5 = liquid_H_tanks(46576.46443)
     #Beluga
-    H2_mass_6, Tank_mass_6, Tot_mass_6 = liquid_H_tanks(37261.17)
+    H2_mass_6, Tank_mass_6, Tot_mass_6 = liquid_H_tanks(46576.46443)
 
     H2Mass_array = np.array([H2_mass_1,H2_mass_2,H2_mass_3,H2_mass_4,H2_mass_5,H2_mass_6])
     TMass_array = np.array([Tank_mass_1, Tank_mass_2, Tank_mass_3, Tank_mass_4, Tank_mass_5, Tank_mass_6])
@@ -120,6 +141,10 @@ def compare_des_liquid():
     plt.xticks(x, ('Cargo', 'Raisle', 'A321', 'FlBttm', 'Wpodded','Beluga'))
     plt.legend(labels=['Hydrogen mass', 'Tank mass','Total mass'])
     plt.show()
+
+print(liquid_H_tanks(12960))
+print(liquid_H_tanks(46576.46443))
+print(liquid_H_tanks_2(4875))
 compare_des_liquid()
 
 # Visulize some stuff about gas H2 tank given H2 volume as input
