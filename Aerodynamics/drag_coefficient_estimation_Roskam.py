@@ -26,7 +26,7 @@ class Roskam_drag_coefficient():
     def run_Roskam_drag_coefficient_functions(self, l_cockpit, l_cabin, l_tail, S_fus, S_b_fus, S_wet_fus, ):
         self.wing_fus_interference()
         self.turbulent_flat_plate_skin_friction()
-        self.zero_lift_drag_fus(S_fus, S_b_fus, S_wet_fus)
+        self.zero_lift_drag_fus(S_b_fus, S_fus, S_wet_fus)
 
         return self.R_wf, self.C_f_fus, self.C_D_o_fus
 
@@ -69,28 +69,11 @@ class Roskam_drag_coefficient():
         '''
         self.d_f = np.sqrt(4 / np.pi * S_fus)
         ld = self.l_f / self.d_f
-        self.C_D_o_fus_exc_base = self.R_wf * self.C_f_fus * ((1 + 60 / ld**3) + 0.0025 * ld) * S_wet_fus / self.S
+        self.C_D_o_fus_exc_base = self.R_wf * self.C_f_fus * (1 + 60 / ld**3 + 0.0025 * ld) * S_wet_fus / self.S
         bf = np.sqrt(4 / np.pi * S_b_fus) / self.d_f
         self.C_D_b_fus = (0.029 * bf**3 / ((self.C_D_o_fus_exc_base * self.S / S_fus)**0.5)) * S_fus / self.S
         self.C_D_o_fus = self.C_D_o_fus_exc_base + self.C_D_b_fus
 
-    '''
-    def exposed_mgc(self, ct, cr, sweep, d_fus, ):
-        """
-        This function calculates the mean geometrical chord of the exposed wing.
-        :param ct: tip chord in [m]
-        :param cr: root chord in [m]
-        :param sweep: sweep angle in [deg]
-        :param d_fus: fuselage diameter in [m]
-        :return: exp_mgc, the mean geometric chord in [m]
-        """
-        delta_cr = d_fus/2/m.tan(m.radians(90-sweep)) # difference between root chord and exposed root chord
-        exposed_cr = cr + delta_cr
-        exposed_taper = ct/exposed_cr
-
-        #Formula for mean geometric chord obtained from ADSEEII course
-        self.exp_mgc = 2/3 * exposed_cr * (1 + exposed_taper + exposed_taper**2)/(1+exposed_taper)
-    '''
 
 
 
