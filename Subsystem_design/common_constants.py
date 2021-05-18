@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from math import pi
+from Subsystem_design.fuel_required import V_H2, V_k
 """
 This file contains one class only, which is meant to contain the variables which are common to the entire subsystem 
 design. It may also contain some simple functions to compute constants derived from other constants (e.g. ISA).
@@ -9,7 +10,7 @@ design. It may also contain some simple functions to compute constants derived f
 
 class Constants():
     def __init__(self):
-        self.rho_0= 1.225                                           # Sea level density                         [kg/m^3]
+        self.rho_0 = 1.225                                          # Sea level density                         [kg/m^3]
         self.p_0 = 101325                                           # Sea level pressure                           [Pa]
         self.T_0 = 288.15                                           # Sea level temperature                        [K]
         self.g_0 = 9.80665                                          # Gravity at sea level                       [m/s^2]
@@ -22,9 +23,9 @@ class Constants():
         self.V_cruise = 230
         self.cruise_altitude = 11280
 
-        ''' Dimensions of A320HACK'''
+        ''' Dimensions of A320-HACK'''
         self.S = 122.6                                              # Wing surface area                            [m^2]
-        self.l_f = 37.57 + 3.7                                      # Fuselage length                               [m]
+        self.l_f = 37.57 + 3                                        # Fuselage length                               [m]
         self.height_f = 4.14                                        # Fuselage height                               [m]
         self.width_f = 3.95                                         # Fuselage width                                [m]
         self.l_cockpit = 5.04                                       # Length of the cockpit                         [m]
@@ -33,9 +34,11 @@ class Constants():
         self.S_b_fus = np.pi * 0.3/2 * 0.45/2                       # Base surface area                            [m^2]
         self.sweep_LE = 27                                          # Wing sweep                                   [deg]
 
-        """Fuel constant A320HACK"""
-        self.V_H2 = 41.918                                          # Volume required of hydrogen                  [m^3]
-        self.V_k = 14.316                                           # Volume required of kerosene                  [m^3]
+        """Fuel constant A320-HACK"""
+        # self.V_H2 = 37.893
+        self.V_H2 = V_H2                                            # Volume required of hydrogen                  [m^3]
+        self.V_H2 = V_k
+        # self.V_k = 14.316                                           # Volume required of kerosene                  [m^3]
 
         """Weights of A320neo"""
         self.MTOW_320neo = 73500                                    # Maximum Take-Off weight of A320neo            [kg]
@@ -157,8 +160,6 @@ class Constants():
             self.p = self.ISA_iso_pressure(p1, T1, h1, h_input)
 
         self.rho = self.ISA_density(self.p, self.T)
-
-
 
 # Try out the class
 

@@ -28,5 +28,7 @@ class Insulation_Material():
 # Preliminary values, change those values for more specific
 
 MLI = Insulation_Material(conductivity=5*10**-5, diffusivity=10**-4, density=35.24)
+
 Rohacell_Foam_20K = Insulation_Material(conductivity=5*10**-3, diffusivity=10**-6, density=51.1)    # ciet
 Rohacell_Foam_315K = Insulation_Material(conductivity=35*10**-3, diffusivity=10**-6, density=51.1)  # at 315K
+
