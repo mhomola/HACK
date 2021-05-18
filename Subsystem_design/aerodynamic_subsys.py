@@ -107,8 +107,8 @@ class AerodynamicCharacteristics(Constants):
 
         # Compute zero lift drag for M = 0.6 for fuselage exclusive of base
         R_n_fus = rho * u1 * l_f / self.visc
-        print('The Fuselage Reynolds Number R_f_fus is: ', R_n_fus, ' [-]')
-        print('The Mach number M is: ', self.M)
+        # print('The Fuselage Reynolds Number R_f_fus is: ', R_n_fus, ' [-]')
+        # print('The Mach number M is: ', self.M)
         R_wf = 1.015  # The wing/fuselage iterference factor from Figure 4.1 in Roskam-VI
         C_f_fus = 0.0016  # The turbulent flat plate skin friction coefficient from Figure 4.3 in Roskam-VI
 
@@ -118,6 +118,7 @@ class AerodynamicCharacteristics(Constants):
         # Compute the fuselage base drag coefficient
         bf = np.sqrt(4 / np.pi * self.S_b_fus) / self.d_f
         C_D_b_fus = 0.9 * bf**2
+        print(C_D_b_fus)
 
         # The zero lift drag coefficient of the fuselage becomes:
         C_D_0_fus = C_D_o_fus_exc_base + C_D_b_fus
@@ -128,28 +129,28 @@ class AerodynamicCharacteristics(Constants):
         return C_D_0_fus, C_D_L_fus
 
     def drag_increase_cruise(self, AoA_cruise):
+        """
+        Compute the drag increase due to the new fuselage length
+        :param AoA_cruise: Angle of attack during cruise for the lift induced drag [deg]
+        :return: The most important parameter which is computed is C_D_0_HACK
+        """
         # Compute density at cruise altitude
         self.ISA_calculator(h_input=self.cruise_alt)
 
         # A320neo
-        C_D_0_fus_neo, _ = self.Roskam_drag_prediction_cruise(rho=self.rho, u1=self.M*self.a, l_f=self.l_f_320neo,
-                                                              l_cockpit=self.l_cockpit_320neo,
-                                                              l_cabin=self.l_cabin_320neo,
-                                                              l_tail=self.l_tail_320neo, AoA=AoA_cruise)
+        self.C_D_0_fus_neo, _ = self.Roskam_drag_prediction_cruise(rho=self.rho, u1=self.M*self.a, l_f=self.l_f_320neo,
+                                                                   l_cockpit=self.l_cockpit_320neo,
+                                                                   l_cabin=self.l_cabin_320neo,
+                                                                   l_tail=self.l_tail_320neo, AoA=AoA_cruise)
 
         # A320-HACK
-        C_D_0_fus_HACK, _ = self.Roskam_drag_prediction_cruise(rho=self.rho, u1=self.M*self.a, l_f=self.l_f,
-                                                               l_cockpit=self.l_cockpit, l_cabin=self.l_cabin,
-                                                               l_tail=self.l_tail, AoA=AoA_cruise)
+        self.C_D_0_fus_HACK, _ = self.Roskam_drag_prediction_cruise(rho=self.rho, u1=self.M*self.a, l_f=self.l_f,
+                                                                    l_cockpit=self.l_cockpit, l_cabin=self.l_cabin,
+                                                                    l_tail=self.l_tail, AoA=AoA_cruise)
 
-        print('\n The zero-lift drag coefficient of the fuselage of the A320neo = ', C_D_0_fus_neo,
-              '\n For the A32-HACK it is = ', C_D_0_fus_HACK)
+        self.C_D_0_HACK = self.C_D_0_clean_neo - self.C_D_0_fus_neo + self.C_D_0_fus_HACK
 
-        self.C_D_0_HACK = self.C_D_0_clean_neo - C_D_0_fus_neo + C_D_0_fus_HACK
 
-        print('\n Assuming the C_D_0 of the A320neo during cruise is = ', self.C_D_0_clean_neo,
-              '\n The C_D_0 of the A320-HACK now becomes = ', self.C_D_0_HACK,
-              '\n That is a ', (self.C_D_0_HACK / self.C_D_0_clean_neo - 1) * 100, '% increase')
 
 
     def L_over_D_cruise(self):
@@ -162,20 +163,33 @@ class AerodynamicCharacteristics(Constants):
 
         C_L_start_cruise = W_start_cruise * self.g_0 / (0.5 * self.rho * V**2 * self.S)
 
-        C_D_start_cruise_neo = self.C_D_0_clean_neo + C_L_start_cruise**2 / (np.pi * self.AR * 0.8)
-        C_D_start_cruise_HACK = self.C_D_0_HACK + C_L_start_cruise**2 / (np.pi * self.AR * 0.8)
+        self.C_D_start_cruise_neo = self.C_D_0_clean_neo + C_L_start_cruise**2 / (np.pi * self.AR * 0.8)
+        self.C_D_start_cruise_HACK = self.C_D_0_HACK + C_L_start_cruise**2 / (np.pi * self.AR * 0.8)
 
-        self.L_D_ratio_neo = C_L_start_cruise / C_D_start_cruise_neo
-        self.L_D_ratio_HACK = C_L_start_cruise / C_D_start_cruise_HACK
+        self.D_start_cruise_HACK = self.C_D_start_cruise_HACK * 0.5 * self.rho * V**2 * self.S
 
-        # Try out the class
+        self.L_D_ratio_neo = C_L_start_cruise / self.C_D_start_cruise_neo
+        self.L_D_ratio_HACK = C_L_start_cruise / self.C_D_start_cruise_HACK
+
+
+# Try out the class
 
 if __name__ == '__main__':
-    Ae = AerodynamicCharacteristics()
+    ae = AerodynamicCharacteristics()
 
     # Ae.wing_MAC()
     # Ae.wing_AR()
     # print('\n\n', Ae.AR)
-    Ae.drag_increase_cruise(AoA_cruise=2)
-    Ae.L_over_D_cruise()
-    print(Ae.L_D_ratio_neo, Ae.L_D_ratio_HACK)
+    ae.drag_increase_cruise(AoA_cruise=2)
+
+    print('\n The zero-lift drag coefficient of the fuselage of the A320neo = ', ae.C_D_0_fus_neo,
+          '\n For the A32-HACK it is = ', ae.C_D_0_fus_HACK)
+
+    print('\n Assuming the C_D_0 of the A320neo during cruise is = ', ae.C_D_0_clean_neo,
+          '\n The C_D_0 of the A320-HACK now becomes = ', ae.C_D_0_HACK,
+          '\n That is a ', (ae.C_D_0_HACK / ae.C_D_0_clean_neo - 1) * 100, '% increase')
+
+    ae.L_over_D_cruise()
+    print('\n The drag coefficient of the A320-HACK during cruise is  = ', ae.C_D_start_cruise_HACK,
+          '\n The drag then is = ', ae.D_start_cruise_HACK,
+          '\n The L/D ratio is = ', ae.L_D_ratio_HACK)
