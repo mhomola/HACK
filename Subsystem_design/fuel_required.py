@@ -128,23 +128,23 @@ def optimum_e_ratio():
     E_ratio_good = []
     for v in VH2:
 '''
+if __name__ == '__main__':
+    e_ratios = np.arange(0.11, 0.5, 0.001) #ratio of energy stored in H2 to kerosene (NOT GLOBAL!)
 
-e_ratios = np.arange(0.11, 0.5, 0.001) #ratio of energy stored in H2 to kerosene (NOT GLOBAL!)
+    #plotting_vol_mass()
 
-#plotting_vol_mass()
-
-# Compute volumes
+    # Compute volumes
 
 
-E_ratio = 0.5 # [-] #ratio of energy stored in H2 to kerosene (NOT GLOBAL!)
+    E_ratio = 0.5 # [-] #ratio of energy stored in H2 to kerosene (NOT GLOBAL!)
 
-V_k, V_H2 = fuel_volume_calc(d_LH2=LH2_d, d_GH2= GH2_d, d_GH2_g= GH2_d_g, d_k=k_d, Ed_H2=H2_ed, Ed_k=k_ed, tot_vol_k=fuel_capacity_a320neo,
-                             e_ratio=E_ratio,state='liquid')
+    V_k, V_H2 = fuel_volume_calc(d_LH2=LH2_d, d_GH2= GH2_d, d_GH2_g= GH2_d_g, d_k=k_d, Ed_H2=H2_ed, Ed_k=k_ed, tot_vol_k=fuel_capacity_a320neo,
+                                 e_ratio=E_ratio,state='liquid')
 
-print('Volume of H2 is ', V_H2, ' l')
-print('Volume of kerosene is ', V_k, ' l')
-print('Mass of H2 is ', V_H2 * LH2_d * 0.001, ' kg')
-print('Mass of kerosene is ', V_k * k_d * 0.001, ' kg')
-plotting_vol_mass()
+    print('Volume of H2 is ', V_H2, ' l')
+    print('Volume of kerosene is ', V_k, ' l')
+    print('Mass of H2 is ', V_H2 * LH2_d * 0.001, ' kg')
+    print('Mass of kerosene is ', V_k * k_d * 0.001, ' kg')
+    plotting_vol_mass()
 
 

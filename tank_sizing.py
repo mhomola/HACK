@@ -142,10 +142,10 @@ def compare_des_liquid():
     plt.legend(labels=['Hydrogen mass', 'Tank mass','Total mass'])
     plt.show()
 
-print(liquid_H_tanks(12960))
-print(liquid_H_tanks(46576.46443))
-print(liquid_H_tanks_2(4875))
-compare_des_liquid()
+#print(liquid_H_tanks(12960))
+#print(liquid_H_tanks(46576.46443))
+#print(liquid_H_tanks_2(4875))
+#compare_des_liquid()
 
 # Visulize some stuff about gas H2 tank given H2 volume as input
 def gas_H_tanks():
@@ -273,6 +273,6 @@ def gas_H_tanks_VOL(tot_Vol):
 #Option 4: flat bottom (upper bound)
 #gas_H_tanks_VOL(4875)
 #Option 5: wing podded
-gas_H_tanks()
+#gas_H_tanks()
 #Option 6: beluga
-gas_H_tanks()
+#gas_H_tanks()
