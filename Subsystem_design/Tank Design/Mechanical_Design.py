@@ -4,8 +4,8 @@ This files contains the classes and functions for determining the mechanical des
 import numpy as np
 import matplotlib.pyplot as plt
 import math as m
-import Main_PreliminaryTank
-import Materials
+# import Main_PreliminaryTank
+# import Materials
 
 # Hydrogen tank storage data
 p_outside = 0.19028  # [bar] at 12100 [m] of altitude
@@ -209,14 +209,14 @@ class Cyl_Tank():
     self.outer_wall()
     self.mass_tank = self.mass_inner_wall + self.mass_insulation + self.mass_outer_wall
 
-if __name__ == '__main__':
-  central_tank = Tank(constraints=Main_PreliminaryTank.central,dp=dp, s_a=s_a, e_w=e_w,material_insulation=Materials.MLI
-                      ,material_inner = Materials.Al_2090_T81,material_outer=Materials.Al_2090_T81,rho=rho,t_tank=t_tank,dt=dt,p_tank=p_tank)
-
-  central_tank.tank_design()
-  print(central_tank.t_insulation)
-  print(central_tank.t_wall_inner)
-  print(central_tank.t_wall_outer)
+# if __name__ == '__main__':
+#   central_tank = Tank(constraints=Main_PreliminaryTank.central,dp=dp, s_a=s_a, e_w=e_w,material_insulation=Materials.MLI
+#                       ,material_inner = Materials.Al_2090_T81,material_outer=Materials.Al_2090_T81,rho=rho,t_tank=t_tank,dt=dt,p_tank=p_tank)
+#
+#   central_tank.tank_design()
+#   print(central_tank.t_insulation)
+#   print(central_tank.t_wall_inner)
+#   print(central_tank.t_wall_outer)
 
 
 
