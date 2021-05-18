@@ -27,7 +27,7 @@ class Constants():
         self.S_b_fus = np.pi * 0.3/2 * 0.45/2                       # Base surface area                            [m^2]
         self.sweep = 27                                             # Wing sweep                                   [deg]
 
-        self.MTOW_320neo = 73900                                    # Maximum Take-Off weight of A320neo            [kg]
+        self.MTOW_320neo = 73500                                    # Maximum Take-Off weight of A320neo            [kg]
         self.MLW_320neo = 66300                                     # Maximum Landing weight of A320neo             [kg]
         self.MRW_320neo = 73900                                     # Maximum Ramp weight of A320neo                [kg]
         self.MZFW_320neo = 62800                                    # Maximu Zero fuel weight of A320neo            [kg]
