@@ -20,6 +20,7 @@ class spacial_constraints():
 #Define the areas of the constraints
 
 central = spacial_constraints(length=3.5,width=1.14,height=2.67)
+
 #ACT1 = spacial_constraint(length=,width=,height=)
 #ACT1 = spacial_constraint(length=,width=,height=)
 #aft = spacial_constraint(length=,width=,height=)
