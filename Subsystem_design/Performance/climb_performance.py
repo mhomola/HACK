@@ -1,6 +1,10 @@
+import fuel_constants
+from subsystem_design.fuel_required import fuel_volume_calc
+from subsystem_design.common_constants import *
 # import fuel_constants
 # from subsystem_design.fuel_required import fuel_volume_calc
 from subsystem_design.common_constants import Constants
+from subsystem_design.aerodynamic_subsys import AerodynamicCharacteristics
 import numpy as np
 
 
@@ -23,8 +27,11 @@ class Climb_perdormance(Constants):
 
         return  diff_rho_ratio[1]
 
-    def rc_steady(self, C_D, C_L, V, W):
-        rc_s = (self.max_cont_thrust/W) - (C_D*V/C_L)
+    def rc_steady(self, W):
+        aerodynamics = AerodynamicCharacteristics()
+        aerodynamics.L_over_D_cruise()
+        print(aerodynamics.C_D_start_cruise_HACK)
+        rc_s = (self.max_cont_thrust/W) - (self.C_D_start_cruise_HACK)
         return rc_s
 
     def rc_real(self, rc_steady, V_EAS):
@@ -35,5 +42,6 @@ class Climb_perdormance(Constants):
 if __name__ == '__main__':
     p = Climb_perdormance()
     p.diff_density(input_altitude=11000)
+    print('Steady rate of climb = ', p.rc_steady(W=702364.53))
 
 
