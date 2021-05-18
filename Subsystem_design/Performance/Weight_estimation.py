@@ -9,11 +9,10 @@ from fuel_constants import *
 from math import pi
 
 
-class compute_weight(Constants)
+class compute_weight(Constants):
 
     def __init__(self):
         super().__init__()
-        self.m_H2, self.m_tank,_ = liquid_H_tanks(h2_vol)          # Hydrogen mass and Tank mass                    [kg]
         self.m_k = 11595.96                                        # Kerosene mass                                  [kg]
         self.sigma_y_FS = 350 * 10 ** 6                            # Yield strendth of Steel (assumption)           [Pa]
         self.rho_FS = 7750                                         # Density of steel                           [kg/m^3]
@@ -22,6 +21,12 @@ class compute_weight(Constants)
         self.FS_length = 66.5                                      # Length of feeding system(roughly)              [m]
         self.t_FS = (self.p_FS * self.D_FS / 2) / (self.sigma_y_FS)  # Thickness of the feeding system                [m]
 
+
+
+
+    def Tank_mass(self,h2_vol):
+
+        self.m_H2, self.m_tank, _ = liquid_H_tanks(h2_vol)          # Hydrogen mass and Tank mass                           [kg]
     def Feeding_sys_m(self):
 
         self.FS_mass = pi * self.D_FS * self.t_FS * self.FS_length * self.rho_FS        # Mass of feeding system     [kg]

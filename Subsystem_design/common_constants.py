@@ -25,13 +25,19 @@ class Constants():
         ''' Dimensions of A320HACK'''
         self.S = 122.6                                              # Wing surface area                            [m^2]
         self.l_f = 37.57 + 3.7                                      # Fuselage length                               [m]
-        self.d_f = 4.14                                             # Fuselage maximum diameter in                  [m]
+        self.height_f = 4.14                                        # Fuselage height                               [m]
+        self.width_f = 3.95                                         # Fuselage width                                [m]
         self.l_cockpit = 5.04                                       # Length of the cockpit                         [m]
         self.l_cabin = 29.53 + 3.7 - self.l_cockpit                 # Length of the cabin + H2 tank                 [m]
         self.l_tail = self.l_f - self.l_cabin - self.l_cockpit      # Length of the tail                            [m]
         self.S_b_fus = np.pi * 0.3/2 * 0.45/2                       # Base surface area                            [m^2]
         self.sweep_LE = 27                                          # Wing sweep                                   [deg]
 
+        """Fuel constant A320HACK"""
+        self.V_H2 = 41.918                                          # Volume required of hydrogen                  [m^3]
+        self.V_k = 14.316                                           # Volume required of kerosene                  [m^3]
+
+        """Weights of A320neo"""
         self.MTOW_320neo = 73500                                    # Maximum Take-Off weight of A320neo            [kg]
         self.MLW_320neo = 66300                                     # Maximum Landing weight of A320neo             [kg]
         self.MRW_320neo = 73900                                     # Maximum Ramp weight of A320neo                [kg]
@@ -39,6 +45,7 @@ class Constants():
         self.MPLW_320neo = 18240                                    # Maximum Payload weight of A320neo             [kg]
         self.OEW_320neo = 44300                                     # Operational Empty weight of A320neo           [kg]
 
+        """Weights of A321neo"""
         self.MTOW_321neo = 89000                                    # Maximum Take-Off weight of A321neo            [kg]
         self.MLW_321neo = 77300                                     # Maximum Landing weight of A321neo             [kg]
         self.MRW_321neo = 89400                                     # Maximum Ramp weight of A321neo                [kg]
@@ -46,6 +53,7 @@ class Constants():
         self.MPLW_321neo = 22910                                    # Maximum Payload weight of A321neo             [kg]
         self.OEW_321neo = self.MZFW_321neo - self.MPLW_321neo       # Operational Empty weight of A320neo           [kg]
 
+        """Dimensions of A320neo and A321neo"""
         self.l_f_321neo= 44.51                                      # Fuselage length of A321neo                    [m]
         self.l_f_320neo = 37.57                                     # Fuselage length of A320neo                    [m]
         self.l_cockpit_320neo = 5.04                                # Length of the cockpit of A320neo              [m]
@@ -53,6 +61,11 @@ class Constants():
         self.l_tail_320neo = self.l_f_320neo - 29.53                # Length of the tail of A320neo                 [m]
 
         self.c_j_kerosene = 16.68 * 10**(-6)                        # Specific cruise fuel consumption of neo   [kg/N*s]
+
+    def fuselage_length(self,vol_eff, vol_fus):
+        V_H2_center_w = vol_eff * vol_fus                           # Volume of hydrogen stored on center wing box [m^3]
+        V_H2_ext_fus = self.V_H2 - V_H2_center_w                    # Volume of hydrogen stored on extended fuselage[m^3]
+        self.l_f = V_H2_ext_fus/(pi * self.width_f/2 * self.height_f/2) #
 
     def speed_of_sound(self, T):
         """

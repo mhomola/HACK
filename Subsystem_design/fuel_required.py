@@ -35,7 +35,7 @@ def fuel_volume_calc(d_LH2, d_GH2, d_GH2_g, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio
         V_LH2 = (E_H2/Ed_H2)*(1/(d_LH2+d_GH2*(1-y)/y))
         V_H2 = V_LH2*(1+(1-y)/y)*1000
 
-    return V_k, V_H2/0.8
+    return V_k, V_H2/0.885
 
 
 def fuel_mass_calc(State, d_k, d_LH2, d_GH2_g):
@@ -63,7 +63,7 @@ def fuel_mass_calc(State, d_k, d_LH2, d_GH2_g):
         m_k, m_H2 = Vk * d_k * 0.001, VH2 * d_GH2_g * 0.001              #Mass of Kerosene and Gas H2 [kg]
         m_tot = m_k + m_H2                                               #Total mass
 
-    return m_k, m_H2, m_tot, Vk, VH2,V_tot
+    return m_k, m_H2, m_tot, Vk, VH2, V_tot
 
 def plotting_vol_mass():
 
@@ -129,7 +129,7 @@ def optimum_e_ratio():
     for v in VH2:
 '''
 
-e_ratios = np.arange(0.11,0.5,0.001) #ratio of energy stored in H2 to kerosene (NOT GLOBAL!)
+e_ratios = np.arange(0.11, 0.5, 0.001) #ratio of energy stored in H2 to kerosene (NOT GLOBAL!)
 
 #plotting_vol_mass()
 
