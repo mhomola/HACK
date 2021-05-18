@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+import Mechanical_Design
+import Materials
+import math as m
 from Subsystem_design.fuel_required import V_H2
 
 total_vol = V_H2 / 1000
