@@ -104,14 +104,16 @@ class Tank():
     self.mass_insulation = self.vol_insulation * self.material_insulation.density
 
   def outer_wall(self):
-    p_atm = 1.013 * 10**5 #Pa
-    t_wall_outer = p_atm * self.r3* 2 / (
-              2 * self.material_outer.yield_strength * 10 ** 6 * self.e_w + 0.8 * p_atm)  # 10^6 factor for MPa ->Pa
-    t_caps_outer = p_atm * self.r3 * 2 * self.K / (
-              2 * self.material_outer.yield_strength * 10 ** 6 * self.e_w + 2 * p_atm * (self.K - 0.1))
+    # p_atm = 1.013 * 10**5 #Pa
+    # t_wall_outer = p_atm * self.r3* 2 / (
+    #           2 * self.material_outer.yield_strength * 10 ** 6 * self.e_w + 0.8 * p_atm)  # 10^6 factor for MPa ->Pa
+    # t_caps_outer = p_atm * self.r3 * 2 * self.K / (
+    #           2 * self.material_outer.yield_strength * 10 ** 6 * self.e_w + 2 * p_atm * (self.K - 0.1))
+    #
+    # self.t_wall_outer = t_wall_outer * self.safety_factor
+    # self.t_caps_outer = t_caps_outer * self.safety_factor
 
-    self.t_wall_outer = t_wall_outer * self.safety_factor
-    self.t_caps_outer = t_caps_outer * self.safety_factor
+    self.t_wall_outer = self.t_wall_inner #we assume them equal for the moment
     self.r4 = self.r3 + self.t_wall_outer
     self.outer_vol_outer_wall =  m.pi * self.r4**2 * (self.length-self.d_0) + 4/3* m.pi * self.r4**3
     self.vol_outer_wall = self.outer_vol_outer_wall - self.outer_vol_insulation
