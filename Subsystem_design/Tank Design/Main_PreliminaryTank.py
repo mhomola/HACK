@@ -1,12 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-import Mechanical_Design
-import Materials
-import math as m
+from Subsystem_design.fuel_required import V_H2
+
+total_vol = V_H2 / 1000
+
 
 central_H2_vol = 15 # [m^3] the volume of LH2 in the central tanks area
 aft_H2_vol = 30     # [m^3] the volume of LH2 that must be stored behind the passenger cabin
+
 
 class spacial_constraints():
     def __init__(self,length,width,height):
