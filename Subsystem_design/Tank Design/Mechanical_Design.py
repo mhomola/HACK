@@ -8,12 +8,16 @@ import math as m
 # Hydrogen tank storage data
 p_outside = 0.19028  # [bar] at 12100 [m] of altitude
 p_tank = 3           # [bar]
-t_outside = 216.65   # [k]
-t_tank = 20          # [k]
+t_outside = 216.65   # [K]
+t_tank = 19          # [K]
 d_0 = 3              # [m] outside diameter -- dummy
-d_e = 4              # [m] elipse minor axis diameter -- dummy
+d_e = 4              # [m] ellipse minor axis diameter -- dummy
 e_w = 0.8            # weld efficiency from Barron, 1985
 s_a = 200            # [MPa] allowable stress dummy value for now!!
+
+#Determining the heat transfer rate that can be accepted based on the user requirement of no boil-off for 36h.
+#Method from "Passive zero-boil-off storage of liquid hydrogen for long-time space missions"
+
 
 dp = np.abs(p_tank-p_outside)
 dt = np.abs(t_tank-t_outside)
@@ -29,31 +33,67 @@ dt = np.abs(t_tank-t_outside)
 #we assume circular cylinders with two hemisphere heads at ends
 
 class Tank():
-  def __init__(self,constraints,dp, s_a, e_w):
+  def __init__(self,constraints,dp, s_a, e_w,material_insulation,material_inner,material_outer,rho,t_tank):
     """
 
     :param constraints: object of class constraints
     :param dp: pressure difference [bar]
-    :param s_a: [MPa] allowable stress
+    :param s_a: [Pa] allowable stress
     :param e_w: weld efficiency
-    :param K:
+    :param material_insulation: [material class object]
+    :param material_inner: [material class object]
+    :param material_outer: [material class object]
+    :param rho: liquid hydrogen mass density [kg/m^3]
+    :param t_tank: temperature inside the tank [K]
     """
-    self.d_0 = min(constraints.width,constraints.height)
+    self.d_0 = min(constraints.width,constraints.height) #[m]
     self.length = constraints.length #including the hemisphere ends
-    self.dp = dp
+    self.dp = dp * 10**5 #[Pa]
     self.s_a = s_a
     self.e_w = e_w
     self.K = 1/6 * (2 + 1)
-    self.outer_volume = m.pi * dp**2/4 * (self.length-self.d_0) + 4/3* m.pi * (self.d_0/2)**3 #cylinder volume + sphere volume
+    self.material_insulation = material_insulation
+    self.material_inner = material_inner
+    self.material_outer = material_outer
+    self.rho = rho
+    self.t_tank = t_tank
+    self.outer_vol_inner_wall = m.pi * dp**2/4 * (self.length-self.d_0) + 4/3* m.pi * (self.d_0/2)**3 #cylinder volume + sphere volume
+                                                                                                      #outer volume described by the inner tank wall
 
 
-  def thickness(self): #D_Verstraete_Thesis_2009
-    t_wall = self.dp * d_0 / (2 * s_a * e_w + 0.8 * self.dp)
-    t_caps = self.dp * d_0 * self.K / (2 * s_a * e_w + 2 * self.dp * (self.K - 0.1))
-    self.t_wall = t_wall
-    self.t_caps = t_caps
+  def inner_wall(self): #D_Verstraete_Thesis_2009
+    t_wall_inner = self.dp * d_0 / (2 * self.material_inner.yield_strength *10**6 * self.e_w + 0.8 * self.dp) #10^6 factor for MPa ->Pa
+    t_caps_inner = self.dp * d_0 * self.K / (2 * self.material_inner.yield_strength*10**6 * self.e_w + 2 * self.dp * (self.K - 0.1))
 
-  def tankwall_volume(self):
-    self.inner_volume = m.pi * (dp/2-self.t_wall)**2 * self.length + 4/3* m.pi * (self.d_0/2-self.t_caps)**3 #volume which will be occupied by
-                                                                                                             #LH2 and insulation
-    self.wall_volume = self.outer_volume - self.inner_volume #this will determine the mass of the tank
+    self.t_wall_inner = t_wall_inner
+    self.t_caps_inner = t_caps_inner
+
+    self.inner_vol_inner_wall = m.pi * (dp/2-self.t_wall_inner)**2 * self.length + 4/3* m.pi * (self.d_0/2-self.t_caps_inner)**3 #volume occupied by LH2
+    self.mass_H2 = self.inner_vol_inner_wall * self.rho #calculates the mass of hydrogen that is encapsulated in the tank
+    self.vol_wall_inner_wall = self.outer_vol_inner_wall - self.inner_vol_inner_wall #this will determine the mass of the inner wall of the tank
+
+  def insulation(self):
+    t_boil = 20  # [K]
+    Cp = 10310  # [J/Kg*K] H2 specific heat capacity at 20[K]
+    time = 36  # [h] no boil-off should occur within 36h
+    dT =  (t_boil - self.t_tank)
+    Q_req = Cp * self.mass_H2 * dT / (time*3600)
+    hi = 0 #convective heat transfer coefficient LH2 [ W/(m^2*k)
+    #Defining the radius of the cylinders
+    self.r1 = (self.d_0 - self.t_wall_inner) /2
+    self.r2 = self.d_0/2
+    # self.r3 = self.r2 * m.exp(self.material_insulation.conductivity*(2*m.pi*(self.length-self.d_0)*dT/Q_req -
+    #                                                                  (1/self.r1/hi+ m.log(self.r2/self.r1)/self.material_inner.conductivity)))
+    self.r3 = self.r2 * m.exp(self.material_insulation.conductivity * (2 * m.pi * (self.length - self.d_0) * dT / Q_req -
+                                               (m.log(self.r2 / self.r1) / self.material_inner.conductivity))) #this formula disregard the hi term
+    self.t_insulation = self.r3-self.r2
+    self.outer_vol_insulation = m.pi * self.r3**2 * (self.length-self.d_0) + 4/3* m.pi * (self.r3)**3
+    self.vol_insulation = self.outer_vol_insulation - self.outer_vol_inner_wall # the volume of the insulation that will be used for computing the mass
+
+
+
+
+
+
+
+

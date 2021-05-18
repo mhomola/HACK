@@ -17,6 +17,11 @@ class Constants():
         self.gamma = 1.4                                            # Heat capacity ratio of air                   [-]
         self.a_0 = 340.294                                          # Sea level speed of sound                     [m/s]
 
+        '''Performance'''
+        self.M = 0.78
+        self.V_cruise = 230
+        self.cruise_altitude = 11280
+
         ''' Dimensions of A320HACK'''
         self.S = 122.6                                              # Wing surface area                            [m^2]
         self.l_f = 37.57 + 3.7                                      # Fuselage length                               [m]
