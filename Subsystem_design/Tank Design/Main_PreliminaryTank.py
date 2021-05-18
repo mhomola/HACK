@@ -1,8 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from fuel_required
+
+total_vol = VH_2
+print(total_vol)
 
 central_H2_vol = 15 # [m^3] the volume of LH2 in the central tanks area
-aft_H2_vol = 30 #[m^3] the volume of LH2 that must be stored behind the passenger cabin
+aft_H2_vol = 30     # [m^3] the volume of LH2 that must be stored behind the passenger cabin
 
 class spacial_constraints():
     def __init__(self,length,width,height):

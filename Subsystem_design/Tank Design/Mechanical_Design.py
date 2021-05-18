@@ -8,7 +8,7 @@ import Main_PreliminaryTank
 import Materials
 # Hydrogen tank storage data
 p_outside = 0.19028  # [bar] at 12100 [m] of altitude
-p_tank = 1.2          # [bar]
+p_tank = 3.5         # [bar] venting pressure
 t_outside = 216.65   # [K]
 t_tank = 19.5         # [K]
 d_0 = 3              # [m] outside diameter -- dummy
