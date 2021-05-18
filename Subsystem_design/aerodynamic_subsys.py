@@ -29,7 +29,9 @@ class AerodynamicCharacteristics(Constants):
         self.RoC_neo = 12.7  # Max rate of climb of the A320neo [m/s]
 
         self.C_D_0_TO_neo = 0.078  # Zero-lift drag coefficient of A320 during take-off
-        self.C_D_0_clean_neo = 0.025  # Zero-lift drag coefficient of A320 during cruise
+        self.C_D_0_clean_neo = 0.023  # Zero-lift drag coefficient of A320 during cruise
+
+        self.R_neo = 4800  # Harmonic range of A320neo [km]
         
     def wing_MAC(self):
         """
@@ -150,12 +152,23 @@ class AerodynamicCharacteristics(Constants):
               '\n That is a ', (self.C_D_0_HACK / self.C_D_0_clean_neo - 1) * 100, '% increase')
 
 
+    def L_over_D_cruise(self):
+        self.ISA_calculator(h_input=self.cruise_alt)
+        self.wing_AR()
+        self.drag_increase_cruise(2)
 
+        W_start_cruise = self.MTOW_320neo * (0.995 * 0.98)
+        V = self.M * self.a
 
+        C_L_start_cruise = W_start_cruise * self.g_0 / (0.5 * self.rho * V**2 * self.S)
 
+        C_D_start_cruise_neo = self.C_D_0_clean_neo + C_L_start_cruise**2 / (np.pi * self.AR * 0.8)
+        C_D_start_cruise_HACK = self.C_D_0_HACK + C_L_start_cruise**2 / (np.pi * self.AR * 0.8)
 
+        self.L_D_ratio_neo = C_L_start_cruise / C_D_start_cruise_neo
+        self.L_D_ratio_HACK = C_L_start_cruise / C_D_start_cruise_HACK
 
-# Try out the class
+        # Try out the class
 
 if __name__ == '__main__':
     Ae = AerodynamicCharacteristics()
@@ -164,3 +177,5 @@ if __name__ == '__main__':
     # Ae.wing_AR()
     # print('\n\n', Ae.AR)
     Ae.drag_increase_cruise(AoA_cruise=2)
+    Ae.L_over_D_cruise()
+    print(Ae.L_D_ratio_neo, Ae.L_D_ratio_HACK)
