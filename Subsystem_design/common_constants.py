@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-
+from math import pi
 """
 This file contains one class only, which is meant to contain the variables which are common to the entire subsystem 
 design. It may also contain some simple functions to compute constants derived from other constants (e.g. ISA).
@@ -63,9 +63,16 @@ class Constants():
         self.c_j_kerosene = 16.68 * 10**(-6)                        # Specific cruise fuel consumption of neo   [kg/N*s]
 
     def fuselage_length(self,vol_eff, vol_fus):
-        V_H2_center_w = vol_eff * vol_fus                           # Volume of hydrogen stored on center wing box [m^3]
-        V_H2_ext_fus = self.V_H2 - V_H2_center_w                    # Volume of hydrogen stored on extended fuselage[m^3]
-        self.l_f = V_H2_ext_fus/(pi * self.width_f/2 * self.height_f/2) #
+        """
+
+        :param vol_eff: Volumetric efficiency of integral tanks (Ratio of usable tank volume-to-volume occupied
+                        in the fuselage                                         [-]
+        :param vol_fus: Volume available for tanks in the center wingbox        [m^3]
+        :return:
+        """
+        self.V_H2_center_w = vol_eff * vol_fus                           # Volume of hydrogen stored on center wing box [m^3]
+        self.V_H2_ext_fus = self.V_H2 - self.V_H2_center_w               # Volume of hydrogen stored on extended fuselage[m^3]
+        self.l_f = self.V_H2_ext_fus/(pi * self.width_f/2 * self.height_f/2) #
 
     def speed_of_sound(self, T):
         """
