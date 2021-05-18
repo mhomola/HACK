@@ -18,6 +18,8 @@ class AerodynamicCharacteristics(Constants):
         self.taper_in = self.c_kink_out / self.c_root  # Taper ratio of the inner trapezoid
         self.taper_out = self.c_tip / self.c_kink_out  # Taper ratio of the outer trapezoid
         self.h_sharklet = 2.43  # Height of the wing sharklets [m]
+        self.sweep_025 = 25  # Sweep at the quarter chord [deg]
+        self.sweep_05 = 22.4  # Sweep at the half chord [deg]
 
         self.b_h = 2 * 6.12  # Span of the horizontal tail [m]
         self.c_r_h = 3.814  # Root chord of the horizontal tail [m]
@@ -167,20 +169,22 @@ class AerodynamicCharacteristics(Constants):
         W_start_cruise = self.MTOW_320neo * (0.995 * 0.98)
         V = self.M * self.a
 
-        C_L_start_cruise = W_start_cruise * self.g_0 / (0.5 * self.rho * V**2 * self.S)
+        self.C_L_start_cruise = W_start_cruise * self.g_0 / (0.5 * self.rho * V**2 * self.S)
 
-        self.C_D_start_cruise_neo = self.C_D_0_clean_neo + C_L_start_cruise**2 / (np.pi * self.AR * self.e)
-        self.C_D_start_cruise_HACK = self.C_D_0_HACK + C_L_start_cruise**2 / (np.pi * self.AR * self.e)
+        self.C_D_start_cruise_neo = self.C_D_0_clean_neo + self.C_L_start_cruise**2 / (np.pi * self.AR * self.e)
+        self.C_D_start_cruise_HACK = self.C_D_0_HACK + self.C_L_start_cruise**2 / (np.pi * self.AR * self.e)
 
         self.D_start_cruise_HACK = self.C_D_start_cruise_HACK * 0.5 * self.rho * V**2 * self.S
         print(self.C_D_start_cruise_HACK, '*0.5*', self.rho, '*', V, '**2 * ', self.S)
 
-        self.L_D_ratio_neo = C_L_start_cruise / self.C_D_start_cruise_neo
-        self.L_D_ratio_HACK = C_L_start_cruise / self.C_D_start_cruise_HACK
+        self.L_D_ratio_neo = self.C_L_start_cruise / self.C_D_start_cruise_neo
+        self.L_D_ratio_HACK = self.C_L_start_cruise / self.C_D_start_cruise_HACK
 
     def lift_gradient(self, M):
+        self.wing_AR()
         beta = np.sqrt(1 - M**2)
-
+        self.CL_alpha = 2 * np.pi * self.AR / (2 + np.sqrt(4 + (self.AR * beta / 0.95)**2 *
+                                                      (1 + (np.tan(self.sweep_05) / beta)**2)))
 
     def plot_lift_drag_characteristics(self):
         C_L_range = np.linspace(-5, 15, 500)
@@ -209,6 +213,7 @@ if __name__ == '__main__':
           '\n That is a ', (ae.C_D_0_HACK / ae.C_D_0_clean_neo - 1) * 100, '% increase')
 
     ae.L_over_D_cruise()
-    print('\n The drag coefficient of the A320-HACK during cruise is  = ', ae.C_D_start_cruise_HACK,
+    print('\n The lift coefficient is = ', ae.C_L_start_cruise,
+          '\n The drag coefficient of the A320-HACK during cruise is  = ', ae.C_D_start_cruise_HACK,
           '\n The drag then is = ', ae.D_start_cruise_HACK,
           '\n The L/D ratio is = ', ae.L_D_ratio_HACK)
