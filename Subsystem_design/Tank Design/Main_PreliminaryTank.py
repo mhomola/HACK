@@ -56,7 +56,7 @@ if __name__ == '__main__':
     aft_H2_vol = total_vol- central_H2_vol#[m^3] the volume of LH2 that must be stored behind the passenger cabin
 
     #Iteration for the tank behind the cabin
-    aft = spacial_constraints(length=2.65,width=3.6,height=3.6)
+    aft = spacial_constraints(length=aft_H2_vol/(1.8**2*m.pi),width=3.6,height=3.6)
     aft_tank = Mechanical_Design.Cyl_Tank(constraints=aft,dp=Mechanical_Design.dp, s_a=Mechanical_Design.s_a, e_w=Mechanical_Design.e_w,material_insulation=Materials.MLI
                           ,material_inner = Materials.Al_2090_T81,material_outer=Materials.Al_2090_T81,rho=Mechanical_Design.rho,t_tank=Mechanical_Design.t_tank,dt=Mechanical_Design.dt,p_tank=Mechanical_Design.p_tank)
     aft_tank.tank_design()
