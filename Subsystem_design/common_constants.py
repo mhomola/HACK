@@ -25,7 +25,7 @@ class Constants():
 
         ''' Dimensions of A320HACK'''
         self.S = 122.6                                              # Wing surface area                            [m^2]
-        self.l_f = 37.57 + 3.7                                      # Fuselage length                               [m]
+        self.l_f = 37.57 + 2.8                                      # Fuselage length                               [m]
         self.height_f = 4.14                                        # Fuselage height                               [m]
         self.width_f = 3.95                                         # Fuselage width                                [m]
         self.l_cockpit = 5.04                                       # Length of the cockpit                         [m]
