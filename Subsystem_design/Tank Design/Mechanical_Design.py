@@ -10,7 +10,7 @@ import Materials
 # Hydrogen tank storage data
 p_outside = 0.19028  # [bar] at 12100 [m] of altitude
 p_tank = 3.5         # [bar] venting pressure
-t_outside = 216.65   # [K]
+t_outside = 273.15+45#216.65   # [K]
 t_tank = 19.75        # [K]
 d_0 = 3              # [m] outside diameter -- dummy
 d_e = 4              # [m] ellipse minor axis diameter -- dummy
