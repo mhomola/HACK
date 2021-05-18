@@ -1,5 +1,6 @@
 from common_constants import Constants
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class AerodynamicCharacteristics(Constants):
@@ -187,10 +188,27 @@ class AerodynamicCharacteristics(Constants):
                                                       (1 + (np.tan(self.sweep_05) / beta)**2)))
 
     def plot_lift_drag_characteristics(self):
-        C_L_range = np.linspace(-5, 15, 500)
-        C_D_range = self.C_D_0_HACK + C_L_range**2 / (np.pi * self.AR * self.e)
-        CL_CD = C_L_range / C_D_range
+        C_L_range = np.linspace(-0.3, 1.5, 500)
+        C_D_range_neo = self.C_D_0_clean_neo + C_L_range**2 / (np.pi * self.AR * self.e)
+        C_D_range_HACK = self.C_D_0_HACK + C_L_range**2 / (np.pi * self.AR * self.e)
+        CL_CD_neo = C_L_range / C_D_range_neo
+        CL_CD_HACK = C_L_range / C_D_range_HACK
 
+        fig1, ax1 = plt.subplots(1,1)
+        ax1.plot(C_L_range, C_D_range_HACK, label='A320-HACK')
+        ax1.plot(C_L_range, C_D_range_neo, label='A320neo', linestyle='--')
+        ax1.legend(loc='best')
+        ax1.set_xlabel(r'$C_L$', size=15)
+        ax1.set_ylabel(r'$C_D$',size=15)
+        # plt.show()
+
+        fig2, ax2 = plt.subplots(1,1)
+        ax2.plot(C_L_range, CL_CD_HACK, label='A320-HACK')
+        ax2.plot(C_L_range, CL_CD_neo, label='A320neo', linestyle='--')
+        ax2.legend(loc='best')
+        ax2.set_xlabel(r'$C_L$', size=15)
+        ax2.set_ylabel(r'$\frac{C_L}{C_D}$', size=15)
+        plt.show()
 
 
 # Try out the class
@@ -217,3 +235,5 @@ if __name__ == '__main__':
           '\n The drag coefficient of the A320-HACK during cruise is  = ', ae.C_D_start_cruise_HACK,
           '\n The drag then is = ', ae.D_start_cruise_HACK,
           '\n The L/D ratio is = ', ae.L_D_ratio_HACK)
+
+    ae.plot_lift_drag_characteristics()
