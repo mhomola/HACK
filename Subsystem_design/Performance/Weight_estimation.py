@@ -57,7 +57,7 @@ class Compute_weight(Constants):
         self.OEW_HACK = self.OEW_320neo + self.m_tank_center_w + self.m_tank_ext_f + self.FS_mass + self.struc_mass
         print('The OEW of HACK is:',self.OEW_HACK)
         self.Max_fuel_mass = self.m_H2_center_w + self.m_H2_ext_f + self.m_k
-
+        print('The max fuel capacity is:',self.Max_fuel_mass)
         self.MPLW_HACK = self.MPLW_320neo                       # Maximum Payload weight of HACK                  [kg]
         self.MZFW_HACK = self.MPLW_HACK + self.OEW_HACK         # Maximum zero fuel weight of HACK                [kg]
         self.MTOW_HACK = self.MTOW_320neo                       # Maximum take-off weight of Hack                 [kg]
@@ -85,6 +85,7 @@ class performance(Compute_weight):
 
     def Range(self,L_D_ratio,cruise_f_ratio):
         R = (self.V_cruise/(self.c_j_kerosene*self.g_0)) * (L_D_ratio) *log(1/cruise_f_ratio)
+        return R
 
     def payload_range_dia(self,L_over_D,h2_vol_center, h2_vol_f):
 
@@ -104,28 +105,26 @@ class performance(Compute_weight):
         Mto = self.MTOW_HACK
         W_Pl_B = self.MPLW_HACK                                               # Payload mass at point B             [kg]
         Mf = self.MTOW_HACK - W_Pl_B - self.OEW_HACK                          # Maximum fuel at maximum payload    [kg]
-        W5W4_B = self.flight_profile_weights(Mf,Mto)
-        R_B = self.Range(L_over_D,W5W4_B)
+        W5W4_B = self.flight_profile_weights(Mf,Mto)                          # Fuel ratio during cruise for point B [-]
+        R_B = self.Range(L_over_D,W5W4_B)                                     # Range at point B                     [m]
 
 
         # Point C: R = ?? and Wf = MFW, Wpl = MTOW - OEM - Maxfuel
         Mf = self.Max_fuel_mass                                               # Maximum fuel capacity of HACK      [kg]
         W_Pl_C = Mto - Mf - self.OEW_HACK                                     #Payload mass at point C             [kg]
-        W5W4_C = self.flight_profile_weights(Mf, Mto)
-        R_C = self.Range(L_over_D, W5W4_C)
+        W5W4_C = self.flight_profile_weights(Mf, Mto)                         # Fuel ratio during cruise for point C [-]
+        R_C = self.Range(L_over_D, W5W4_C)                                    # Range at point C                     [m]
 
 
         # Point D: R = ?? and W_Pl = 0--> W_fuel = Maxfuel
         Mf = self.Max_fuel_mass                                               # Maximum fuel capacity of HACK      [kg]
         W_PL_D = 0                                                            # Payload mass at point D            [kg]
         Mto = self.OEW_HACK + Mf + W_PL_D                                     # Take off weight at point D         [kg]
-        W5W4_D = self.flight_profile_weights(Mf, Mto)
-        R_D = self.Range(L_over_D, W5W4_D)
+        W5W4_D = self.flight_profile_weights(Mf, Mto)                         # Fuel ratio during cruise for point D [-]
+        R_D = self.Range(L_over_D, W5W4_D)                                    # Range at point D                     [m]
 
-        Range_array = np.array([R_A,R_B,R_C,R_D])
-        print(Range_array)
+        Range_array = np.array([R_A*0.001,R_B*0.001,R_C*0.001,R_D*0.001])
         Payload_array = np.array([W_Pl_A,W_Pl_B,W_Pl_C,W_PL_D])
-        print(Payload_array)
         plt.plot(Range_array,Payload_array,marker = '*',color = 'tab:red')
         plt.xlabel('Range [m]')
         plt.ylabel('Payload Mass [kg]')
@@ -140,4 +139,4 @@ Aerodynamic_charac = AerodynamicCharacteristics()
 Aerodynamic_charac.L_over_D_cruise()
 
 Performance = performance()
-Performance.payload_range_dia(L_over_D=Aerodynamic_charac.L_D_ratio_HACK, h2_vol_center=76.477,h2_vol_f=34.271)
+Performance.payload_range_dia(L_over_D=Aerodynamic_charac.L_D_ratio_HACK, h2_vol_center=7.6477,h2_vol_f=30.245)
