@@ -18,21 +18,21 @@ class Constants():
         self.a_0 = 340.294                                          # Sea level speed of sound                     [m/s]
 
         ''' Dimensions of A320HACK'''
-        self.S = 122.6                                              #  Wing surface area                           [m^2]
-        self.l_f = 37.57                                            # Fuselage length                               [m] :todo: Change this value to account for H2
+        self.S = 122.6                                              # Wing surface area                            [m^2]
+        self.l_f = 37.57 + 3.7                                      # Fuselage length                               [m]
         self.d_f = 4.14                                             # Fuselage maximum diameter in                  [m]
         self.l_cockpit = 5.04                                       # Length of the cockpit                         [m]
-        self.l_cabin = 29.53 - self.l_cockpit                       # Length of the cabin                           [m] :todo: Change this value to account for H2
-        self.l_tail = self.l_f - 29.53                              # Length of the tail                            [m] :todo: Change this value to account for H2
+        self.l_cabin = 29.53 + 3.7 - self.l_cockpit                 # Length of the cabin + H2 tank                 [m]
+        self.l_tail = self.l_f - self.l_cabin - self.l_cockpit      # Length of the tail                            [m]
         self.S_b_fus = np.pi * 0.3/2 * 0.45/2                       # Base surface area                            [m^2]
-        self.sweep = 27                                             # Wing sweep                                   [deg]
+        self.sweep_LE = 27                                          # Wing sweep                                   [deg]
 
         self.MTOW_320neo = 73500                                    # Maximum Take-Off weight of A320neo            [kg]
         self.MLW_320neo = 66300                                     # Maximum Landing weight of A320neo             [kg]
         self.MRW_320neo = 73900                                     # Maximum Ramp weight of A320neo                [kg]
         self.MZFW_320neo = 62800                                    # Maximu Zero fuel weight of A320neo            [kg]
         self.MPLW_320neo = 18240                                    # Maximum Payload weight of A320neo             [kg]
-        self.OEW_320neo = self.MZFW_320neo - self.MPLW_320neo       # Operational Empty weight of A320neo           [kg]
+        self.OEW_320neo = 44300                                     # Operational Empty weight of A320neo           [kg]
 
         self.MTOW_321neo = 89000                                    # Maximum Take-Off weight of A321neo            [kg]
         self.MLW_321neo = 77300                                     # Maximum Landing weight of A321neo             [kg]
@@ -42,7 +42,13 @@ class Constants():
         self.OEW_321neo = self.MZFW_321neo - self.MPLW_321neo       # Operational Empty weight of A320neo           [kg]
 
         self.l_f_321neo= 44.51                                      # Fuselage length of A321neo                    [m]
-        self.l_f_320neo = 37.57                                     # Fuselage length of A320neo                    [m
+        self.l_f_320neo = 37.57                                     # Fuselage length of A320neo                    [m]
+        self.l_cockpit_320neo = 5.04                                # Length of the cockpit of A320neo              [m]
+        self.l_cabin_320neo = 29.53 - self.l_cockpit_320neo         # Length of the cabin of A320neo                [m]
+        self.l_tail_320neo = self.l_f_320neo - 29.53                # Length of the tail of A320neo                 [m]
+
+        self.c_j_kerosene = 16.68 * 10**(-6)                        # Specific cruise fuel consumption of neo   [kg/N*s]
+
     def speed_of_sound(self, T):
         """
         Compute the speed of sound in air for any temperature
