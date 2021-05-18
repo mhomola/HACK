@@ -1,5 +1,6 @@
-from common_constants import Constants
+from Subsystem_design.common_constants import Constants
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class AerodynamicCharacteristics(Constants):
@@ -18,6 +19,8 @@ class AerodynamicCharacteristics(Constants):
         self.taper_in = self.c_kink_out / self.c_root  # Taper ratio of the inner trapezoid
         self.taper_out = self.c_tip / self.c_kink_out  # Taper ratio of the outer trapezoid
         self.h_sharklet = 2.43  # Height of the wing sharklets [m]
+        self.sweep_025 = 25  # Sweep at the quarter chord [deg]
+        self.sweep_05 = 22.4  # Sweep at the half chord [deg]
 
         self.b_h = 2 * 6.12  # Span of the horizontal tail [m]
         self.c_r_h = 3.814  # Root chord of the horizontal tail [m]
@@ -167,26 +170,45 @@ class AerodynamicCharacteristics(Constants):
         W_start_cruise = self.MTOW_320neo * (0.995 * 0.98)
         V = self.M * self.a
 
-        C_L_start_cruise = W_start_cruise * self.g_0 / (0.5 * self.rho * V**2 * self.S)
+        self.C_L_start_cruise = W_start_cruise * self.g_0 / (0.5 * self.rho * V**2 * self.S)
 
-        self.C_D_start_cruise_neo = self.C_D_0_clean_neo + C_L_start_cruise**2 / (np.pi * self.AR * self.e)
-        self.C_D_start_cruise_HACK = self.C_D_0_HACK + C_L_start_cruise**2 / (np.pi * self.AR * self.e)
+        self.C_D_start_cruise_neo = self.C_D_0_clean_neo + self.C_L_start_cruise**2 / (np.pi * self.AR * self.e)
+        self.C_D_start_cruise_HACK = self.C_D_0_HACK + self.C_L_start_cruise**2 / (np.pi * self.AR * self.e)
 
         self.D_start_cruise_HACK = self.C_D_start_cruise_HACK * 0.5 * self.rho * V**2 * self.S
         print(self.C_D_start_cruise_HACK, '*0.5*', self.rho, '*', V, '**2 * ', self.S)
 
-        self.L_D_ratio_neo = C_L_start_cruise / self.C_D_start_cruise_neo
-        self.L_D_ratio_HACK = C_L_start_cruise / self.C_D_start_cruise_HACK
+        self.L_D_ratio_neo = self.C_L_start_cruise / self.C_D_start_cruise_neo
+        self.L_D_ratio_HACK = self.C_L_start_cruise / self.C_D_start_cruise_HACK
 
     def lift_gradient(self, M):
+        self.wing_AR()
         beta = np.sqrt(1 - M**2)
-
+        self.CL_alpha = 2 * np.pi * self.AR / (2 + np.sqrt(4 + (self.AR * beta / 0.95)**2 *
+                                                      (1 + (np.tan(self.sweep_05) / beta)**2)))
 
     def plot_lift_drag_characteristics(self):
-        C_L_range = np.linspace(-5, 15, 500)
-        C_D_range = self.C_D_0_HACK + C_L_range**2 / (np.pi * self.AR * self.e)
-        CL_CD = C_L_range / C_D_range
+        C_L_range = np.linspace(-0.3, 1.5, 500)
+        C_D_range_neo = self.C_D_0_clean_neo + C_L_range**2 / (np.pi * self.AR * self.e)
+        C_D_range_HACK = self.C_D_0_HACK + C_L_range**2 / (np.pi * self.AR * self.e)
+        CL_CD_neo = C_L_range / C_D_range_neo
+        CL_CD_HACK = C_L_range / C_D_range_HACK
 
+        fig1, ax1 = plt.subplots(1,1)
+        ax1.plot(C_L_range, C_D_range_HACK, label='A320-HACK')
+        ax1.plot(C_L_range, C_D_range_neo, label='A320neo', linestyle='--')
+        ax1.legend(loc='best')
+        ax1.set_xlabel(r'$C_L$', size=15)
+        ax1.set_ylabel(r'$C_D$',size=15)
+        # plt.show()
+
+        fig2, ax2 = plt.subplots(1,1)
+        ax2.plot(C_L_range, CL_CD_HACK, label='A320-HACK')
+        ax2.plot(C_L_range, CL_CD_neo, label='A320neo', linestyle='--')
+        ax2.legend(loc='best')
+        ax2.set_xlabel(r'$C_L$', size=15)
+        ax2.set_ylabel(r'$\frac{C_L}{C_D}$', size=15)
+        plt.show()
 
 
 # Try out the class
@@ -209,6 +231,9 @@ if __name__ == '__main__':
           '\n That is a ', (ae.C_D_0_HACK / ae.C_D_0_clean_neo - 1) * 100, '% increase')
 
     ae.L_over_D_cruise()
-    print('\n The drag coefficient of the A320-HACK during cruise is  = ', ae.C_D_start_cruise_HACK,
+    print('\n The lift coefficient is = ', ae.C_L_start_cruise,
+          '\n The drag coefficient of the A320-HACK during cruise is  = ', ae.C_D_start_cruise_HACK,
           '\n The drag then is = ', ae.D_start_cruise_HACK,
           '\n The L/D ratio is = ', ae.L_D_ratio_HACK)
+
+    ae.plot_lift_drag_characteristics()
