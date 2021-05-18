@@ -22,7 +22,7 @@ GH2_d_g = regressor(p_tank_g)                     # Density of gas H2 (fully gas
 k_d = 810.0                                       # Mass density of kerosene                           [kg/m^3]
 y = 0.95                                          # LH2 volume ratio (from Winnefeld et al.)           [-]
 fuel_capacity_a320neo = 23859        #23860#26730 # Maximum Fuel capacity of A320neo                   [l]
-
+fuel_capacity_a320neo_FUTURE = 23859*0.9
 
 #Engine performance Constants (estimate)
 
