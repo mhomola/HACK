@@ -44,13 +44,13 @@ if __name__ == '__main__':
         central_iter.width = central_iter.width + 0.01
 
     print("#######CENTRAL TANKS######")
-    print("Mass of one tank",central_tank.mass_tank,"[kg]")
-    print("Insulation of the tank thickness",central_tank.t_insulation*100,"[cm]")
-    print("Thickness inner wall",central_tank.t_wall_inner*1000,"[mm]")
-    print("Thickness outer wall",central_tank.t_wall_outer *1000,"[mm]")
-    print("H2 volume that is stored per tank",central_tank.inner_vol_inner_wall,"[m^3]")
-    print("Outer Diameter of the tank[including insulation]",central_tank.r4*2,"[m]")
-    print("Number of tanks tht can be accommodated in the central sector",m.floor(central.height/(central_tank.r4*2)))
+    print("Mass of one tank", central_tank.mass_tank, "[kg]")
+    print("Insulation of the tank thickness", central_tank.t_insulation*100, "[cm]")
+    print("Thickness inner wall", central_tank.t_wall_inner*1000, "[mm]")
+    print("Thickness outer wall", central_tank.t_wall_outer *1000, "[mm]")
+    print("H2 volume that is stored per tank", central_tank.inner_vol_inner_wall, "[m^3]")
+    print("Outer Diameter of the tank[including insulation]", central_tank.r4*2, "[m]")
+    print("Number of tanks tht can be accommodated in the central sector", m.floor(central.height/(central_tank.r4*2)))
 
     central_H2_vol = central_tank.inner_vol_inner_wall * m.floor(central.height/(central_tank.r4*2)) #[m^3]the volume of LH2 in the central tanks area
     aft_H2_vol = total_vol- central_H2_vol#[m^3] the volume of LH2 that must be stored behind the passenger cabin
@@ -71,4 +71,4 @@ if __name__ == '__main__':
     print("Length",aft.length,"#m")
 
     weight_addition = aft_tank.mass_tank + 2*central_tank.mass_tank
-    print(weight_addition)
+    print("Added Weight = ", weight_addition)

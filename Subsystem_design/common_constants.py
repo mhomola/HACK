@@ -23,9 +23,9 @@ class Constants():
         self.V_cruise = 230
         self.cruise_altitude = 11280
 
-        ''' Dimensions of A320HACK'''
+        ''' Dimensions of A320-HACK'''
         self.S = 122.6                                              # Wing surface area                            [m^2]
-        self.l_f = 37.57 + 2.8                                      # Fuselage length                               [m]
+        self.l_f = 37.57 + 3                                        # Fuselage length                               [m]
         self.height_f = 4.14                                        # Fuselage height                               [m]
         self.width_f = 3.95                                         # Fuselage width                                [m]
         self.l_cockpit = 5.04                                       # Length of the cockpit                         [m]
@@ -34,7 +34,7 @@ class Constants():
         self.S_b_fus = np.pi * 0.3/2 * 0.45/2                       # Base surface area                            [m^2]
         self.sweep_LE = 27                                          # Wing sweep                                   [deg]
 
-        """Fuel constant A320HACK"""
+        """Fuel constant A320-HACK"""
         # self.V_H2 = 37.893
         self.V_H2 = V_H2                                            # Volume required of hydrogen                  [m^3]
         self.V_H2 = V_k
