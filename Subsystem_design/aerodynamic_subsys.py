@@ -32,6 +32,7 @@ class AerodynamicCharacteristics(Constants):
         self.C_D_0_clean_neo = 0.023  # Zero-lift drag coefficient of A320 during cruise
 
         self.R_neo = 4800  # Harmonic range of A320neo [km]
+        self.e = 0.992  # Oswald efficiency factor
         
     def wing_MAC(self):
         """
@@ -86,6 +87,10 @@ class AerodynamicCharacteristics(Constants):
         self.y_mac_h = (self.b_h / 6) * (1 + 2 * self.taper_h) / (1 + self.taper_h)
         self.x_mac_h = self.y_mac_h * np.tan(self.sweep_LE_h * np.pi / 180)
 
+        print('\n MAC of the horizontal tail = ', self.mac_h, ' m',
+              '\n y position of the MAC = ', self.y_mac_h, ' m',
+              '\n x position of the LEMAC measured from the start of the root chord = ', self.x_mac_h, ' m')
+
     def Roskam_drag_prediction_cruise(self, rho, u1, l_f, l_cockpit, l_cabin, l_tail, AoA):
         """
         This function computes the drag from the fuselage according to the procedure given by Roskam at transonic
@@ -100,10 +105,12 @@ class AerodynamicCharacteristics(Constants):
         :return: The zero lift drag coefficient of the fuselage and the drag coefficient of the fusselage due to lift
         """
         # Wetted area as computed in ADSEE-II
+        S_fus = np.pi * 0.25 * self.height_f * self.width_f
+        self.d_f = np.sqrt(4 * S_fus / np.pi)
         S_wet_fus = np.pi * self.d_f / 4 * \
                     (1 / (3 * l_cockpit**2) * ((4 * l_cockpit**2 + self.d_f**2 / 4) - self.d_f**3 / 8)
                      - self.d_f + 4 * l_cabin + 2 * np.sqrt(l_tail**2 + self.d_f**2 / 4))
-        S_fus = np.pi * 0.25 * self.d_f**2
+
 
         # Compute zero lift drag for M = 0.6 for fuselage exclusive of base
         R_n_fus = rho * u1 * l_f / self.visc
@@ -118,7 +125,6 @@ class AerodynamicCharacteristics(Constants):
         # Compute the fuselage base drag coefficient
         bf = np.sqrt(4 / np.pi * self.S_b_fus) / self.d_f
         C_D_b_fus = 0.9 * bf**2
-        print(C_D_b_fus)
 
         # The zero lift drag coefficient of the fuselage becomes:
         C_D_0_fus = C_D_o_fus_exc_base + C_D_b_fus
@@ -163,13 +169,24 @@ class AerodynamicCharacteristics(Constants):
 
         C_L_start_cruise = W_start_cruise * self.g_0 / (0.5 * self.rho * V**2 * self.S)
 
-        self.C_D_start_cruise_neo = self.C_D_0_clean_neo + C_L_start_cruise**2 / (np.pi * self.AR * 0.8)
-        self.C_D_start_cruise_HACK = self.C_D_0_HACK + C_L_start_cruise**2 / (np.pi * self.AR * 0.8)
+        self.C_D_start_cruise_neo = self.C_D_0_clean_neo + C_L_start_cruise**2 / (np.pi * self.AR * self.e)
+        self.C_D_start_cruise_HACK = self.C_D_0_HACK + C_L_start_cruise**2 / (np.pi * self.AR * self.e)
 
         self.D_start_cruise_HACK = self.C_D_start_cruise_HACK * 0.5 * self.rho * V**2 * self.S
+        print(self.C_D_start_cruise_HACK, '*0.5*', self.rho, '*', V, '**2 * ', self.S)
 
         self.L_D_ratio_neo = C_L_start_cruise / self.C_D_start_cruise_neo
         self.L_D_ratio_HACK = C_L_start_cruise / self.C_D_start_cruise_HACK
+
+    def lift_gradient(self, M):
+        beta = np.sqrt(1 - M**2)
+
+
+    def plot_lift_drag_characteristics(self):
+        C_L_range = np.linspace(-5, 15, 500)
+        C_D_range = self.C_D_0_HACK + C_L_range**2 / (np.pi * self.AR * self.e)
+        CL_CD = C_L_range / C_D_range
+
 
 
 # Try out the class
@@ -177,9 +194,11 @@ class AerodynamicCharacteristics(Constants):
 if __name__ == '__main__':
     ae = AerodynamicCharacteristics()
 
-    # Ae.wing_MAC()
-    # Ae.wing_AR()
-    # print('\n\n', Ae.AR)
+    ae.wing_MAC()
+    ae.h_tail_MAC()
+    ae.wing_AR()
+    print('\n Wing AR = ', ae.AR)
+
     ae.drag_increase_cruise(AoA_cruise=2)
 
     print('\n The zero-lift drag coefficient of the fuselage of the A320neo = ', ae.C_D_0_fus_neo,
