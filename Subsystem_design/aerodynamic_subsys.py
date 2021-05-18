@@ -28,9 +28,6 @@ class AerodynamicCharacteristics(Constants):
         self.taper_h = self.c_t_h / self.c_r_h  # Taper ratio of the horizontal tail
         self.sweep_LE_h = 33  # Sweep of the LE of the horizontal tail [deg]
 
-        self.MTOW_neo = 79000  # Maximum take off weight of A320neo [kg]
-        self.RoC_neo = 12.7  # Max rate of climb of the A320neo [m/s]
-
         self.C_D_0_TO_neo = 0.078  # Zero-lift drag coefficient of A320 during take-off
         self.C_D_0_clean_neo = 0.023  # Zero-lift drag coefficient of A320 during cruise
 
@@ -159,9 +156,6 @@ class AerodynamicCharacteristics(Constants):
 
         self.C_D_0_HACK = self.C_D_0_clean_neo - self.C_D_0_fus_neo + self.C_D_0_fus_HACK
 
-
-
-
     def L_over_D_cruise(self):
         self.ISA_calculator(h_input=self.cruise_alt)
         self.wing_AR()
@@ -176,7 +170,6 @@ class AerodynamicCharacteristics(Constants):
         self.C_D_start_cruise_HACK = self.C_D_0_HACK + self.C_L_start_cruise**2 / (np.pi * self.AR * self.e)
 
         self.D_start_cruise_HACK = self.C_D_start_cruise_HACK * 0.5 * self.rho * V**2 * self.S
-        print(self.C_D_start_cruise_HACK, '*0.5*', self.rho, '*', V, '**2 * ', self.S)
 
         self.L_D_ratio_neo = self.C_L_start_cruise / self.C_D_start_cruise_neo
         self.L_D_ratio_HACK = self.C_L_start_cruise / self.C_D_start_cruise_HACK
@@ -237,3 +230,11 @@ if __name__ == '__main__':
           '\n The L/D ratio is = ', ae.L_D_ratio_HACK)
 
     ae.plot_lift_drag_characteristics()
+
+    ae.drag_increase_TO()
+    print('\n The zero-lift drag coefficient of the fuselage of the A320neo at TO = ', ae.C_D_0_fus_neo,
+          '\n For the A32-HACK it is = ', ae.C_D_0_fus_HACK)
+
+    print('\n Assuming the C_D_0 of the A320neo during TO is = ', ae.C_D_0_TO_neo,
+          '\n The C_D_0 of the A320-HACK now becomes = ', ae.C_D_0_HACK,
+          '\n That is a ', (ae.C_D_0_HACK / ae.C_D_0_TO_neo - 1) * 100, '% increase')
