@@ -17,7 +17,7 @@ class Compute_weight(Constants):
         super().__init__()
         self.m_k = 11595.96                                        # Kerosene mass                                  [kg]
         self.sigma_y_FS = 350 * 10 ** 6                            # Yield strendth of Steel (assumption)           [Pa]
-        self.rho_FS = 7750                                         # Density of steel                           [kg/m^3]
+        self.rho_FS = 7870                                         # Density of steel                           [kg/m^3]
         self.D_FS = 0.4                                            # Diameter of the pipelines                      [m]
         self.p_FS = 1.66 * p_tank                                  # Assumed pressure inside the tanks              [Pa]
         self.FS_length = 66.5                                      # Length of feeding system(roughly)              [m]
@@ -27,9 +27,16 @@ class Compute_weight(Constants):
 
 
     def Tank_mass(self,h2_vol_center, h2_vol_f):
+        """
 
-        self.m_H2_center_w, self.m_tank_center_w, _ = liquid_H_tanks(h2_vol_center*1000) # Hydrogen mass and Tank mass[kg]
-        self.m_H2_ext_f, self.m_tank_ext_f, _ = liquid_H_tanks(h2_vol_f * 1000)          # Hydrogen mass and Tank mass[kg]
+        :param h2_vol_center: Volume of H2 contained in the center tanks                    [m^3]
+        :param h2_vol_f: Volume of H2 contained in the extended fuselage tanks              [m^3]
+        :return: m_H2_center_w, m_tank_center_w, m_H2_ext_f, m_tank_ext_f
+        """
+        self.m_H2_center_w,_, _ = liquid_H_tanks(h2_vol_center*1000)                    # Hydrogen mass             [kg]
+        self.m_tank_center_w = self.center_tank_mass                                    # Center Tank's mass       [kg]
+        self.m_H2_ext_f, self.m_tank_ext_f, _ = liquid_H_tanks(h2_vol_f * 1000)         # Hydrogen mass             [kg]
+        self.m_tank_ext_f = self.fuselage_tank_mass                                     # Fuselage tank's mass      [kg]
 
         return self.m_H2_center_w, self.m_tank_center_w,self.m_H2_ext_f, self.m_tank_ext_f
 
@@ -60,9 +67,9 @@ class Compute_weight(Constants):
 
         # Operational Empty Weight of Hack    [kg]
         self.OEW_HACK = self.OEW_320neo + self.m_tank_center_w + self.m_tank_ext_f + self.FS_mass + self.struc_mass
-        print('The OEW of HACK is:',self.OEW_HACK)
+        #print('The OEW of HACK is:',self.OEW_HACK)
         self.Max_fuel_mass = self.m_H2_center_w + self.m_H2_ext_f + self.m_k
-        print('The max fuel capacity is:',self.Max_fuel_mass)
+        #print('The max fuel capacity is:',self.Max_fuel_mass)
         self.MPLW_HACK = self.MPLW_320neo                       # Maximum Payload weight of HACK                  [kg]
         self.MZFW_HACK = self.MPLW_HACK + self.OEW_HACK         # Maximum zero fuel weight of HACK                [kg]
         self.MTOW_HACK = self.MTOW_320neo                       # Maximum take-off weight of Hack                 [kg]
@@ -76,13 +83,13 @@ class performance(Compute_weight):
         Wf_Wto = Mf/Mto                                         # Fuel fraction between maximum fuel mass          [-]
                                                                 # @ max. payload, and MTOW
         M_ff = 1 - Wf_Wto
-        W5_W4 = M_ff * (1/self.W1_Wto) * (1/self.W2_W1) * (1/self.W3_W2) \
+        W5_W4 = M_ff  * (1/self.W3_W2) \
                 * (1/self.W4_W3) * (1/self.W6_W5) * (1/self.W7_W6)         # Fuel ratio between the end            [-]
                                                                            # and beginning of cruise
         return W5_W4
 
     def Range(self,L_D_ratio,cruise_f_ratio):
-        R = (self.V_cruise/(self.c_j_kerosene*self.g_0)) * (L_D_ratio) *log(1/cruise_f_ratio)
+        R = (self.V_cruise/(self.c_j_k_H2_cruise*self.g_0)) * (L_D_ratio) *log(1/cruise_f_ratio)
         return R
 
     def payload_range_dia(self,L_over_D,h2_vol_center, h2_vol_f):
@@ -133,13 +140,18 @@ class performance(Compute_weight):
 
 AC_weights = Compute_weight()
 AC_weights.weight_break_down_HACK(h2_vol_center=10.74,h2_vol_f=31.29)
-
+AC_weights.Struc_m()
+print(AC_weights.t_FS)
+print(AC_weights.Feeding_sys_m())
+print(AC_weights.struc_mass)
+print(AC_weights.m_H2_center_w)
+print(AC_weights.m_H2_ext_f)
 Aerodynamic_charac = AerodynamicCharacteristics()
 Aerodynamic_charac.L_over_D_cruise()
 
 Performance = performance()
 Performance.payload_range_dia(L_over_D=Aerodynamic_charac.L_D_ratio_HACK, h2_vol_center=7.6477,h2_vol_f=30.245)
-
+print(Aerodynamic_charac.L_D_ratio_HACK)
 if __name__ == '__main__':
     print('The OEW of the A320HACK is:',AC_weights.OEW_HACK)
     print('The MPLW of the A320HACK is:', AC_weights.MPLW_HACK)

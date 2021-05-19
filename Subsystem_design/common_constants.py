@@ -46,7 +46,11 @@ class Constants():
         self.W6_W5 = 0.990
         self.W7_W6 = 0.992
         self.c_j_kerosene = 16.68 * 10 ** (-6)                      # Specific cruise fuel consumption of neo   [kg/N*s]
+        self.c_j_k_H2_cruise = 11.83 * 10 ** (-6)                  # Specific cruise fuel consumption of HACK  [kg/N*s]
 
+        """Tank design constants""" #Plsss automate these, for design changes
+        self.center_tank_mass = 390.6                               # Mass of center tanks in total (2 tanks)       [kg]
+        self.fuselage_tank_mass = 286.6                             # Mass of aft tank (1 tank)                     [kg]
         """Weights of A320neo"""
         self.MTOW_320neo = 73500                                    # Maximum Take-Off weight of A320neo            [kg]
         self.MLW_320neo = 66300                                     # Maximum Landing weight of A320neo             [kg]
@@ -170,7 +174,7 @@ class Constants():
 
 # Try out the class
 
-Weigth_Centre_Tanks
+#Weigth_Centre_Tanks
 
 if __name__ == '__main__':
     c = Constants()
