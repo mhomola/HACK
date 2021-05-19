@@ -25,7 +25,7 @@ class Constants():
 
         ''' Dimensions of A320-HACK'''
         self.S = 122.6                                              # Wing surface area                            [m^2]
-        self.l_f = 37.57 + 3                                        # Fuselage length                               [m]
+        self.l_f = 37.57 + 3.15                                     # Fuselage length                               [m]
         self.height_f = 4.14                                        # Fuselage height                               [m]
         self.width_f = 3.95                                         # Fuselage width                                [m]
         self.l_cockpit = 5.04                                       # Length of the cockpit                         [m]
@@ -38,7 +38,7 @@ class Constants():
         # self.V_H2 = 37.893
         self.V_H2 = V_H2                                            # Volume required of hydrogen                  [m^3]
         self.V_H2 = V_k
-        # self.V_k = 14.316                                           # Volume required of kerosene                  [m^3]
+        # self.V_k = 14.316                                         # Volume required of kerosene                  [m^3]
 
         """Weights of A320neo"""
         self.MTOW_320neo = 73500                                    # Maximum Take-Off weight of A320neo            [kg]
@@ -162,6 +162,8 @@ class Constants():
         self.rho = self.ISA_density(self.p, self.T)
 
 # Try out the class
+
+Weigth_Centre_Tanks
 
 if __name__ == '__main__':
     c = Constants()
