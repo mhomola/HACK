@@ -39,6 +39,13 @@ class Constants():
         self.V_H2 = V_H2                                            # Volume required of hydrogen                  [m^3]
         self.V_H2 = V_k
         # self.V_k = 14.316                                           # Volume required of kerosene                  [m^3]
+        self.W1_Wto = 0.990
+        self.W2_W1 = 0.990
+        self.W3_W2 = 0.995
+        self.W4_W3 = 0.980
+        self.W6_W5 = 0.990
+        self.W7_W6 = 0.992
+        self.c_j_kerosene = 16.68 * 10 ** (-6)                      # Specific cruise fuel consumption of neo   [kg/N*s]
 
         """Weights of A320neo"""
         self.MTOW_320neo = 73500                                    # Maximum Take-Off weight of A320neo            [kg]
@@ -63,7 +70,7 @@ class Constants():
         self.l_cabin_320neo = 29.53 - self.l_cockpit_320neo         # Length of the cabin of A320neo                [m]
         self.l_tail_320neo = self.l_f_320neo - 29.53                # Length of the tail of A320neo                 [m]
 
-        self.c_j_kerosene = 16.68 * 10**(-6)                        # Specific cruise fuel consumption of neo   [kg/N*s]
+
 
     def fuselage_length(self,vol_eff, vol_fus):
         """
