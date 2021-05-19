@@ -20,7 +20,7 @@ class spacial_constraints():
 
 #Define the areas of the constraints
 
-central = spacial_constraints(length=3.5,width=1.14,height=2.67)
+central = spacial_constraints(length=6.5,width=1.14,height=2.67)
 
 central_iter = spacial_constraints(length=6.5,width=1.14,height=2.67)
 central_iter.width = central_iter.width * 0.7 #we start from a smaller diameter
@@ -40,7 +40,7 @@ central_H2_vol = central_tank.inner_vol_inner_wall * m.floor(central.height/(cen
 aft_H2_vol = total_vol - central_H2_vol#[m^3] the volume of LH2 that must be stored behind the passenger cabin
 
 # Iteration for the tank behind the cabin
-aft = spacial_constraints(length=aft_H2_vol / (1.8 ** 2 * m.pi), width=3.6, height=3.6)
+aft = spacial_constraints(length=aft_H2_vol / (1.78 ** 2 * m.pi), width=3.56, height=3.56)
 aft_tank = Mechanical_Design.Cyl_Tank(constraints=aft, dp=Mechanical_Design.dp, s_a=Mechanical_Design.s_a,
                                       e_w=Mechanical_Design.e_w, material_insulation=Materials.MLI
                                       , material_inner=Materials.Al_2090_T81, material_outer=Materials.Al_2090_T81,
