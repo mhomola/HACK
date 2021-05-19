@@ -1,7 +1,7 @@
 #Following file computes a first estimation of the weight of the A320-HACK
 
 from tank_sizing import liquid_H_tanks
-from Subsystem_design.fuel_required import fuel_volume_calc
+#from Subsystem_design.fuel_required import fuel_volume_calc
 from Subsystem_design.common_constants import Constants
 from fuel_constants import *
 from math import pi,log
@@ -47,7 +47,12 @@ class Compute_weight(Constants):
         return self.struc_mass
 
     def weight_break_down_HACK(self,h2_vol_center, h2_vol_f):
+        """
 
+        :param h2_vol_center: Volume of H2 contained in the center tanks                    [m^3]
+        :param h2_vol_f: Volume of H2 contained in the extended fuselage tanks              [m^3]
+        :return: None
+        """
         #Running Tank mass, feeding system mass and struc mass  function
         self.Tank_mass(h2_vol_center, h2_vol_f)
         self.Feeding_sys_m()
@@ -64,14 +69,7 @@ class Compute_weight(Constants):
         self.Max_fuel_at_max_PL = self.MTOW_HACK - self.MPLW_HACK - self.OEW_HACK   #Maximum fuel at maximum payload[kg]
 
 class performance(Compute_weight):
-    def __init__(self):
-        super().__init__()
-        self.W1_Wto = 0.990
-        self.W2_W1 = 0.990
-        self.W3_W2 = 0.995
-        self.W4_W3 = 0.980
-        self.W6_W5 = 0.990
-        self.W7_W6 = 0.992
+    #super().__init__()
 
     def flight_profile_weights(self,Mf,Mto):
         #Starts with MTOW, obtain Wf/Wto:
@@ -133,10 +131,19 @@ class performance(Compute_weight):
 
 #const = Constants()
 
-#AC_weights = Compute_weight()
+AC_weights = Compute_weight()
+AC_weights.weight_break_down_HACK(h2_vol_center=10.74,h2_vol_f=31.29)
 
 Aerodynamic_charac = AerodynamicCharacteristics()
 Aerodynamic_charac.L_over_D_cruise()
 
 Performance = performance()
 Performance.payload_range_dia(L_over_D=Aerodynamic_charac.L_D_ratio_HACK, h2_vol_center=7.6477,h2_vol_f=30.245)
+
+if __name__ == '__main__':
+    print('The OEW of the A320HACK is:',AC_weights.OEW_HACK)
+    print('The MPLW of the A320HACK is:', AC_weights.MPLW_HACK)
+    print('The max fuel mass of the A320HACK is:', AC_weights.Max_fuel_mass)
+    print('The max fuel @ MPLW of the A320HACK is:', AC_weights.Max_fuel_at_max_PL)
+    print('The MZFW of the A320HACK is:', AC_weights.MZFW_HACK)
+    print('The MTOW of the A320HACK is:', AC_weights.MTOW_HACK)

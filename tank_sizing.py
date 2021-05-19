@@ -3,7 +3,7 @@
 
 import numpy as np
 from fuel_constants import *
-from Subsystem_design.fuel_required import fuel_mass_calc, fuel_volume_calc
+#from Subsystem_design.fuel_required import fuel_mass_calc, fuel_volume_calc
 import matplotlib.pyplot as plt
 
 
