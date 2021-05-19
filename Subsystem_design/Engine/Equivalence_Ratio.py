@@ -41,7 +41,7 @@ def sfc(H2_frac,Ker_frac):
 
 
 
-print(sfc(0,1))
+print(sfc(1,0))
 
 
 
