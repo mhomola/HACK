@@ -63,7 +63,7 @@ class Tank():
     self.t_tank = t_tank
     self.dt = dt
     self.p_tank = p_tank * 10**5 #[Pa]
-    self.safety_factor = 1.25
+    self.safety_factor = 1.5
     self.outer_vol_inner_wall = m.pi * (self.d_0/2)**2 * (self.length-self.d_0) + 4/3* m.pi * (self.d_0/2)**3 #cylinder volume + sphere volume
                                                                                                       #outer volume described by the inner tank wall
 
@@ -155,7 +155,7 @@ class Cyl_Tank():
     self.t_tank = t_tank
     self.dt = dt
     self.p_tank = p_tank * 10**5 #[Pa]
-    self.safety_factor = 1.25
+    self.safety_factor = 1.5
     self.outer_vol_inner_wall = m.pi * (self.d_0/2)**2 * (self.length)
 
 

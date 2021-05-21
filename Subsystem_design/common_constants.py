@@ -99,8 +99,8 @@ class Constants():
         self.k_d = 810.0                                            # Mass density of kerosene                           [kg/m^3]
 
         """Tank design constants""" #Plsss automate these, for design changes
-        self.center_tank_mass = 228.3615 * 2   # Mass of center tanks in total (2 tanks)       [kg]
-        self.fuselage_tank_mass = 345.3723      # Mass of aft tank (1 tank)                     [kg]
+        self.center_tank_mass = 270.1199 * 2   # Mass of center tanks in total (2 tanks)       [kg]
+        self.fuselage_tank_mass = 412.605      # Mass of aft tank (1 tank)                     [kg]
 
         """Weights of HACK"""
         self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                     [kg]
