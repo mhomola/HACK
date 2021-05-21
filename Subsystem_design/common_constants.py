@@ -3,7 +3,6 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from math import pi
 from Subsystem_design.fuel_required import V_H2, V_k
-from Subsystem_design.aerodynamic_subsys import AerodynamicCharacteristics
 """
 This file contains one class only, which is meant to contain the variables which are common to the entire subsystem 
 design. It may also contain some simple functions to compute constants derived from other constants (e.g. ISA).
@@ -33,33 +32,9 @@ class Constants():
         self.V_cruise = self.M * self.a_c
 
         '''Aerodynamics'''
-        aero = AerodynamicCharacteristics()
-        aero.aero_functions(AoA_cruise=2)
-
-        self.mac = aero.mac                                         # MAC of the complete wing                      [m]
-        self.y_mac = aero.y_mac                                     # y position of MAC                             [m]
-        self.x_mac = aero.x_mac                                     # x loc of LEMAC from beginning of root chord   [m]
-        self.AR = aero.AR                                           # Aspect Ratio incl sharklets
         self.e = 0.992                                              # Oswald efficiency factor
-
-        self.mac_h = aero.mac_h                                     # MAC of the complete wing                      [m]
-        self.y_mac_h = aero.y_mac_h                                 # y position of MAC of horizontal tail          [m]
-        self.x_mac_h = aero.x_mac_h                                 # x loc of LEMAC of horziontal tail from c_r_h  [m]
-
         self.C_D_0_TO_neo = 0.078                                   # Zero-lift drag coefficient of A320neo - TO
         self.C_D_0_clean_neo = 0.023                                # Zero-lift drag coefficient of A320neo - cruise
-        self.C_D_0_fus_neo = aero.C_D_0_fus_neo                     # Zero-lift drag coefficient of A320neo's fuselage
-        self.C_D_0_fus_HACK = aero.C_D_0_fus_HACK                   # Zero-lift drag coefficient of A320-Hack's fuselage
-        self.C_D_0_HACK = aero.C_D_0_HACK                           # Zero-lift drag coefficient of A320-HACK - cruise
-
-        self.C_L_start_cruise = aero.C_L_start_cruise               # Lift coefficient at start of cruise for both AC
-        self.C_D_start_cruise_neo = aero.C_D_start_cruise_neo       # Drag Coefficient at start of cruise - A320neo
-        self.C_D_start_cruise_HACK = aero.C_D_start_cruise_HACK     # Drag Coefficient at start of cruise - A320-HACK
-
-        self.D_start_cruise_HACK = aero.D_start_cruise_HACK         # Drag at start of cruise - A320-HACK           [N]
-
-        self.L_D_ratio_neo = aero.L_D_ratio_neo                     # Lift to Drag ratio at start of cruise - A320neo
-        self.L_D_ratio_HACK = aero.L_D_ratio_HACK                   # Lift to Drag ratio at start of cruise - A320-HACK
 
         self.b_in = 2 * 6.4                                         # Span of inner wing trapezoid                  [m]
         self.b_out = 2 * 10.616                                     # Span of outer wing trapezoid                  [m]
