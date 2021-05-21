@@ -42,9 +42,9 @@ class Constants():
         self.W1_Wto = 0.990
         self.W2_W1 = 0.990
         self.W3_W2 = 0.995
-        self.W4_W3 = 0.980
-        self.W6_W5 = 0.990
-        self.W7_W6 = 0.992
+        self.W4_W3 =0.980#0.9511#0.980
+        self.W6_W5 = 0.990#0.9785#0.990
+        self.W7_W6 = 0.992#0.99#0.992
         self.c_j_kerosene = 16.68 * 10 ** (-6)                      # Specific cruise fuel consumption of neo   [kg/N*s]
         self.c_j_k_H2_cruise = 11.83 * 10 ** (-6)                  # Specific cruise fuel consumption of HACK  [kg/N*s]
 
@@ -57,7 +57,7 @@ class Constants():
         self.MRW_320neo = 73900                                     # Maximum Ramp weight of A320neo                [kg]
         self.MZFW_320neo = 62800                                    # Maximu Zero fuel weight of A320neo            [kg]
         self.MPLW_320neo = 18240                                    # Maximum Payload weight of A320neo             [kg]
-        self.OEW_320neo = 44300                                     # Operational Empty weight of A320neo           [kg]
+        self.OEW_320neo = 44560                                     # Operational Empty weight of A320neo           [kg]
 
         """Weights of A321neo"""
         self.MTOW_321neo = 89000                                    # Maximum Take-Off weight of A321neo            [kg]
