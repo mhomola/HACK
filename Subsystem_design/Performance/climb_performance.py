@@ -41,7 +41,7 @@ class Climb_perdormance(Constants):
         aerodynamics.wing_AR()
         CD= 4 * aerodynamics.C_D_0_clean_neo
         CL=np.sqrt(3 * aerodynamics.C_D_0_clean_neo*np.pi*aerodynamics.AR*aerodynamics.e)
-        print(CD, CL)
+        print(CD, CL, 'AR= ', aerodynamics.AR)
         maxrc = ((self.max_cont_thrust / W)-(CD/CL))*np.sqrt(2*W/(self.S*self.rho_0*CL))
         return maxrc
 
