@@ -72,7 +72,8 @@ class Compute_weight(Constants):
         #print('The max fuel capacity is:',self.Max_fuel_mass)
         self.MPLW_HACK = self.MPLW_320neo                       # Maximum Payload weight of HACK                  [kg]
         self.MZFW_HACK = self.MPLW_HACK + self.OEW_HACK         # Maximum zero fuel weight of HACK                [kg]
-        self.MTOW_HACK = self.MTOW_320neo                       # Maximum take-off weight of Hack                 [kg]
+        self.MTOW_HACK = self.MTOW_320neo + 2.6586*\
+                         (self.OEW_HACK-self.OEW_320neo)    # Maximum take-off weight of Hack interpol b/w A320/21  [kg]
         self.Fuel_idel_taxi_take_off = 262.888                  # Fuel for take-off and idle
         self.Max_fuel_at_max_PL = self.MTOW_HACK - self.MPLW_HACK - self.OEW_HACK \
                                   - self.Fuel_idel_taxi_take_off   #Maximum fuel at maximum payload[kg]
