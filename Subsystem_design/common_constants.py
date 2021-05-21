@@ -4,6 +4,8 @@ from matplotlib import pyplot as plt
 from math import pi
 from Subsystem_design.fuel_required import V_H2, V_k
 
+
+
 """
 This file contains one class only, which is meant to contain the variables which are common to the entire subsystem 
 design. It may also contain some simple functions to compute constants derived from other constants (e.g. ISA).
@@ -97,8 +99,8 @@ class Constants():
         self.k_d = 810.0                                            # Mass density of kerosene                           [kg/m^3]
 
         """Tank design constants""" #Plsss automate these, for design changes
-        self.center_tank_mass = 390.6                               # Mass of center tanks in total (2 tanks)       [kg]
-        self.fuselage_tank_mass = 286.6                             # Mass of aft tank (1 tank)                     [kg]
+        self.center_tank_mass = 228.3615 * 2   # Mass of center tanks in total (2 tanks)       [kg]
+        self.fuselage_tank_mass = 345.3723      # Mass of aft tank (1 tank)                     [kg]
 
         """Weights of HACK"""
         self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                     [kg]
@@ -234,6 +236,7 @@ if __name__ == '__main__':
     print('\n T = ', c.T, ' K',
           '\n P = ', c.p, ' Pa',
           '\n rho = ', c.rho, ' kg/m^3')
+
 
 
 
