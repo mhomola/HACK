@@ -18,4 +18,5 @@ print(vals)
 print(len(vals[3]))
 
 for i in range(len(vals[0])):
-    f.write(str(vals[0][i])+ "   "+str(vals[1][i])+"   "+str(vals[2][i])+"\n")
+    #f.write(str(vals[0][i])+ "   "+str(vals[1][i])+"   "+str(vals[2][i])+"   "+str(vals[3][i])+"\n")
+    f.write('%-50s %-20s %-30s %-30s\n'%(str(vals[0][i]),str(vals[1][i]),str(vals[2][i]),str(vals[3][i])))
