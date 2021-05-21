@@ -3,6 +3,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from math import pi
 from Subsystem_design.fuel_required import V_H2, V_k
+
 """
 This file contains one class only, which is meant to contain the variables which are common to the entire subsystem 
 design. It may also contain some simple functions to compute constants derived from other constants (e.g. ISA).
@@ -35,6 +36,9 @@ class Constants():
         self.e = 0.992                                              # Oswald efficiency factor
         self.C_D_0_TO_neo = 0.078                                   # Zero-lift drag coefficient of A320neo - TO
         self.C_D_0_clean_neo = 0.023                                # Zero-lift drag coefficient of A320neo - cruise
+        self.C_L_max_clean = 1.8                                    # Max lift coefficient clean
+        self.C_L_max_TO = 2.2                                       # Max lift coefficient during TO
+        self.C_L_max_land = 3.0                                     # Max lift coefficient during landing
 
         self.b_in = 2 * 6.4                                         # Span of inner wing trapezoid                  [m]
         self.b_out = 2 * 10.616                                     # Span of outer wing trapezoid                  [m]
@@ -78,7 +82,6 @@ class Constants():
         self.W7_W6 = 0.992
         self.c_j_kerosene = 16.68 * 10 ** (-6)                     # Specific cruise fuel consumption of neo    [kg/N*s]
         self.c_j_k_H2_cruise = 11.83 * 10 ** (-6)                  # Specific cruise fuel consumption of HACK   [kg/N*s]
-
 
         """Tank design constants""" #Plsss automate these, for design changes
         self.center_tank_mass = 390.6                               # Mass of center tanks in total (2 tanks)       [kg]
