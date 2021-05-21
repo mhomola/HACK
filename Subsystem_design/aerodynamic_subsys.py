@@ -183,7 +183,6 @@ class AerodynamicCharacteristics(Constants):
         ax2.set_ylabel(r'$\frac{C_L}{C_D}$', size=15)
         plt.show()
 
-
 # Try out the class
 
 if __name__ == '__main__':
