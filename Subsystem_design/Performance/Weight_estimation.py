@@ -6,7 +6,7 @@ from Subsystem_design.common_constants import Constants
 from fuel_constants import *
 from math import pi,log
 import matplotlib.pyplot as plt
-#from Subsystem_design.aerodynamic_subsys import AerodynamicCharacteristics
+from Subsystem_design.aerodynamic_subsys import AerodynamicCharacteristics
 import numpy as np
 
 
@@ -68,7 +68,7 @@ class Compute_weight(Constants):
         # Operational Empty Weight of Hack    [kg]
         self.OEW_HACK = self.OEW_320neo + self.m_tank_center_w + self.m_tank_ext_f + self.FS_mass + self.struc_mass
 
-        self.Max_fuel_mass_capacity = self.m_H2_center_w + self.m_H2_ext_f + self.m_k
+        self.Max_fuel_mass_capacity_HACK = self.m_H2_center_w + self.m_H2_ext_f + self.m_k
 
         self.MPLW_HACK = self.MPLW_320neo                         # Maximum Payload weight of HACK                  [kg]
         self.MZFW_HACK = self.MPLW_HACK + self.OEW_HACK           # Maximum zero fuel weight of HACK                [kg]
@@ -91,11 +91,11 @@ class performance(Compute_weight):
                                                                            # and beginning of cruise
         return W5_W4
 
-    def Range(self,L_D_ratio,cruise_f_ratio):
-        R = (self.V_cruise/(self.c_j_k_H2_cruise*self.g_0)) * (L_D_ratio) *log(1/cruise_f_ratio)
+    def Range(self,L_D_ratio,cruise_f_ratio,SFC):
+        R = (self.V_cruise/(SFC*self.g_0)) * (L_D_ratio) *log(1/cruise_f_ratio)
         return R
 
-    def payload_range_dia_HACK(self,h2_vol_center=None, h2_vol_f=None):
+    def payload_range_dia_HACK(self,L_over_D,h2_vol_center, h2_vol_f,SFC):
 
         # Function to plot the payload-range diagram
         #Payload as a funstion of range
@@ -114,22 +114,64 @@ class performance(Compute_weight):
         W_Pl_B = self.MPLW_HACK                                               # Payload mass at point B             [kg]
         Mf = self.Max_fuel_at_max_PL_HACK                                     # Maximum fuel at maximum payload    [kg]
         W5W4_B = self.flight_profile_weights(Mf,Mto)                          # Fuel ratio during cruise for point B [-]
-        R_B = self.Range(self.L_D_ratio_HACK,W5W4_B)                                     # Range at point B                     [m]
+        R_B = self.Range(L_over_D,W5W4_B,SFC)                                     # Range at point B                     [m]
 
 
         # Point C: R = ?? and Wf = MFW, Wpl = MTOW - OEM - Maxfuel
-        Mf = self.Max_fuel_mass_capacity - self.Fuel_idel_taxi_take_off_HACK  # Maximum fuel capacity of HACK      [kg]
+        Mf = self.Max_fuel_mass_capacity_HACK - self.Fuel_idel_taxi_take_off_HACK  # Maximum fuel capacity of HACK      [kg]
         W_Pl_C = Mto - Mf - self.OEW_HACK                                     #Payload mass at point C             [kg]
         W5W4_C = self.flight_profile_weights(Mf, Mto)                         # Fuel ratio during cruise for point C [-]
-        R_C = self.Range(self.L_D_ratio_HACK, W5W4_C)                                    # Range at point C                     [m]
+        R_C = self.Range(L_over_D, W5W4_C,SFC)                                    # Range at point C                     [m]
 
 
         # Point D: R = ?? and W_Pl = 0--> W_fuel = Maxfuel
-        Mf = self.Max_fuel_mass_capacity - self.Fuel_idel_taxi_take_off_HACK  # Maximum fuel capacity of HACK      [kg]
+        Mf = self.Max_fuel_mass_capacity_HACK - self.Fuel_idel_taxi_take_off_HACK  # Maximum fuel capacity of HACK      [kg]
         W_PL_D = 0                                                            # Payload mass at point D            [kg]
         Mto = self.OEW_HACK + Mf + W_PL_D                                     # Take off weight at point D         [kg]
         W5W4_D = self.flight_profile_weights(Mf, Mto)                         # Fuel ratio during cruise for point D [-]
-        R_D = self.Range(self.L_D_ratio_HACK, W5W4_D)                                    # Range at point D                     [m]
+        R_D = self.Range(L_over_D, W5W4_D,SFC)                                    # Range at point D                     [m]
+
+        Range_array = np.array([R_A*0.001,R_B*0.001,R_C*0.001,R_D*0.001])
+        Payload_array = np.array([W_Pl_A,W_Pl_B,W_Pl_C,W_PL_D])
+        plt.plot(Range_array,Payload_array,marker = '*',color = 'tab:red')
+        plt.xlabel('Range [km]')
+        plt.ylabel('Payload Mass [kg]')
+        plt.show()
+
+    def payload_range_dia_320neo(self,L_over_D,SFC):
+
+        # Function to plot the payload-range diagram
+        #Payload as a funstion of range
+        #Get Range equation, get Wf and Wi from fuel fractions
+        # R = V/cp * L/D * Wi/Wf
+        # Running compute_weight class to get variables inside functions
+
+
+        #Point A: R = 0 and W_Pl = MPLW
+        R_A = 0
+        W_Pl_A = self.MPLW_320neo                                               # Payload mass at point A             [kg]
+
+        #Point B: R = ?? and W_Pl = MPLW
+        Mto = self.MTOW_320neo
+        W_Pl_B = self.MPLW_320neo                                               # Payload mass at point B             [kg]
+        Mf = self.MTOW_320neo - self.MPLW_320neo - self.OEW_320neo              # Maximum fuel at maximum payload    [kg]
+        W5W4_B = self.flight_profile_weights(Mf,Mto)                            # Fuel ratio during cruise for point B [-]
+        R_B = self.Range(L_over_D,W5W4_B,SFC)                                   # Range at point B                     [m]
+
+
+        # Point C: R = ?? and Wf = MFW, Wpl = MTOW - OEM - Maxfuel
+        Mf = self.Max_fuel_mass_capacity_320neo - self.Fuel_idel_taxi_take_off_320neo # Maximum fuel capacity of A320neo     [kg]
+        W_Pl_C = Mto - Mf - self.OEW_320neo                                  # Payload mass at point C              [kg]
+        W5W4_C = self.flight_profile_weights(Mf, Mto)                        # Fuel ratio during cruise for point C [-]
+        R_C = self.Range(L_over_D, W5W4_C,SFC)                               # Range at point C                     [m]
+
+
+        # Point D: R = ?? and W_Pl = 0--> W_fuel = Maxfuel
+        Mf = self.Max_fuel_mass_capacity_320neo - self.Fuel_idel_taxi_take_off_320neo # Maximum fuel capacity of A320neo      [kg]
+        W_PL_D = 0                                                            # Payload mass at point D            [kg]
+        Mto = self.OEW_320neo + Mf + W_PL_D                                   # Take off weight at point D         [kg]
+        W5W4_D = self.flight_profile_weights(Mf, Mto)                         # Fuel ratio during cruise for point D [-]
+        R_D = self.Range(L_over_D, W5W4_D,SFC)                                # Range at point D                     [m]
 
         Range_array = np.array([R_A*0.001,R_B*0.001,R_C*0.001,R_D*0.001])
         Payload_array = np.array([W_Pl_A,W_Pl_B,W_Pl_C,W_PL_D])
@@ -139,22 +181,24 @@ class performance(Compute_weight):
         plt.show()
 
 if __name__ == '__main__':
-    #const = Constants()
+    const = Constants()
     """Weights of A320-HACK"""
 
     AC_weights = Compute_weight()                                               # Initiallize class of weight estimation
     AC_weights.weight_break_down_HACK(h2_vol_center=11.34,h2_vol_f=30.69)       # Based on H2 volume estimates
     AC_weights.Struc_m()
 
-    # Aerodynamic_charac = AerodynamicCharacteristics()
-    # Aerodynamic_charac.L_over_D_cruise()
+    Aerodynamic_charac = AerodynamicCharacteristics()
+    Aerodynamic_charac.L_over_D_cruise()
 
     Performance = performance()
-    Performance.payload_range_dia_HACK(h2_vol_center=11.34,h2_vol_f=30.69)
+    Performance.payload_range_dia_HACK(L_over_D=Aerodynamic_charac.L_D_ratio_HACK,h2_vol_center=11.34,h2_vol_f=30.69,SFC= const.c_j_k_H2_cruise)
+    Performance.payload_range_dia_320neo(L_over_D=Aerodynamic_charac.L_D_ratio_HACK,SFC = const.c_j_kerosene)
 
     print('The OEW of the A320HACK is:',AC_weights.OEW_HACK)
     print('The MPLW of the A320HACK is:', AC_weights.MPLW_HACK)
-    print('The max fuel mass of the A320HACK is:', AC_weights.Max_fuel_mass_capacity)
+    print('The max fuel mass of the A320HACK is:', AC_weights.Max_fuel_mass_capacity_HACK)
     print('The max fuel @ MPLW of the A320HACK is:', AC_weights.Max_fuel_at_max_PL_HACK)
     print('The MZFW of the A320HACK is:', AC_weights.MZFW_HACK)
     print('The MTOW of the A320HACK is:', AC_weights.MTOW_HACK)
+
