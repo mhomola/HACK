@@ -3,7 +3,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from math import pi
 from Subsystem_design.fuel_required import V_H2, V_k
-from Subsystem_design.aerodynamic_subsys import AerodynamicCharacteristics
+#from Subsystem_design.aerodynamic_subsys import AerodynamicCharacteristics
 """
 This file contains one class only, which is meant to contain the variables which are common to the entire subsystem 
 design. It may also contain some simple functions to compute constants derived from other constants (e.g. ISA).
@@ -52,7 +52,7 @@ class Constants():
         self.D_start_cruise_HACK = aero.D_start_cruise_HACK         # Drag at start of cruise - A320-HACK           [N]
 
         self.L_D_ratio_neo = aero.L_D_ratio_neo                     # Lift to Drag ratio at start of cruise - A320neo
-        self.L_D_ratio_HACK = aero.L_D_ratio_HACK                   # Lift to Drag ratio at start of cruise - A320-HACK
+        self.L_D_ratio_HACK = aero.L_D_ratio_HACK                # Lift to Drag ratio at start of cruise - A320-HACK
 
         self.b_in = 2 * 6.4                                         # Span of inner wing trapezoid                  [m]
         self.b_out = 2 * 10.616                                     # Span of outer wing trapezoid                  [m]
@@ -99,8 +99,11 @@ class Constants():
 
 
         """Tank design constants""" #Plsss automate these, for design changes
-        self.center_tank_mass = 390.6                               # Mass of center tanks in total (2 tanks)       [kg]
-        self.fuselage_tank_mass = 286.6                             # Mass of aft tank (1 tank)                     [kg]
+        self.center_tank_mass = 368.9                              # Mass of center tanks in total (2 tanks)       [kg]
+        self.fuselage_tank_mass = 274.9                             # Mass of aft tank (1 tank)                     [kg]
+
+        """Weights of the A320-HACK"""
+        self.Fuel_idel_taxi_take_off_HACK = 262.888  # Fuel for take-off and idle                     [kg]
 
         """Weights of A320neo"""
         self.MTOW_320neo = 73500                                    # Maximum Take-Off weight of A320neo            [kg]
@@ -109,6 +112,7 @@ class Constants():
         self.MZFW_320neo = 62800                                    # Maximu Zero fuel weight of A320neo            [kg]
         self.MPLW_320neo = 18240                                    # Maximum Payload weight of A320neo             [kg]
         self.OEW_320neo = 44560                                     # Operational Empty weight of A320neo           [kg]
+        self.Fuel_idel_taxi_take_off_320neo = 262.888               # Fuel for take-off and idle                    [kg]
 
         """Weights of A321neo"""
         self.MTOW_321neo = 89000                                    # Maximum Take-Off weight of A321neo            [kg]
