@@ -6,34 +6,14 @@ import matplotlib.pyplot as plt
 class AerodynamicCharacteristics(Constants):
     def __init__(self):
         super().__init__()
-        self.M = 0.78  # Cruising Mach number
-        self.cruise_alt = 11280  # Initial cruising altitude [m]
-        self.visc = 1.458 * 10**(-5)  # Air viscosity [N*s/m^2]
 
-        self.b_in = 2 * 6.4  # Span of inner wing trapezoid [m]
-        self.b_out = 2 * 10.616  # Span of outer wing trapezoid [m]
-        self.b = self.b_in + self.b_out  # Span of the entire wing
-        self.c_root = 7.0465  # Root chord including the kink [m]
-        self.c_kink_out = 3.72  # Chord at the point where the kink ends [m]
-        self.c_tip = 1.488  # Chord at the tip of the wing excluding sharklet [m]
-        self.taper_in = self.c_kink_out / self.c_root  # Taper ratio of the inner trapezoid
-        self.taper_out = self.c_tip / self.c_kink_out  # Taper ratio of the outer trapezoid
-        self.h_sharklet = 2.43  # Height of the wing sharklets [m]
-        self.sweep_025 = 25  # Sweep at the quarter chord [deg]
-        self.sweep_05 = 22.4  # Sweep at the half chord [deg]
+    def aero_functions(self, AoA_cruise):
+        self.wing_MAC()
+        self.wing_AR()
+        self.h_tail_MAC()
+        self.drag_increase_cruise(AoA_cruise=AoA_cruise)
+        self.L_over_D_cruise()
 
-        self.b_h = 2 * 6.12  # Span of the horizontal tail [m]
-        self.c_r_h = 3.814  # Root chord of the horizontal tail [m]
-        self.c_t_h = 1.186  # Tip chord of the horizontal tail [m]
-        self.taper_h = self.c_t_h / self.c_r_h  # Taper ratio of the horizontal tail
-        self.sweep_LE_h = 33  # Sweep of the LE of the horizontal tail [deg]
-
-        self.C_D_0_TO_neo = 0.078  # Zero-lift drag coefficient of A320 during take-off
-        self.C_D_0_clean_neo = 0.023  # Zero-lift drag coefficient of A320 during cruise
-
-        self.R_neo = 4800  # Harmonic range of A320neo [km]
-        self.e = 0.992  # Oswald efficiency factor
-        
     def wing_MAC(self):
         """
         The wing MAC is computed using the ADSEE-II slides. The wing surface is composed out of two trapezoids.
@@ -141,7 +121,7 @@ class AerodynamicCharacteristics(Constants):
         :return: The most important parameter which is computed is C_D_0_HACK
         """
         # Compute density at cruise altitude
-        self.ISA_calculator(h_input=self.cruise_alt)
+        self.ISA_calculator(h_input=self.cruise_altitude)
 
         # A320neo
         self.C_D_0_fus_neo, _ = self.Roskam_drag_prediction_cruise(rho=self.rho, u1=self.M*self.a, l_f=self.l_f_320neo,
@@ -157,7 +137,7 @@ class AerodynamicCharacteristics(Constants):
         self.C_D_0_HACK = self.C_D_0_clean_neo - self.C_D_0_fus_neo + self.C_D_0_fus_HACK
 
     def L_over_D_cruise(self):
-        self.ISA_calculator(h_input=self.cruise_alt)
+        self.ISA_calculator(h_input=self.cruise_altitude)
         self.wing_AR()
         self.drag_increase_cruise(2)
 

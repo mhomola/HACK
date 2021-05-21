@@ -3,6 +3,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from math import pi
 from Subsystem_design.fuel_required import V_H2, V_k
+from Subsystem_design.aerodynamic_subsys import AerodynamicCharacteristics
 """
 This file contains one class only, which is meant to contain the variables which are common to the entire subsystem 
 design. It may also contain some simple functions to compute constants derived from other constants (e.g. ISA).
@@ -17,11 +18,59 @@ class Constants():
         self.R = 287.0                                              # Specific gas constant of air            [J/(kg*K)]
         self.gamma = 1.4                                            # Heat capacity ratio of air                   [-]
         self.a_0 = 340.294                                          # Sea level speed of sound                     [m/s]
+        self.visc = 1.458 * 10**(-5)                                # Air viscosity                            [N*s/m^2]
 
         '''Performance'''
         self.M = 0.78
         self.V_cruise = 230
         self.cruise_altitude = 11280
+
+        '''Aerodynamics'''
+        aero = AerodynamicCharacteristics()
+        aero.aero_functions(AoA_cruise=2)
+
+        self.mac = aero.mac                                         # MAC of the complete wing                      [m]
+        self.y_mac = aero.y_mac                                     # y position of MAC                             [m]
+        self.x_mac = aero.x_mac                                     # x loc of LEMAC from beginning of root chord   [m]
+        self.AR = aero.AR                                           # Aspect Ratio incl sharklets
+        self.e = 0.992                                              # Oswald efficiency factor
+
+        self.mac_h = aero.mac_h                                     # MAC of the complete wing                      [m]
+        self.y_mac_h = aero.y_mac_h                                 # y position of MAC of horizontal tail          [m]
+        self.x_mac_h = aero.x_mac_h                                 # x loc of LEMAC of horziontal tail from c_r_h  [m]
+
+        self.C_D_0_TO_neo = 0.078                                   # Zero-lift drag coefficient of A320neo - TO
+        self.C_D_0_clean_neo = 0.023                                # Zero-lift drag coefficient of A320neo - cruise
+        self.C_D_0_fus_neo = aero.C_D_0_fus_neo                     # Zero-lift drag coefficient of A320neo's fuselage
+        self.C_D_0_fus_HACK = aero.C_D_0_fus_HACK                   # Zero-lift drag coefficient of A320-Hack's fuselage
+        self.C_D_0_HACK = aero.C_D_0_HACK                           # Zero-lift drag coefficient of A320-HACK - cruise
+
+        self.C_L_start_cruise = aero.C_L_start_cruise               # Lift coefficient at start of cruise for both AC
+        self.C_D_start_cruise_neo = aero.C_D_start_cruise_neo       # Drag Coefficient at start of cruise - A320neo
+        self.C_D_start_cruise_HACK = aero.C_D_start_cruise_HACK     # Drag Coefficient at start of cruise - A320-HACK
+
+        self.D_start_cruise_HACK = aero.D_start_cruise_HACK         # Drag at start of cruise - A320-HACK           [N]
+
+        self.L_D_ratio_neo = aero.L_D_ratio_neo                     # Lift to Drag ratio at start of cruise - A320neo
+        self.L_D_ratio_HACK = aero.L_D_ratio_HACK                   # Lift to Drag ratio at start of cruise - A320-HACK
+
+        self.b_in = 2 * 6.4                                         # Span of inner wing trapezoid                  [m]
+        self.b_out = 2 * 10.616                                     # Span of outer wing trapezoid                  [m]
+        self.b = self.b_in + self.b_out                             # Span of the entire wing
+        self.c_root = 7.0465                                        # Root chord including the kink                 [m]
+        self.c_kink_out = 3.72                                      # Chord at the point where the kink ends        [m]
+        self.c_tip = 1.488                                          # Chord at the tip of the wing excl sharklet    [m]
+        self.taper_in = self.c_kink_out / self.c_root               # Taper ratio of the inner trapezoid
+        self.taper_out = self.c_tip / self.c_kink_out               # Taper ratio of the outer trapezoid
+        self.h_sharklet = 2.43                                      # Height of the wing sharklets                  [m]
+        self.sweep_025 = 25                                         # Sweep at the quarter chord                   [deg]
+        self.sweep_05 = 22.4                                        # Sweep at the half chord                      [deg]
+
+        self.b_h = 2 * 6.12                                         # Span of the horizontal tail                   [m]
+        self.c_r_h = 3.814                                          # Root chord of the horizontal tail             [m]
+        self.c_t_h = 1.186                                          # Tip chord of the horizontal tail              [m]
+        self.taper_h = self.c_t_h / self.c_r_h                      # Taper ratio of the horizontal tail
+        self.sweep_LE_h = 33                                        # Sweep of the LE of the horizontal tail       [deg]
 
         ''' Dimensions of A320-HACK'''
         self.S = 122.6                                              # Wing surface area                            [m^2]
@@ -45,12 +94,13 @@ class Constants():
         self.W4_W3 = 0.980
         self.W6_W5 = 0.990
         self.W7_W6 = 0.992
-        self.c_j_kerosene = 16.68 * 10 ** (-6)                      # Specific cruise fuel consumption of neo   [kg/N*s]
-        self.c_j_k_H2_cruise = 11.83 * 10 ** (-6)                  # Specific cruise fuel consumption of HACK  [kg/N*s]
+        self.c_j_kerosene = 16.68 * 10 ** (-6)                     # Specific cruise fuel consumption of neo    [kg/N*s]
+        self.c_j_k_H2_cruise = 11.83 * 10 ** (-6)                  # Specific cruise fuel consumption of HACK   [kg/N*s]
 
         """Tank design constants""" #Plsss automate these, for design changes
         self.center_tank_mass = 390.6                               # Mass of center tanks in total (2 tanks)       [kg]
         self.fuselage_tank_mass = 286.6                             # Mass of aft tank (1 tank)                     [kg]
+
         """Weights of A320neo"""
         self.MTOW_320neo = 73500                                    # Maximum Take-Off weight of A320neo            [kg]
         self.MLW_320neo = 66300                                     # Maximum Landing weight of A320neo             [kg]
@@ -74,8 +124,6 @@ class Constants():
         self.l_cabin_320neo = 29.53 - self.l_cockpit_320neo         # Length of the cabin of A320neo                [m]
         self.l_tail_320neo = self.l_f_320neo - 29.53                # Length of the tail of A320neo                 [m]
 
-
-
     def fuselage_length(self,vol_eff, vol_fus):
         """
 
@@ -84,9 +132,9 @@ class Constants():
         :param vol_fus: Volume available for tanks in the center wingbox        [m^3]
         :return:
         """
-        self.V_H2_center_w = vol_eff * vol_fus                           # Volume of hydrogen stored on center wing box [m^3]
-        self.V_H2_ext_fus = self.V_H2 - self.V_H2_center_w               # Volume of hydrogen stored on extended fuselage[m^3]
-        self.l_f = self.V_H2_ext_fus/(pi * self.width_f/2 * self.height_f/2) #
+        self.V_H2_center_w = vol_eff * vol_fus  # Volume of hydrogen stored on center wing box [m^3]
+        self.V_H2_ext_fus = self.V_H2 - self.V_H2_center_w  # Volume of hydrogen stored on extended fuselage[m^3]
+        self.l_f = self.V_H2_ext_fus/(pi * self.width_f/2 * self.height_f/2)
 
     def speed_of_sound(self, T):
         """
