@@ -22,8 +22,13 @@ class Constants():
 
         '''Performance'''
         self.M = 0.78
-        self.V_cruise = 230
         self.cruise_altitude = 11280
+        self.ISA_calculator(h_input=self.cruise_altitude)
+        self.rho_c = self.rho
+        self.a_c = self.a
+        self.T_c = self.T
+        self.p_c = self.p
+        self.V_cruise = self.M * self.a_c
 
         '''Aerodynamics'''
         aero = AerodynamicCharacteristics()
