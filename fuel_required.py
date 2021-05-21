@@ -28,7 +28,7 @@ def fuel_volume_calc(d_LH2, d_GH2, d_GH2_g, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio
 
     if state == 'gas':
 
-        V_H2 = (E_H2/Ed_H2)/d_GH2_g * 1000
+        V_H2 = (E_H2/Ed_H2)/d_GH2 * 1000
 
     if state == 'liquid':
 
@@ -145,6 +145,7 @@ if __name__ == '__main__':
     print('Volume of kerosene is ', V_k, ' l')
     print('Mass of H2 is ', V_H2 * LH2_d * 0.001, ' kg')
     print('Mass of kerosene is ', V_k * k_d * 0.001, ' kg')
+    print(GH2_d)
     plotting_vol_mass()
 
 

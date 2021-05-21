@@ -29,8 +29,8 @@ t_idle = 1229
 t_taxi = 26*60 #[s]
 t_taxi_out = 17.94*60
 t_taxi_in = 8.06*60
-t_climb = 25*60
-t_descend = 25*60
+t_climb = 20*60
+t_descend = 20*60
 
 V_ker = fc.fuel_capacity_a320neo
 m_ker_all = fc.fuel_capacity_a320neo*fc.k_d/1000
@@ -72,6 +72,8 @@ h2m_taxi_o = 2*ff_taxi_o*t_taxi_out
 ff_taxi_i = fuel_flow(T_frac_Arr_Roll_Taxi,sfc_h2)
 h2m_taxi_i = 2*ff_taxi_i*t_taxi_in
 
+print((h2m_idle+h2m_taxi_o+h2m_taxi_i))
+
 h2_m_rem = m_h2-(h2m_idle+h2m_taxi_o+h2m_taxi_i)
 r = h2_m_rem*LHV_H2/(h2_m_rem*LHV_H2+m_ker*LHV_k)
 print(r)
@@ -110,6 +112,11 @@ t4 = t3 + t_cruise
 t5 = t4 + t_descend
 t6 = t5 + t_taxi_in
 
+x=t5-t2
+print(x)
+
+print(t2,'s - ',t5)
+
 #masses of hydrogen in the flight
 mh2_idle = m_h2 - h2m_idle
 mh2_taxi_o = mh2_idle - h2m_taxi_o
@@ -142,6 +149,7 @@ plt.legend()
 plt.ylabel('Fuel flow [kg/s]')
 plt.xlabel('Time [s]')
 plt.show()
+
 
 
 # Mission fuel fractions
