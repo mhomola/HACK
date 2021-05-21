@@ -82,6 +82,7 @@ print(r)
 
 ff_climb_h2 = fuel_flow(T_frac_Climb,sfc_h2*r)
 ff_cruise_h2 = fuel_flow(T_frac_Cruise,sfc_h2*r)
+ff_cruise_h2 = 119.512
 ff_desc_h2 = fuel_flow(T_frac_Descent,sfc_h2*r)
 #ff_climb = fuel_flow(T_frac_Climb,s)
 
