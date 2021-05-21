@@ -124,7 +124,7 @@ class AerodynamicCharacteristics(Constants):
 
         # Compute the fuselage base drag coefficient
         bf = np.sqrt(4 / np.pi * self.S_b_fus) / self.d_f
-        C_D_b_fus = 0.9 * bf**2
+        C_D_b_fus = 0.09 * bf**2
 
         # The zero lift drag coefficient of the fuselage becomes:
         C_D_0_fus = C_D_o_fus_exc_base + C_D_b_fus
@@ -229,12 +229,8 @@ if __name__ == '__main__':
           '\n The drag then is = ', ae.D_start_cruise_HACK,
           '\n The L/D ratio is = ', ae.L_D_ratio_HACK)
 
+    print('\n rho = ', ae.rho,
+          '\n V = ', ae.M * ae.a)
+
     ae.plot_lift_drag_characteristics()
 
-    ae.drag_increase_TO()
-    print('\n The zero-lift drag coefficient of the fuselage of the A320neo at TO = ', ae.C_D_0_fus_neo,
-          '\n For the A32-HACK it is = ', ae.C_D_0_fus_HACK)
-
-    print('\n Assuming the C_D_0 of the A320neo during TO is = ', ae.C_D_0_TO_neo,
-          '\n The C_D_0 of the A320-HACK now becomes = ', ae.C_D_0_HACK,
-          '\n That is a ', (ae.C_D_0_HACK / ae.C_D_0_TO_neo - 1) * 100, '% increase')
