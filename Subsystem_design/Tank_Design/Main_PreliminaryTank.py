@@ -50,6 +50,8 @@ aft_tank.tank_design()
 
 weight_addition = aft_tank.mass_tank + 2 * central_tank.mass_tank
 
+ijk = 2 * central_tank.mass_tank
+
 if __name__ == '__main__':
 
     print("#######CENTRAL TANKS######")

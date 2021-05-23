@@ -3,6 +3,9 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from math import pi
 from Subsystem_design.fuel_required import V_H2, V_k
+
+
+
 """
 This file contains one class only, which is meant to contain the variables which are common to the entire subsystem 
 design. It may also contain some simple functions to compute constants derived from other constants (e.g. ISA).
@@ -18,6 +21,14 @@ class Constants():
         self.gamma = 1.4                                            # Heat capacity ratio of air                   [-]
         self.a_0 = 340.294                                          # Sea level speed of sound                     [m/s]
         self.visc = 1.458 * 10**(-5)                                # Air viscosity                            [N*s/m^2]
+
+
+        """Properties of H2"""
+
+        self.H2_ed = 33.5                                   # Energy density of hydrogen                         [kWh/kg]
+
+        """Properties of kerosene"""
+        self.k_ed = 12.0                                    # Energy density of kerosene                         [kWh/kg]
 
         '''Performance'''
         self.cruise_altitude = 11280
@@ -35,6 +46,9 @@ class Constants():
         self.e = 0.992                                              # Oswald efficiency factor
         self.C_D_0_TO_neo = 0.078                                   # Zero-lift drag coefficient of A320neo - TO
         self.C_D_0_clean_neo = 0.023                                # Zero-lift drag coefficient of A320neo - cruise
+        self.C_L_max_clean = 1.8                                    # Max lift coefficient clean
+        self.C_L_max_TO = 2.2                                       # Max lift coefficient during TO
+        self.C_L_max_land = 3.0                                     # Max lift coefficient during landing
 
         self.b_in = 2 * 6.4                                         # Span of inner wing trapezoid                  [m]
         self.b_out = 2 * 10.616                                     # Span of outer wing trapezoid                  [m]
@@ -79,10 +93,17 @@ class Constants():
         self.c_j_kerosene = 16.68 * 10 ** (-6)                     # Specific cruise fuel consumption of neo    [kg/N*s]
         self.c_j_k_H2_cruise = 11.83 * 10 ** (-6)                  # Specific cruise fuel consumption of HACK   [kg/N*s]
 
+        """Fuel Contants A320neo"""
+        self.fuel_capacity_a320neo_FUTURE = 23859*0.9
+        self.fuel_capacity_320neo = 23.859                          # Maximum Fuel capacity of A320neo              [m^3]
+        self.k_d = 810.0                                            # Mass density of kerosene                           [kg/m^3]
 
         """Tank design constants""" #Plsss automate these, for design changes
-        self.center_tank_mass = 390.6                               # Mass of center tanks in total (2 tanks)       [kg]
-        self.fuselage_tank_mass = 286.6                             # Mass of aft tank (1 tank)                     [kg]
+        self.center_tank_mass = 228.3615 * 2   # Mass of center tanks in total (2 tanks)       [kg]
+        self.fuselage_tank_mass = 345.3723      # Mass of aft tank (1 tank)                     [kg]
+
+        """Weights of HACK"""
+        self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                     [kg]
 
         """Weights of A320neo"""
         self.MTOW_320neo = 73500                                    # Maximum Take-Off weight of A320neo            [kg]
@@ -91,6 +112,8 @@ class Constants():
         self.MZFW_320neo = 62800                                    # Maximu Zero fuel weight of A320neo            [kg]
         self.MPLW_320neo = 18240                                    # Maximum Payload weight of A320neo             [kg]
         self.OEW_320neo = 44560                                     # Operational Empty weight of A320neo           [kg]
+        self.Fuel_idel_taxi_take_off_320neo = 400                   # Fuel for before take -off                     [kg]
+        self.Max_fuel_mass_capacity_320neo = self.fuel_capacity_320neo * self.k_d   #Maximum kerosene mass of A320neo [kg]
 
         """Weights of A321neo"""
         self.MTOW_321neo = 89000                                    # Maximum Take-Off weight of A321neo            [kg]
@@ -213,6 +236,7 @@ if __name__ == '__main__':
     print('\n T = ', c.T, ' K',
           '\n P = ', c.p, ' Pa',
           '\n rho = ', c.rho, ' kg/m^3')
+
 
 
 
