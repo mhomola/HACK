@@ -8,15 +8,17 @@ import math as m
 # import Materials
 
 # Hydrogen tank storage data
+
 p_outside = 0.19028  # [bar] at 12100 [m] of altitude
-p_tank = 5         # [bar] venting pressure
-t_outside = 273.15+45#216.65   # [K]
+p_tank = 3.5    *1.5     # [bar] venting pressure
+t_outside = 273.15+45 #216.65   # [K]
 t_tank = 19.75        # [K]
 d_0 = 3              # [m] outside diameter -- dummy
 d_e = 4              # [m] ellipse minor axis diameter -- dummy
 e_w = 0.8            # weld efficiency from Barron, 1985
 s_a = 200            # [MPa] allowable stress dummy value for now!!
-rho = 0.86 * 71             # [kg/m^3] liquid hydrogen density
+rho = 71             # [kg/m^3] liquid hydrogen density
+
 
 #Determining the heat transfer rate that can be accepted based on the user requirement of no boil-off for 36h.
 #Method from "Passive zero-boil-off storage of liquid hydrogen for long-time space missions"
@@ -63,7 +65,7 @@ class Tank():
     self.t_tank = t_tank
     self.dt = dt
     self.p_tank = p_tank * 10**5 #[Pa]
-    self.safety_factor = 1.5
+    self.safety_factor = 1.25
     self.outer_vol_inner_wall = m.pi * (self.d_0/2)**2 * (self.length-self.d_0) + 4/3* m.pi * (self.d_0/2)**3 #cylinder volume + sphere volume
                                                                                                       #outer volume described by the inner tank wall
 
@@ -155,7 +157,7 @@ class Cyl_Tank():
     self.t_tank = t_tank
     self.dt = dt
     self.p_tank = p_tank * 10**5 #[Pa]
-    self.safety_factor = 1.5
+    self.safety_factor = 1.25
     self.outer_vol_inner_wall = m.pi * (self.d_0/2)**2 * (self.length)
 
 
