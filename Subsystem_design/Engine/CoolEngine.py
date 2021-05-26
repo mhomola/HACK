@@ -68,21 +68,36 @@ def cp_first_last(data, T, cp_array, T_array):
        
     return cp_array, T_array, index_after
 
-def h(h0, cp_array, T_array):
+
+def h(h0, data, T0, Tmax):    
+    cp_array, T_array = np.array([]), np.array([])
+    # Find initial data to retrieve
+    cp_array, T_array, index_after = cp_first_last(data, T0, cp_array, T_array)
+    # Find all other cp's and temperatures
+    cp_array, T_array = cp_between(data, index_after, cp_array, T_array, T0, Tmax)   
+    # Find final data
+    if T_array[-1] != Tmax and data[-1][1] >= Tmax:
+        cp_array, T_array, index_after = cp_first_last(data, Tmax, cp_array, T_array)     
+    
     cp_integral = np.array([])
     for i in range(len(cp_array)):
         cp_integral = np.append(cp_integral, cp_array[i]*T_array[i])
     
-    h = h0 + np.sum(cp_integral) 
+    h = h0 + np.sum(cp_integral)
     
     return h
 
 
 ''' BEGINNING OF CODE '''
-#print('hello')
-N2_cp_data = np.array(np.genfromtxt('N2_cp.dat'))
-#print(N2_cp_data)
-h2_cp_data = np.array(np.genfromtxt('C:\\Users\\sarar\\OneDrive\\Ambiente de Trabalho\\Folders\\DELFT\\3rd year\\DSE\\h2_cp.dat'))
+N2_cp_data = np.array(np.genfromtxt('N2_cp.dat')) # T[K]; cp[kJ/(kg*K)]
+h2_cp_data = np.array(np.genfromtxt('h2_cp.dat')) # T[K]; cp[kJ/(kg*K)]
+# https://webbook.nist.gov/cgi/cbook.cgi?ID=C124185&Units=SI&Mask=7
+C10H22_cp_data = np.array(np.genfromtxt('C10H22_cp.dat'))  # T[K]; cp[J/(mol*K)]
+h0_C10H22 = -249.7 # [kJ/mol]
+# https://webbook.nist.gov/cgi/cbook.cgi?ID=C95636&Units=SI&Mask=7
+C9H12_cp_data = np.array(np.genfromtxt('C9H12_cp.dat'))  # T[K]; cp[J/(mol*K)]
+h0_C9H12 = -13.9 # [kJ/mol]
+
 
 Tair = 800 # [K] # Temperature of air when injected (both in PZ and SZ)
 Tcc = 2000 # [K] # Temperature of fuel after the combustion, i.e. maximum temperature
@@ -113,61 +128,24 @@ mr_cool = mf_cool/ mf_end
 
 
 # Find h_cc: find h_ker, h_h2, h_air [J/kg]
-h_decane = -249.9*1000 + (Tcc-T0)*235 # [J/mol] --> these values are at 25C, is this okay?
-h_benzene = 8*1000 + (Tcc-T0)*154 # [J/mol]
-# h_hexane =
+h_decane = h(h0_C10H22*1000, C10H22_cp_data, T0, Tcc) # [J/mol] C10H22 --> these values are at 25C, is this okay?
+h_benzene = h(h0_C9H12*1000, C9H12_cp_data, T0, Tcc) # C9H12 [J/mol]
+# h_hexane: couldn't find values
 
 h_ker_cc = 0.74/(0.74+0.15)*h_decane + 0.15/(0.74+0.15)*h_benzene # [J/mol] --> Cp not found for C8H19
                                         # can I use this formula? Or maybe not dividing by the sum
 # Find h_h2_cc [J/kg]
-cp_h2_cc, T_h2_cc = np.array([]), np.array([])
-# Find initial data to retrieve
-cp_h2_cc, T_h2_cc, index_after = cp_first_last(h2_cp_data, T0, cp_h2_cc, T_h2_cc)
-# Find all other cp's and temperatures
-cp_h2_cc, T_h2_cc = cp_between(h2_cp_data, index_after, cp_h2_cc, T_h2_cc, T0, Tcc)   
-# Find final data
-if T_h2_cc[-1] != Tcc:
-    cp_h2_cc, T_h2_cc, index_after = cp_first_last(h2_cp_data, Tcc, cp_h2_cc, T_h2_cc)
-
-print("\nHydrogen\nTempreature [K]\n", T_h2_cc)
-print("Specific heat [kJ/(kg K)]\n",cp_h2_cc)
-    
-h_h2_cc = h(0, cp_h2_cc, T_h2_cc)*1000 # [J/kg]
+h_h2_cc = h(0, h2_cp_data, T0, Tcc)*1000 # [J/kg]
 
 # Find h_air_cc [J/kg]
-cp_air_cc, T_air_cc = np.array([]), np.array([])
-# Find initial data to retrieve
-cp_air_cc, T_air_cc, index_after = cp_first_last(N2_cp_data, T0, cp_air_cc, T_air_cc)
-# Find all other cp's and temperatures
-cp_air_cc, T_air_cc = cp_between(N2_cp_data, index_after, cp_air_cc, T_air_cc, T0, Tcc)   
-# Find final data
-if T_h2_cc[-1] != Tcc:
-    cp_air_cc, T_air_cc, index_after = cp_first_last(N2_cp_data, Tcc, cp_air_cc, T_air_cc)
-
-print("\nAir\nTempreature [K]\n", T_air_cc)
-print("Specific heat [kJ/(kg K)]\n",cp_air_cc)
-
-h_air_cc = h(0, cp_air_cc, T_air_cc)*1000 # [J/kg]
-        
+h_air_cc = h(0, h2_cp_data, T0, Tcc)*1000 # [J/kg]
+ 
 # Total enthalpy in combustion
 h_cc = h_ker_cc*mr_ker_cc + h_h2_cc*mr_h2_cc + h_air_cc*mr_air_cc
 
 
-
 # Find h_cool [J/kg]
-cp_cool, T_cool = np.array([]), np.array([])
-# Find initial data to retrieve
-cp_cool, T_cool, index_after = cp_first_last(N2_cp_data, T0, cp_cool, T_cool)
-# Find all other cp's and temperatures
-cp_cool, T_cool = cp_between(N2_cp_data, index_after, cp_cool, T_cool, T0, Tair)   
-# Find final data
-if T_cool[-1] != Tair:
-    cp_cool, T_cool, index_after = cp_first_last(N2_cp_data, Tair, cp_cool, T_cool)
-
-print("\nAir to cool\nTempreature [K]\n", T_cool)
-print("Specific heat [kJ/(kg K)]\n",cp_cool)
-
-h_cool = h(0, cp_cool, T_cool) # [kJ/kg]
+h_cool = h(0, h2_cp_data, T0, Tair)*1000 # [J/kg]
 
 
 # Find h_mix
