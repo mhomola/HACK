@@ -128,8 +128,8 @@ mr_cool = mf_cool/ mf_end
 
 
 # Find h_cc: find h_ker, h_h2, h_air [J/kg]
-h_decane = h(h0_C10H22*1000, C10H22_cp_data, T0, Tcc) # [J/mol] C10H22 --> these values are at 25C, is this okay?
-h_benzene = h(h0_C9H12*1000, C9H12_cp_data, T0, Tcc) # C9H12 [J/mol]
+h_decane = h(h0_C10H22*1000, C10H22_cp_data, T0, Tcc) # [J/mol] C10H22
+h_benzene = h(h0_C9H12*1000, C9H12_cp_data, T0, Tcc) # [J/mol] C9H12
 # h_hexane: couldn't find values
 
 h_ker_cc = 0.74/(0.74+0.15)*h_decane + 0.15/(0.74+0.15)*h_benzene # [J/mol] --> Cp not found for C8H19
@@ -157,9 +157,10 @@ h_mix = mr_cc*h_cc + mr_cool*h_cool
 # Find cp_mix
 # Assume a temperature at the end of the cc: T_assumed
 # Find cp_mix for that temperature: C_p_mix(T_assumed) = SUM( c_p_k(T_assumed)*mr_k )
+cp_mix = mr_air_mix*cp_air_mix + mr_h2_mix*cp_h2_mix + mr_ker_mix*cp_ker_mix
 # Find the temperature at the end of the combustion chamber
-T_end = T0 + (h_mix - delta_h_mix) / Cp_mix
+T_end = T0 + (h_mix - delta_h_mix) / cp_mix
 # Check if T_end ~ T_assumed, if not iterate T_assumed
 
-# Find the temperature in case we case delta Cp is sufficiently small
+# Find the temperature in case delta Cp is sufficiently small
 T_linear = T_cc*mr_cc + T_cool*mr_cool
