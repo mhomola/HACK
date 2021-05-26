@@ -83,6 +83,10 @@ def cp_temperature(data, T):
     
     return cp, index_after
 
+def check_temp(T_assumed):
+    if T_assumed - 10 <= T_end <= T_assumed + 10:
+    print("T_assumed = T_end", T_assumed, T_end)
+
 cp_air_cc = np.array([])
 T_air_cc = np.array([])
 
@@ -127,10 +131,18 @@ h_mix = mr_cc*h_cc + mr_cool*h_cool
 
 # Find cp_mix
 # Assume a temperature at the end of the cc: T_assumed
+T_assumed = 2000 #K
 # Find cp_mix for that temperature: C_p_mix(T_assumed) = SUM( c_p_k(T_assumed)*mr_k )
+cp_mix = cp_regression(h2_cp_data,T_assumed) * mr_h2_mix + cp_regression(N2_cp_data,T_assumed) * mr_air_mix + cp_ker * \
+         (T_assumed - T_0) * mr_ker_mix     #cp_ker does not have a list with values yet. will fix that later
+
 # Find the temperature at the end of the combustion chamber
-T_end = T0 + (h_mix - delta_h_mix) / Cp_mix
+T_end = T0 + (h_mix - delta_h_mix) / cp_mix
 # Check if T_end ~ T_assumed, if not iterate T_assumed
+
+
+
+
 
 # Find the temperature in case we case delta Cp is sufficiently small
 T_linear = T_cc*mr_cc + T_cool*mr_cool
