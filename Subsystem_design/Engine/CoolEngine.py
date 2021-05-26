@@ -80,10 +80,11 @@ h_mix = mr_cc*h_cc + mr_cool*h_cool
 
 
 # Find cp_mix
-
-
+# Assume a temperature at the end of the cc: T_assumed
+# Find cp_mix for that temperature: C_p_mix(T_assumed) = SUM( c_p_k(T_assumed)*mr_k )
 # Find the temperature at the end of the combustion chamber
 T_end = T_0 + (h_mix - delta_h_mix) / Cp_mix
+# Check if T_end ~ T_assumed, if not iterate T_assumed
 
 # Find the temperature in case we case delta Cp is sufficiently small
 T_linear = T_cc*mr_cc + T_cool*mr_cool
