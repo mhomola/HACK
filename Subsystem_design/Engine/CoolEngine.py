@@ -70,8 +70,8 @@ def cp_first_last(data, T, cp_array, T_array):
 
 def h(h0, cp_array, T_array):
     cp_integral = np.array([])
-    for i in range(len(cp_air_cc)):
-        cp_integral = np.append(cp_integral, cp_air_cc[i]*T_air_cc[i])
+    for i in range(len(cp_array)):
+        cp_integral = np.append(cp_integral, cp_array[i]*T_array[i])
     
     h = h0 + np.sum(cp_integral) 
     
@@ -159,17 +159,16 @@ cp_cool, T_cool = np.array([]), np.array([])
 # Find initial data to retrieve
 cp_cool, T_cool, index_after = cp_first_last(N2_cp_data, T0, cp_cool, T_cool)
 # Find all other cp's and temperatures
-cp_cool, T_cool = cp_between(N2_cp_data, index_after, cp_cool, T_cool, T0, T_cool)   
+cp_cool, T_cool = cp_between(N2_cp_data, index_after, cp_cool, T_cool, T0, Tair)   
 # Find final data
-if T_h2_cc[-1] != Tcc:
-    cp_cool, T_cool, index_after = cp_first_last(N2_cp_data, Tcc, cp_cool, T_cool)
+if T_cool[-1] != Tair:
+    cp_cool, T_cool, index_after = cp_first_last(N2_cp_data, Tair, cp_cool, T_cool)
 
-print("\nAir\nTempreature [K]\n", T_air_cc)
-print("Specific heat [kJ/(kg K)]\n",cp_air_cc)
+print("\nAir to cool\nTempreature [K]\n", T_cool)
+print("Specific heat [kJ/(kg K)]\n",cp_cool)
 
 h_cool = h(0, cp_cool, T_cool) # [kJ/kg]
 
-#for i in range(len(N2_cp_data))
 
 # Find h_mix
 h_mix = mr_cc*h_cc + mr_cool*h_cool
