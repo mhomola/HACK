@@ -20,9 +20,9 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-print('hello')
+#print('hello')
 N2_cp_data = np.array(np.genfromtxt('N2_cp.dat'))
-print(N2_cp_data)
+#print(N2_cp_data)
 h2_cp_data = np.array(np.genfromtxt('C:\\Users\\sarar\\OneDrive\\Ambiente de Trabalho\\Folders\\DELFT\\3rd year\\DSE\\h2_cp.dat'))
 
 Tair = 800 # [K] # Temperature of air when injected (both in PZ and SZ)
@@ -31,12 +31,12 @@ T0 = 298 # [K] --> 15 degrees C, where does it come from? At sea level? # To be 
 
 # Mass flows
 # Before combustion
-mf_h2_cc = 0
-mf_ker_cc = 0
-mf_air_cc = 0
+mf_h2_cc = 1
+mf_ker_cc = 1
+mf_air_cc = 1
 mf_cc = mf_h2_cc + mf_ker_cc + mf_air_cc
 # After cooling air is injected
-mf_cool = 0
+mf_cool = 1
 mf_end = mf_cc + mf_cool
 
 # Mass ratios
@@ -55,7 +55,7 @@ h_decane = -249.9*1000 + (Tcc-T0)*235 # [J/mol] --> these values are at 25C, is 
 h_benzene = 8*1000 + (Tcc-T0)*154 # [J/mol]
 # h_hexane =
 
-h_ker = 0.74/(0.74+0.15)*h_decane + 0.15/(0.74+0.15)*h_benzene # [J/mol] --> Cp not found for C8H19
+h_ker_cc = 0.74/(0.74+0.15)*h_decane + 0.15/(0.74+0.15)*h_benzene # [J/mol] --> Cp not found for C8H19
                                         # can I use this formula? Or maybe not dividing by the sum
 
 h_h2 = (Tcc-T0)
@@ -95,24 +95,36 @@ else:
 cp_air_cc = np.append(cp_air_cc, cp_T0)
 T_air_cc = np.append(T_air_cc, T0)
 
-
+# Initialize T
+T = T0
 # Find all other cp's and temperatures
-for i in range(len(N2_cp_data)):
-    while N2_cp_data[i][0] < Tcc:
+while T < Tcc:
+    for i in range(index_after, len(N2_cp_data)):
+        cp_air_cc = np.append(cp_air_cc, N2_cp_data[i][1])
+        T_air_cc = np.append(T_air_cc, N2_cp_data[i][0])
+        T = N2_cp_data[i][0]
         
+# Find final data
+if not(Tcc in N2_cp_data[:][0]):
+    cp_Tcc, index_after = cp_regression(N2_cp_data, Tcc)
+else:
+    cp_T0, index_after = cp_temperature(N2_cp_data, Tcc)
+
+cp_air_cc = np.append(cp_air_cc, cp_Tcc)
+T_air_cc = np.append(T_air_cc, Tcc)    
+
+print(T_air_cc)
+
+cp_integral = np.array([])
+for i in range(len(cp_air_cc)):
+    cp_integral = np.append(cp_integral, cp_air_cc[i]*T_air_cc[i])
+    
+h_air_cc = np.sum(cp_integral)     
         
     
-        
-        
-    
-# make it a sum of (T*cp)i between Tcc and T0. If the
-                #initial or final temperatures are not in the file, interpolate between before and after
 
-h_air = (Tcc-T0) # approximate to air to only N2
-        # make it a sum of (T*cp)i between Tcc and T0. If the initial or final
-        # temperatures are not in teh file, interpolate between before and after
 
-h_cc = h_ker*mr_ker_cc + h_h2*mr_h2_cc + h_air*mr_air_cc
+h_cc = h_ker_cc*mr_ker_cc + h_h2_cc*mr_h2_cc + h_air_cc*mr_air_cc
 
 # Find h_cool [J/kg]
 h_cool = (T_air-T0)
