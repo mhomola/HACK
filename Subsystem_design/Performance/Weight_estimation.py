@@ -72,7 +72,7 @@ class Compute_weight(Constants):
 
         self.MPLW_HACK = self.MPLW_320neo                         # Maximum Payload weight of HACK                  [kg]
         self.MZFW_HACK = self.MPLW_HACK + self.OEW_HACK           # Maximum zero fuel weight of HACK                [kg]
-        self.MTOW_HACK = self.MTOW_320neo                         # Maximum take-off weight of Hack                 [kg]
+        self.MTOW_HACK = (self.OEW_HACK - 16914.5)/0.376          # Maximum take-off weight of Hack                 [kg]
 
         self.Max_fuel_at_max_PL_HACK = self.MTOW_HACK - self.MPLW_HACK - self.OEW_HACK   #Maximum fuel at maximum payload[kg]
 
@@ -202,3 +202,9 @@ if __name__ == '__main__':
     print('The MZFW of the A320HACK is:', AC_weights.MZFW_HACK)
     print('The MTOW of the A320HACK is:', AC_weights.MTOW_HACK)
 
+    OEW = np.array([const.OEW_320neo, const.OEW_321neo])
+    MTOW = np.array([const.MTOW_320neo, const.MTOW_321neo])
+    plt.plot(MTOW,OEW,marker = '*')
+    plt.ylabel('OEW [kg]')
+    plt.xlabel('MTOW [kg]')
+    plt.show()

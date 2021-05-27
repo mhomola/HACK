@@ -16,6 +16,7 @@ FF_Climb = 1.9
 FF_Cruise = 0.5
 FF_Descent = 0.45
 FF_Arrival_Roll_Taxi = 0.145
+F_cruise = 18.8
 
 #Thrust
 T_frac_Taxi = 0.124
@@ -81,7 +82,10 @@ print(r)
 
 
 ff_climb_h2 = fuel_flow(T_frac_Climb,sfc_h2*r)
-ff_cruise_h2 = fuel_flow(T_frac_Cruise,sfc_h2*r)
+ff_cruise_h2_OLD = fuel_flow(T_frac_Cruise,sfc_h2*r)
+ff_cruise_h2 = (r * sfc_h2 * F_cruise)/1000
+print(ff_cruise_h2_OLD)
+print(ff_cruise_h2)
 ff_desc_h2 = fuel_flow(T_frac_Descent,sfc_h2*r)
 #ff_climb = fuel_flow(T_frac_Climb,s)
 
@@ -95,7 +99,8 @@ t_cruise = h2_m_rem2/(2*ff_cruise_h2)
 #masses of kerosene
 mk_init = m_ker
 ff_climb_k = fuel_flow(T_frac_Climb,sfc_ker*(1-r))
-ff_cruise_k = fuel_flow(T_frac_Cruise,sfc_ker*(1-r))
+ff_cruise_k_OLD = fuel_flow(T_frac_Cruise,sfc_ker*(1-r))
+ff_cruise_k = ((1-r)*sfc_ker* F_cruise)/1000
 ff_desc_k = fuel_flow(T_frac_Descent,sfc_ker*(1-r))
 
 mk_climb = mk_init - 2*ff_climb_k*t_climb
