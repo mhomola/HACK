@@ -6,7 +6,7 @@ from Subsystem_design.fuel_required import V_H2
 total_vol = V_H2 / 1000 #[m^3]
 
 class spacial_constraints():
-    def __init__(self,length,width,height):
+    def __init__(self, length, width, height):
         """
         The sizes of the current A320 neo will represent dimensional constraints for fitting in the LH2 tanks.
         :param length:  [m]
