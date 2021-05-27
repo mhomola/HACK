@@ -137,10 +137,31 @@ fuel_h2 = np.array([m_h2,mh2_idle, mh2_taxi_o, mh2_climb, mh2_cruise, mh2_desc, 
 fuel_k = np.array([m_ker, mk_init, mk_init, mk_climb, mk_cruise, mk_desc, mk_desc])
 fuel_tot = fuel_h2+fuel_k
 
+Eh = 119.96*np.array([0,h2m_idle, h2m_taxi_o, h2m_climb, h2_m_rem2, h2m_desc, h2m_taxi_i])
+Ek = 43.2*np.array([0,0,0,2*ff_climb_k*t_climb,2*ff_cruise_k*t_cruise,2*ff_desc_k*t_descend,0])
+
+Em_sum = np.array([])
+Eh_sum = np.array([])
+
+for i in range(len(Eh)):
+    Em_sum = np.append(Em_sum,sum(Ek[:i+1]))
+    Eh_sum = np.append(Eh_sum,sum(Eh[:i+1]))
+    print(Eh_sum)
+
 plt.plot(t,fuel_h2,label = 'H2')
 plt.plot(t,fuel_k,label = 'Kerosene')
 plt.plot(t,fuel_tot,label = 'Total')
 plt.ylabel('Mass of fuel on-board [kg]')
+plt.xlabel('Time [s]')
+plt.legend()
+plt.show()
+
+E_tot = Em_sum + Eh_sum
+
+plt.plot(t,Em_sum,label = 'H2')
+plt.plot(t,Eh_sum,label = 'Kerosene')
+plt.plot(t,E_tot,label = 'Total')
+plt.ylabel('Energy consumed over mission [MJ]')
 plt.xlabel('Time [s]')
 plt.legend()
 plt.show()
