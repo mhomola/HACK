@@ -143,16 +143,16 @@ h_air_cc = h(0, h2_cp_data, T0, Tcc)*1000 # [J/kg]
 # Total enthalpy in combustion
 h_cc = h_ker_cc*mr_ker_cc + h_h2_cc*mr_h2_cc + h_air_cc*mr_air_cc
 
-
 # Find h_cool [J/kg]
 h_cool = h(0, h2_cp_data, T0, Tair)*1000 # [J/kg]
-
 
 # Find h_mix
 h_mix = mr_cc*h_cc + mr_cool*h_cool
 
 # Find delta_h_mix (only contribution comes from kerosene, but now mr_ker changes because of the cooling air added)
-
+r_h0_C9H12 = 1
+r_C10H22 = 1
+delta_h_mix = mr_ker_mix*r_h0_C9H12*h0_C10H22+mr_ker_mix*r_C10H22*h0_C9H12
 
 # Find cp_mix
 # Assume a temperature at the end of the cc: T_assumed
