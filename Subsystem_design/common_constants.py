@@ -73,7 +73,7 @@ class Constants():
 
         ''' Dimensions of A320-HACK'''
         self.S = 122.6                                              # Wing surface area                            [m^2]
-        self.extra_length = 2.742                                   # Increase in length for tank allocation        [m]
+        self.extra_length = 3.01                                    # Increase in length for tank allocation        [m]
         self.l_f = 37.57 + self.extra_length                        # Fuselage length                               [m]
         self.height_f = 4.14                                        # Fuselage height                               [m]
         self.width_f = 3.95                                         # Fuselage width                                [m]
@@ -84,10 +84,12 @@ class Constants():
         self.sweep_LE = 27                                          # Wing sweep                                   [deg]
 
         """Fuel constant A320-HACK"""
-        # self.V_H2 = 37.893
+
         self.V_H2 = V_H2                                            # Volume required of hydrogen                  [m^3]
         self.V_k = V_k
-        # self.V_k = 14.316                                           # Volume required of kerosene                  [m^3]
+        self.V_H2_usable = V_H2 * 0.965                             # Volume required of kerosene                  [m^3]
+        self.V_H2_centre = 5.660714 * 2                             # Volume in the centre of the fuselage         [m^3]
+        self.V_H2_aft = 29.87253                                   # Volume in
         self.W1_Wto = 0.990
         self.W2_W1 = 0.990
         self.W3_W2 = 0.995
@@ -104,7 +106,7 @@ class Constants():
 
         """Tank design constants""" #Plsss automate these, for design changes
         self.center_tank_mass = 268.3*2   # Mass of center tanks in total (2 tanks)       [kg]
-        self.fuselage_tank_mass = 362.05     # Mass of aft tank (1 tank)                     [kg]
+        self.fuselage_tank_mass = 397.31     # Mass of aft tank (1 tank)                     [kg]
 
         """Weights of HACK"""
         self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                     [kg]
@@ -128,23 +130,23 @@ class Constants():
         self.OEW_321neo = self.MZFW_321neo - self.MPLW_321neo       # Operational Empty weight of A320neo           [kg]
 
         """Dimensions of A320neo and A321neo"""
-        self.l_f_321neo= 44.51                                      # Fuselage length of A321neo                    [m]
+        self.l_f_321neo = 44.51                                      # Fuselage length of A321neo                    [m]
         self.l_f_320neo = 37.57                                     # Fuselage length of A320neo                    [m]
         self.l_cockpit_320neo = 5.04                                # Length of the cockpit of A320neo              [m]
         self.l_cabin_320neo = 29.53 - self.l_cockpit_320neo         # Length of the cabin of A320neo                [m]
         self.l_tail_320neo = self.l_f_320neo - 29.53                # Length of the tail of A320neo                 [m]
 
-    def fuselage_length(self,vol_eff, vol_fus):
-        """
-
-        :param vol_eff: Volumetric efficiency of integral tanks (Ratio of usable tank volume-to-volume occupied
-                        in the fuselage                                         [-]
-        :param vol_fus: Volume available for tanks in the center wingbox        [m^3]
-        :return:
-        """
-        self.V_H2_center_w = vol_eff * vol_fus  # Volume of hydrogen stored on center wing box [m^3]
-        self.V_H2_ext_fus = self.V_H2 - self.V_H2_center_w  # Volume of hydrogen stored on extended fuselage[m^3]
-        self.l_f = self.V_H2_ext_fus/(pi * self.width_f/2 * self.height_f/2)
+    # def fuselage_length(self,vol_eff, vol_fus):
+    #     """
+    #
+    #     :param vol_eff: Volumetric efficiency of integral tanks (Ratio of usable tank volume-to-volume occupied
+    #                     in the fuselage                                         [-]
+    #     :param vol_fus: Volume available for tanks in the center wingbox        [m^3]
+    #     :return:
+    #     """
+    #     self.V_H2_center_w = vol_eff * vol_fus  # Volume of hydrogen stored on center wing box [m^3]
+    #     self.V_H2_ext_fus = self.V_H2 - self.V_H2_center_w  # Volume of hydrogen stored on extended fuselage[m^3]
+    #     self.l_f = self.V_H2_ext_fus/(pi * self.width_f/2 * self.height_f/2)
 
     def speed_of_sound(self, T):
         """
