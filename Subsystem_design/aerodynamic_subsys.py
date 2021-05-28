@@ -154,11 +154,12 @@ class AerodynamicCharacteristics(Constants):
         self.L_D_ratio_neo = self.C_L_start_cruise / self.C_D_start_cruise_neo
         self.L_D_ratio_HACK = self.C_L_start_cruise / self.C_D_start_cruise_HACK
 
-    def lift_gradient(self, M):
-        self.wing_AR()
+    def lift_gradient_calc(self, M, AR, sweep_05):
         beta = np.sqrt(1 - M**2)
-        self.CL_alpha = 2 * np.pi * self.AR / (2 + np.sqrt(4 + (self.AR * beta / 0.95)**2 *
-                                                      (1 + (np.tan(self.sweep_05) / beta)**2)))
+        self.CL_alpha = 2 * np.pi * AR / (2 + np.sqrt(4 + (AR * beta / 0.95)**2 *
+                                                     (1 + (np.tan(sweep_05) / beta)**2)))
+
+
 
     def plot_lift_drag_characteristics(self):
         C_L_range = np.linspace(-0.3, 1.5, 500)
