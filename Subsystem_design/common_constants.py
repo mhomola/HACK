@@ -70,7 +70,7 @@ class Constants():
 
         ''' Dimensions of A320-HACK'''
         self.S = 122.6                                              # Wing surface area                            [m^2]
-        self.l_f = 37.57 + 3.15                                     # Fuselage length                               [m]
+        self.l_f = 37.57 + 2.742                                    # Fuselage length                               [m]
         self.height_f = 4.14                                        # Fuselage height                               [m]
         self.width_f = 3.95                                         # Fuselage width                                [m]
         self.l_cockpit = 5.04                                       # Length of the cockpit                         [m]
@@ -82,7 +82,7 @@ class Constants():
         """Fuel constant A320-HACK"""
         # self.V_H2 = 37.893
         self.V_H2 = V_H2                                            # Volume required of hydrogen                  [m^3]
-        self.V_H2 = V_k
+        self.V_k = V_k
         # self.V_k = 14.316                                           # Volume required of kerosene                  [m^3]
         self.W1_Wto = 0.990
         self.W2_W1 = 0.990
@@ -99,8 +99,8 @@ class Constants():
         self.k_d = 810.0                                            # Mass density of kerosene                           [kg/m^3]
 
         """Tank design constants""" #Plsss automate these, for design changes
-        self.center_tank_mass = 228.3615 * 2   # Mass of center tanks in total (2 tanks)       [kg]
-        self.fuselage_tank_mass = 345.3723      # Mass of aft tank (1 tank)                     [kg]
+        self.center_tank_mass = 268.3*2   # Mass of center tanks in total (2 tanks)       [kg]
+        self.fuselage_tank_mass = 362.05     # Mass of aft tank (1 tank)                     [kg]
 
         """Weights of HACK"""
         self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                     [kg]
@@ -113,7 +113,7 @@ class Constants():
         self.MPLW_320neo = 18240                                    # Maximum Payload weight of A320neo             [kg]
         self.OEW_320neo = 44560                                     # Operational Empty weight of A320neo           [kg]
         self.Fuel_idel_taxi_take_off_320neo = 400                   # Fuel for before take -off                     [kg]
-        self.Max_fuel_mass_capacity_320neo = self.fuel_capacity_320neo * self.k_d   #Maximum kerosene mass of A320neo [kg]
+        self.Max_fuel_mass_capacity_320neo = self.fuel_capacity_320neo * self.k_d #Maximum kerosene mass of A320neo [kg]
 
         """Weights of A321neo"""
         self.MTOW_321neo = 89000                                    # Maximum Take-Off weight of A321neo            [kg]
@@ -236,6 +236,8 @@ if __name__ == '__main__':
     print('\n T = ', c.T, ' K',
           '\n P = ', c.p, ' Pa',
           '\n rho = ', c.rho, ' kg/m^3')
+    print(c.V_H2)
+    print(c.V_k)
 
 
 

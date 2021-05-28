@@ -16,6 +16,7 @@ FF_Climb = 1.9
 FF_Cruise = 0.5
 FF_Descent = 0.45
 FF_Arrival_Roll_Taxi = 0.145
+F_cruise = 18.8
 
 #Thrust
 T_frac_Taxi = 0.124
@@ -81,7 +82,10 @@ print(r)
 
 
 ff_climb_h2 = fuel_flow(T_frac_Climb,sfc_h2*r)
-ff_cruise_h2 = fuel_flow(T_frac_Cruise,sfc_h2*r)
+ff_cruise_h2_OLD = fuel_flow(T_frac_Cruise,sfc_h2*r)
+ff_cruise_h2 = (r * sfc_h2 * F_cruise)/1000
+print(ff_cruise_h2_OLD)
+print(ff_cruise_h2)
 ff_desc_h2 = fuel_flow(T_frac_Descent,sfc_h2*r)
 #ff_climb = fuel_flow(T_frac_Climb,s)
 
@@ -95,7 +99,8 @@ t_cruise = h2_m_rem2/(2*ff_cruise_h2)
 #masses of kerosene
 mk_init = m_ker
 ff_climb_k = fuel_flow(T_frac_Climb,sfc_ker*(1-r))
-ff_cruise_k = fuel_flow(T_frac_Cruise,sfc_ker*(1-r))
+ff_cruise_k_OLD = fuel_flow(T_frac_Cruise,sfc_ker*(1-r))
+ff_cruise_k = ((1-r)*sfc_ker* F_cruise)/1000
 ff_desc_k = fuel_flow(T_frac_Descent,sfc_ker*(1-r))
 
 mk_climb = mk_init - 2*ff_climb_k*t_climb
@@ -132,10 +137,31 @@ fuel_h2 = np.array([m_h2,mh2_idle, mh2_taxi_o, mh2_climb, mh2_cruise, mh2_desc, 
 fuel_k = np.array([m_ker, mk_init, mk_init, mk_climb, mk_cruise, mk_desc, mk_desc])
 fuel_tot = fuel_h2+fuel_k
 
+Eh = 119.96*np.array([0,h2m_idle, h2m_taxi_o, h2m_climb, h2_m_rem2, h2m_desc, h2m_taxi_i])
+Ek = 43.2*np.array([0,0,0,2*ff_climb_k*t_climb,2*ff_cruise_k*t_cruise,2*ff_desc_k*t_descend,0])
+
+Em_sum = np.array([])
+Eh_sum = np.array([])
+
+for i in range(len(Eh)):
+    Em_sum = np.append(Em_sum,sum(Ek[:i+1]))
+    Eh_sum = np.append(Eh_sum,sum(Eh[:i+1]))
+    print(Eh_sum)
+
 plt.plot(t,fuel_h2,label = 'H2')
 plt.plot(t,fuel_k,label = 'Kerosene')
 plt.plot(t,fuel_tot,label = 'Total')
 plt.ylabel('Mass of fuel on-board [kg]')
+plt.xlabel('Time [s]')
+plt.legend()
+plt.show()
+
+E_tot = Em_sum + Eh_sum
+
+plt.plot(t,Em_sum,label = 'H2')
+plt.plot(t,Eh_sum,label = 'Kerosene')
+plt.plot(t,E_tot,label = 'Total')
+plt.ylabel('Energy consumed over mission [MJ]')
 plt.xlabel('Time [s]')
 plt.legend()
 plt.show()
