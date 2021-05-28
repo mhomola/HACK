@@ -67,14 +67,18 @@ class Constants():
         self.c_t_h = 1.186                                          # Tip chord of the horizontal tail              [m]
         self.taper_h = self.c_t_h / self.c_r_h                      # Taper ratio of the horizontal tail
         self.sweep_LE_h = 33                                        # Sweep of the LE of the horizontal tail       [deg]
+        self.S_h = 31                                               # Surface area of horizontal tail              [m^2]
+        self.AR_h = self.b_h**2 / self.S_h                          # Aspect ratio of horizontal tail
+        self.Vh_V = 0.85                                            # Ratio between V_h and V
 
         ''' Dimensions of A320-HACK'''
         self.S = 122.6                                              # Wing surface area                            [m^2]
-        self.l_f = 37.57 + 3.01                                    # Fuselage length                               [m]
+        self.extra_length = 3.01                                    # Increase in length for tank allocation        [m]
+        self.l_f = 37.57 + self.extra_length                        # Fuselage length                               [m]
         self.height_f = 4.14                                        # Fuselage height                               [m]
         self.width_f = 3.95                                         # Fuselage width                                [m]
         self.l_cockpit = 5.04                                       # Length of the cockpit                         [m]
-        self.l_cabin = 29.53 + 3.7 - self.l_cockpit                 # Length of the cabin + H2 tank                 [m]
+        self.l_cabin = 29.53 + self.extra_length - self.l_cockpit   # Length of the cabin + H2 tank                 [m]
         self.l_tail = self.l_f - self.l_cabin - self.l_cockpit      # Length of the tail                            [m]
         self.S_b_fus = np.pi * 0.3/2 * 0.45/2                       # Base surface area                            [m^2]
         self.sweep_LE = 27                                          # Wing sweep                                   [deg]
