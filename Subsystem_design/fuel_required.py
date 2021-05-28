@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from fuel_constants import *
 
 
-def fuel_volume_calc(d_LH2, d_GH2, d_GH2_g, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio, state, y = 0.95):
+def fuel_volume_calc(d_LH2, d_GH2, d_GH2_g, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio, state, y = 0.885):
 
     """
 
@@ -117,7 +117,7 @@ def plotting_vol_mass():
     plt.show()
 
 def VH2_calc():
-    e_ratios = np.arange(0.11,0.5,0.001)
+    e_ratios = np.arange(0.11, 0.5, 0.001)
     return fuel_volume_calc(d_LH2=LH2_d, d_GH2= GH2_d, d_GH2_g= GH2_d_g,d_k=k_d, Ed_H2=H2_ed, Ed_k=k_ed
                             , tot_vol_k=fuel_capacity_a320neo,e_ratio=e_ratios,state='liquid')[1]
 
