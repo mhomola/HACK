@@ -4,7 +4,7 @@ from tank_sizing import liquid_H_tanks
 #from Subsystem_design.fuel_required import fuel_volume_calc
 from Subsystem_design.common_constants import Constants
 from fuel_constants import *
-from math import pi,log
+from math import pi,log, log10
 import matplotlib.pyplot as plt
 from Subsystem_design.aerodynamic_subsys import AerodynamicCharacteristics
 import numpy as np
@@ -72,7 +72,7 @@ class Compute_weight(Constants):
 
         self.MPLW_HACK = self.MPLW_320neo                         # Maximum Payload weight of HACK                  [kg]
         self.MZFW_HACK = self.MPLW_HACK + self.OEW_HACK           # Maximum zero fuel weight of HACK                [kg]
-        self.MTOW_HACK = (self.OEW_HACK - 16914.5)/0.376          # Maximum take-off weight of Hack                 [kg]
+        self.MTOW_HACK = self.MTOW_320neo                         # Maximum take-off weight of Hack                 [kg]
 
         self.Max_fuel_at_max_PL_HACK = self.MTOW_HACK - self.MPLW_HACK - self.OEW_HACK   #Maximum fuel at maximum payload[kg]
 
@@ -185,7 +185,7 @@ if __name__ == '__main__':
     """Weights of A320-HACK"""
 
     AC_weights = Compute_weight()                                               # Initiallize class of weight estimation
-    AC_weights.weight_break_down_HACK(h2_vol_center=11.34,h2_vol_f=30.69)       # Based on H2 volume estimates
+    AC_weights.weight_break_down_HACK(h2_vol_center=const.V_H2_centre,h2_vol_f=const.V_H2_aft)       # Based on H2 volume estimates
     AC_weights.Struc_m()
 
     Aerodynamic_charac = AerodynamicCharacteristics()
@@ -193,7 +193,8 @@ if __name__ == '__main__':
 
     Performance = performance()
     Performance.payload_range_dia_HACK(L_over_D=Aerodynamic_charac.L_D_ratio_HACK,h2_vol_center=11.34,h2_vol_f=30.69,SFC= const.c_j_k_H2_cruise)
-    Performance.payload_range_dia_320neo(L_over_D=Aerodynamic_charac.L_D_ratio_HACK,SFC = const.c_j_kerosene)
+    #Performance.payload_range_dia_320neo(L_over_D=Aerodynamic_charac.L_D_ratio_HACK,SFC = const.c_j_kerosene)
+    #W4_W5 = (3200*10**3)/(((const.M * Aerodynamic_charac.a)/(const.c_j_k_H2_cruise*const.g_0)) * Aerodynamic_charac.L_D_ratio_HACK)
 
     print('The OEW of the A320HACK is:',AC_weights.OEW_HACK)
     print('The MPLW of the A320HACK is:', AC_weights.MPLW_HACK)
@@ -201,10 +202,6 @@ if __name__ == '__main__':
     print('The max fuel @ MPLW of the A320HACK is:', AC_weights.Max_fuel_at_max_PL_HACK)
     print('The MZFW of the A320HACK is:', AC_weights.MZFW_HACK)
     print('The MTOW of the A320HACK is:', AC_weights.MTOW_HACK)
+    print('The extra structural mass of the A320HACK is:', AC_weights.struc_mass)
 
-    OEW = np.array([const.OEW_320neo, const.OEW_321neo])
-    MTOW = np.array([const.MTOW_320neo, const.MTOW_321neo])
-    plt.plot(MTOW,OEW,marker = '*')
-    plt.ylabel('OEW [kg]')
-    plt.xlabel('MTOW [kg]')
-    plt.show()
+

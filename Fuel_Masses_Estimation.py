@@ -40,6 +40,7 @@ E_tot = m_ker_all*LHV_k
 E_h2 = (1/3)*E_tot
 
 m_h2 = (E_h2/LHV_H2)
+print(m_h2)
 
 sfc_ker = 14.4*0.9 #Altitude has to be added!!!
 sfc_h2 = sfc_ker*fc.k_ed/fc.H2_ed

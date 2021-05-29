@@ -102,11 +102,11 @@ class Constants():
         """Fuel Contants A320neo"""
         self.fuel_capacity_a320neo_FUTURE = 23859*0.9
         self.fuel_capacity_320neo = 23.859                          # Maximum Fuel capacity of A320neo              [m^3]
-        self.k_d = 810.0                                            # Mass density of kerosene                           [kg/m^3]
+        self.k_d = 810.0                                            # Mass density of kerosene                      [kg/m^3]
 
         """Tank design constants""" #Plsss automate these, for design changes
-        self.center_tank_mass = 268.3*2   # Mass of center tanks in total (2 tanks)       [kg]
-        self.fuselage_tank_mass = 397.31     # Mass of aft tank (1 tank)                     [kg]
+        self.center_tank_mass = 268.3*2                             # Mass of center tanks in total (2 tanks)       [kg]
+        self.fuselage_tank_mass = 397.31                            # Mass of aft tank (1 tank)                     [kg]
 
         """Weights of HACK"""
         self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                     [kg]
