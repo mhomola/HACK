@@ -11,6 +11,7 @@ class AerodynamicCharacteristics(Constants):
         self.wing_MAC()
         self.wing_AR()
         self.h_tail_MAC()
+        self.v_tail_MAC()
         self.drag_increase_cruise(AoA_cruise=AoA_cruise)
         self.lift_gradient_res()
         self.L_over_D_cruise()
@@ -72,6 +73,19 @@ class AerodynamicCharacteristics(Constants):
               '\n y position of the MAC = ', self.y_mac_h, ' m',
               '\n x position of the LEMAC measured from the start of the root chord = ', self.x_mac_h, ' m')
 
+    def v_tail_MAC(self):
+        """
+        The MAC is computed using the ADSEE-II slides.
+        :return: The length and position of the horizontal wing's MAC
+        """
+        self.mac_v = (2/3) * self.c_r_v * (1 + self.taper_v + self.taper_v**2) / (1 + self.taper_v)
+        self.y_mac_v = (self.b_v / 6) * (1 + 2 * self.taper_v) / (1 + self.taper_v)
+        self.x_mac_v = self.y_mac_v * np.tan(self.sweep_LE_v * np.pi / 180)
+
+        print('\n MAC of the vertical tail = ', self.mac_h, ' m',
+              '\n y position of the MAC = ', self.y_mac_h, ' m',
+              '\n x position of the LEMAC measured from the start of the root chord = ', self.x_mac_h, ' m')
+
     def Roskam_drag_prediction_cruise(self, rho, u1, l_f, l_cockpit, l_cabin, l_tail, AoA):
         """
         This function computes the drag from the fuselage according to the procedure given by Roskam at transonic
@@ -88,12 +102,10 @@ class AerodynamicCharacteristics(Constants):
         # Wetted area as computed in ADSEE-II
         S_fus = np.pi * 0.25 * self.height_f * self.width_f
         self.d_f = np.sqrt(4 * S_fus / np.pi)
-        print(self.d_f)
         S_wet_fus = np.pi * self.d_f / 4 * \
                     (1 / (3 * l_cockpit**2) * ((4 * l_cockpit**2 + self.d_f**2 / 4) - self.d_f**3 / 8)
                      - self.d_f + 4 * l_cabin + 2 * np.sqrt(l_tail**2 + self.d_f**2 / 4))
 
-        print(S_wet_fus)
         # Compute zero lift drag for M = 0.6 for fuselage exclusive of base
         R_n_fus = rho * u1 * l_f / self.visc
         # print('The Fuselage Reynolds Number R_f_fus is: ', R_n_fus, ' [-]')
@@ -101,9 +113,8 @@ class AerodynamicCharacteristics(Constants):
         R_wf = 1.015  # The wing/fuselage iterference factor from Figure 4.1 in Roskam-VI
         C_f_fus = 0.0016  # The turbulent flat plate skin friction coefficient from Figure 4.3 in Roskam-VI
 
-        ld = self.l_f / self.d_f
+        ld = l_f / self.d_f
         C_D_o_fus_exc_base = R_wf * C_f_fus * (1 + 60 / ld**3 + 0.0025 * ld) * S_wet_fus / self.S
-
         # Compute the fuselage base drag coefficient
         bf = np.sqrt(4 / np.pi * self.S_b_fus) / self.d_f
         C_D_b_fus = 0.09 * bf**2
