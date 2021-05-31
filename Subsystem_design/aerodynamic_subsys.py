@@ -11,6 +11,7 @@ class AerodynamicCharacteristics(Constants):
         self.wing_MAC()
         self.wing_AR()
         self.h_tail_MAC()
+        self.v_tail_MAC()
         self.drag_increase_cruise(AoA_cruise=AoA_cruise)
         self.lift_gradient_res()
         self.L_over_D_cruise()
@@ -69,6 +70,19 @@ class AerodynamicCharacteristics(Constants):
         self.x_mac_h = self.y_mac_h * np.tan(self.sweep_LE_h * np.pi / 180)
 
         print('\n MAC of the horizontal tail = ', self.mac_h, ' m',
+              '\n y position of the MAC = ', self.y_mac_h, ' m',
+              '\n x position of the LEMAC measured from the start of the root chord = ', self.x_mac_h, ' m')
+
+    def v_tail_MAC(self):
+        """
+        The MAC is computed using the ADSEE-II slides.
+        :return: The length and position of the horizontal wing's MAC
+        """
+        self.mac_v = (2/3) * self.c_r_v * (1 + self.taper_v + self.taper_v**2) / (1 + self.taper_v)
+        self.y_mac_v = (self.b_v / 6) * (1 + 2 * self.taper_v) / (1 + self.taper_v)
+        self.x_mac_v = self.y_mac_v * np.tan(self.sweep_LE_v * np.pi / 180)
+
+        print('\n MAC of the vertical tail = ', self.mac_h, ' m',
               '\n y position of the MAC = ', self.y_mac_h, ' m',
               '\n x position of the LEMAC measured from the start of the root chord = ', self.x_mac_h, ' m')
 

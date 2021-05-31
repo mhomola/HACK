@@ -71,6 +71,14 @@ class Constants():
         self.AR_h = self.b_h**2 / self.S_h                          # Aspect ratio of horizontal tail
         self.Vh_V = 0.85                                            # Ratio between V_h and V
 
+        self.b_v = 2 * 5.87
+        self.c_r_v = 5.595                                          # Root chord of the horizontal tail             [m]
+        self.c_t_v = 1.822                                          # Tip chord of the horizontal tail              [m]
+        self.taper_v = self.c_t_v / self.c_r_v                      # Taper ratio of the horizontal tail
+        self.sweep_LE_v = 41                                        # Sweep of the LE of the horizontal tail       [deg]
+        self.S_h = 21.5                                             # Surface area of horizontal tail              [m^2]
+        self.AR_h = self.b_h**2 / self.S_h                          # Aspect ratio of horizontal tail
+
         ''' Dimensions of A320-HACK'''
         self.S = 122.6                                              # Wing surface area                            [m^2]
         self.extra_length = 3.01                                    # Increase in length for tank allocation        [m]
