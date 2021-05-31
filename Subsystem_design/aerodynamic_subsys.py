@@ -11,7 +11,9 @@ class AerodynamicCharacteristics(Constants):
         self.wing_MAC()
         self.wing_AR()
         self.h_tail_MAC()
+        self.v_tail_MAC()
         self.drag_increase_cruise(AoA_cruise=AoA_cruise)
+        self.lift_gradient_res()
         self.L_over_D_cruise()
 
     def wing_MAC(self):
@@ -71,6 +73,19 @@ class AerodynamicCharacteristics(Constants):
               '\n y position of the MAC = ', self.y_mac_h, ' m',
               '\n x position of the LEMAC measured from the start of the root chord = ', self.x_mac_h, ' m')
 
+    def v_tail_MAC(self):
+        """
+        The MAC is computed using the ADSEE-II slides.
+        :return: The length and position of the horizontal wing's MAC
+        """
+        self.mac_v = (2/3) * self.c_r_v * (1 + self.taper_v + self.taper_v**2) / (1 + self.taper_v)
+        self.y_mac_v = (self.b_v / 6) * (1 + 2 * self.taper_v) / (1 + self.taper_v)
+        self.x_mac_v = self.y_mac_v * np.tan(self.sweep_LE_v * np.pi / 180)
+
+        print('\n MAC of the vertical tail = ', self.mac_h, ' m',
+              '\n y position of the MAC = ', self.y_mac_h, ' m',
+              '\n x position of the LEMAC measured from the start of the root chord = ', self.x_mac_h, ' m')
+
     def Roskam_drag_prediction_cruise(self, rho, u1, l_f, l_cockpit, l_cabin, l_tail, AoA):
         """
         This function computes the drag from the fuselage according to the procedure given by Roskam at transonic
@@ -91,7 +106,6 @@ class AerodynamicCharacteristics(Constants):
                     (1 / (3 * l_cockpit**2) * ((4 * l_cockpit**2 + self.d_f**2 / 4) - self.d_f**3 / 8)
                      - self.d_f + 4 * l_cabin + 2 * np.sqrt(l_tail**2 + self.d_f**2 / 4))
 
-
         # Compute zero lift drag for M = 0.6 for fuselage exclusive of base
         R_n_fus = rho * u1 * l_f / self.visc
         # print('The Fuselage Reynolds Number R_f_fus is: ', R_n_fus, ' [-]')
@@ -99,9 +113,8 @@ class AerodynamicCharacteristics(Constants):
         R_wf = 1.015  # The wing/fuselage iterference factor from Figure 4.1 in Roskam-VI
         C_f_fus = 0.0016  # The turbulent flat plate skin friction coefficient from Figure 4.3 in Roskam-VI
 
-        ld = self.l_f / self.d_f
+        ld = l_f / self.d_f
         C_D_o_fus_exc_base = R_wf * C_f_fus * (1 + 60 / ld**3 + 0.0025 * ld) * S_wet_fus / self.S
-
         # Compute the fuselage base drag coefficient
         bf = np.sqrt(4 / np.pi * self.S_b_fus) / self.d_f
         C_D_b_fus = 0.09 * bf**2
@@ -154,11 +167,16 @@ class AerodynamicCharacteristics(Constants):
         self.L_D_ratio_neo = self.C_L_start_cruise / self.C_D_start_cruise_neo
         self.L_D_ratio_HACK = self.C_L_start_cruise / self.C_D_start_cruise_HACK
 
-    def lift_gradient(self, M):
-        self.wing_AR()
+    def lift_gradient_calc(self, M, AR, sweep_05):
         beta = np.sqrt(1 - M**2)
-        self.CL_alpha = 2 * np.pi * self.AR / (2 + np.sqrt(4 + (self.AR * beta / 0.95)**2 *
-                                                      (1 + (np.tan(self.sweep_05) / beta)**2)))
+        return 2 * np.pi * AR / (2 + np.sqrt(4 + (AR * beta / 0.95)**2 *
+                                            (1 + (np.tan(sweep_05) / beta)**2)))
+
+    def lift_gradient_res(self):
+        self.CL_alpha_w = self.lift_gradient_calc(M=self.M, AR=self.AR, sweep_05=self.sweep_05*np.pi / 180)
+        sweep_05_h_rad = np.arctan(np.tan(self.sweep_LE_h * np.pi / 180) +
+                                   self.c_r_h / 2 / (self.b_h / 2) * (self.taper_h - 1))
+        self.CL_alpha_h = self.lift_gradient_calc(M=self.M*self.Vh_V, AR=self.AR_h, sweep_05=sweep_05_h_rad)
 
     def plot_lift_drag_characteristics(self):
         C_L_range = np.linspace(-0.3, 1.5, 500)
@@ -188,12 +206,9 @@ class AerodynamicCharacteristics(Constants):
 if __name__ == '__main__':
     ae = AerodynamicCharacteristics()
 
-    ae.wing_MAC()
-    ae.h_tail_MAC()
-    ae.wing_AR()
-    print('\n Wing AR = ', ae.AR)
+    ae.aero_functions(AoA_cruise=2)
 
-    ae.drag_increase_cruise(AoA_cruise=2)
+    print('\n Wing AR = ', ae.AR)
 
     print('\n The zero-lift drag coefficient of the fuselage of the A320neo = ', ae.C_D_0_fus_neo,
           '\n For the A32-HACK it is = ', ae.C_D_0_fus_HACK)
@@ -202,11 +217,13 @@ if __name__ == '__main__':
           '\n The C_D_0 of the A320-HACK now becomes = ', ae.C_D_0_HACK,
           '\n That is a ', (ae.C_D_0_HACK / ae.C_D_0_clean_neo - 1) * 100, '% increase')
 
-    ae.L_over_D_cruise()
     print('\n The lift coefficient is = ', ae.C_L_start_cruise,
           '\n The drag coefficient of the A320-HACK during cruise is  = ', ae.C_D_start_cruise_HACK,
           '\n The drag then is = ', ae.D_start_cruise_HACK,
-          '\n The L/D ratio is = ', ae.L_D_ratio_HACK)
+          '\n The L/D ratio is = ', ae.L_D_ratio_HACK,
+          '\n The C_L_alpha of the wing is = ', ae.CL_alpha_w,
+          '\n The C_L_alpha of the horizontal tail is = ', ae.CL_alpha_h)
+
 
     print('\n rho = ', ae.rho,
           '\n V = ', ae.M * ae.a)

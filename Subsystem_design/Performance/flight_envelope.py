@@ -40,44 +40,46 @@ class FlightEnvelope(Constants):
         # Cruise speed
         V_C = self.V_cruise
         V_C_eq = V_C * np.sqrt(self.rho / self.rho_0)
+        print(V_C, V_C_eq)
 
         # Dive speed
         V_D1 = self.V_cruise / 0.8   # CS25 Design Dive speed V_c <= 0.8V_D
         V_D2 = self.V_cruise + 0.05 * self.a  # CS25: The margin may not be reduced to less than 0.05M
-        V_D = np.array([V_D1, V_D2])
-        V_D_eq = V_D * np.sqrt(self.rho / self.rho_0)
-        if V_D1/self.a_c <= 1:
-            V_D_eq.append(V_D1)
-        if V_D2/self.a_c <= 1:
-            V_D_eq.append(V_D2)
-        self.V_D_eq = max(V_D_eq)
-        self.V_D = V_D[np.where(V_D_eq == self.V_D_eq)[0]]
+        V_D_lst = np.array([V_D1, V_D2])
+        V_D_eq_lst = V_D_lst * np.sqrt(self.rho / self.rho_0)
+        V_D_eq = np.max(V_D_eq_lst[np.where(V_D_eq_lst/self.a <= 1.0)])
+        V_D = V_D_lst[np.where(V_D_eq_lst == V_D_eq)[0]]
+        print(V_D_eq)
 
         # Maneuver speed
-        V_A = np.sqrt(self.n_max / self.C_L_max_clean) * (self.W / (0.5 * self.rho * self.S))
+        V_A = np.sqrt(self.n_max / self.C_L_max_clean * self.W / (0.5 * self.rho * self.S))
         V_A_eq = V_A * np.sqrt(self.rho / self.rho_0)
-        V_A_land = np.sqrt(2.0 / self.C_L_max_land) * (self.W / (0.5 * self.rho * self.S))
+        V_A_land = np.sqrt(2.0 / self.C_L_max_land * self.W / (0.5 * self.rho * self.S))
         V_A_land_eq = V_A_land * np.sqrt(self.rho / self.rho_0)
-        V_A_TO = np.sqrt(2.0 / self.C_L_max_land) * (self.W / (0.5 * self.rho * self.S))
+        V_A_TO = np.sqrt(2.0 / self.C_L_max_land * self.W / (0.5 * self.rho * self.S))
         V_A_TO_eq = V_A_TO * np.sqrt(self.rho / self.rho_0)
+        print(V_A_eq, V_A_land_eq)
 
         # Stall speeds
-        V_s1 = np.sqrt(1.0 / self.C_L_max_clean) * (self.W / (0.5 * self.rho * self.S))
+        V_s1 = np.sqrt(1.0 / self.C_L_max_clean * self.W / (0.5 * self.rho * self.S))
         V_s1_eq = V_s1 * np.sqrt(self.rho / self.rho_0)
         V_s0_land = np.sqrt(self.W / (self.C_L_max_land * 0.5 * self.rho * self.S))
         V_s0_land_eq = V_s0_land * np.sqrt(self.rho / self.rho_0)
         V_s0_TO = np.sqrt(self.W / (self.C_L_max_TO * 0.5 * self.rho * self.S))
         V_s0_TO_eq = V_s0_TO * np.sqrt(self.rho / self.rho_0)
+        print(V_s1_eq)
 
         # Design  wing-flap  speeds
-        V_F1 = 1.6 * np.sqrt(W_TO / (self.C_L_max_TO * 0.5 * 1.225 * self.S))
-        V_F2 = 1.8 * np.sqrt(W_land / (self.C_L_max_land * 0.5 * 1.225 * self.S))
+        V_F1 = 1.6 * np.sqrt(W_TO / (self.C_L_max_TO * 0.5 * self.rho * self.S))
+        V_F2 = 1.8 * np.sqrt(W_land / (self.C_L_max_land * 0.5 * self.rho * self.S))
         V_F = max(V_F1, V_F2)
         V_F_eq = V_F * np.sqrt(self.rho / self.rho_0)
+        print(V_F_eq)
 
         # Negative loads
-        V_H = np.sqrt((1 / self.C_L_max_clean) * (self.W / self.S) / (self.rho * 0.5))
+        V_H = np.sqrt(1 / self.C_L_max_clean * self.W / (self.rho * 0.5* self.S))
         V_H_eq = V_H * np.sqrt(self.rho / self.rho_0)
+        print(V_H_eq)
 
         # cl_max curve
         v_clmax_curve = np.linspace(0, V_A_eq, 100)
@@ -95,7 +97,7 @@ class FlightEnvelope(Constants):
         v_clmax_land_curve = np.linspace(0, V_A_land_eq, 100)
         n_clmax_land_curve = self.C_L_max_land * 0.5 * self.rho_0 * v_clmax_land_curve**2 * self.S / self.W
         v_clmax_land_curve = np.hstack((v_clmax_land_curve, np.linspace(V_A_land_eq, V_F_eq, 5)))
-        n_clmax_land_curve = np.hstack((n_clmax_curve, np.ones(5) * 2.0))
+        n_clmax_land_curve = np.hstack((n_clmax_land_curve, np.ones(5) * 2.0))
 
         # negative cl_max curve
         v_neg_clmax_curve = np.linspace(0, V_H_eq, 100)
@@ -116,9 +118,10 @@ class FlightEnvelope(Constants):
         ax.axvline(x=0, color='k', linewidth=0.75)
         plt.show()
 
-if __name__ == '__main__':
-    fe = FlightEnvelope(altitude=11280, W=73000)
 
+if __name__ == '__main__':
+    fe = FlightEnvelope(altitude=11280, W=73500 * 9.80665)
+    fe.plot_maneuver_envelope()
     print('\n n_max = ', fe.n_max,
           '\n V_D = ', fe.V_D)
 

@@ -67,23 +67,37 @@ class Constants():
         self.c_t_h = 1.186                                          # Tip chord of the horizontal tail              [m]
         self.taper_h = self.c_t_h / self.c_r_h                      # Taper ratio of the horizontal tail
         self.sweep_LE_h = 33                                        # Sweep of the LE of the horizontal tail       [deg]
+        self.S_h = 31                                               # Surface area of horizontal tail              [m^2]
+        self.AR_h = self.b_h**2 / self.S_h                          # Aspect ratio of horizontal tail
+        self.Vh_V = 0.85                                            # Ratio between V_h and V
+
+        self.b_v = 2 * 5.87
+        self.c_r_v = 5.595                                          # Root chord of the horizontal tail             [m]
+        self.c_t_v = 1.822                                          # Tip chord of the horizontal tail              [m]
+        self.taper_v = self.c_t_v / self.c_r_v                      # Taper ratio of the horizontal tail
+        self.sweep_LE_v = 41                                        # Sweep of the LE of the horizontal tail       [deg]
+        self.S_h = 21.5                                             # Surface area of horizontal tail              [m^2]
+        self.AR_h = self.b_h**2 / self.S_h                          # Aspect ratio of horizontal tail
 
         ''' Dimensions of A320-HACK'''
         self.S = 122.6                                              # Wing surface area                            [m^2]
-        self.l_f = 37.57 + 3.15                                     # Fuselage length                               [m]
+        self.extra_length = 2.67023                                 # Increase in length for tank allocation        [m]
+        self.l_f = 37.57 + self.extra_length                        # Fuselage length                               [m]
         self.height_f = 4.14                                        # Fuselage height                               [m]
         self.width_f = 3.95                                         # Fuselage width                                [m]
         self.l_cockpit = 5.04                                       # Length of the cockpit                         [m]
-        self.l_cabin = 29.53 + 3.7 - self.l_cockpit                 # Length of the cabin + H2 tank                 [m]
+        self.l_cabin = 29.53 + self.extra_length - self.l_cockpit   # Length of the cabin + H2 tank                 [m]
         self.l_tail = self.l_f - self.l_cabin - self.l_cockpit      # Length of the tail                            [m]
         self.S_b_fus = np.pi * 0.3/2 * 0.45/2                       # Base surface area                            [m^2]
         self.sweep_LE = 27                                          # Wing sweep                                   [deg]
 
         """Fuel constant A320-HACK"""
-        # self.V_H2 = 37.893
+
         self.V_H2 = V_H2                                            # Volume required of hydrogen                  [m^3]
-        self.V_H2 = V_k
-        # self.V_k = 14.316                                           # Volume required of kerosene                  [m^3]
+        self.V_k = V_k
+        self.V_H2_usable = V_H2 * 0.965                             # Volume required of kerosene                  [m^3]
+        self.V_H2_centre = 5.660714 * 2                             # Volume in the centre of the fuselage         [m^3]
+        self.V_H2_aft = 26.512585                                   # Volume in
         self.W1_Wto = 0.990
         self.W2_W1 = 0.990
         self.W3_W2 = 0.995
@@ -96,11 +110,11 @@ class Constants():
         """Fuel Contants A320neo"""
         self.fuel_capacity_a320neo_FUTURE = 23859*0.9
         self.fuel_capacity_320neo = 23.859                          # Maximum Fuel capacity of A320neo              [m^3]
-        self.k_d = 810.0                                            # Mass density of kerosene                           [kg/m^3]
+        self.k_d = 810.0                                            # Mass density of kerosene                      [kg/m^3]
 
         """Tank design constants""" #Plsss automate these, for design changes
-        self.center_tank_mass = 228.3615 * 2   # Mass of center tanks in total (2 tanks)       [kg]
-        self.fuselage_tank_mass = 345.3723      # Mass of aft tank (1 tank)                     [kg]
+        self.center_tank_mass = 268.3*2                             # Mass of center tanks in total (2 tanks)       [kg]
+        self.fuselage_tank_mass = 352.6236                          # Mass of aft tank (1 tank)                     [kg]
 
         """Weights of HACK"""
         self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                     [kg]
@@ -113,7 +127,7 @@ class Constants():
         self.MPLW_320neo = 18240                                    # Maximum Payload weight of A320neo             [kg]
         self.OEW_320neo = 44560                                     # Operational Empty weight of A320neo           [kg]
         self.Fuel_idel_taxi_take_off_320neo = 400                   # Fuel for before take -off                     [kg]
-        self.Max_fuel_mass_capacity_320neo = self.fuel_capacity_320neo * self.k_d   #Maximum kerosene mass of A320neo [kg]
+        self.Max_fuel_mass_capacity_320neo = self.fuel_capacity_320neo * self.k_d #Maximum kerosene mass of A320neo [kg]
 
         """Weights of A321neo"""
         self.MTOW_321neo = 89000                                    # Maximum Take-Off weight of A321neo            [kg]
@@ -124,23 +138,23 @@ class Constants():
         self.OEW_321neo = self.MZFW_321neo - self.MPLW_321neo       # Operational Empty weight of A320neo           [kg]
 
         """Dimensions of A320neo and A321neo"""
-        self.l_f_321neo= 44.51                                      # Fuselage length of A321neo                    [m]
+        self.l_f_321neo = 44.51                                      # Fuselage length of A321neo                    [m]
         self.l_f_320neo = 37.57                                     # Fuselage length of A320neo                    [m]
         self.l_cockpit_320neo = 5.04                                # Length of the cockpit of A320neo              [m]
         self.l_cabin_320neo = 29.53 - self.l_cockpit_320neo         # Length of the cabin of A320neo                [m]
         self.l_tail_320neo = self.l_f_320neo - 29.53                # Length of the tail of A320neo                 [m]
 
-    def fuselage_length(self,vol_eff, vol_fus):
-        """
-
-        :param vol_eff: Volumetric efficiency of integral tanks (Ratio of usable tank volume-to-volume occupied
-                        in the fuselage                                         [-]
-        :param vol_fus: Volume available for tanks in the center wingbox        [m^3]
-        :return:
-        """
-        self.V_H2_center_w = vol_eff * vol_fus  # Volume of hydrogen stored on center wing box [m^3]
-        self.V_H2_ext_fus = self.V_H2 - self.V_H2_center_w  # Volume of hydrogen stored on extended fuselage[m^3]
-        self.l_f = self.V_H2_ext_fus/(pi * self.width_f/2 * self.height_f/2)
+    # def fuselage_length(self,vol_eff, vol_fus):
+    #     """
+    #
+    #     :param vol_eff: Volumetric efficiency of integral tanks (Ratio of usable tank volume-to-volume occupied
+    #                     in the fuselage                                         [-]
+    #     :param vol_fus: Volume available for tanks in the center wingbox        [m^3]
+    #     :return:
+    #     """
+    #     self.V_H2_center_w = vol_eff * vol_fus  # Volume of hydrogen stored on center wing box [m^3]
+    #     self.V_H2_ext_fus = self.V_H2 - self.V_H2_center_w  # Volume of hydrogen stored on extended fuselage[m^3]
+    #     self.l_f = self.V_H2_ext_fus/(pi * self.width_f/2 * self.height_f/2)
 
     def speed_of_sound(self, T):
         """
@@ -236,6 +250,8 @@ if __name__ == '__main__':
     print('\n T = ', c.T, ' K',
           '\n P = ', c.p, ' Pa',
           '\n rho = ', c.rho, ' kg/m^3')
+    print(c.V_H2)
+    print(c.V_k)
 
 
 
