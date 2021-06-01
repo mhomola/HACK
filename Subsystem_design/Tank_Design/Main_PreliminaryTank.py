@@ -20,9 +20,10 @@ class spacial_constraints():
 
 #Define the areas of the constraints
 
-central = spacial_constraints(length=6.5,width=1.14,height=2.67)
 
-central_iter = spacial_constraints(length=6.5,width=1.14,height=2.67)
+central = spacial_constraints(length=6.5, width=1.14, height=2.67)
+
+central_iter = spacial_constraints(length=6.5, width=1.14, height=2.67)
 central_iter.width = central_iter.width * 0.7 #we start from a smaller diameter
 
 iter_cond = 1 #will be sitched to 0 when the outerdiameter of the tank will surpass the central.width
