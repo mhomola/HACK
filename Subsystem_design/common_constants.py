@@ -81,7 +81,7 @@ class Constants():
 
         ''' Dimensions of A320-HACK'''
         self.S = 122.6                                              # Wing surface area                            [m^2]
-        self.extra_length = 2.67023                                 # Increase in length for tank allocation        [m]
+        self.extra_length = 2.66445                                 # Increase in length for tank allocation        [m]
         self.l_f = 37.57 + self.extra_length                        # Fuselage length                               [m]
         self.height_f = 4.14                                        # Fuselage height                               [m]
         self.width_f = 3.95                                         # Fuselage width                                [m]
@@ -96,8 +96,8 @@ class Constants():
         self.V_H2 = V_H2                                            # Volume required of hydrogen                  [m^3]
         self.V_k = V_k
         self.V_H2_usable = V_H2 * 0.965                             # Volume required of kerosene                  [m^3]
-        self.V_H2_centre = 5.660714 * 2                             # Volume in the centre of the fuselage         [m^3]
-        self.V_H2_aft = 26.512585                                   # Volume in
+        self.V_H2_centre = 5.68952 * 2                             # Volume in the centre of the fuselage         [m^3]
+        self.V_H2_aft = 26.44275                                   # Volume in
         self.W1_Wto = 0.990
         self.W2_W1 = 0.990
         self.W3_W2 = 0.995
@@ -113,8 +113,8 @@ class Constants():
         self.k_d = 810.0                                            # Mass density of kerosene                      [kg/m^3]
 
         """Tank design constants""" #Plsss automate these, for design changes
-        self.center_tank_mass = 268.3*2                             # Mass of center tanks in total (2 tanks)       [kg]
-        self.fuselage_tank_mass = 352.6236                          # Mass of aft tank (1 tank)                     [kg]
+        self.center_tank_mass = 115.4953 * 2                       # Mass of center tanks in total (2 tanks)       [kg]
+        self.fuselage_tank_mass = 419.5118                         # Mass of aft tank (1 tank)                     [kg]
 
         """Weights of HACK"""
         self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                     [kg]
