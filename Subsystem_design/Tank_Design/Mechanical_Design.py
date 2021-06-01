@@ -13,7 +13,7 @@ p_outside = 0.19028  # [bar] at 12100 [m] of altitude
 p_tank = 3.5 *1.5     # [bar] venting pressure
 t_outside = 273.15+45 #216.65   # [K]
 t_tank = 19.75        # [K]
-d_0 = 3              # [m] outside diameter -- dummy
+#d_0 = 3              # [m] outside diameter -- dummy
 d_e = 4              # [m] ellipse minor axis diameter -- dummy
 e_w = 0.8            # weld efficiency from Barron, 1985
 s_a = 200            # [MPa] allowable stress dummy value for now!!
@@ -71,8 +71,8 @@ class Tank():
 
 
   def inner_wall(self): #D_Verstraete_Thesis_2009
-    t_wall_inner = self.p_tank * d_0 / (2 * self.material_inner.yield_strength *10**6 * self.e_w + 0.8 * self.p_tank) #10^6 factor for MPa ->Pa
-    t_caps_inner = self.p_tank * d_0 * self.K / (2 * self.material_inner.yield_strength*10**6 * self.e_w + 2 * self.p_tank * (self.K - 0.1)) #we use directly p_tank cause p_tank - p_vac = p_tank
+    t_wall_inner = self.p_tank * self.d_0 / (2 * self.material_inner.yield_strength *10**6 * self.e_w + 0.8 * self.p_tank) #10^6 factor for MPa ->Pa
+    t_caps_inner = self.p_tank * self.d_0 * self.K / (2 * self.material_inner.yield_strength*10**6 * self.e_w + 2 * self.p_tank * (self.K - 0.1)) #we use directly p_tank cause p_tank - p_vac = p_tank
 
     self.t_wall_inner = t_wall_inner * self.safety_factor
     self.t_caps_inner = t_caps_inner * self.safety_factor
@@ -162,7 +162,7 @@ class Cyl_Tank():
 
 
   def inner_wall(self): #D_Verstraete_Thesis_2009
-    t_wall_inner = self.p_tank * d_0 / (2 * self.material_inner.yield_strength *10**6 * self.e_w + 0.8 * self.p_tank) #10^6 factor for MPa ->Pa
+    t_wall_inner = self.p_tank * self.d_0 / (2 * self.material_inner.yield_strength *10**6 * self.e_w + 0.8 * self.p_tank) #10^6 factor for MPa ->Pa
 
 
     self.t_wall_inner = t_wall_inner * self.safety_factor
