@@ -169,7 +169,7 @@ plt.xlabel('Time [s]')
 plt.legend()
 plt.show()
 
-h2ff = [ff_idle,ff_idle, ff_taxi_o, ff_taxi_o, ff_climb_h2, ff_climb_h2, ff_cruise_h2, ff_cruise_h2, ff_desc_h2, ff_desc_h2, ff_taxi_i, ff_taxi_i]
+h2ff = [ff_idle,ff_idle, ff_taxi_o, ff_taxi_o, ff_climb_h2, ff_climb_h2, ff_cruise_h2, ff_cruise_h2, ff_desc_h2, ff_desc_h2, ff_taxi_i, ff_taxi_i] #h2 fuel consumption
 t2 = [t0,t1,t1,t2,t2,t3,t3,t4,t4,t5,t5,t6]
 kff = [0,0,0,0,ff_climb_k,ff_climb_k,ff_cruise_k,ff_cruise_k,ff_desc_k,ff_desc_k,0,0]  #Kerosene fuel consumption
 plt.plot(t2,h2ff,label = 'H2')

@@ -10,8 +10,6 @@ n = 2.24    # [cm2/A]
 cp = 1004
 gamma = 1.4
 
-i = np.arange(0,1.6,0.01)
-
 def Ecell(i):
     return EOCV-b*np.log10((i+iloss)/iloss)-R*i-m*(np.exp(n*i)-1)
 
@@ -72,10 +70,18 @@ def P_com(h,p2):
 
 print(ISA_p(281.65))
 
+A = 0.5*100*100
+
+i = np.arange(0,1.6,0.01)
+
 V = np.array([Ecell(j) for j in i])
 P = i*V
 n_eff = 0.95
 th_eff = n_eff*V*(1/1.25)*100
+
+# Iact = i*A
+# Vact = np.array([Ecell(j) for j in Iact])
+# Pact = Iact*Vact
 
 plt.plot(i,V,'k', label='Actual value')
 plt.title('Fuel cell voltage as a function of current')
@@ -96,6 +102,18 @@ plt.plot(P,th_eff,'k')
 plt.title('Fuel cell efficiency as a function of power')
 plt.ylabel('Thermal efficiency [-]')
 plt.xlabel('Power [W/cm2]')
+plt.show()
+
+plt.plot(V,th_eff,'k')
+plt.title('Fuel cell efficiency as a function of voltage')
+plt.ylabel('Thermal efficiency [-]')
+plt.xlabel('Voltage [V]')
+plt.show()
+
+plt.plot(i*A,i*A*V*160,'k')
+plt.title('Actual fuel cell power as a function of current')
+plt.ylabel('Power density [W/cm2]')
+plt.xlabel('Current density [A/cm2]')
 plt.show()
 
 h = np.arange(0,11001)
