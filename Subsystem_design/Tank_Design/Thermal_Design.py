@@ -2,7 +2,7 @@
 This files contains the classes and functions for determining the insulation properties of the tank.
 """
 import numpy as np
-
+Q_req = np.load("Q_required.npy") #fist element is the Q_req for the central tank, the second is for the aft tank
 
 T_h = 273.15 + 45
 T_c = 19.75

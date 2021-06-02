@@ -216,6 +216,7 @@ print()
 
 #total
 m_total = m_h2+m_ker
+print(m_total)
 fr_t_idle = (h2m_idle+0)/m_total
 fr_t_taxi_out = (h2m_taxi_o+0)/m_total
 fr_t_taxi_in = (h2m_taxi_i+0)/m_total
