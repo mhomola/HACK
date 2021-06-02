@@ -1,5 +1,6 @@
 import Mechanical_Design
 import Materials
+import numpy as np
 import math as m
 from Subsystem_design.fuel_required import V_H2
 
@@ -77,4 +78,9 @@ if __name__ == '__main__':
     print("Length", aft.length, "#m")
 
     print("Added Weight = ", weight_addition)
+
+    Q_req = [central_tank.Q_req,aft_tank.Q_req]
+    Q_req = np.array(Q_req)
+    np.save("Q_required.npy",Q_req)
+
 

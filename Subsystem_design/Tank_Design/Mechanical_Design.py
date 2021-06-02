@@ -86,6 +86,7 @@ class Tank():
     Cp = 10310  # [J/Kg*K] H2 specific heat capacity at 20[K]
     time = 36  # [h] no boil-off should occur within 36h
     Q_req = Cp * self.mass_H2 * (t_boil - self.t_tank) / (time*3600)
+    self.Q_req = Q_req
     print(Q_req)
     hi = 1000  # convective heat transfer coefficient LH2 [W/(m^2*k)]
     #Defining the radius of the cylinders
@@ -177,6 +178,7 @@ class Cyl_Tank():
     Cp = 10310  # [J/Kg*K] H2 specific heat capacity at 20[K]
     time = 36  # [h] no boil-off should occur within 36h
     Q_req = Cp * self.mass_H2 * (t_boil - self.t_tank) / (time*3600)
+    self.Q_req = Q_req
     hi = 1000 #convective heat transfer coefficient LH2 [ W/(m^2*k)
     #Defining the radius of the cylinders
     self.r1 = (self.d_0 - self.t_wall_inner) /2
