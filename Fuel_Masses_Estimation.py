@@ -171,9 +171,9 @@ plt.show()
 
 h2ff = [ff_idle,ff_idle, ff_taxi_o, ff_taxi_o, ff_climb_h2, ff_climb_h2, ff_cruise_h2, ff_cruise_h2, ff_desc_h2, ff_desc_h2, ff_taxi_i, ff_taxi_i]
 t2 = [t0,t1,t1,t2,t2,t3,t3,t4,t4,t5,t5,t6]
-kff = [0,0,0,0,ff_climb_k,ff_climb_k,ff_cruise_k,ff_cruise_k,ff_desc_k,ff_desc_k,0,0]
+kff = [0,0,0,0,ff_climb_k,ff_climb_k,ff_cruise_k,ff_cruise_k,ff_desc_k,ff_desc_k,0,0]  #Kerosene fuel consumption
 plt.plot(t2,h2ff,label = 'H2')
-plt.plot(t2,kff,label = 'H2')
+plt.plot(t2,kff,label = 'Kerosene')
 plt.legend()
 plt.ylabel('Fuel flow [kg/s]')
 plt.xlabel('Time [s]')
@@ -216,6 +216,7 @@ print()
 
 #total
 m_total = m_h2+m_ker
+print(m_total)
 fr_t_idle = (h2m_idle+0)/m_total
 fr_t_taxi_out = (h2m_taxi_o+0)/m_total
 fr_t_taxi_in = (h2m_taxi_i+0)/m_total
