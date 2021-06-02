@@ -13,8 +13,6 @@ p_outside = 0.19028      # [bar] at 12100 [m] of altitude
 p_tank = 3.5 * 1.5       # [bar] venting pressure
 t_outside = 273.15 + 45  # [K]
 t_tank = 19.75           # [K]
-# d_0 = 3                 # [m] outside diameter -- dummy
-d_e = 4                  # [m] ellipse minor axis diameter -- dummy
 e_w = 0.8                # weld efficiency from Barron, 1985
 s_a = 200                # [MPa] allowable stress dummy value for now!!
 rho = 71.1                # [kg/m^3] liquid hydrogen density
@@ -88,7 +86,8 @@ class Tank():
     Cp = 10310  # [J/Kg*K] H2 specific heat capacity at 20[K]
     time = 36  # [h] no boil-off should occur within 36h
     Q_req = Cp * self.mass_H2 * (t_boil - self.t_tank) / (time*3600)
-    hi = 1000 #convective heat transfer coefficient LH2 [ W/(m^2*k)
+    print(Q_req)
+    hi = 1000  # convective heat transfer coefficient LH2 [W/(m^2*k)]
     #Defining the radius of the cylinders
     self.r1 = (self.d_0 - self.t_wall_inner) /2
     self.r2 = self.d_0/2
@@ -102,7 +101,7 @@ class Tank():
     #self.t_insulation = self.material_insulation.conductivity * self.dt * self.conduction_area/Q_req
     self.t_insulation = (self.r3-self.r2)*self.safety_factor #insulation of the thickness
     #self.r3 = self.t_insulation + self.r2
-    self.outer_vol_insulation = m.pi * self.r3**2 * (self.length-self.d_0) + 4/3* m.pi * (self.r3)**3
+    self.outer_vol_insulation = m.pi * self.r3**2 * (self.length-self.d_0) + 4/3 * m.pi * (self.r3)**3
     self.vol_insulation = self.outer_vol_insulation - self.outer_vol_inner_wall # the volume of the insulation that will be used for computing the mass
     self.mass_insulation = self.vol_insulation * self.material_insulation.density
 
