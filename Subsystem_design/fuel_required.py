@@ -32,8 +32,9 @@ def fuel_volume_calc(d_LH2, d_GH2, d_GH2_g, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio
 
     if state == 'liquid':
 
-        V_LH2 = (E_H2/Ed_H2)*(1/(d_LH2+d_GH2*(1-y)/y))
-        V_H2 = V_LH2*(1+(1-y)/y)*1000
+        V_LH2 = (E_H2/Ed_H2) * (1/(d_LH2 + d_GH2 * (1 - y)/y))  # y maximum filling of LH2
+        V_H2 = V_LH2 * (1 + (1-y) / y) * 1000
+
 
     return V_k, V_H2/0.965
 
@@ -50,7 +51,7 @@ def fuel_mass_calc(State, d_k, d_LH2, d_GH2_g):
                                          e_ratio=e_ratios, state=State)
         V_tot = Vk + VH2                                                              #Total volume [l]
 
-        m_k, m_H2 = Vk * d_k * 0.001, VH2 * d_LH2 * 0.001                             #Mass of Kerosene and Liquid H2 [kg]
+        m_k, m_H2 = Vk * d_k * 0.001, VH2 * LH2_d * 0.001                            #Mass of Kerosene and Liquid H2 [kg]
         m_tot = m_k + m_H2                                                            #Total mass
 
     if State == 'gas':

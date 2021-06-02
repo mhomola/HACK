@@ -25,16 +25,17 @@ class Constants():
 
         """Properties of H2"""
 
-        self.H2_ed = 33.5                                   # Energy density of hydrogen                         [kWh/kg]
+        self.H2_ed = 33.5                                           # Energy density of hydrogen                [kWh/kg]
 
         """Properties of kerosene"""
-        self.k_ed = 12.0                                    # Energy density of kerosene                         [kWh/kg]
+        self.k_ed = 12.0                                            # Energy density of kerosene                [kWh/kg]
 
         '''Performance'''
-        self.cruise_altitude = 11280
+        self.cruise_altitude = 11280                                # Cruise altitude                               [m]
+        self.max_altitude = 12130                                   # Max certified altitude                        [m]
         self.ISA_calculator(h_input=self.cruise_altitude)
 
-        self.rho_c = self.rho
+        self.rho_c = self.rho                                       # Aird density at cruise latitude           [kg/m^3]
         self.a_c = self.a
         self.T_c = self.T
         self.p_c = self.p
@@ -70,10 +71,21 @@ class Constants():
         self.S_h = 31                                               # Surface area of horizontal tail              [m^2]
         self.AR_h = self.b_h**2 / self.S_h                          # Aspect ratio of horizontal tail
         self.Vh_V = 0.85                                            # Ratio between V_h and V
+        self.S_elevator = 7.63                                      # Surface area of the elevators                [m^2]
+        self.max_elevator_deflection_nu = 30                        # Max elevator deflection nose up              [deg]
+        self.max_elevator_deflection_nd = 17                        # Max elevator deflection nose down            [deg]
+
+        self.b_v = 2 * 5.87                                         # Double the span of the evrtical tail          [m]
+        self.c_r_v = 5.595                                          # Root chord of the vertical tail               [m]
+        self.c_t_v = 1.822                                          # Tip chord of the vertical tail                [m]
+        self.taper_v = self.c_t_v / self.c_r_v                      # Taper ratio of the vertical tail
+        self.sweep_LE_v = 41                                        # Sweep of the LE of the vertical tail         [deg]
+        self.S_v = 21.5                                             # Surface area of vertical tail                [m^2]
+        self.AR_v = self.b_v**2 / 4 / self.S_v                      # Aspect ratio of vertical tail
 
         ''' Dimensions of A320-HACK'''
         self.S = 122.6                                              # Wing surface area                            [m^2]
-        self.extra_length = 3.01                                    # Increase in length for tank allocation        [m]
+        self.extra_length = 2.66445                                 # Increase in length for tank allocation        [m]
         self.l_f = 37.57 + self.extra_length                        # Fuselage length                               [m]
         self.height_f = 4.14                                        # Fuselage height                               [m]
         self.width_f = 3.95                                         # Fuselage width                                [m]
@@ -82,14 +94,17 @@ class Constants():
         self.l_tail = self.l_f - self.l_cabin - self.l_cockpit      # Length of the tail                            [m]
         self.S_b_fus = np.pi * 0.3/2 * 0.45/2                       # Base surface area                            [m^2]
         self.sweep_LE = 27                                          # Wing sweep                                   [deg]
+        self.X_root_wing = 11.88                                    # Distance from nose to root of wing            [m]
+        self.X_root_vtail = 30.11                                   # Distance from nose to root of vertical tail   [m]
+        self.X_root_htail = 31.60                                   # Distance from nose to root of horizontal tail [m]
 
         """Fuel constant A320-HACK"""
 
         self.V_H2 = V_H2                                            # Volume required of hydrogen                  [m^3]
         self.V_k = V_k
         self.V_H2_usable = V_H2 * 0.965                             # Volume required of kerosene                  [m^3]
-        self.V_H2_centre = 5.660714 * 2                             # Volume in the centre of the fuselage         [m^3]
-        self.V_H2_aft = 29.87253                                   # Volume in
+        self.V_H2_centre = 5.68952 * 2                             # Volume in the centre of the fuselage         [m^3]
+        self.V_H2_aft = 26.44275                                   # Volume in
         self.W1_Wto = 0.990
         self.W2_W1 = 0.990
         self.W3_W2 = 0.995
@@ -105,8 +120,8 @@ class Constants():
         self.k_d = 810.0                                            # Mass density of kerosene                      [kg/m^3]
 
         """Tank design constants""" #Plsss automate these, for design changes
-        self.center_tank_mass = 268.3*2                             # Mass of center tanks in total (2 tanks)       [kg]
-        self.fuselage_tank_mass = 397.31                            # Mass of aft tank (1 tank)                     [kg]
+        self.center_tank_mass = 115.4953 * 2                       # Mass of center tanks in total (2 tanks)       [kg]
+        self.fuselage_tank_mass = 419.5118                         # Mass of aft tank (1 tank)                     [kg]
 
         """Weights of HACK"""
         self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                     [kg]

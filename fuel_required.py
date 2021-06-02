@@ -3,10 +3,9 @@ import matplotlib.pyplot as plt
 from fuel_constants import *
 
 
-def fuel_volume_calc(d_LH2, d_GH2, d_GH2_g, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio, state, y = 0.885):
+def fuel_volume_calc(d_LH2, d_GH2, d_GH2_g, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio, state, y = 0.965):
 
     """
-
     :param d_LH2: density of liquid hydrogen [kg/m^3]
     :param d_GH2: density of gaseous hydrogen [kg/m^3]
     :param d_k: density of kerosene [kg/m^3]
@@ -36,7 +35,7 @@ def fuel_volume_calc(d_LH2, d_GH2, d_GH2_g, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio
         print('V_LH2',V_LH2)
         V_H2 = V_LH2*(1+(1-y)/y)*1000
 
-    return V_k, V_H2/0.965
+    return V_k, V_H2
 
 
 def fuel_mass_calc(State, d_k, d_LH2, d_GH2_g):
