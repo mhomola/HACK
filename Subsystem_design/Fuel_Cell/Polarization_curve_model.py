@@ -56,16 +56,22 @@ def ISA_t(h):
 
     return T0 + dT * h
 
-def P_com(h,p2):
+def P_com(h,p2,m):
 
     T1 = ISA_t(h)
 
-    m = 0.02
     nc = 0.7
     gamma = 1.4
-    p1 = ISA_p(T1)
+    g = 9.81
+    R = 287.05
+
+    if h <= 11000:
+        p1 = ISA_p(T1)
+    else:
+        p11 = ISA_p(ISA_t(11000))
+        p1 = p11*np.exp(-g/(R*ISA_t(11000))*(h-11000))
     
-    return cp*(T1/nc)*((p2/p1)**((gamma-1)/gamma)-1)*m
+    return cp*(T1/nc)*((p2/p1)**((gamma-1)/gamma)-1)*m, p1
 
 
 print(ISA_p(281.65))
@@ -100,13 +106,14 @@ plt.show()
 
 plt.plot(P,th_eff,'k')
 plt.title('Fuel cell efficiency as a function of power')
-plt.ylabel('Thermal efficiency [-]')
+plt.ylabel('Thermal efficiency [%]')
 plt.xlabel('Power [W/cm2]')
 plt.show()
 
+
 plt.plot(V,th_eff,'k')
 plt.title('Fuel cell efficiency as a function of voltage')
-plt.ylabel('Thermal efficiency [-]')
+plt.ylabel('Thermal efficiency [%]')
 plt.xlabel('Voltage [V]')
 plt.show()
 
@@ -116,12 +123,28 @@ plt.ylabel('Power density [W/cm2]')
 plt.xlabel('Current density [A/cm2]')
 plt.show()
 
-h = np.arange(0,11001)
-P_comp_req = P_com(h,200000)
+h = np.arange(0,13001)
+# P_comp_req1 = P_com(h,200000,0.05)
+# P_comp_req2 = P_com(h,200000,0.1)
+# P_comp_req3 = P_com(h,200000,0.15)
+# P_comp_req4 = P_com(h,200000,0.2)
 
-plt.plot(h/1000,P_comp_req/1000,'k')
-plt.title('Compressor power as a function of altitude, m = 1, nc = 0.7')
+P_comp_req1 = np.array([P_com(i,200000,0.05)[0] for i in h])
+P_comp_req2 = np.array([P_com(i,200000,0.1)[0] for i in h])
+P_comp_req3 = np.array([P_com(i,200000,0.15)[0] for i in h])
+P_comp_req4 = np.array([P_com(i,200000,0.2)[0] for i in h])
+p_check = np.array([P_com(i,200000,0.2)[1] for i in h])
+
+plt.plot(h/1000,P_comp_req1/1000,'#6f83e3', label = 'm = 0.05')
+plt.plot(h/1000,P_comp_req2/1000,'#3c4a8c', label = 'm = 0.1')
+plt.plot(h/1000,P_comp_req3/1000,'#1d2759', label = 'm = 0.15')
+plt.plot(h/1000,P_comp_req4/1000,'#060b24', label = 'm = 0.2')
+plt.legend()
+plt.title('Compressor power as a function of altitude, nc = 0.7')
 plt.ylabel('Compressor power [kW]')
 plt.xlabel('Altitude [km]')
+plt.show()
+
+plt.plot(h, p_check)
 plt.show()
 
