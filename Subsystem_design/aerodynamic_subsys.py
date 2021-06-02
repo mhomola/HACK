@@ -40,17 +40,17 @@ class AerodynamicCharacteristics(Constants):
         self.x_mac = self.y_mac * np.tan(self.sweep_LE * np.pi / 180)  # x location of LEMAC from root chord [m]
 
         # V&V - Unit tests
-        print('\n MAC of the inner trapezoid = ', mac_in, ' m',
-              '\n with y position of the MAC = ', y_mac_in, ' m',
-              '\n and with surface area = ', S_in, ' m^2')
-
-        print('\n MAC of the outer trapezoid = ', mac_out, ' m',
-              '\n with y position of the MAC = ', 0.5 * self.b_in + y_mac_out, ' m',
-              '\n and with surface area = ', S_out, ' m^2')
-
-        print('\n MAC of the wing = ', self.mac, ' m',
-              '\n y position of the MAC = ', self.y_mac, ' m',
-              '\n x position of the LEMAC measured from the start of the root chord = ', self.x_mac, ' m')
+        # print('\n MAC of the inner trapezoid = ', mac_in, ' m',
+        #       '\n with y position of the MAC = ', y_mac_in, ' m',
+        #       '\n and with surface area = ', S_in, ' m^2')
+        #
+        # print('\n MAC of the outer trapezoid = ', mac_out, ' m',
+        #       '\n with y position of the MAC = ', 0.5 * self.b_in + y_mac_out, ' m',
+        #       '\n and with surface area = ', S_out, ' m^2')
+        #
+        # print('\n MAC of the wing = ', self.mac, ' m',
+        #       '\n y position of the MAC = ', self.y_mac, ' m',
+        #       '\n x position of the LEMAC measured from the start of the root chord = ', self.x_mac, ' m')
 
     def wing_AR(self):
         """
@@ -69,9 +69,9 @@ class AerodynamicCharacteristics(Constants):
         self.y_mac_h = (self.b_h / 6) * (1 + 2 * self.taper_h) / (1 + self.taper_h)
         self.x_mac_h = self.y_mac_h * np.tan(self.sweep_LE_h * np.pi / 180)
 
-        print('\n MAC of the horizontal tail = ', self.mac_h, ' m',
-              '\n y position of the MAC = ', self.y_mac_h, ' m',
-              '\n x position of the LEMAC measured from the start of the root chord = ', self.x_mac_h, ' m')
+        # print('\n MAC of the horizontal tail = ', self.mac_h, ' m',
+        #       '\n y position of the MAC = ', self.y_mac_h, ' m',
+        #       '\n x position of the LEMAC measured from the start of the root chord = ', self.x_mac_h, ' m')
 
     def v_tail_MAC(self):
         """
@@ -82,9 +82,9 @@ class AerodynamicCharacteristics(Constants):
         self.y_mac_v = (self.b_v / 6) * (1 + 2 * self.taper_v) / (1 + self.taper_v)
         self.x_mac_v = self.y_mac_v * np.tan(self.sweep_LE_v * np.pi / 180)
 
-        print('\n MAC of the vertical tail = ', self.mac_h, ' m',
-              '\n y position of the MAC = ', self.y_mac_h, ' m',
-              '\n x position of the LEMAC measured from the start of the root chord = ', self.x_mac_h, ' m')
+        # print('\n MAC of the vertical tail = ', self.mac_v, ' m',
+        #       '\n y position of the MAC = ', self.y_mac_v, ' m',
+        #       '\n x position of the LEMAC measured from the start of the root chord = ', self.x_mac_v, ' m')
 
     def Roskam_drag_prediction_cruise(self, rho, u1, l_f, l_cockpit, l_cabin, l_tail, AoA):
         """
