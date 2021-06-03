@@ -11,6 +11,7 @@ This file contains one class only, which is meant to contain the variables which
 design. It may also contain some simple functions to compute constants derived from other constants (e.g. ISA).
 """
 
+
 class Constants():
     def __init__(self):
         self.rho_0 = 1.225                                          # Sea level density                         [kg/m^3]
@@ -162,6 +163,67 @@ class Constants():
         self.k_gas = 1.33
         self.ratio_air_cc = 0.6 # percentage of core air that is used in combustion
 
+        """"Altitude and speed"""
+        self.phases = np.array(['idle', 'taxi out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi in'])
+        self.M0 = np.array([0.2, 0.2, 0.5, 0.5, 0.78, 0.5, 0.2])  # [-] Mach number
+        self.h = np.array([10, 10, 50, 3000, 11280, 3000, 10])  # [m] altitude
+        self.T0, self.p0, self.rho0, self.a0 = np.array([]), np.array([]), np.array([]), np.array([])
+
+        for i in self.h:
+            self.ISA_calculator(h_input = i)
+            self.T0 = np.append(self.T0, self.T)
+            self.p0 = np.append(self.p0, self.p)
+            self.rho0 = np.append(self.rho0, self.rho)
+            self.a0 = np.append(self.a0, self.a)
+
+        self.v0 = self.M0 * self.a0
+
+    def engine_data_neo(self):
+        self.eta_inlet = 0.97
+        self.PR_fan = 1.6
+        self.eta_fan = 0.93
+        self.BR = 11.1
+        self.eta_LPC = 0.92
+        self.eta_HPC = 0.92
+        self.eta_LPT = 0.94
+        self.eta_HPT = 0.94
+        self.eta_mech = 0.9
+        self.eta_cc = 0.99
+        self.PR_LPC = 2
+        self.PR_HPC = 11.93
+        self.eta_nozzle = 0.98
+        self.PR_cc = 0.96
+        self.T04 = 1630 # [K]
+        self.LHV_f = 43.2 # [MJ/kg]
+
+    def engine_data_hack(self):
+        self.eta_inlet = 0.97
+        self.PR_fan = 1
+        self.eta_fan = 0.93
+        self.BR = 12
+        self.eta_LPC = 0.92
+        self.eta_HPC = 0.92
+        self.eta_LPT = 0.94
+        self.eta_HPT = 0.94
+        self.eta_mech = 0.9
+        self.eta_cc = 0.99
+        self.PR_LPC = 2.3
+        self.PR_HPC = 13
+        self.eta_nozzle = 0.98
+        self.PR_cc = 0.96
+        self.T04 = 1630 # [K]
+
+        # Fuel properties
+
+        self.mr_h2 = np.array([ 1, 1, 0.1376, 0.1376, 0.1376, 0.1376, 1  ])
+        self.mr_ker = 1 - self.mr_h2
+
+        self.ER_h2 = ( self.mr_h2*self.LHV_h2 ) / (  self.mr_h2*self.LHV_h2 + self.mr_ker*self.LHV_ker)
+        self.ER_ker = ( self.mr_ker*self.LHV_ker ) / (  self.mr_h2*self.LHV_h2 + self.mr_ker*self.LHV_ker)
+
+        # find LHV_f for each phase, according to mass fractions
+        self.LHV_f = self.ER_h2*self.LHV_h2 + self.ER_ker*self.LHV_ker  # [MJ/kg]
+
     # def fuselage_length(self,vol_eff, vol_fus):
     #     """
     #
@@ -259,54 +321,54 @@ class Constants():
         self.rho = self.ISA_density(self.p, self.T)
 
 
-class engine_data_neo:
-    def __init__(self):
-        self.eta_inlet = 0.97
-        self.PR_fan = 1.6
-        self.eta_fan = 0.93
-        self.BR = 11.1
-        self.eta_LPC = 0.92
-        self.eta_HPC = 0.92
-        self.eta_LPT = 0.94
-        self.eta_HPT = 0.94
-        self.eta_mech = 0.9
-        self.eta_cc = 0.99
-        self.PR_LPC = 2
-        self.PR_HPC = 11.93
-        self.eta_nozzle = 0.98
-        self.PR_cc = 0.96
-        self.T04 = 1630 # [K]
-        self.LHV_f = 43.2 # [MJ/kg]
+# class engine_data_neo:
+#     def __init__(self):
+#         self.eta_inlet = 0.97
+#         self.PR_fan = 1.6
+#         self.eta_fan = 0.93
+#         self.BR = 11.1
+#         self.eta_LPC = 0.92
+#         self.eta_HPC = 0.92
+#         self.eta_LPT = 0.94
+#         self.eta_HPT = 0.94
+#         self.eta_mech = 0.9
+#         self.eta_cc = 0.99
+#         self.PR_LPC = 2
+#         self.PR_HPC = 11.93
+#         self.eta_nozzle = 0.98
+#         self.PR_cc = 0.96
+#         self.T04 = 1630 # [K]
+#         self.LHV_f = 43.2 # [MJ/kg]
 
 
-class engine_data_hack:
-    def __init__(self):
-        self.eta_inlet = 0.97
-        self.PR_fan = 1
-        self.eta_fan = 0.93
-        self.BR = 12
-        self.eta_LPC = 0.92
-        self.eta_HPC = 0.92
-        self.eta_LPT = 0.94
-        self.eta_HPT = 0.94
-        self.eta_mech = 0.9
-        self.eta_cc = 0.99
-        self.PR_LPC = 2.3
-        self.PR_HPC = 13
-        self.eta_nozzle = 0.98
-        self.PR_cc = 0.96
-        self.T04 = 1630 # [K]
-
-        # Fuel properties
-
-        self.mr_h2 = np.array([ 1, 1, 0.1376, 0.1376, 0.1376, 0.1376, 1  ])
-        self.mr_ker = 1 - self.mr_h2
-
-        self.ER_h2 = ( self.mr_h2*self.LHV_h2 ) / (  self.mr_h2*self.LHV_h2 + self.mr_ker*self.LHV_ker)
-        self.ER_ker = ( self.mr_ker*self.LHV_ker ) / (  self.mr_h2*self.LHV_h2 + self.mr_ker*self.LHV_ker)
-
-        # find LHV_f for each phase, according to mass fractions
-        self.LHV_f = self.ER_h2*self.LHV_h2 + self.ER_ker*self.LHV_ker  # [MJ/kg]
+# class engine_data_hack:
+#     def __init__(self):
+        # self.eta_inlet = 0.97
+        # self.PR_fan = 1
+        # self.eta_fan = 0.93
+        # self.BR = 12
+        # self.eta_LPC = 0.92
+        # self.eta_HPC = 0.92
+        # self.eta_LPT = 0.94
+        # self.eta_HPT = 0.94
+        # self.eta_mech = 0.9
+        # self.eta_cc = 0.99
+        # self.PR_LPC = 2.3
+        # self.PR_HPC = 13
+        # self.eta_nozzle = 0.98
+        # self.PR_cc = 0.96
+        # self.T04 = 1630 # [K]
+        #
+        # # Fuel properties
+        #
+        # self.mr_h2 = np.array([ 1, 1, 0.1376, 0.1376, 0.1376, 0.1376, 1  ])
+        # self.mr_ker = 1 - self.mr_h2
+        #
+        # self.ER_h2 = ( self.mr_h2*self.LHV_h2 ) / (  self.mr_h2*self.LHV_h2 + self.mr_ker*self.LHV_ker)
+        # self.ER_ker = ( self.mr_ker*self.LHV_ker ) / (  self.mr_h2*self.LHV_h2 + self.mr_ker*self.LHV_ker)
+        #
+        # # find LHV_f for each phase, according to mass fractions
+        # self.LHV_f = self.ER_h2*self.LHV_h2 + self.ER_ker*self.LHV_ker  # [MJ/kg]
 
 # Try out the class
 
