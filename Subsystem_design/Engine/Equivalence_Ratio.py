@@ -1,5 +1,4 @@
-
-
+#old version do not use
 LHV_k = 43.2
 LHV_H2 = 119.96
 og_SFC = 14.4

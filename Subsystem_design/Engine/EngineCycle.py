@@ -9,12 +9,12 @@ Created on Wed Jun  2 09:39:04 2021
 # Find estimates for all constants --> Aero Engine Technology course
 # Find altitude and speed of each phase
 # Check why when the nozzle is not chocked T8 > T05 (hypothesis: error with p05)
-# Determine stoichiometric ratio --> find equivalence ratio
 # Fuel flow of each fuel
 
 # DONE
 # Determine LHV_fuel according to mass ratio of fuels
 # Determine atmospheric conditions
+# Determine stoichiometric ratio --> find equivalence ratio
 
 
 from Subsystem_design.common_constants import Constants
@@ -64,7 +64,7 @@ class Engine_Cycle(Constants):
         self.mf_fuel = (self.mf_hot * self.ratio_air_cc * self.cp_gas * (self.T04-self.T03)) / (self.LHV_f[i]*10**6 * self.eta_cc)
         self.mf_airfuel = self.mf_hot + self.mf_fuel # at the end of the cc
 
-        self.mf_h2 = self.mf_fuel * self.ER_h2[i]
+        self.mf_h2 = self.mf_fuel * self.ER_h2[i]   #energy ratio H2
         self.mf_ker = self.mf_fuel * self.ER_ker[i]
 
         # T04 = 1500 [K], is given
@@ -128,6 +128,10 @@ class Engine_Cycle(Constants):
 
         self.T_total = self.T_fan + self.T_core # [N]
 
+        self.stoichiometric_ratio = self.mr_h2[i] * self.stoich_ratio_h2 + self.mr_ker[i] * self.stoich_ratio_ker
+
+        self.equivalence_ratio = (self.mf_fuel/(self.mf_hot * self.ratio_air_cc)) / self.stoichiometric_ratio #TBD what mf_air to use
+
 
 ''' FORMULAE
 
@@ -173,5 +177,6 @@ if __name__ == '__main__':
         print('Exit of nozzle: T8 = ', ec.T8, '[K]; p8 = ', ec.p8, '[Pa]; v8 = ', ec.v8, '[m/s]')
         print('Exit of fan: T18 = ', ec.T18, '[K]; p18 = ', ec.p18, '[Pa]; v18 = ', ec.v18, '[m/s]')
         print('Provided Trhust: Fan = ', ec.T_fan, '[N]; Core = ', ec.T_core, '[N]; Total = ', ec.T_total, '[N]')
+        print('Equivalence Ratio' = equivalence_ratio)
 
 
