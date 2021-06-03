@@ -239,6 +239,7 @@ class Constants():
         # find LHV_f for each phase, according to mass fractions
         self.LHV_f = self.ER_h2*self.LHV_h2 + self.ER_ker*self.LHV_ker  # [MJ/kg]
 
+        self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))
         self.stoich_ratio_ker = 1/15.66 #FAR
         self.stoich_ratio_h2 = 1/34.3 #FAR
 
