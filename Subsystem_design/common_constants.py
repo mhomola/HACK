@@ -100,7 +100,7 @@ class Constants():
         self.X_root_vtail = 30.11                                   # Distance from nose to root of vertical tail   [m]
         self.X_root_htail = 31.60                                   # Distance from nose to root of horizontal tail [m]
         self.D_fan = 78 * 0.0254                                    # Fan diameter, 78 [in]                         [m]
-        self.A_fan = np.pi * self.D_fan**2 / 4                      # Area of the fan                               [m2]        
+        self.A_fan = np.pi * self.D_fan**2 / 4                      # Area of the fan                               [m2]
 
         """Fuel constant A320-HACK"""
 
@@ -239,8 +239,8 @@ class Constants():
         # find LHV_f for each phase, according to mass fractions
         self.LHV_f = self.ER_h2*self.LHV_h2 + self.ER_ker*self.LHV_ker  # [MJ/kg]
 
-        self.ratio_air_cc =  np.array(np.genfromtxt('mr_cc_hack.dat'))                                    # percentage of core air that is used in combustion
-
+        self.stoich_ratio_ker = 1/15.66 #FAR
+        self.stoich_ratio_h2 = 1/34.3 #FAR
 
     # def fuselage_length(self,vol_eff, vol_fus):
     #     """
