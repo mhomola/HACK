@@ -6,7 +6,7 @@ Created on Wed Jun  2 09:39:04 2021
 """
 
 # TODO
-# Find estimates for all constants
+# Find estimates for all constants --> Aero Engine Technology course
 # Find altitude and speed of each phase
 # Check why when the nozzle is not chocked T8 > T05 (hypothesis: error with p05)
 # Determine stoichiometric ratio --> find equivalence ratio
@@ -63,6 +63,9 @@ class Engine_Cycle(Constants):
         # Exit of cc - Entrance of HPT
         self.mf_fuel = (self.mf_hot * self.ratio_air_cc * self.cp_gas * (self.T04-self.T03)) / (self.LHV_f[i]*10**6 * self.eta_cc)
         self.mf_airfuel = self.mf_hot + self.mf_fuel # at the end of the cc
+
+        self.mf_h2 = self.mf_fuel * self.ER_h2[i]
+        self.mf_ker = self.mf_fuel * self.ER_ker[i]
 
         # T04 = 1500 [K], is given
         self.p04 = self.p03 * self.PR_cc
@@ -160,6 +163,10 @@ if __name__ == '__main__':
         print('Entrance of HPC: T025 = ', ec.T025, '[K]; p025 = ', ec.p025, '[Pa]')
         print('Entrance of CC: T03 = ', ec.T03, '[K]; p03 = ', ec.p03, '[Pa]')
         print('Mass flow CC: Fuel = ', ec.mf_fuel, '[kg/s]; air CC = ', ec.mf_hot*c.ratio_air_cc, '[kg/s]; Total end of CC = ', ec.mf_airfuel,'[kg/s]')
+
+
+        print('Hydrogen = ', ec.mf_h2, '[kg/s]; Kerosene = ', ec.mf_ker,'[kg/s]')
+
         print('Entrance of HPT: T04 = ', ec.T04, '[K]; p04 = ', ec.p04, '[Pa]')
         print('Entrance of LPT: T045 = ', ec.T045, '[K]; p045 = ', ec.p045, '[Pa]')
         print('Entrance of nozzle: T05 = ', ec.T05, '[K]; p05 = ', ec.p05, '[Pa]')
