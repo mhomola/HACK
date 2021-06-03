@@ -1,5 +1,6 @@
 import Mechanical_Design
 import Materials
+import numpy as np
 import math as m
 from Subsystem_design.fuel_required import V_H2
 
@@ -20,9 +21,10 @@ class spacial_constraints():
 
 #Define the areas of the constraints
 
-central = spacial_constraints(length=6.5,width=1.14,height=2.67)
 
-central_iter = spacial_constraints(length=6.5,width=1.14,height=2.67)
+central = spacial_constraints(length=6.5, width=1.14, height=2.67)
+
+central_iter = spacial_constraints(length=6.5, width=1.14, height=2.67)
 central_iter.width = central_iter.width * 0.7 #we start from a smaller diameter
 
 iter_cond = 1 #will be sitched to 0 when the outerdiameter of the tank will surpass the central.width
@@ -52,6 +54,7 @@ weight_addition = aft_tank.mass_tank + 2 * central_tank.mass_tank
 
 ijk = 2 * central_tank.mass_tank
 
+
 if __name__ == '__main__':
 
     print("#######CENTRAL TANKS######")
@@ -75,3 +78,9 @@ if __name__ == '__main__':
     print("Length", aft.length, "#m")
 
     print("Added Weight = ", weight_addition)
+
+    Q_req = [central_tank.Q_req,aft_tank.Q_req]
+    Q_req = np.array(Q_req)
+    np.save("Q_required.npy",Q_req)
+
+

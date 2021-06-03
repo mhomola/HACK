@@ -59,7 +59,7 @@ class Roskam_drag_coefficient():
         # flat_plate = io.imread('flat_plate_skin_friction.PNG')
         # plt.imshow(flat_plate)
         # plt.show()
-        self.C_f_fus = 0.002
+        self.C_f_fus = 0.0016
 
     def zero_lift_drag_fus(self, S_b_fus, S_fus, S_wet_fus):
         '''
@@ -69,9 +69,10 @@ class Roskam_drag_coefficient():
         '''
         self.d_f = np.sqrt(4 / np.pi * S_fus)
         ld = self.l_f / self.d_f
+        print(ld)
         self.C_D_o_fus_exc_base = self.R_wf * self.C_f_fus * (1 + 60 / ld**3 + 0.0025 * ld) * S_wet_fus / self.S
         bf = np.sqrt(4 / np.pi * S_b_fus) / self.d_f
-        self.C_D_b_fus = (0.029 * bf**3 / ((self.C_D_o_fus_exc_base * self.S / S_fus)**0.5)) * S_fus / self.S
+        self.C_D_b_fus = 0.09 * bf**2
         self.C_D_o_fus = self.C_D_o_fus_exc_base + self.C_D_b_fus
 
 

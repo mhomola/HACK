@@ -9,15 +9,13 @@ import math as m
 
 # Hydrogen tank storage data
 
-p_outside = 0.19028  # [bar] at 12100 [m] of altitude
-p_tank = 3.5 *1.5     # [bar] venting pressure
-t_outside = 273.15+45 #216.65   # [K]
-t_tank = 19.75        # [K]
-d_0 = 3              # [m] outside diameter -- dummy
-d_e = 4              # [m] ellipse minor axis diameter -- dummy
-e_w = 0.8            # weld efficiency from Barron, 1985
-s_a = 200            # [MPa] allowable stress dummy value for now!!
-rho = 71             # [kg/m^3] liquid hydrogen density
+p_outside = 0.19028      # [bar] at 12100 [m] of altitude
+p_tank = 3.5 * 1.5       # [bar] venting pressure
+t_outside = 273.15 + 45  # [K]
+t_tank = 19.75           # [K]
+e_w = 0.8                # weld efficiency from Barron, 1985
+s_a = 200                # [MPa] allowable stress dummy value for now!!
+rho = 71.1                # [kg/m^3] liquid hydrogen density
 
 
 #Determining the heat transfer rate that can be accepted based on the user requirement of no boil-off for 36h.
@@ -71,8 +69,8 @@ class Tank():
 
 
   def inner_wall(self): #D_Verstraete_Thesis_2009
-    t_wall_inner = self.p_tank * d_0 / (2 * self.material_inner.yield_strength *10**6 * self.e_w + 0.8 * self.p_tank) #10^6 factor for MPa ->Pa
-    t_caps_inner = self.p_tank * d_0 * self.K / (2 * self.material_inner.yield_strength*10**6 * self.e_w + 2 * self.p_tank * (self.K - 0.1)) #we use directly p_tank cause p_tank - p_vac = p_tank
+    t_wall_inner = self.p_tank * self.d_0 / (2 * self.material_inner.yield_strength *10**6 * self.e_w + 0.8 * self.p_tank) #10^6 factor for MPa ->Pa
+    t_caps_inner = self.p_tank * self.d_0 * self.K / (2 * self.material_inner.yield_strength*10**6 * self.e_w + 2 * self.p_tank * (self.K - 0.1)) #we use directly p_tank cause p_tank - p_vac = p_tank
 
     self.t_wall_inner = t_wall_inner * self.safety_factor
     self.t_caps_inner = t_caps_inner * self.safety_factor
@@ -88,7 +86,9 @@ class Tank():
     Cp = 10310  # [J/Kg*K] H2 specific heat capacity at 20[K]
     time = 36  # [h] no boil-off should occur within 36h
     Q_req = Cp * self.mass_H2 * (t_boil - self.t_tank) / (time*3600)
-    hi = 1000 #convective heat transfer coefficient LH2 [ W/(m^2*k)
+    self.Q_req = Q_req
+    print(Q_req)
+    hi = 1000  # convective heat transfer coefficient LH2 [W/(m^2*k)]
     #Defining the radius of the cylinders
     self.r1 = (self.d_0 - self.t_wall_inner) /2
     self.r2 = self.d_0/2
@@ -102,7 +102,7 @@ class Tank():
     #self.t_insulation = self.material_insulation.conductivity * self.dt * self.conduction_area/Q_req
     self.t_insulation = (self.r3-self.r2)*self.safety_factor #insulation of the thickness
     #self.r3 = self.t_insulation + self.r2
-    self.outer_vol_insulation = m.pi * self.r3**2 * (self.length-self.d_0) + 4/3* m.pi * (self.r3)**3
+    self.outer_vol_insulation = m.pi * self.r3**2 * (self.length-self.d_0) + 4/3 * m.pi * (self.r3)**3
     self.vol_insulation = self.outer_vol_insulation - self.outer_vol_inner_wall # the volume of the insulation that will be used for computing the mass
     self.mass_insulation = self.vol_insulation * self.material_insulation.density
 
@@ -162,7 +162,7 @@ class Cyl_Tank():
 
 
   def inner_wall(self): #D_Verstraete_Thesis_2009
-    t_wall_inner = self.p_tank * d_0 / (2 * self.material_inner.yield_strength *10**6 * self.e_w + 0.8 * self.p_tank) #10^6 factor for MPa ->Pa
+    t_wall_inner = self.p_tank * self.d_0 / (2 * self.material_inner.yield_strength *10**6 * self.e_w + 0.8 * self.p_tank) #10^6 factor for MPa ->Pa
 
 
     self.t_wall_inner = t_wall_inner * self.safety_factor
@@ -178,6 +178,7 @@ class Cyl_Tank():
     Cp = 10310  # [J/Kg*K] H2 specific heat capacity at 20[K]
     time = 36  # [h] no boil-off should occur within 36h
     Q_req = Cp * self.mass_H2 * (t_boil - self.t_tank) / (time*3600)
+    self.Q_req = Q_req
     hi = 1000 #convective heat transfer coefficient LH2 [ W/(m^2*k)
     #Defining the radius of the cylinders
     self.r1 = (self.d_0 - self.t_wall_inner) /2
