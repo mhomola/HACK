@@ -7,14 +7,14 @@ Created on Wed Jun  2 09:39:04 2021
 
 # TODO
 # Find estimates for all constants --> Aero Engine Technology course
-# Find altitude and speed of each phase
+# Find altitude and speed of each phase --> Elena
 # Check why when the nozzle is not chocked T8 > T05 (hypothesis: error with p05)
-# Determine stoichiometric ratio --> find equivalence ratio
-# Fuel flow of each fuel
 
 # DONE
 # Determine LHV_fuel according to mass ratio of fuels
 # Determine atmospheric conditions
+# Fuel flow of each fuel
+# Determine stoichiometric ratio --> find equivalence ratio --> Elena (check what is used rn for stoichiometric ratio)
 
 
 from Subsystem_design.common_constants import Constants
@@ -61,7 +61,7 @@ class Engine_Cycle(Constants):
         self.p03 = self.p025 * self.PR_HPC
 
         # Exit of cc - Entrance of HPT
-        self.mf_fuel = (self.mf_hot * self.ratio_air_cc * self.cp_gas * (self.T04-self.T03)) / (self.LHV_f[i]*10**6 * self.eta_cc)
+        self.mf_fuel = (self.mf_hot * self.ratio_air_cc[i] * self.cp_gas * (self.T04-self.T03)) / (self.LHV_f[i]*10**6 * self.eta_cc)
         self.mf_airfuel = self.mf_hot + self.mf_fuel # at the end of the cc
 
         self.mf_h2 = self.mf_fuel * self.ER_h2[i]
@@ -147,7 +147,7 @@ Stations:
 
 
 if __name__ == '__main__':
-    aircraft = input('Would you like to do the analysis for the engine of A320neo or A320-HACK? Answer neo or HACK: ')
+    aircraft = input('Would you like to analyse the engine of A320neo or A320-HACK? Answer neo or HACK: ')
 
     ec = Engine_Cycle()
     c = Constants()
@@ -162,7 +162,7 @@ if __name__ == '__main__':
         print('Mass flow of air: Total = ', ec.mf_air_init[i], '[kg/s]; Core = ', ec.mf_hot, '[kg/s]; Bypassed = ', ec.mf_cold,'[kg/s]')
         print('Entrance of HPC: T025 = ', ec.T025, '[K]; p025 = ', ec.p025, '[Pa]')
         print('Entrance of CC: T03 = ', ec.T03, '[K]; p03 = ', ec.p03, '[Pa]')
-        print('Mass flow CC: Fuel = ', ec.mf_fuel, '[kg/s]; air CC = ', ec.mf_hot*c.ratio_air_cc, '[kg/s]; Total end of CC = ', ec.mf_airfuel,'[kg/s]')
+        print('Mass flow CC: Fuel = ', ec.mf_fuel, '[kg/s]; air CC = ', ec.mf_hot*c.ratio_air_cc[i], '[kg/s]; Total end of CC = ', ec.mf_airfuel,'[kg/s]')
 
 
         print('Hydrogen = ', ec.mf_h2, '[kg/s]; Kerosene = ', ec.mf_ker,'[kg/s]')
