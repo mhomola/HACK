@@ -14,6 +14,8 @@ Created on Tue May 25 11:53:39 2021
     _mix = after the cooling air is added
 
 """
+# TODO - adapt this code to classes and to be able to do the iteration
+
 import math as m
 import numpy as np
 import pandas as pd
@@ -85,7 +87,7 @@ def h(h0, data, T0, Tmax):
     
     h = h0 + np.sum(cp_integral)
     
-    return h
+    return h, cp_integral
 
 
         
@@ -174,25 +176,27 @@ delta_h_mix = mr_ker_mix*h0_C12H26*1000 # [J/mol]
 # Assume a temperature at the end of the cc: T_assumed
 # Find cp_mix for that temperature: C_p_mix(T_assumed) = SUM( c_p_k(T_assumed)*mr_k )
 
-T = Tcc
-e = 50 # [K]
+# T = Tcc
+# e = 50 # [K]
+#
+# while T >= T0:
+#     cp_air_mix = cp_first_last(N2_cp_data, T, np.array([]), np.array([]))[0][0]
+#     cp_h2_mix = cp_first_last(h2_cp_data, T, np.array([]), np.array([]))[0][0]
+#     cp_ker_mix = cp_first_last(C12H26_cp_data, T, np.array([]), np.array([]))[0][0]
+#     cp_mix = mr_air_mix*cp_air_mix + mr_h2_mix*cp_h2_mix + mr_ker_mix*cp_ker_mix
+#
+#     # Find the temperature at the end of the combustion chamber
+#     T_end = T0 + (h_mix - delta_h_mix) / cp_mix
+#     print('T_end = ',T_end,' for starting T = ',T)
+#     # Check if T_end ~ T_assumed, if not iterate T_assumed
+#
+#     if T_end < T + e and T_end > T  - e:
+#         break
+#
+#     else:
+#         T -= 25 # [K] temperature steps
 
-while T >= T0: 
-    cp_air_mix = cp_first_last(N2_cp_data, T, np.array([]), np.array([]))[0][0]
-    cp_h2_mix = cp_first_last(h2_cp_data, T, np.array([]), np.array([]))[0][0]
-    cp_ker_mix = cp_first_last(C12H26_cp_data, T, np.array([]), np.array([]))[0][0]    
-    cp_mix = mr_air_mix*cp_air_mix + mr_h2_mix*cp_h2_mix + mr_ker_mix*cp_ker_mix
-    
-    # Find the temperature at the end of the combustion chamber
-    T_end = T0 + (h_mix - delta_h_mix) / cp_mix
-    print('T_end = ',T_end,' for starting T = ',T)
-    # Check if T_end ~ T_assumed, if not iterate T_assumed
-    
-    if T_end < T + e and T_end > T  - e:
-        break
-
-    else:
-        T -= 25 # [K] temperature steps
+mr_cool = (  ) / (   )
     
 print('Temperature at the end of the combustion chamber [K]: ', T_end)
 
