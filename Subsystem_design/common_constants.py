@@ -194,7 +194,7 @@ class Constants():
         self.eta_nozzle = 0.98
         self.PR_cc = 0.96
         self.T04 = 1630 # [K]
-        self.LHV_f = 43.2 # [MJ/kg]
+        self.LHV_f = np.array([43.2]*7) # [MJ/kg]
 
     def engine_data_hack(self):
         self.eta_inlet = 0.97
