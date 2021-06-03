@@ -98,6 +98,8 @@ class Constants():
         self.X_root_wing = 11.88                                    # Distance from nose to root of wing            [m]
         self.X_root_vtail = 30.11                                   # Distance from nose to root of vertical tail   [m]
         self.X_root_htail = 31.60                                   # Distance from nose to root of horizontal tail [m]
+        self.D_fan = 4                                              # Fan diameter                                  [m]
+        self.A_fan = np.pi * self.D_fan**2 / 4                      # Area of the fan                               [m2]        
 
         """Fuel constant A320-HACK"""
 
