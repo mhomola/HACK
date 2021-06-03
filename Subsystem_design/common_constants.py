@@ -161,7 +161,6 @@ class Constants():
         self.cp_gas = 1150                                          # Specific heat constant gas                    [J/kg/K]
         self.k_air = 1.4                                            # Ration of specific heat for air
         self.k_gas = 1.33                                           # Ration of specific heat for air
-        self.ratio_air_cc = 0.95                                     # percentage of core air that is used in combustion
 
         self.N2_cp_data = np.array(np.genfromtxt('N2_cp.dat'))      # cp vs. T data for N2                          T[K]; cp[kJ/(kg*K)]
         self.molarmass_N2 = 28.01340                                # Molar mass of N2                              [g/mol]
@@ -207,7 +206,11 @@ class Constants():
 
         self.mr_h2 = np.array([ 0, 0, 0, 0, 0, 0, 0  ])
         self.mr_ker = 1 - self.mr_h2
-        self.LHV_f = np.array([43.2]*7) # [MJ/kg]
+        self.ER_h2 = np.array([0, 0, 0, 0, 0, 0, 0])
+        self.ER_ker = 1 - self.mr_h2
+        self.LHV_f = np.array([self.LHV_ker]*7) # [MJ/kg]
+
+        self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_neo.dat'))                                   # percentage of core air that is used in combustion
 
     def engine_data_hack(self):
         self.eta_inlet = 0.97
@@ -227,7 +230,6 @@ class Constants():
         self.T04 = 1630 # [K]
 
         # Fuel properties
-
         self.mr_h2 = np.array([ 1, 1, 0.1376, 0.1376, 0.1376, 0.1376, 1  ])
         self.mr_ker = 1 - self.mr_h2
 
@@ -236,6 +238,9 @@ class Constants():
 
         # find LHV_f for each phase, according to mass fractions
         self.LHV_f = self.ER_h2*self.LHV_h2 + self.ER_ker*self.LHV_ker  # [MJ/kg]
+
+        self.ratio_air_cc =  np.array(np.genfromtxt('mr_cc_hack.dat'))                                    # percentage of core air that is used in combustion
+
 
     # def fuselage_length(self,vol_eff, vol_fus):
     #     """
