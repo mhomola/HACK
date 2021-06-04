@@ -19,6 +19,7 @@ class Constants():
         self.T_0 = 288.15                                           # Sea level temperature                        [K]
         self.g_0 = 9.80665                                          # Gravity at sea level                       [m/s^2]
         self.R = 287.0                                              # Specific gas constant of air            [J/(kg*K)]
+        self.R_univ = 8.314                                         # Universal gas constant                    [J/mol/K]
         self.gamma = 1.4                                            # Heat capacity ratio of air                   [-]
         self.a_0 = 340.294                                          # Sea level speed of sound                     [m/s]
         self.visc = 1.458 * 10**(-5)                                # Air viscosity                            [N*s/m^2]
@@ -156,7 +157,6 @@ class Constants():
         self.l_tail_320neo = self.l_f_320neo - 29.53                # Length of the tail of A320neo                 [m]
 
         """Propulsion"""
-        self.R = 287                                                # Gas constant                                  [J/kg/K]
         self.cp_air = 1000                                          # Specific heat constant air                    [J/kg/K]
         self.cp_gas = 1150                                          # Specific heat constant gas                    [J/kg/K]
         self.k_air = 1.4                                            # Ration of specific heat for air
@@ -174,7 +174,7 @@ class Constants():
 
         """"Altitude and speed"""
         self.phases = np.array(['idle', 'taxi out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi in'])
-        self.M0 = np.array([0.2, 0.2, 0.5, 0.5, 0.78, 0.5, 0.2])  # [-] Mach number
+        self.M0 = np.array([0.73, 0.2, 0.5, 0.5, 0.78, 0.5, 0.2])  # [-] Mach number
         self.h = np.array([10, 10, 50, 3000, 11280, 3000, 10])  # [m] altitude
         self.T0, self.p0, self.rho0, self.a0 = np.array([]), np.array([]), np.array([]), np.array([])
 
@@ -188,21 +188,22 @@ class Constants():
         self.v0 = self.M0 * self.a0
 
     def engine_data_neo(self):
-        self.eta_inlet = 0.97
-        self.PR_fan = 1.6
-        self.eta_fan = 0.93
-        self.BR = 11.1
-        self.eta_LPC = 0.92
-        self.eta_HPC = 0.92
-        self.eta_LPT = 0.94
-        self.eta_HPT = 0.94
-        self.eta_mech = 0.9
-        self.eta_cc = 0.99
-        self.PR_LPC = 2
-        self.PR_HPC = 11.93
-        self.eta_nozzle = 0.98
-        self.PR_cc = 0.96
-        self.T04 = 1630 # [K]
+        self.eta_inlet = 0.9208608681597723
+        self.PR_fan = 1.4206
+        self.eta_fan = 0.90445
+        self.BR = 11.24426
+        self.eta_LPC = 0.90019
+        self.eta_HPC = 0.91449
+        self.eta_LPT = 0.9405
+        self.eta_HPT = 1 # 1.072044268921447 (computed)  # 0.91898 (given)
+        self.eta_mech_H =  0.7465403131365893
+        self.eta_mech_L = 1
+        self.eta_cc = 0.995 # that of Leap-1B
+        self.PR_LPC = 2.69419
+        self.PR_HPC = 9.73784
+        self.eta_nozzle = 1 # 1.0737340755627587 (computed) # previous assumption: 0.98
+        self.PR_cc = 0.9395309126896629
+        self.T04 = 1459.30433 # [K]
 
         self.mr_h2 = np.array([ 0, 0, 0, 0, 0, 0, 0  ])
         self.mr_ker = 1 - self.mr_h2
@@ -211,23 +212,25 @@ class Constants():
         self.LHV_f = np.array([self.LHV_ker]*7) # [MJ/kg]
 
         self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_neo.dat'))                                   # percentage of core air that is used in combustion
+        self.mf_bleed = 0.667 # [kg/s]
 
     def engine_data_hack(self):
-        self.eta_inlet = 0.97
-        self.PR_fan = 1
-        self.eta_fan = 0.93
-        self.BR = 12
-        self.eta_LPC = 0.92
-        self.eta_HPC = 0.92
-        self.eta_LPT = 0.94
-        self.eta_HPT = 0.94
-        self.eta_mech = 0.9
-        self.eta_cc = 0.99
-        self.PR_LPC = 2.3
-        self.PR_HPC = 13
-        self.eta_nozzle = 0.98
-        self.PR_cc = 0.96
-        self.T04 = 1630 # [K]
+        self.eta_inlet = 0.9208608681597723
+        self.PR_fan = 1.4206
+        self.eta_fan = 0.90445
+        self.BR = 11.24426
+        self.eta_LPC = 0.90019
+        self.eta_HPC = 0.91449
+        self.eta_LPT = 0.9405
+        self.eta_HPT = 1
+        self.eta_mech_H =  0.7465403131365893
+        self.eta_mech_L = 1
+        self.eta_cc = 0.995
+        self.PR_LPC = 2.69419
+        self.PR_HPC = 9.73784
+        self.eta_nozzle = 1
+        self.PR_cc = 0.9395309126896629
+        self.T04 = 1459.30433 # [K]
 
         # Fuel properties
         self.mr_h2 = np.array([ 1, 1, 0.1376, 0.1376, 0.1376, 0.1376, 1  ])
@@ -240,6 +243,7 @@ class Constants():
         self.LHV_f = self.ER_h2*self.LHV_h2 + self.ER_ker*self.LHV_ker  # [MJ/kg]
 
         self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))
+        self.mf_bleed = 0  # [kg/s]
         self.stoich_ratio_ker = 1/15.66 #FAR
         self.stoich_ratio_h2 = 1/34.3 #FAR
 
