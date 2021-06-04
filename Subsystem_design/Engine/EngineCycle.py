@@ -22,7 +22,6 @@ from Subsystem_design.common_constants import Constants
 import numpy as np
 import pandas as pd
 
-
 class Engine_Cycle(Constants):
     def __init__(self):
         super().__init__()
@@ -73,7 +72,6 @@ class Engine_Cycle(Constants):
         # Exit of cc - Entrance of HPT
         self.mf_fuel = (self.mf_hot * self.ratio_air_cc[i] * self.cp_gas * (self.T04-self.T03)) / (self.LHV_f[i]*10**6 * self.eta_cc)
         self.mf_airfuel = self.mf_hot + self.mf_fuel # at the end of the cc
-
         self.mf_h2 = self.mf_fuel * self.ER_h2[i]   #energy ratio H2
         self.mf_ker = self.mf_fuel * self.ER_ker[i]
 
@@ -87,6 +85,7 @@ class Engine_Cycle(Constants):
         # Exit of HPT - Entrance of LPT
         self.T045 = self.T04 - self.W_HPT / ( self.mf_airfuel * self.cp_gas )
         self.p045 = self.p04 * ( 1 - ( 1 - self.T045/self.T04 ) / self.eta_HPT ) ** ( self.k_gas / (self.k_gas-1) )
+
 
         # Exit of LPT - Entrance of nozzle
         self.T05 = self.T045 - self.W_LPT / (self.mf_airfuel * self.cp_gas)
@@ -155,6 +154,33 @@ Stations:
     18 - exit of bypassed air
     8 - exit of nozzle from core
 '''
+    #def cycle_analysis(self):
+
+
+
+if __name__ == '__main__':
+    aircraft = input('Would you like to do the analysis for the engine of A320neo or A320-HACK? Answer neo or HACK: ')
+
+    ec = Engine_Cycle()
+    c = Constants()
+
+    for i in range(len(c.phases)):
+        print('** Analysis for ', c.phases[i], ' **')
+        ec.cycle_analysis(aircraft, i)
+
+        print('\nInlet:\nT0 = ', c.T0[i], '[K]; p0 = ', c.p0[i], ',[Pa]; T00 = ', ec.T00, '[K]; p00 = ', ec.p00, '[Pa]')
+        print('\nEntrance of fan:\nT02 = ', ec.T02, '[K]; p02 = ', ec.p02, '[Pa]')
+        print('\nEntrance of LPC:\nT021 = ', ec.T021, '[K]; p021 = ', ec.p021, '[Pa]')
+        print('\nEntrance of LPC:\nT021 = ', ec.T021, '[K]; p021 = ', ec.p021, '[Pa]')
+        print('\nEntrance of LPC:\nT021 = ', ec.T021, '[K]; p021 = ', ec.p021, '[Pa]')
+        print('\nMass flow of air:\nTotal = ', ec.mf_air_init[i], '[kg/s]; Core = ', ec.mf_hot, '[kg/s]; Bypassed = ', ec.mf_cold,'[kg/s]')
+        print('\nEntrance of HPC:\nT025 = ', ec.T025, '[K]; p025 = ', ec.p025, '[Pa]')
+        print('\nEntrance of CC:\nT03 = ', ec.T03, '[K]; p03 = ', ec.p03, '[Pa]')
+        print('\nMass flow CC:\nFuel = ', ec.mf_fuel, '[kg/s]; air CC = ', ec.mf_hot*c.ratio_air_cc, '[kg/s]; Total end of CC = ', ec.mf_airfuel,'[kg/s]')
+        print('\nEntrance of HPT:\nT04 = ', ec.T04, '[K]; p04 = ', ec.p04, '[Pa]')
+        print('\nEntrance of LPT:\nT045 = ', ec.T045, '[K]; p045 = ', ec.p045, '[Pa]')
+        print('\nEntrance of nozzle:\nT05 = ', ec.T05, '[K]; p05 = ', ec.p05, '[Pa]')
+        print('\nProvided Trhust:\nFan = ', ec.T_fan, '[N]; Core = ', ec.T_core, '[N]; Total = ', ec.T_total, '[N]')
 
 
 if __name__ == '__main__':
@@ -192,3 +218,4 @@ if __name__ == '__main__':
     print('Provided Thrust: Fan = ', ec.T_fan, '[N]; Core = ', ec.T_core, '[N]; Total = ', ec.T_total, '[N]')
 
     #print('Equivalence Ratio = ', ec.equivalence_ratio)
+

@@ -107,7 +107,7 @@ class Constants():
         self.V_H2 = V_H2                                            # Volume required of hydrogen                  [m^3]
         self.V_k = V_k
         self.V_H2_usable = V_H2 * 0.965                             # Volume required of kerosene                  [m^3]
-        # self.V_H2_centre = 5.68952 * 2                             # Volume in the centre of the fuselage         [m^3]
+        # self.V_H2_centre = 5.68952 * 2                             # Volume in the centre of the fuselage        [m^3]
         # self.V_H2_aft = 26.44275                                   # Volume in
         self.W1_Wto = 0.990
         self.W2_W1 = 0.990
@@ -245,6 +245,67 @@ class Constants():
         self.mf_bleed = 0  # [kg/s]
         self.stoich_ratio_ker = 1/15.66 #FAR
         self.stoich_ratio_h2 = 1/34.3 #FAR
+
+        """"Altitude and speed"""
+        self.phases = np.array(['idle', 'taxi out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi in'])
+        self.M0 = np.array([0.2, 0.2, 0.5, 0.5, 0.78, 0.5, 0.2])  # [-] Mach number
+        self.h = np.array([10, 10, 50, 3000, 11280, 3000, 10])  # [m] altitude
+        self.T0, self.p0, self.rho0, self.a0 = np.array([]), np.array([]), np.array([]), np.array([])
+
+        for i in self.h:
+            self.ISA_calculator(h_input = i)
+            self.T0 = np.append(self.T0, self.T)
+            self.p0 = np.append(self.p0, self.p)
+            self.rho0 = np.append(self.rho0, self.rho)
+            self.a0 = np.append(self.a0, self.a)
+
+        self.v0 = self.M0 * self.a0
+
+    def engine_data_neo(self):
+        self.eta_inlet = 0.97
+        self.PR_fan = 1.6
+        self.eta_fan = 0.93
+        self.BR = 11.1
+        self.eta_LPC = 0.92
+        self.eta_HPC = 0.92
+        self.eta_LPT = 0.94
+        self.eta_HPT = 0.94
+        self.eta_mech = 0.9
+        self.eta_cc = 0.99
+        self.PR_LPC = 2
+        self.PR_HPC = 11.93
+        self.eta_nozzle = 0.98
+        self.PR_cc = 0.96
+        self.T04 = 1630 # [K]
+        self.LHV_f = 43.2 # [MJ/kg]
+
+    def engine_data_hack(self):
+        self.eta_inlet = 0.97
+        self.PR_fan = 1
+        self.eta_fan = 0.93
+        self.BR = 12
+        self.eta_LPC = 0.92
+        self.eta_HPC = 0.92
+        self.eta_LPT = 0.94
+        self.eta_HPT = 0.94
+        self.eta_mech = 0.9
+        self.eta_cc = 0.99
+        self.PR_LPC = 2.3
+        self.PR_HPC = 13
+        self.eta_nozzle = 0.98
+        self.PR_cc = 0.96
+        self.T04 = 1630 # [K]
+
+        # Fuel properties
+
+        self.mr_h2 = np.array([ 1, 1, 0.1376, 0.1376, 0.1376, 0.1376, 1  ])
+        self.mr_ker = 1 - self.mr_h2
+
+        self.ER_h2 = ( self.mr_h2*self.LHV_h2 ) / (  self.mr_h2*self.LHV_h2 + self.mr_ker*self.LHV_ker)
+        self.ER_ker = ( self.mr_ker*self.LHV_ker ) / (  self.mr_h2*self.LHV_h2 + self.mr_ker*self.LHV_ker)
+
+        # find LHV_f for each phase, according to mass fractions
+        self.LHV_f = self.ER_h2*self.LHV_h2 + self.ER_ker*self.LHV_ker  # [MJ/kg]
 
     # def fuselage_length(self,vol_eff, vol_fus):
     #     """
