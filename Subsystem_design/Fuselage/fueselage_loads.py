@@ -48,7 +48,7 @@ class FuselageLoads(Constants):
         self.tail_weight()
         self.tail_loads()
 
-        self.S_y
+        # self.S_y
 
 
 
