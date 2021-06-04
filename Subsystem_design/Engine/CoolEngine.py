@@ -88,8 +88,6 @@ def h(h0, data, T0, Tmax):
     return h
 
 
-        
-
 ''' BEGINNING OF CODE '''
 ''' Data '''
 N2_cp_data = np.array(np.genfromtxt('N2_cp.dat')) # T[K]; cp[kJ/(kg*K)]
