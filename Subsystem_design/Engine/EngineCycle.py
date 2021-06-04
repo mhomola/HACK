@@ -15,6 +15,7 @@ Created on Wed Jun  2 09:39:04 2021
 # Determine atmospheric conditions
 # Fuel flow of each fuel
 # Determine stoichiometric ratio --> find equivalence ratio --> Elena (check what is used rn for stoichiometric ratio)
+# Verification: ran code with values from P&P past paper and results matched
 
 
 from Subsystem_design.common_constants import Constants
@@ -36,6 +37,7 @@ class Engine_Cycle(Constants):
         self.data(aircraft)
 
         self.mf_air_init = self.rho0 * self.A_fan * self.v0
+        self.mf_air_init[0] = 298 # [kg/s]
         # Total temperature and pressure at inlet
         self.T00 = self.T0[i] * ( 1 + (self.k_air-1)/2 * self.M0[i]**2 )
         self.p00 = self.p0[i] * ( 1 + (self.k_air-1)/2 * self.M0[i]**2 ) ** (self.k_air / (self.k_air-1) )
@@ -60,6 +62,14 @@ class Engine_Cycle(Constants):
         self.T03 = self.T025 + ( self.T025/self.eta_HPC ) * ( self.PR_HPC ** ( (self.k_air-1)/self.k_air ) - 1 )
         self.p03 = self.p025 * self.PR_HPC
 
+        # Power to drive fan, LPC, HPC[W]
+        self.W_fan = self.mf_air_init[i] * self.cp_air * (self.T021-self.T00)
+        self.W_LPC = self.mf_hot * self.cp_air * (self.T025-self.T021)
+        self.W_HPC = self.mf_hot * self.cp_air * (self.T03-self.T025)
+
+        # Bleed air
+        self.mf_hot = self.mf_hot - self.mf_bleed
+
         # Exit of cc - Entrance of HPT
         self.mf_fuel = (self.mf_hot * self.ratio_air_cc[i] * self.cp_gas * (self.T04-self.T03)) / (self.LHV_f[i]*10**6 * self.eta_cc)
         self.mf_airfuel = self.mf_hot + self.mf_fuel # at the end of the cc
@@ -70,12 +80,9 @@ class Engine_Cycle(Constants):
         # T04 = 1500 [K], is given
         self.p04 = self.p03 * self.PR_cc
 
-        # Power to drive fan, LPC, HPC, HPT, LPT [W]
-        self.W_fan = self.mf_air_init[i] * self.cp_air * (self.T021-self.T00)
-        self.W_LPC = self.mf_hot * self.cp_air * (self.T025-self.T021)
-        self.W_HPC = self.mf_hot * self.cp_air * (self.T03-self.T025)
-        self.W_HPT = self.W_HPC / self.eta_mech
-        self.W_LPT = (self.W_fan + self.W_LPC) / self.eta_mech
+        # Power to drive HPT, LPT [W]
+        self.W_HPT = self.W_HPC / self.eta_mech_H
+        self.W_LPT = (self.W_fan + self.W_LPC) / self.eta_mech_L
 
         # Exit of HPT - Entrance of LPT
         self.T045 = self.T04 - self.W_HPT / ( self.mf_airfuel * self.cp_gas )
@@ -84,6 +91,7 @@ class Engine_Cycle(Constants):
         # Exit of LPT - Entrance of nozzle
         self.T05 = self.T045 - self.W_LPT / (self.mf_airfuel * self.cp_gas)
         self.p05 = self.p045 * ( 1 - ( 1 - self.T05/self.T045 ) / self.eta_LPT ) ** ( self.k_gas / (self.k_gas-1) )
+        self.OPR = self.p03 / self.p02
 
         # Is the nozzle chocked?
         self.PR_cr_nozzle = 1 / ( ( 1 - (self.k_gas-1)/(self.k_gas+1)/self.eta_nozzle) ** (self.k_gas / (self.k_gas-1)) )
@@ -101,7 +109,7 @@ class Engine_Cycle(Constants):
         elif self.p05/self.p0[i] < self.PR_cr_nozzle:
             print('The nozzle is NOT chocked')
             self.p8 = self.p0[i]
-            self.T8 = self.T05 * ( 1 - self.eta_nozzle * ( 1 - (self.p8/self.p05) ** ( (self.k_gas-1)/self.k_gas ) ) )
+            self.T8 = self.T05 * ( 1- ( self.eta_nozzle * ( 1- ( (self.p8/self.p05)**((self.k_gas-1)/self.k_gas) ) ) ) )
             self.v8 = np.sqrt( 2 * self.cp_gas * (self.T05 - self.T8) )
             self.T_core = self.mf_airfuel * ( self.v8 - self.v0[i] )
 
@@ -113,7 +121,7 @@ class Engine_Cycle(Constants):
             print('The fan is chocked')
             self.TR_cr_bypassed = (self.k_air + 1) / 2
             self.T18 = self.T021 / self.TR_cr_bypassed
-            self.p18 = self.p021 / self.PR_fan
+            self.p18 = self.p021 / self.PR_cr_fan
             self.v18 = np.sqrt(self.k_air * self.R * self.T18)
             self.A18 = (self.mf_cold * self.R * self.T18) / (self.p18 * self.v18)
             self.T_fan = self.mf_cold * (self.v18 - self.v0[i]) + self.A18 * (self.p18 - self.p0[i])  # [N]
@@ -129,7 +137,6 @@ class Engine_Cycle(Constants):
         self.T_total = self.T_fan + self.T_core # [N]
 
         self.stoichiometric_ratio = self.mr_h2[i] * self.stoich_ratio_h2 + self.mr_ker[i] * self.stoich_ratio_ker
-
         self.equivalence_ratio = (self.mf_fuel/(self.mf_hot * self.ratio_air_cc)) / self.stoichiometric_ratio #TBD what mf_air to use
 
 
@@ -155,26 +162,33 @@ if __name__ == '__main__':
 
     ec = Engine_Cycle()
     c = Constants()
+    if aircraft == 'neo':
+        c.engine_data_neo()
+    elif aircraft == 'hack':
+        c.engine_data_hack()
+    #for i in range(len(c.phases)):
+    i = -3
+    print('\n** Analysis for', c.phases[i], ' **')
+    ec.cycle_analysis(aircraft=aircraft, i=i)
 
-    for i in range(len(c.phases)):
-        print('\n** Analysis for', c.phases[i], ' **')
-        ec.cycle_analysis(aircraft=aircraft, i=i)
+    print('\nInlet: v0 = ', ec.v0[i], '[m/s]; T0 = ', c.T0[i], '[K]; p0 = ', c.p0[i], ',[Pa]; T00 = ', ec.T00, '[K]; p00 = ', ec.p00, '[Pa]')
+    print('Entrance of fan: T02 = ', ec.T02, '[K]; p02 = ', ec.p02, '[Pa]')
+    print('Entrance of LPC: T021 = ', ec.T021, '[K]; p021 = ', ec.p021, '[Pa]')
+    print('Mass flow of air: Total = ', ec.mf_air_init[i], '[kg/s]; Core = ', ec.mf_hot, '[kg/s]; Bypassed = ', ec.mf_cold,'[kg/s]')
+    print('Entrance of HPC: T025 = ', ec.T025, '[K]; p025 = ', ec.p025, '[Pa]')
+    print('Entrance of CC: T03 = ', ec.T03, '[K]; p03 = ', ec.p03, '[Pa]')
+    print('\nMass flow CC: Fuel = ', ec.mf_fuel, '[kg/s]; air CC = ', ec.mf_hot*c.ratio_air_cc[i], '[kg/s]; Total end of CC = ', ec.mf_airfuel,'[kg/s]')
 
-        print('\nInlet: T0 = ', c.T0[i], '[K]; p0 = ', c.p0[i], ',[Pa]; T00 = ', ec.T00, '[K]; p00 = ', ec.p00, '[Pa]')
-        print('Entrance of fan: T02 = ', ec.T02, '[K]; p02 = ', ec.p02, '[Pa]')
-        print('Entrance of LPC: T021 = ', ec.T021, '[K]; p021 = ', ec.p021, '[Pa]')
-        print('Mass flow of air: Total = ', ec.mf_air_init[i], '[kg/s]; Core = ', ec.mf_hot, '[kg/s]; Bypassed = ', ec.mf_cold,'[kg/s]')
-        print('Entrance of HPC: T025 = ', ec.T025, '[K]; p025 = ', ec.p025, '[Pa]')
-        print('Entrance of CC: T03 = ', ec.T03, '[K]; p03 = ', ec.p03, '[Pa]')
-        print('Mass flow CC: Fuel = ', ec.mf_fuel, '[kg/s]; air CC = ', ec.mf_hot*c.ratio_air_cc[i], '[kg/s]; Total end of CC = ', ec.mf_airfuel,'[kg/s]')
+    print('Hydrogen = ', ec.mf_h2, '[kg/s]; Kerosene = ', ec.mf_ker,'[kg/s]')
 
+    print('\nEntrance of HPT: T04 = ', ec.T04, '[K]; p04 = ', ec.p04, '[Pa]')
+    print('Entrance of LPT: T045 = ', ec.T045, '[K]; p045 = ', ec.p045, '[Pa]')
+    print('Entrance of nozzle: T05 = ', ec.T05, '[K]; p05 = ', ec.p05, '[Pa]')
+    print('Overall pressure ratio, OPR = ', ec.OPR)
+    print('Exit of nozzle: T8 = ', ec.T8, '[K]; p8 = ', ec.p8, '[Pa]; v8 = ', ec.v8, '[m/s]')
+    print('Exit of fan: T18 = ', ec.T18, '[K]; p18 = ', ec.p18, '[Pa]; v18 = ', ec.v18, '[m/s]')
 
-        print('Hydrogen = ', ec.mf_h2, '[kg/s]; Kerosene = ', ec.mf_ker,'[kg/s]')
+    print('\nW_fan = ', ec.W_fan, 'W_LPC = ', ec.W_LPC, 'W_HPC = ', ec.W_HPC, 'W_LPT = ', ec.W_LPT, 'W_HPT = ', ec.W_HPT)
+    print('Provided Thrust: Fan = ', ec.T_fan, '[N]; Core = ', ec.T_core, '[N]; Total = ', ec.T_total, '[N]')
 
-        print('Entrance of HPT: T04 = ', ec.T04, '[K]; p04 = ', ec.p04, '[Pa]')
-        print('Entrance of LPT: T045 = ', ec.T045, '[K]; p045 = ', ec.p045, '[Pa]')
-        print('Entrance of nozzle: T05 = ', ec.T05, '[K]; p05 = ', ec.p05, '[Pa]')
-        print('Exit of nozzle: T8 = ', ec.T8, '[K]; p8 = ', ec.p8, '[Pa]; v8 = ', ec.v8, '[m/s]')
-        print('Exit of fan: T18 = ', ec.T18, '[K]; p18 = ', ec.p18, '[Pa]; v18 = ', ec.v18, '[m/s]')
-        print('Provided Trhust: Fan = ', ec.T_fan, '[N]; Core = ', ec.T_core, '[N]; Total = ', ec.T_total, '[N]')
-        print('Equivalence Ratio' = equivalence_ratio)
+    #print('Equivalence Ratio = ', ec.equivalence_ratio)
