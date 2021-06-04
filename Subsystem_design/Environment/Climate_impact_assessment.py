@@ -122,6 +122,12 @@ class Climate_assess():
 
     '''Start of functions to compute RF of NOx (CH4, O3L and O3S)'''
     def s(self,compound):
+        '''
+        :param compound:Name of the species we want the RF of.
+                        Can be CO2, CH4,O3L,O3S,soot,sulfate,H2O and contrails
+        :return: forcing factor function for CH4 or O3S or contrails
+        to take into account the change in RF of NOx with altitude
+        '''
         if compound == 'CH4':
             forcing_fact = np.array([0.864,0.865,0.920777,0.9592,0.9624,0.945,0.9448,0.9346,0.938,0.9132,
                                  0.9205,0.9345,0.9728,1.0433,1.1278,1.187,1.2034,1.1885,1.179])
@@ -161,6 +167,8 @@ class Climate_assess():
     def G_NOx(self,tau,compound):
         '''
         :param t: Time until we want to check the climate impact [year]
+        :compound: Name of the species we want the RF of.
+                    Can be CO2, CH4,O3L,O3S,soot,sulfate,H2O and contrails
         :return: Response function of CH4
         '''
         if compound == 'CH4':
@@ -242,7 +250,18 @@ class Climate_assess():
         return RFnorm
 
     def delta_T(self,t,h,e_CO2, e_H2O, e_NOx, e_soot, e_sulfate,U,plot=False):
-
+        '''
+        :param t: Time until we want to check the climate impact [year]
+        :param h: Altitude or altitudes at which we are in [m]
+        :param e_CO2: Emission of CO2 in [kg]
+        :param e_H2O: Emission of H2O in [kg]
+        :param e_NOx: Emission of NOx in [kg]
+        :param e_soot: Emission of soot in [kg]
+        :param e_sulfate: Emission of sulfate in [kg]
+        :param U: Number of missions/number of flights per year
+        :param plot: If we want to plot the change in Temperature per year
+        :return: Change in temperature over the span of years selected [K]
+        '''
         'To check with climate impact requirement'
         t_prime = np.arange(self.t_0, t + self.dt, self.dt)
         RF_norm = self.RF_norm(t,h,e_CO2, e_H2O, e_NOx, e_soot, e_sulfate,U)
