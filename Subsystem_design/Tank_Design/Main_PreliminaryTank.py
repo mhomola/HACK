@@ -46,7 +46,7 @@ central_H2_vol = central_tank.inner_vol_inner_wall * m.floor(central.height/(cen
 
 pod_H2_vol = (total_vol - central_H2_vol)/2  # [m^3] the volume of LH2 in each pod
 
-pod = spacial_constraints(length=5.55, width=2.05, height=2.05)
+pod = spacial_constraints(length=5.76, width=2, height=2)
 pod_tank = Mechanical_Design.PodTank(constraints=pod, dp=Mechanical_Design.dp, s_a=Mechanical_Design.s_a,
                                       e_w=Mechanical_Design.e_w, material_insulation=Materials.MLI
                                       , material_inner=Materials.Al_2090_T81, material_outer=Materials.Al_2090_T81,
@@ -56,6 +56,9 @@ pod_tank.tank_design()
 
 weight_addition = central_tank.mass_tank * 2 + pod_tank.mass_tank * 2
 volume_all = central_tank.inner_vol_inner_wall * 2 + pod_tank.inner_vol_inner_wall * 2
+
+l_wing_pod = pod.length
+d_wing_pod = pod_tank.r4 *2
 
 if __name__ == '__main__':
 
@@ -75,8 +78,8 @@ if __name__ == '__main__':
     print("Thickness inner wall", pod_tank.t_wall_inner * 1000, "[mm]")
     print("Thickness outer wall", pod_tank.t_wall_outer * 1000, "[mm]")
     print("H2 volume that is stored per tank", pod_tank.inner_vol_inner_wall, "[m^3]")
-    print("Outer Diameter of the tank[including insulation]", pod_tank.r4 * 2, "[m]")
-    print("Length", pod.length, "[m]")
+    print("Outer Diameter of the tank[including insulation]", d_wing_pod, "[m]")
+    print("Length", l_wing_pod, "[m]")
     print("Required Heat = ", pod_tank.Q_req, "vs Designed Heat =  ", pod_tank.Q_tot)
 
 
