@@ -46,7 +46,7 @@ central_H2_vol = central_tank.inner_vol_inner_wall * m.floor(central.height/(cen
 
 pod_H2_vol = (total_vol - central_H2_vol)/2  # [m^3] the volume of LH2 in each pod
 
-pod = spacial_constraints(length=5.765, width=2, height=2)
+pod = spacial_constraints(length=5.55, width=2.05, height=2.05)
 pod_tank = Mechanical_Design.PodTank(constraints=pod, dp=Mechanical_Design.dp, s_a=Mechanical_Design.s_a,
                                       e_w=Mechanical_Design.e_w, material_insulation=Materials.MLI
                                       , material_inner=Materials.Al_2090_T81, material_outer=Materials.Al_2090_T81,
@@ -83,8 +83,8 @@ if __name__ == '__main__':
     print("Volume of all Tanks = ", volume_all, "[m^3]", "complying with the required ", V_H2/1000, "[m^3]")
 
 
-    Q_req = [central_tank.Q_req, pod_tank.Q_req]
-    Q_req = np.array(Q_req)
-    np.save("Q_required.npy", Q_req)
+    # Q_req = [central_tank.Q_req, pod_tank.Q_req]
+    # Q_req = np.array(Q_req)
+    # np.save("Q_required.npy", Q_req)
 
 
