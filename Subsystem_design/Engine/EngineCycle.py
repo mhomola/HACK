@@ -29,11 +29,13 @@ class Engine_Cycle(Constants):
     def data(self, aircraft):
         if aircraft == 'neo':
             self.engine_data_neo()
+            print("Efficiency cc: ",self.eta_cc)
         elif aircraft == 'hack':
             self.engine_data_hack()
 
     def cycle_analysis(self, aircraft, i): # i = phase
         self.data(aircraft)
+        print( 'Bleed: ', self.mf_bleed )
 
         self.mf_air_init = self.rho0 * self.A_fan * self.v0
         self.mf_air_init[0] = 298 # [kg/s]
@@ -135,8 +137,8 @@ class Engine_Cycle(Constants):
 
         self.T_total = self.T_fan + self.T_core # [N]
 
-        #self.stoichiometric_ratio = self.mr_h2[i] * self.stoich_ratio_h2 + self.mr_ker[i] * self.stoich_ratio_ker
-        #self.equivalence_ratio = (self.mf_fuel/(self.mf_hot * self.ratio_air_cc)) / self.stoichiometric_ratio #TBD what mf_air to use
+        # self.stoichiometric_ratio = self.mr_h2[i] * self.stoich_ratio_h2 + self.mr_ker[i] * self.stoich_ratio_ker
+        # self.equivalence_ratio = (self.mf_fuel/(self.mf_hot * self.ratio_air_cc)) / self.stoichiometric_ratio #TBD what mf_air to use
 
 
 ''' FORMULAE
@@ -154,33 +156,7 @@ Stations:
     18 - exit of bypassed air
     8 - exit of nozzle from core
 '''
-    #def cycle_analysis(self):
 
-
-
-if __name__ == '__main__':
-    aircraft = input('Would you like to do the analysis for the engine of A320neo or A320-HACK? Answer neo or HACK: ')
-
-    ec = Engine_Cycle()
-    c = Constants()
-
-    for i in range(len(c.phases)):
-        print('** Analysis for ', c.phases[i], ' **')
-        ec.cycle_analysis(aircraft, i)
-
-        print('\nInlet:\nT0 = ', c.T0[i], '[K]; p0 = ', c.p0[i], ',[Pa]; T00 = ', ec.T00, '[K]; p00 = ', ec.p00, '[Pa]')
-        print('\nEntrance of fan:\nT02 = ', ec.T02, '[K]; p02 = ', ec.p02, '[Pa]')
-        print('\nEntrance of LPC:\nT021 = ', ec.T021, '[K]; p021 = ', ec.p021, '[Pa]')
-        print('\nEntrance of LPC:\nT021 = ', ec.T021, '[K]; p021 = ', ec.p021, '[Pa]')
-        print('\nEntrance of LPC:\nT021 = ', ec.T021, '[K]; p021 = ', ec.p021, '[Pa]')
-        print('\nMass flow of air:\nTotal = ', ec.mf_air_init[i], '[kg/s]; Core = ', ec.mf_hot, '[kg/s]; Bypassed = ', ec.mf_cold,'[kg/s]')
-        print('\nEntrance of HPC:\nT025 = ', ec.T025, '[K]; p025 = ', ec.p025, '[Pa]')
-        print('\nEntrance of CC:\nT03 = ', ec.T03, '[K]; p03 = ', ec.p03, '[Pa]')
-        print('\nMass flow CC:\nFuel = ', ec.mf_fuel, '[kg/s]; air CC = ', ec.mf_hot*c.ratio_air_cc, '[kg/s]; Total end of CC = ', ec.mf_airfuel,'[kg/s]')
-        print('\nEntrance of HPT:\nT04 = ', ec.T04, '[K]; p04 = ', ec.p04, '[Pa]')
-        print('\nEntrance of LPT:\nT045 = ', ec.T045, '[K]; p045 = ', ec.p045, '[Pa]')
-        print('\nEntrance of nozzle:\nT05 = ', ec.T05, '[K]; p05 = ', ec.p05, '[Pa]')
-        print('\nProvided Trhust:\nFan = ', ec.T_fan, '[N]; Core = ', ec.T_core, '[N]; Total = ', ec.T_total, '[N]')
 
 
 if __name__ == '__main__':
@@ -192,30 +168,31 @@ if __name__ == '__main__':
         c.engine_data_neo()
     elif aircraft == 'hack':
         c.engine_data_hack()
-    #for i in range(len(c.phases)):
-    i = -3
-    print('\n** Analysis for', c.phases[i], ' **')
-    ec.cycle_analysis(aircraft=aircraft, i=i)
 
-    print('\nInlet: v0 = ', ec.v0[i], '[m/s]; T0 = ', c.T0[i], '[K]; p0 = ', c.p0[i], ',[Pa]; T00 = ', ec.T00, '[K]; p00 = ', ec.p00, '[Pa]')
-    print('Entrance of fan: T02 = ', ec.T02, '[K]; p02 = ', ec.p02, '[Pa]')
-    print('Entrance of LPC: T021 = ', ec.T021, '[K]; p021 = ', ec.p021, '[Pa]')
-    print('Mass flow of air: Total = ', ec.mf_air_init[i], '[kg/s]; Core = ', ec.mf_hot, '[kg/s]; Bypassed = ', ec.mf_cold,'[kg/s]')
-    print('Entrance of HPC: T025 = ', ec.T025, '[K]; p025 = ', ec.p025, '[Pa]')
-    print('Entrance of CC: T03 = ', ec.T03, '[K]; p03 = ', ec.p03, '[Pa]')
-    print('\nMass flow CC: Fuel = ', ec.mf_fuel, '[kg/s]; air CC = ', ec.mf_hot*c.ratio_air_cc[i], '[kg/s]; Total end of CC = ', ec.mf_airfuel,'[kg/s]')
 
-    print('Hydrogen = ', ec.mf_h2, '[kg/s]; Kerosene = ', ec.mf_ker,'[kg/s]')
+    for i in range(len(c.phases)):
+        print('\n** Analysis for', c.phases[i], ' **')
+        ec.cycle_analysis(aircraft=aircraft, i=i)
 
-    print('\nEntrance of HPT: T04 = ', ec.T04, '[K]; p04 = ', ec.p04, '[Pa]')
-    print('Entrance of LPT: T045 = ', ec.T045, '[K]; p045 = ', ec.p045, '[Pa]')
-    print('Entrance of nozzle: T05 = ', ec.T05, '[K]; p05 = ', ec.p05, '[Pa]')
-    print('Overall pressure ratio, OPR = ', ec.OPR)
-    print('Exit of nozzle: T8 = ', ec.T8, '[K]; p8 = ', ec.p8, '[Pa]; v8 = ', ec.v8, '[m/s]')
-    print('Exit of fan: T18 = ', ec.T18, '[K]; p18 = ', ec.p18, '[Pa]; v18 = ', ec.v18, '[m/s]')
+        print('\nInlet: v0 = ', ec.v0[i], '[m/s]; T0 = ', c.T0[i], '[K]; p0 = ', c.p0[i], ',[Pa]; T00 = ', ec.T00, '[K]; p00 = ', ec.p00, '[Pa]')
+        print('Entrance of fan: T02 = ', ec.T02, '[K]; p02 = ', ec.p02, '[Pa]')
+        print('Entrance of LPC: T021 = ', ec.T021, '[K]; p021 = ', ec.p021, '[Pa]')
+        print('Mass flow of air: Total = ', ec.mf_air_init[i], '[kg/s]; Core = ', ec.mf_hot, '[kg/s]; Bypassed = ', ec.mf_cold,'[kg/s]')
+        print('Entrance of HPC: T025 = ', ec.T025, '[K]; p025 = ', ec.p025, '[Pa]')
+        print('Entrance of CC: T03 = ', ec.T03, '[K]; p03 = ', ec.p03, '[Pa]')
+        print('\nMass flow CC: Fuel = ', ec.mf_fuel, '[kg/s]; air CC = ', ec.mf_hot*c.ratio_air_cc[i], '[kg/s]; Total end of CC = ', ec.mf_airfuel,'[kg/s]')
 
-    print('\nW_fan = ', ec.W_fan, 'W_LPC = ', ec.W_LPC, 'W_HPC = ', ec.W_HPC, 'W_LPT = ', ec.W_LPT, 'W_HPT = ', ec.W_HPT)
-    print('Provided Thrust: Fan = ', ec.T_fan, '[N]; Core = ', ec.T_core, '[N]; Total = ', ec.T_total, '[N]')
+        print('Hydrogen = ', ec.mf_h2, '[kg/s]; Kerosene = ', ec.mf_ker,'[kg/s]')
 
-    #print('Equivalence Ratio = ', ec.equivalence_ratio)
+        print('\nEntrance of HPT: T04 = ', ec.T04, '[K]; p04 = ', ec.p04, '[Pa]')
+        print('Entrance of LPT: T045 = ', ec.T045, '[K]; p045 = ', ec.p045, '[Pa]')
+        print('Entrance of nozzle: T05 = ', ec.T05, '[K]; p05 = ', ec.p05, '[Pa]')
+        print('Overall pressure ratio, OPR = ', ec.OPR)
+        print('Exit of nozzle: T8 = ', ec.T8, '[K]; p8 = ', ec.p8, '[Pa]; v8 = ', ec.v8, '[m/s]')
+        print('Exit of fan: T18 = ', ec.T18, '[K]; p18 = ', ec.p18, '[Pa]; v18 = ', ec.v18, '[m/s]')
+
+        print('\nW_fan = ', ec.W_fan, 'W_LPC = ', ec.W_LPC, 'W_HPC = ', ec.W_HPC, 'W_LPT = ', ec.W_LPT, 'W_HPT = ', ec.W_HPT)
+        print('Provided Thrust: Fan = ', ec.T_fan, '[N]; Core = ', ec.T_core, '[N]; Total = ', ec.T_total, '[N]')
+
+        #print('Equivalence Ratio = ', ec.equivalence_ratio)
 
