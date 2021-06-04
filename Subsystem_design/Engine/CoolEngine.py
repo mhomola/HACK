@@ -19,7 +19,10 @@ Created on Tue May 25 11:53:39 2021
 from Subsystem_design.common_constants import Constants
 from Subsystem_design.Engine.EngineCycle import Engine_Cycle
 import numpy as np
+import matlab.engine
+eng = matlab.engine.start_matlab()
 
+test = eng.reactor1('kerosene')
 
 class Engine_Cool(Constants):
     def __init__(self):
@@ -94,50 +97,51 @@ class Engine_Cool(Constants):
 
 
 
-if __name__ == "__main__":
-    aircraft = input('Would you like to analyse the engine of A320neo or A320-HACK? Answer neo or hack: ')
-    cycle, const, cool = Engine_Cycle(), Constants(), Engine_Cool()
 
-    class Emissions:
-        def __init__(self):
-            self.Tpz = 2000 # [K]  ---> Take from Ivan's code. This is just so that this code can run for now
+aircraft = input('Would you like to analyse the engine of A320neo or A320-HACK? Answer neo or hack: ')
+cycle, const, cool = Engine_Cycle(), Constants(), Engine_Cool()
 
-
-    emiss = Emissions()
+class Emissions:
+    def __init__(self):
+        self.Tpz = 2000 # [K]  ---> Take from Ivan's code. This is just so that this code can run for now
 
 
-    save_list = list()
-    for i in range(len(const.phases)):
-        print('\nPHASE:', const.phases[i])
-        cycle.cycle_analysis(aircraft, i)
-        if aircraft == 'neo':
-            const.engine_data_neo()
-        elif aircraft == 'hack':
-            const.engine_data_hack()
+emiss = Emissions()
 
-        # INITIALIZE WHILE LOOP
+
+save_list = list()
+for i in range(len(const.phases)):
+    cycle.cycle_analysis(aircraft, i)
+    if aircraft == 'neo':
+        const.engine_data_neo()
+    elif aircraft == 'hack':
+        const.engine_data_hack()
+
+    # INITIALIZE WHILE LOOP
+    cool.SZ_air(emiss.Tpz, cycle.mf_hot, cycle.mf_fuel, cycle.T03, const.T04)
+    e = 0.1
+    delta_mr_air = 2*e
+
+    while abs(delta_mr_air) > e * cool.mr_SZair:
         cool.SZ_air(emiss.Tpz, cycle.mf_hot, cycle.mf_fuel, cycle.T03, const.T04)
-        e = 0.1
-        delta_mr_air = 2*e
+        delta_mr_air = ( (1 - const.ratio_air_cc[i]) - cool.mr_SZair ) / cool.mr_SZair
+        # print('WHILE LOOP\nMass ratio of air needed to be injected on secondary zone:', cool.mr_SZair)
+        # print('Mass ratio of air actually injected on secondary zone:', 1 - const.ratio_air_cc[i])
+        const.ratio_air_cc[i] = 1-cool.mr_SZair
+        np.savetxt("mr_cc_" + aircraft + ".dat", const.ratio_air_cc)
 
-        while abs(delta_mr_air) > e * cool.mr_SZair:
-            cool.SZ_air(emiss.Tpz, cycle.mf_hot, cycle.mf_fuel, cycle.T03, const.T04)
-            delta_mr_air = ( (1 - const.ratio_air_cc[i]) - cool.mr_SZair ) / cool.mr_SZair
-            # print('WHILE LOOP\nMass ratio of air needed to be injected on secondary zone:', cool.mr_SZair)
-            # print('Mass ratio of air actually injected on secondary zone:', 1 - const.ratio_air_cc[i])
-            const.ratio_air_cc[i] = 1-cool.mr_SZair
-            np.savetxt("mr_cc_" + aircraft + ".dat", const.ratio_air_cc)
-
+    if __name__ == "__main__":
+        print('\nPHASE:', const.phases[i])
         print('\nFINAL\nMass ratio of air needed to be injected on secondary zone:', cool.mr_SZair)
         print('Mass ratio of air actually injected on secondary zone:', 1 - const.ratio_air_cc[i],'\n')
         print('Mass ratio of air needed to be injected to the cc:', 1 - cool.mr_SZair)
 
-        save_list.append(cool.mr_SZair)
+    save_list.append(cool.mr_SZair)
 
-    np.savetxt("mr_cc_"+aircraft+".dat", save_list)
+np.savetxt("mr_cc_"+aircraft+".dat", save_list)
 
-    # if cool.mr_SZair < const.ratio_air_cc:
-    #     const.ratio_air_cc -= 0.1
-    # elif cool.mr_SZair > const.ratio_air_cc:
-    #     const.ratio_air_cc += 0.1
-    # Check if mr_air_SZ == 1 - const.ratio_air_cc, if not iterate
+# if cool.mr_SZair < const.ratio_air_cc:
+#     const.ratio_air_cc -= 0.1
+# elif cool.mr_SZair > const.ratio_air_cc:
+#     const.ratio_air_cc += 0.1
+# Check if mr_air_SZ == 1 - const.ratio_air_cc, if not iterate
