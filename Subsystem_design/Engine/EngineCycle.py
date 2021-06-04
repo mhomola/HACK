@@ -22,6 +22,12 @@ from Subsystem_design.common_constants import Constants
 import numpy as np
 import pandas as pd
 
+import matlab.engine
+eng = matlab.engine.start_matlab()
+
+ret = eng.triarea(1.0,5.0)
+print(ret)
+
 class Engine_Cycle(Constants):
     def __init__(self):
         super().__init__()
