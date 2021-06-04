@@ -9,14 +9,14 @@ import matplotlib.pyplot as plt
 # Weight (all values in [kg])
 OEW         = 44560  
 MTOW        = 73500  
-FuelW_ker   = 16200
+FuelW_ker   = 10000
 FuelW_H2    = 0
 #
 FuelW = FuelW_ker + FuelW_H2
 #    
 MaxPLW      =   MTOW-OEW-FuelW
-Cargo_fd    =   3400
-Cargo_af    =   4500
+Cargo_fd    =   3170
+Cargo_af    =   3170
 
 # Wing configuration
 xcg0    =   0.25                # [MAC] CG of OEW
