@@ -171,6 +171,9 @@ class Constants():
         self.h0_C12H26 = -290.90                                        # Zero enthalpy of dodecane                 [kJ/mol]         # https://www.chemeo.com/cid/34-125-5/n-Dodecane
         self.molarmass_C12H26 = 170.3348                                # Molar mass of dodecane                    [g/mol]
 
+        self.stoich_ratio_ker = 1/15.66 #FAR
+        self.stoich_ratio_h2 = 1/34.3 #FAR
+
         """"Altitude and speed"""
         self.phases = np.array(['idle', 'taxi out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi in'])
         self.M0 = np.array([0.73, 0.2, 0.5, 0.5, 0.78, 0.5, 0.2])  # [-] Mach number
@@ -243,8 +246,6 @@ class Constants():
 
         self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))
         self.mf_bleed = 0  # [kg/s]
-        self.stoich_ratio_ker = 1/15.66 #FAR
-        self.stoich_ratio_h2 = 1/34.3 #FAR
 
         """"Altitude and speed"""
         self.phases = np.array(['idle', 'taxi out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi in'])
