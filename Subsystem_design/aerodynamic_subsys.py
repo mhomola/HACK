@@ -1,7 +1,7 @@
 from Subsystem_design.common_constants import Constants
 import numpy as np
 import matplotlib.pyplot as plt
-# from Subsystem_design.Tank_Design.Main_PreliminaryTank import 
+from Subsystem_design.Tank_Design.Main_PreliminaryTank import d_wing_pod, l_wing_pod
 
 
 class AerodynamicCharacteristics(Constants):
@@ -110,14 +110,14 @@ class AerodynamicCharacteristics(Constants):
         # Compute zero lift drag for M = 0.6 for fuselage exclusive of base
         l_f = l_cockpit + l_cabin + l_tail
         R_n_fus = rho * u1 * l_f / self.visc
-        # print('The Fuselage Reynolds Number R_f_fus is: ', R_n_fus, ' [-]')
+        print('The Fuselage Reynolds Number R_f_fus is: ', R_n_fus, ' [-]')
         # print('The Mach number M is: ', self.M)
         if l_f > 20:
             R_wf = 1.015  # The wing/fuselage iterference factor from Figure 4.1 in Roskam-VI
             C_f_fus = 0.0016  # The turbulent flat plate skin friction coefficient from Figure 4.3 in Roskam-VI
         else:
             R_wf = 1
-            C_f_fus = 0.002
+            C_f_fus = 0.0018
 
 
         ld = l_f / self.d_f
@@ -153,6 +153,14 @@ class AerodynamicCharacteristics(Constants):
 
         self.D_CL_tank = 1 / (self.S * 3.281**2) * (L_R * (K_sweep * K_P) + L_alpha_ws * (alpha - 4))
 
+    def drag_engines(self):
+        """
+        In this function you you can compute the drag from the engines. This is used to know what the loads are
+        which act on the fuselage.
+        :return:
+        """
+
+
     def drag_increase_cruise(self, AoA_cruise):
         """
         Compute the drag increase due to the new fuselage length
@@ -171,8 +179,8 @@ class AerodynamicCharacteristics(Constants):
                                                                    width_f=self.width_f)
 
         # A320-HACK
-        self.l_tank_nose, self.l_tank_body, self.l_tank_tail = 1.5, 2, 2
-        self.d_tank = 1.5
+        self.l_tank_nose, self.l_tank_body, self.l_tank_tail = d_wing_pod / 2, l_wing_pod - d_wing_pod, 2*d_wing_pod
+        self.d_tank = d_wing_pod
         self.C_D_0_tank_HACK, _ = self.Roskam_drag_prediction_cruise(rho=self.rho, u1=self.M*self.a,
                                                                      l_cockpit=self.l_tank_nose,
                                                                      l_cabin=self.l_tank_body,
