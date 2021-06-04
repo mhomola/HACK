@@ -24,11 +24,11 @@ class Constants():
 
 
         """Properties of H2"""
-        self.H2_ed = 33.5                                       # Energy density of hydrogen                         [kWh/kg]
-        self.LHV_h2 = 119.96                                       # Lower heating value hydrogen                   [MJ/kg]
+        self.H2_ed = 33.5                                       # Energy density of hydrogen                   [kWh/kg]
+        self.LHV_h2 = 119.96                                    # Lower heating value hydrogen                 [MJ/kg]
 
         """Properties of kerosene"""
-        self.k_ed = 12.0                                    # Energy density of kerosene                         [kWh/kg]
+        self.k_ed = 12.0                                    # Energy density of kerosene                       [kWh/kg]
         self.LHV_ker = 43.2                                 # Lower heating value of kerosene                   [MJ/kg]
 
         '''Performance'''
@@ -122,9 +122,10 @@ class Constants():
         self.k_d = 810.0                                            # Mass density of kerosene                      [kg/m^3]
 
         """Tank design constants""" #Plsss automate these, for design changes
-        self.center_tank_mass = 115.4953 * 2                       # Mass of center tanks in total (2 tanks)       [kg]
-        self.fuselage_tank_mass = 419.5118                         # Mass of aft tank (1 tank)                     [kg]
-
+        self.center_tank_mass = 78.5018                       # Mass of each center tank (we have 2 tanks)       [kg]
+        self.pod_tank_mass = 352.6451                         # Mass of each pod tank (we have 2 tank)           [kg]
+        self.x_cg_pod = 0.26
+        self.x_cg_centertank = 1.1
         """Weights of HACK"""
         self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                     [kg]
 
@@ -137,6 +138,10 @@ class Constants():
         self.OEW_320neo = 44560                                     # Operational Empty weight of A320neo           [kg]
         self.Fuel_idel_taxi_take_off_320neo = 400                   # Fuel for before take -off                     [kg]
         self.Max_fuel_mass_capacity_320neo = self.fuel_capacity_320neo * self.k_d #Maximum kerosene mass of A320neo [kg]
+        self.x_cg_320neo_zf = 0.29
+        self.x_cg_320neo_mtow = 0.275
+        self.x_cg_hack = self.x_cg_320neo_zf * self.MZFW_320neo + \
+                        (self.x_cg_320neo_mtow -self.x_cg_320neo_zf)*self.Max_fuel_mass_capacity_320neo
 
         """Weights of A321neo"""
         self.MTOW_321neo = 89000                                    # Maximum Take-Off weight of A321neo            [kg]
@@ -317,5 +322,6 @@ if __name__ == '__main__':
     print('\n T = ', c.T, ' K',
           '\n P = ', c.p, ' Pa',
           '\n rho = ', c.rho, ' kg/m^3')
-    print(c.V_H2)
-    print(c.V_k)
+
+
+    print(c.x_cg_hack)

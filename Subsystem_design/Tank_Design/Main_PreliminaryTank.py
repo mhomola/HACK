@@ -46,7 +46,7 @@ central_H2_vol = central_tank.inner_vol_inner_wall * m.floor(central.height/(cen
 
 pod_H2_vol = (total_vol - central_H2_vol)/2  # [m^3] the volume of LH2 in each pod
 
-pod = spacial_constraints(length=5.76, width=2, height=2)
+pod = spacial_constraints(length=5.765, width=2, height=2)
 pod_tank = Mechanical_Design.PodTank(constraints=pod, dp=Mechanical_Design.dp, s_a=Mechanical_Design.s_a,
                                       e_w=Mechanical_Design.e_w, material_insulation=Materials.MLI
                                       , material_inner=Materials.Al_2090_T81, material_outer=Materials.Al_2090_T81,
@@ -58,7 +58,7 @@ weight_addition = central_tank.mass_tank * 2 + pod_tank.mass_tank * 2
 volume_all = central_tank.inner_vol_inner_wall * 2 + pod_tank.inner_vol_inner_wall * 2
 
 l_wing_pod = pod.length
-d_wing_pod = pod_tank.r4 *2
+d_wing_pod = pod_tank.r4 * 2
 
 if __name__ == '__main__':
 
