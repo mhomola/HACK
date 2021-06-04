@@ -99,14 +99,15 @@ class Constants():
         self.X_root_vtail = 30.11                                   # Distance from nose to root of vertical tail   [m]
         self.X_root_htail = 31.60                                   # Distance from nose to root of horizontal tail [m]
         self.D_fan = 4                                              # Fan diameter                                  [m]
-        self.A_fan = np.pi * self.D_fan**2 / 4                      # Area of the fan                               [m2]        
+        self.A_fan = np.pi * self.D_fan**2 / 4                      # Area of the fan                               [m2]
+        self.D_fan_cowl = self.D_fan + 
 
         """Fuel constant A320-HACK"""
 
         self.V_H2 = V_H2                                            # Volume required of hydrogen                  [m^3]
         self.V_k = V_k
         self.V_H2_usable = V_H2 * 0.965                             # Volume required of kerosene                  [m^3]
-        # self.V_H2_centre = 5.68952 * 2                             # Volume in the centre of the fuselage         [m^3]
+        # self.V_H2_centre = 5.68952 * 2                             # Volume in the centre of the fuselage        [m^3]
         # self.V_H2_aft = 26.44275                                   # Volume in
         self.W1_Wto = 0.990
         self.W2_W1 = 0.990
