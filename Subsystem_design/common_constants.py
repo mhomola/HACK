@@ -87,12 +87,11 @@ class Constants():
 
         ''' Dimensions of A320-HACK'''
         self.S = 122.6                                              # Wing surface area                            [m^2]
-        self.extra_length = 2.66445                                 # Increase in length for tank allocation        [m]
-        self.l_f = 37.57 + self.extra_length                        # Fuselage length                               [m]
+        self.l_f = 37.57                                            # Fuselage length                               [m]
         self.height_f = 4.14                                        # Fuselage height                               [m]
         self.width_f = 3.95                                         # Fuselage width                                [m]
         self.l_cockpit = 5.04                                       # Length of the cockpit                         [m]
-        self.l_cabin = 29.53 + self.extra_length - self.l_cockpit   # Length of the cabin + H2 tank                 [m]
+        self.l_cabin = 29.53 - self.l_cockpit                       # Length of the cabin + H2 tank                 [m]
         self.l_tail = self.l_f - self.l_cabin - self.l_cockpit      # Length of the tail                            [m]
         self.S_b_fus = np.pi * 0.3/2 * 0.45/2                       # Base surface area                            [m^2]
         self.sweep_LE = 27                                          # Wing sweep                                   [deg]
@@ -107,8 +106,8 @@ class Constants():
         self.V_H2 = V_H2                                            # Volume required of hydrogen                  [m^3]
         self.V_k = V_k
         self.V_H2_usable = V_H2 * 0.965                             # Volume required of kerosene                  [m^3]
-        self.V_H2_centre = 5.68952 * 2                             # Volume in the centre of the fuselage         [m^3]
-        self.V_H2_aft = 26.44275                                   # Volume in
+        # self.V_H2_centre = 5.68952 * 2                             # Volume in the centre of the fuselage         [m^3]
+        # self.V_H2_aft = 26.44275                                   # Volume in
         self.W1_Wto = 0.990
         self.W2_W1 = 0.990
         self.W3_W2 = 0.995
