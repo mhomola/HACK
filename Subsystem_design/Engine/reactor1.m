@@ -1,4 +1,4 @@
- function reactor1(g)
+function reactor1(g)
 % REACTOR1 Zero-dimensional kinetics: adiabatic, constant pressure.
 %
 %
@@ -19,7 +19,7 @@ nSteps = ceil(TotalTime/dt); %number of steps. Total time = nSteps*dt
 
 
 if strcmp(g,'kerosene')
-   gas = Solution('kerosene.cti');
+   gas = Solution('kerosene.yaml', 'gas');
 else
    gas = GRI30('None');
 end
@@ -27,11 +27,11 @@ end
 % set the initial conditions. All values below are for stoichiometric
 % conditions. Divide the values of O2 and N2 by the equivalence ratio to
 % get the lean condition.
-%set(gas,'T',T,'P',P,'X','H2:1,O2:0.5,N2:1.88'); %H2
+% set(gas,'T',T,'P',P,'X','H2:1,O2:0.5,N2:1.88'); %H2
 %set(gas,'T',T,'P',P,'X','CH4:1,O2:2,N2:7.52');  % methane
 %set(gas,'T',T,'P',P,'X','NC10H22:1,O2:15.5,N2:58.28') % decane
-set(gas,'T',T,'P',P,'X','NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,O2:14.76,N2:55.45') %kerosene
-%set(gas,'T',T,'P',P,'X','NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:1,O2:15.26,N2:57.38') % 50% H2 in volume  
+%set(gas,'T',T,'P',P,'X','NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,O2:14.76,N2:55.45') %kerosene
+set(gas,'T',T,'P',P,'X','NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:1,O2:15.26,N2:57.38') % 50% H2 in volume  
 %set(gas,'T',T,'P',P,'X','NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:60,O2:44.76,N2:168.3') % 50% H2 in volume  
 
 
