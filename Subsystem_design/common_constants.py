@@ -108,6 +108,7 @@ class Constants():
         self.D_e = 2.2                                              # Diameter of the cowling exit                  [m]
         self.l_n = 3.75                                             # Length of the fan cowling                     [m]
         self.l_eng = 5.44                                           # Length of the complete engine                 [m]
+        self.y_engine = 0.34*self.b/2                               # Y location of the engine on the wing          [m]
 
         """Fuel constant A320-HACK"""
 
@@ -127,25 +128,27 @@ class Constants():
 
         """Fuel Contants A320neo"""
         self.fuel_capacity_a320neo_FUTURE = 23859*0.9
-        self.fuel_capacity_320neo = 23.859                          # Maximum Fuel capacity of A320neo              [m^3]
-        self.k_d = 810.0                                            # Mass density of kerosene                      [kg/m^3]
+        self.fuel_capacity_320neo = 23.859                          # Maximum Fuel capacity of A320neo          [m^3]
+        self.k_d = 810.0                                            # Mass density of kerosene                  [kg/m^3]
 
-        """Tank design constants""" #Plsss automate these, for design changes
+        """Tank design constants""" # Plsss automate these, for design changes
         self.center_tank_mass = mass_center_tank              # Mass of each center tank (we have 2 tanks)       [kg]
         self.pod_tank_mass = mass_pod                         # Mass of each pod tank (we have 2 tank)           [kg]
         self.x_cg_pod = 0.26
         self.x_cg_centertank = 1.1
-        self.y_cg_pod = 0.55*self.b/2
+        self.y_cg_pod = 0.55*self.b/2                         # Y location of the pods on the wing                   [m]
+
         """Weights of HACK"""
-        self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                     [kg]
+        self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                       [kg]
 
         """Weights of A320neo"""
         self.MTOW_320neo = 73500                                    # Maximum Take-Off weight of A320neo            [kg]
         self.MLW_320neo = 66300                                     # Maximum Landing weight of A320neo             [kg]
         self.MRW_320neo = 73900                                     # Maximum Ramp weight of A320neo                [kg]
-        self.MZFW_320neo = 62800                                    # Maximu Zero fuel weight of A320neo            [kg]
+        self.MZFW_320neo = 62800                                    # Maximum Zero fuel weight of A320neo           [kg]
         self.MPLW_320neo = 18240                                    # Maximum Payload weight of A320neo             [kg]
         self.OEW_320neo = 44560                                     # Operational Empty weight of A320neo           [kg]
+        self.Wing_Weight_320neo = 9150                              # Wing weight DOI:10.5139/IJASS.2014.15.4.38
         self.Fuel_idel_taxi_take_off_320neo = 400                   # Fuel for before take -off                     [kg]
         self.Max_fuel_mass_capacity_320neo = self.fuel_capacity_320neo * self.k_d #Maximum kerosene mass of A320neo [kg]
         self.x_cg_320neo_zf = 0.29
