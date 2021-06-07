@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.integrate as spint
 import pandas as pd
+from Subsystem_design.Wing.Kerosene_distirbution import kerosene_calc
 
 class Loads_w(Constants):
 
@@ -84,6 +85,11 @@ class Loads_w(Constants):
     def wing_strcut_weight(self, x):
         Ww_prime = self.WwS * self.chord(x=x)
         return Ww_prime
+
+    def kerosene_distribution(self):
+        self.kerosene,dummy,self.kerosene_max = kerosene_calc()
+        #self.kerosene = function of kerosene weight distribution from o to kerosene_max
+        #self.kerosene_max = half spanwise location
 
     def mc_step(self, dist, i):
         return max(0, dist-self.dx/2)**(i + 1) / (dist-self.dx/2)

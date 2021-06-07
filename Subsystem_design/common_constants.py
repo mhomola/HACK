@@ -193,8 +193,8 @@ class Constants():
 
         """"Altitude and speed"""
         self.phases = np.array(['idle', 'taxi out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi in'])
-        self.M0 = np.array([0.2, 0.2, 0.5, 0.5, 0.78, 0.5, 0.2])  # [-] Mach number
-        self.h = np.array([10, 10, 50, 3000, 11280, 3000, 10])  # [m] altitude
+        self.M0 = np.array([0.015, 0.02, 0.5, 0.5, 0.78, 0.5, 0.02])  # [-] Mach number
+        self.h = np.array([1, 1, 50, 3000, 11280, 300, 1])  # [m] altitude
         self.T0, self.p0, self.rho0, self.a0 = np.array([]), np.array([]), np.array([]), np.array([])
 
         for i in self.h:
