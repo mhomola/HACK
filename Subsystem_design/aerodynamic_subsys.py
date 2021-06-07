@@ -16,6 +16,8 @@ class AerodynamicCharacteristics(Constants):
         self.drag_increase_cruise(AoA_cruise=AoA_cruise)
         self.lift_gradient_res()
         self.L_over_D_cruise()
+        self.empennage_drag()
+        self.drag_engines()
 
     def wing_MAC(self):
         """
@@ -110,7 +112,7 @@ class AerodynamicCharacteristics(Constants):
         # Compute zero lift drag for M = 0.6 for fuselage exclusive of base
         l_f = l_cockpit + l_cabin + l_tail
         R_n_fus = rho * u1 * l_f / self.visc
-        print('The Fuselage Reynolds Number R_f_fus is: ', R_n_fus, ' [-]')
+        # print('The Fuselage Reynolds Number R_f_fus is: ', R_n_fus, ' [-]')
         # print('The Mach number M is: ', self.M)
         if l_f > 20:
             R_wf = 1.015  # The wing/fuselage iterference factor from Figure 4.1 in Roskam-VI
@@ -155,11 +157,46 @@ class AerodynamicCharacteristics(Constants):
 
     def drag_engines(self):
         """
-        In this function you you can compute the drag from the engines. This is used to know what the loads are
+        In this function you can compute the drag from the engines. This is used to know what the loads are
         which act on the fuselage.
         :return:
         """
 
+        # Wetted area of the engine
+        beta = 0.25  # Ratio of the length to the point of max width over the total length of fan cowling
+        S_wet_fan_cowling = self.l_n * self.D_n * (2 + 0.35 * beta + 0.8 * beta * self.D_h / self.D_n +
+                                                   1.15 * (1 - beta) * self.D_e / self.D_n)
+        S_wet_gasgenerator = np.pi * 1.6 * 0.7
+        S_wet_plug = 2 * 0.52 * 0.98
+        S_wet_engine = S_wet_plug + S_wet_plug + S_wet_fan_cowling
+
+        # Compute C_D_0
+        ld = self.l_eng / self.D_n
+        self.C_D_o_engine = 1 * 0.002 * (1 + 60 / ld**3 + 0.0025 * ld) * S_wet_engine / self.S
+
+    def empennage_drag(self):
+        self.h_tail_MAC()
+        self.v_tail_MAC()
+
+        # Vertical Tail
+        tc_v = 0.55 / self.mac_v
+        Rn_v = self.rho_c * self.M * self.a_c * self.mac_v / self.visc
+        # print('The Reynolds Number Rf_v is: ', Rn_v, ' [-]')
+        Cf_v = 0.0025
+        Lprime_v = 1.2
+        R_LS_v = 1.22
+        S_wet_v = self.S_v
+        self.C_D_0_Vtail = Cf_v * R_LS_v * (1 + Lprime_v * tc_v + 100 * tc_v**4) * S_wet_v / self.S
+
+        # Horizontal tail
+        tc_h = 0.34 / self.mac_h
+        Rn_h = self.rho_c * self.M * self.a_c * self.mac_h / self.visc
+        # print('The Reynolds Number Rf_h is: ', Rn_h, ' [-]')
+        Cf_h = 0.00275
+        Lprime_h = 1.2
+        R_LS_h = 1.25
+        S_wet_h = self.S_h - 7.35
+        self.C_D_0_Htail = Cf_h * R_LS_h * (1 + Lprime_h * tc_h + 100 * tc_h**4) * S_wet_h / self.S
 
     def drag_increase_cruise(self, AoA_cruise):
         """
@@ -273,7 +310,11 @@ if __name__ == '__main__':
     print('\n rho = ', ae.rho,
           '\n V = ', ae.M * ae.a)
 
+    # ae.plot_lift_drag_characteristics()
+    ae.empennage_drag()
+
     print(ae.C_L_start_cruise)
 
     ae.plot_lift_drag_characteristics()
+
 
