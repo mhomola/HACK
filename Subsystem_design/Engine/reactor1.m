@@ -40,8 +40,8 @@ help reactor1
 % Phases - based on data from GSP 11
 
 % Cruise:
-%P = 11.70102*100000; %101325; %in Pascal
-%T = 724.90893; %800; in Kelvin
+% P = 11.70102*100000; %101325; %in Pascal
+% T = 724.90893; %800; in Kelvin
 
 % Take-Off:
 P = P_input; %101325; %in Pascal

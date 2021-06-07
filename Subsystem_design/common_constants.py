@@ -247,7 +247,8 @@ class Constants():
         self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))
         self.mf_bleed = 0  # [kg/s]
 
-
+        """ STRUCTURES"""
+        self.pylon_height = 0.38                                                # [m] height of the pylon of the tank
 
     # def fuselage_length(self,vol_eff, vol_fus):
     #     """
