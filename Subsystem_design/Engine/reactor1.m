@@ -1,4 +1,4 @@
-function TPZ = reactor1(g)
+function TPZ = reactor1(g, P_input, T_input)
 
 %    REACTOR1 Zero-dimensional kinetics: adiabatic, constant pressure.
 %
@@ -44,8 +44,8 @@ help reactor1
 %T = 724.90893; %800; in Kelvin
 
 % Take-Off:
-P = 32.8312*100000; %101325; %in Pascal
-T = 811.34892; %800; in Kelvin
+P = P_input; %101325; %in Pascal
+T = T_input; %800; in Kelvin
 
 %------------------
 
@@ -55,7 +55,7 @@ TotalTime = 0.7; % in seconds - includes autoignition phase
 nSteps = ceil(TotalTime/dt); %number of steps. Total time = nSteps*dt
 
 if strcmp(g,'kerosene') %   compare string
-   gas = Solution('kerosene.cti');
+   gas = Solution('kerosene.yaml', 'gas');
    %gas = Solution('nDodecane_Reitz.yaml','nDodecane_IG');
 else
    gas = GRI30('None');
@@ -131,10 +131,10 @@ disp(['CPU time = ' num2str(cputime - t0)]);
 
 p = 0.005;
 [t_five_i, t_com_i] = time_res(temp,dt,p);
-t_five = tim(t_five_i) + dt/2
-t_com = tim(t_com_i)
+t_five = tim(t_five_i) + dt/2;
+t_com = tim(t_com_i);
 
-t_res = (t_com - t_five)*1000
+t_res = (t_com - t_five)*1000;
 disp(['Residence time = ' t_res ' ms'])
 
 clf; %  clear figure
