@@ -25,7 +25,7 @@ def height_y(y,h1,h2,l):
     taper = h2/h1
     return h1 - h1 * (1 - taper) * (y/l)
 
-def volume_calc():
+def kerosene_calc():
     """
 
     :return: kerosene_weight_function [function] defined on 0,l absolute value in [N]
@@ -60,7 +60,7 @@ def volume_calc():
     return kerosene_weight_function,spanwise,l
 
 if __name__ == '__main__':
-    kerosene_weight_function,spanwise,l = volume_calc()
+    kerosene_weight_function,spanwise,l = kerosene_calc()
     plt.plot(spanwise,kerosene_weight_function(spanwise))
     plt.xlabel("Half_spanwise location [m]")
     plt.ylabel("Weight[N]")

@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.integrate as spint
 import pandas as pd
+from Subsystem_design.Wing.Kerosene_distirbution import kerosene_calc
 
 class Loads_w(Constants):
 
