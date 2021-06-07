@@ -128,7 +128,7 @@ class Engine_Cycle(Constants):
 
         self.T_total = self.T_fan + self.T_core # [N]
 
-        self.stoichiometric_ratio = self.mr_h2[i] * self.stoich_ratio_h2 + self.mr_ker[i] * self.stoich_ratio_ker
+        self.stoichiometric_ratio = self.mr_h2[i] * self.stoich_ratio_h2 + self.mr_ker * self.stoich_ratio_ker
 
         self.equivalence_ratio = (self.mf_fuel/(self.mf_hot * self.ratio_air_cc)) / self.stoichiometric_ratio #TBD what mf_air to use
 
