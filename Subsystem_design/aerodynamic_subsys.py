@@ -1,7 +1,7 @@
 from Subsystem_design.common_constants import Constants
 import numpy as np
 import matplotlib.pyplot as plt
-# from Subsystem_design.Tank_Design.Main_PreliminaryTank import 
+from Subsystem_design.Tank_Design.Main_PreliminaryTank import d_wing_pod, l_wing_pod
 
 
 class AerodynamicCharacteristics(Constants):
@@ -16,6 +16,8 @@ class AerodynamicCharacteristics(Constants):
         self.drag_increase_cruise(AoA_cruise=AoA_cruise)
         self.lift_gradient_res()
         self.L_over_D_cruise()
+        self.empennage_drag()
+        self.drag_engines()
 
     def wing_MAC(self):
         """
@@ -117,7 +119,7 @@ class AerodynamicCharacteristics(Constants):
             C_f_fus = 0.0016  # The turbulent flat plate skin friction coefficient from Figure 4.3 in Roskam-VI
         else:
             R_wf = 1
-            C_f_fus = 0.002
+            C_f_fus = 0.0018
 
 
         ld = l_f / self.d_f
@@ -153,6 +155,49 @@ class AerodynamicCharacteristics(Constants):
 
         self.D_CL_tank = 1 / (self.S * 3.281**2) * (L_R * (K_sweep * K_P) + L_alpha_ws * (alpha - 4))
 
+    def drag_engines(self):
+        """
+        In this function you can compute the drag from the engines. This is used to know what the loads are
+        which act on the fuselage.
+        :return:
+        """
+
+        # Wetted area of the engine
+        beta = 0.25  # Ratio of the length to the point of max width over the total length of fan cowling
+        S_wet_fan_cowling = self.l_n * self.D_n * (2 + 0.35 * beta + 0.8 * beta * self.D_h / self.D_n +
+                                                   1.15 * (1 - beta) * self.D_e / self.D_n)
+        S_wet_gasgenerator = np.pi * 1.6 * 0.7
+        S_wet_plug = 2 * 0.52 * 0.98
+        S_wet_engine = S_wet_plug + S_wet_plug + S_wet_fan_cowling
+
+        # Compute C_D_0
+        ld = self.l_eng / self.D_n
+        self.C_D_o_engine = 1 * 0.002 * (1 + 60 / ld**3 + 0.0025 * ld) * S_wet_engine / self.S
+
+    def empennage_drag(self):
+        self.h_tail_MAC()
+        self.v_tail_MAC()
+
+        # Vertical Tail
+        tc_v = 0.55 / self.mac_v
+        Rn_v = self.rho_c * self.M * self.a_c * self.mac_v / self.visc
+        # print('The Reynolds Number Rf_v is: ', Rn_v, ' [-]')
+        Cf_v = 0.0025
+        Lprime_v = 1.2
+        R_LS_v = 1.22
+        S_wet_v = self.S_v
+        self.C_D_0_Vtail = Cf_v * R_LS_v * (1 + Lprime_v * tc_v + 100 * tc_v**4) * S_wet_v / self.S
+
+        # Horizontal tail
+        tc_h = 0.34 / self.mac_h
+        Rn_h = self.rho_c * self.M * self.a_c * self.mac_h / self.visc
+        # print('The Reynolds Number Rf_h is: ', Rn_h, ' [-]')
+        Cf_h = 0.00275
+        Lprime_h = 1.2
+        R_LS_h = 1.25
+        S_wet_h = self.S_h - 7.35
+        self.C_D_0_Htail = Cf_h * R_LS_h * (1 + Lprime_h * tc_h + 100 * tc_h**4) * S_wet_h / self.S
+
     def drag_increase_cruise(self, AoA_cruise):
         """
         Compute the drag increase due to the new fuselage length
@@ -171,8 +216,8 @@ class AerodynamicCharacteristics(Constants):
                                                                    width_f=self.width_f)
 
         # A320-HACK
-        self.l_tank_nose, self.l_tank_body, self.l_tank_tail = 1.5, 2, 2
-        self.d_tank = 1.5
+        self.l_tank_nose, self.l_tank_body, self.l_tank_tail = d_wing_pod / 2, l_wing_pod - d_wing_pod, 2*d_wing_pod
+        self.d_tank = d_wing_pod
         self.C_D_0_tank_HACK, _ = self.Roskam_drag_prediction_cruise(rho=self.rho, u1=self.M*self.a,
                                                                      l_cockpit=self.l_tank_nose,
                                                                      l_cabin=self.l_tank_body,
@@ -236,6 +281,8 @@ class AerodynamicCharacteristics(Constants):
         ax2.set_ylabel(r'$\frac{C_L}{C_D}$', size=15)
         plt.show()
 
+
+
 # Try out the class
 
 if __name__ == '__main__':
@@ -263,5 +310,9 @@ if __name__ == '__main__':
     print('\n rho = ', ae.rho,
           '\n V = ', ae.M * ae.a)
 
+    # ae.plot_lift_drag_characteristics()
+    ae.empennage_drag()
+
     ae.plot_lift_drag_characteristics()
+
 

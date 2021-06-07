@@ -3,6 +3,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from math import pi
 from Subsystem_design.fuel_required import V_H2, V_k
+from Subsystem_design.Tank_Design.Main_PreliminaryTank import mass_pod, mass_center_tank
 
 
 
@@ -19,17 +20,18 @@ class Constants():
         self.T_0 = 288.15                                           # Sea level temperature                        [K]
         self.g_0 = 9.80665                                          # Gravity at sea level                       [m/s^2]
         self.R = 287.0                                              # Specific gas constant of air            [J/(kg*K)]
+        self.R_univ = 8.314                                         # Universal gas constant                    [J/mol/K]
         self.gamma = 1.4                                            # Heat capacity ratio of air                   [-]
         self.a_0 = 340.294                                          # Sea level speed of sound                     [m/s]
         self.visc = 1.458 * 10**(-5)                                # Air viscosity                            [N*s/m^2]
 
 
         """Properties of H2"""
-        self.H2_ed = 33.5                                       # Energy density of hydrogen                         [kWh/kg]
-        self.LHV_h2 = 119.96                                       # Lower heating value hydrogen                   [MJ/kg]
+        self.H2_ed = 33.5                                       # Energy density of hydrogen                   [kWh/kg]
+        self.LHV_h2 = 119.96                                    # Lower heating value hydrogen                 [MJ/kg]
 
         """Properties of kerosene"""
-        self.k_ed = 12.0                                    # Energy density of kerosene                         [kWh/kg]
+        self.k_ed = 12.0                                    # Energy density of kerosene                       [kWh/kg]
         self.LHV_ker = 43.2                                 # Lower heating value of kerosene                   [MJ/kg]
 
         '''Performance'''
@@ -55,7 +57,8 @@ class Constants():
 
         self.b_in = 2 * 6.4                                         # Span of inner wing trapezoid                  [m]
         self.b_out = 2 * 10.616                                     # Span of outer wing trapezoid                  [m]
-        self.b = self.b_in + self.b_out                             # Span of the entire wing
+        self.b = self.b_in + self.b_out                             # Span of the entire wing                       [m]
+        self.c_fus = 6.0465                                         # Chord right where the fuselage ends           [m]
         self.c_root = 7.0465                                        # Root chord including the kink                 [m]
         self.c_kink_out = 3.72                                      # Chord at the point where the kink ends        [m]
         self.c_tip = 1.488                                          # Chord at the tip of the wing excl sharklet    [m]
@@ -99,14 +102,20 @@ class Constants():
         self.X_root_vtail = 30.11                                   # Distance from nose to root of vertical tail   [m]
         self.X_root_htail = 31.60                                   # Distance from nose to root of horizontal tail [m]
         self.D_fan = 78 * 0.0254                                    # Fan diameter, 78 [in]                         [m]
-        self.A_fan = np.pi * self.D_fan**2 / 4                      # Area of the fan                               [m2]        
+        self.A_fan = np.pi * self.D_fan**2 / 4                      # Area of the fan                               [m2]
+        self.D_h = 2.3                                              # Diameter of cowling inlet                     [m]
+        self.D_n = 2.5                                              # Diameter of the cowling                       [m]
+        self.D_e = 2.2                                              # Diameter of the cowling exit                  [m]
+        self.l_n = 3.75                                             # Length of the fan cowling                     [m]
+        self.l_eng = 5.44                                           # Length of the complete engine                 [m]
+        self.y_engine = 0.34*self.b/2                               # Y location of the engine on the wing          [m]
 
         """Fuel constant A320-HACK"""
 
         self.V_H2 = V_H2                                            # Volume required of hydrogen                  [m^3]
         self.V_k = V_k
         self.V_H2_usable = V_H2 * 0.965                             # Volume required of kerosene                  [m^3]
-        # self.V_H2_centre = 5.68952 * 2                             # Volume in the centre of the fuselage         [m^3]
+        # self.V_H2_centre = 5.68952 * 2                             # Volume in the centre of the fuselage        [m^3]
         # self.V_H2_aft = 26.44275                                   # Volume in
         self.W1_Wto = 0.990
         self.W2_W1 = 0.990
@@ -119,25 +128,33 @@ class Constants():
 
         """Fuel Contants A320neo"""
         self.fuel_capacity_a320neo_FUTURE = 23859*0.9
-        self.fuel_capacity_320neo = 23.859                          # Maximum Fuel capacity of A320neo              [m^3]
-        self.k_d = 810.0                                            # Mass density of kerosene                      [kg/m^3]
+        self.fuel_capacity_320neo = 23.859                          # Maximum Fuel capacity of A320neo          [m^3]
+        self.k_d = 810.0                                            # Mass density of kerosene                  [kg/m^3]
 
-        """Tank design constants""" #Plsss automate these, for design changes
-        self.center_tank_mass = 115.4953 * 2                       # Mass of center tanks in total (2 tanks)       [kg]
-        self.fuselage_tank_mass = 419.5118                         # Mass of aft tank (1 tank)                     [kg]
+        """Tank design constants""" # Plsss automate these, for design changes
+        self.center_tank_mass = mass_center_tank              # Mass of each center tank (we have 2 tanks)       [kg]
+        self.pod_tank_mass = mass_pod                         # Mass of each pod tank (we have 2 tank)           [kg]
+        self.x_cg_pod = 0.26
+        self.x_cg_centertank = 1.1
+        self.y_cg_pod = 0.55*self.b/2                         # Y location of the pods on the wing                   [m]
 
         """Weights of HACK"""
-        self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                     [kg]
+        self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                       [kg]
 
         """Weights of A320neo"""
         self.MTOW_320neo = 73500                                    # Maximum Take-Off weight of A320neo            [kg]
         self.MLW_320neo = 66300                                     # Maximum Landing weight of A320neo             [kg]
         self.MRW_320neo = 73900                                     # Maximum Ramp weight of A320neo                [kg]
-        self.MZFW_320neo = 62800                                    # Maximu Zero fuel weight of A320neo            [kg]
+        self.MZFW_320neo = 62800                                    # Maximum Zero fuel weight of A320neo           [kg]
         self.MPLW_320neo = 18240                                    # Maximum Payload weight of A320neo             [kg]
         self.OEW_320neo = 44560                                     # Operational Empty weight of A320neo           [kg]
+        self.Wing_Weight_320neo = 9150                              # Wing weight DOI:10.5139/IJASS.2014.15.4.38
         self.Fuel_idel_taxi_take_off_320neo = 400                   # Fuel for before take -off                     [kg]
         self.Max_fuel_mass_capacity_320neo = self.fuel_capacity_320neo * self.k_d #Maximum kerosene mass of A320neo [kg]
+        self.x_cg_320neo_zf = 0.29
+        self.x_cg_320neo_mtow = 0.275
+        self.x_cg_hack = self.x_cg_320neo_zf * self.MZFW_320neo + \
+                        (self.x_cg_320neo_mtow -self.x_cg_320neo_zf)*self.Max_fuel_mass_capacity_320neo
 
         """Weights of A321neo"""
         self.MTOW_321neo = 89000                                    # Maximum Take-Off weight of A321neo            [kg]
@@ -155,22 +172,23 @@ class Constants():
         self.l_tail_320neo = self.l_f_320neo - 29.53                # Length of the tail of A320neo                 [m]
 
         """Propulsion"""
-        self.R = 287                                                # Gas constant                                  [J/kg/K]
         self.cp_air = 1000                                          # Specific heat constant air                    [J/kg/K]
         self.cp_gas = 1150                                          # Specific heat constant gas                    [J/kg/K]
         self.k_air = 1.4                                            # Ration of specific heat for air
         self.k_gas = 1.33                                           # Ration of specific heat for air
-        self.ratio_air_cc = 0.95                                     # percentage of core air that is used in combustion
 
-        self.N2_cp_data = np.array(np.genfromtxt('N2_cp.dat'))      # cp vs. T data for N2                          T[K]; cp[kJ/(kg*K)]
-        self.molarmass_N2 = 28.01340                                # Molar mass of N2                              [g/mol]
+        # self.N2_cp_data = np.array(np.genfromtxt('N2_cp.dat'))      # cp vs. T data for N2          T[K]; cp[kJ/(kg*K)]
+        self.molarmass_N2 = 28.01340                                # Molar mass of N2                          [g/mol]
 
-        self.h2_cp_data = np.array(np.genfromtxt('h2_cp.dat'))      # cp vs. T data for h2                          T[K]; cp[kJ/(kg*K)]
-        self.molarmass_h2 = 2.01588                                 # Molar mass of h2                              [g/mol]
+        # self.h2_cp_data = np.array(np.genfromtxt('h2_cp.dat'))      # cp vs. T data for h2          T[K]; cp[kJ/(kg*K)]
+        self.molarmass_h2 = 2.01588                                 # Molar mass of h2                          [g/mol]
 
-        self.C12H26_cp_data = np.array(np.genfromtxt('C12H26_cp.dat'))  # cp vs. T data for dodecane                T[K]; cp[J/(mol*K)]
+        # self.C12H26_cp_data = np.array(np.genfromtxt('C12H26_cp.dat'))  # cp vs. T data for dodecane                T[K]; cp[J/(mol*K)]
         self.h0_C12H26 = -290.90                                        # Zero enthalpy of dodecane                 [kJ/mol]         # https://www.chemeo.com/cid/34-125-5/n-Dodecane
         self.molarmass_C12H26 = 170.3348                                # Molar mass of dodecane                    [g/mol]
+
+        self.stoich_ratio_ker = 1/15.66 #FAR
+        self.stoich_ratio_h2 = 1/34.3 #FAR
 
         """"Altitude and speed"""
         self.phases = np.array(['idle', 'taxi out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi in'])
@@ -179,7 +197,7 @@ class Constants():
         self.T0, self.p0, self.rho0, self.a0 = np.array([]), np.array([]), np.array([]), np.array([])
 
         for i in self.h:
-            self.ISA_calculator(h_input = i)
+            self.ISA_calculator(h_input=i)
             self.T0 = np.append(self.T0, self.T)
             self.p0 = np.append(self.p0, self.p)
             self.rho0 = np.append(self.rho0, self.rho)
@@ -187,46 +205,59 @@ class Constants():
 
         self.v0 = self.M0 * self.a0
 
+    def chord(self, x):
+        if x <= 0.5*self.b_in:
+            c = (self.c_kink_out - self.c_root) / (0.5 * self.b_in) * x + self.c_root
+        else:
+            c = (self.c_tip - self.c_kink_out) / (0.5 * self.b_out) * (x - 0.5 * self.b_in) + self.c_kink_out
+        return c
+
     def engine_data_neo(self):
-        self.eta_inlet = 0.97
-        self.PR_fan = 1.6
-        self.eta_fan = 0.93
-        self.BR = 11.1
-        self.eta_LPC = 0.92
-        self.eta_HPC = 0.92
-        self.eta_LPT = 0.94
-        self.eta_HPT = 0.94
-        self.eta_mech = 0.9
-        self.eta_cc = 0.99
-        self.PR_LPC = 2
-        self.PR_HPC = 11.93
-        self.eta_nozzle = 0.98
-        self.PR_cc = 0.96
-        self.T04 = 1630 # [K]
+        self.eta_inlet = 0.9208608681597723
+        self.PR_fan = 1.4206
+        self.eta_fan = 0.90445
+        self.BR = 11.24426
+        self.eta_LPC = 0.90019
+        self.eta_HPC = 0.91449
+        self.eta_LPT = 0.9405
+        self.eta_HPT = 1 # 1.072044268921447 (computed)  # 0.91898 (given)
+        self.eta_mech_H =  0.7465403131365893
+        self.eta_mech_L = 1
+        self.eta_cc = 0.995 # that of Leap-1B
+        self.PR_LPC = 2.69419
+        self.PR_HPC = 9.73784
+        self.eta_nozzle = 1 # 1.0737340755627587 (computed) # previous assumption: 0.98
+        self.PR_cc = 0.9395309126896629
+        self.T04 = 1459.30433 # [K]
 
         self.mr_h2 = np.array([ 0, 0, 0, 0, 0, 0, 0  ])
         self.mr_ker = 1 - self.mr_h2
-        self.LHV_f = np.array([43.2]*7) # [MJ/kg]
+        self.ER_h2 = np.array([0, 0, 0, 0, 0, 0, 0])
+        self.ER_ker = 1 - self.mr_h2
+        self.LHV_f = np.array([self.LHV_ker]*7) # [MJ/kg]
+
+        self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_neo.dat'))                                   # percentage of core air that is used in combustion
+        self.mf_bleed = 0.667 # [kg/s]
 
     def engine_data_hack(self):
-        self.eta_inlet = 0.97
-        self.PR_fan = 1
-        self.eta_fan = 0.93
-        self.BR = 12
-        self.eta_LPC = 0.92
-        self.eta_HPC = 0.92
-        self.eta_LPT = 0.94
-        self.eta_HPT = 0.94
-        self.eta_mech = 0.9
-        self.eta_cc = 0.99
-        self.PR_LPC = 2.3
-        self.PR_HPC = 13
-        self.eta_nozzle = 0.98
-        self.PR_cc = 0.96
-        self.T04 = 1630 # [K]
+        self.eta_inlet = 0.9208608681597723
+        self.PR_fan = 1.4206
+        self.eta_fan = 0.90445
+        self.BR = 11.24426
+        self.eta_LPC = 0.90019
+        self.eta_HPC = 0.91449
+        self.eta_LPT = 0.9405
+        self.eta_HPT = 1
+        self.eta_mech_H =  0.7465403131365893
+        self.eta_mech_L = 1
+        self.eta_cc = 0.995
+        self.PR_LPC = 2.69419
+        self.PR_HPC = 9.73784
+        self.eta_nozzle = 1
+        self.PR_cc = 0.9395309126896629
+        self.T04 = 1459.30433 # [K]
 
         # Fuel properties
-
         self.mr_h2 = np.array([ 1, 1, 0.1376, 0.1376, 0.1376, 0.1376, 1  ])
         self.mr_ker = 1 - self.mr_h2
 
@@ -236,8 +267,11 @@ class Constants():
         # find LHV_f for each phase, according to mass fractions
         self.LHV_f = self.ER_h2*self.LHV_h2 + self.ER_ker*self.LHV_ker  # [MJ/kg]
 
-        self.stoich_ratio_ker = 1/15.66 #FAR
-        self.stoich_ratio_h2 = 1/34.3 #FAR
+        self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))
+        self.mf_bleed = 0  # [kg/s]
+
+        """ STRUCTURES"""
+        self.pylon_height = 0.38                                                # [m] height of the pylon of the tank
 
     # def fuselage_length(self,vol_eff, vol_fus):
     #     """
@@ -395,5 +429,6 @@ if __name__ == '__main__':
     print('\n T = ', c.T, ' K',
           '\n P = ', c.p, ' Pa',
           '\n rho = ', c.rho, ' kg/m^3')
-    print(c.V_H2)
-    print(c.V_k)
+
+
+    print(c.pod_tank_mass)
