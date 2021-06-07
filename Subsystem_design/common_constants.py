@@ -145,12 +145,14 @@ class Constants():
         self.OEW_321neo = self.MZFW_321neo - self.MPLW_321neo       # Operational Empty weight of A320neo           [kg]
 
         """Dimensions of A320neo and A321neo"""
-        self.l_f_321neo = 44.51                                      # Fuselage length of A321neo                    [m]
+        self.l_f_321neo = 44.51                                     # Fuselage length of A321neo                    [m]
         self.l_f_320neo = 37.57                                     # Fuselage length of A320neo                    [m]
         self.l_cockpit_320neo = 5.04                                # Length of the cockpit of A320neo              [m]
         self.l_cabin_320neo = 29.53 - self.l_cockpit_320neo         # Length of the cabin of A320neo                [m]
         self.l_tail_320neo = self.l_f_320neo - 29.53                # Length of the tail of A320neo                 [m]
 
+        """ Structures """
+        self.pylon_height = 0.38                                    # height of the tanks pylon                     [m]
     # def fuselage_length(self,vol_eff, vol_fus):
     #     """
     #
