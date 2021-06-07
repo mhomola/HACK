@@ -74,6 +74,11 @@ class Loads_w(Constants):
         self.D_tank_sys = ae.C_D_0_tank_sys_HACK * self.q_crit * self.S
         self.D_eng = ae.C_D_o_engine * self.q_crit * self.S
 
+    def kerosene_distribution(self):
+        self.kerosene,dummy,self.kerosene_max = kerosene_calc()
+        #self.kerosene = function of kerosene weight distribution from o to kerosene_max
+        #self.kerosene_max = half spanwise location
+
     def mc_step(self, dist, i):
         return max(0, dist-self.dx/2)**(i + 1) / (dist-self.dx/2)
 
