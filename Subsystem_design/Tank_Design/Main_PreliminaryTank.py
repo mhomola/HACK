@@ -1,5 +1,5 @@
-import Mechanical_Design
-import Materials
+import Subsystem_design.Tank_Design.Mechanical_Design as Mechanical_Design
+import Subsystem_design.Tank_Design.Materials as Materials
 import numpy as np
 import math as m
 from Subsystem_design.fuel_required import V_H2

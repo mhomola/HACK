@@ -313,8 +313,6 @@ if __name__ == '__main__':
     # ae.plot_lift_drag_characteristics()
     ae.empennage_drag()
 
-    print(ae.C_L_start_cruise)
-
     ae.plot_lift_drag_characteristics()
 
 
