@@ -19,10 +19,12 @@ Created on Tue May 25 11:53:39 2021
 from Subsystem_design.common_constants import Constants
 from Subsystem_design.Engine.EngineCycle import Engine_Cycle
 import numpy as np
+
 import matlab.engine
 eng = matlab.engine.start_matlab()
 
-test = eng.reactor1('kerosene')
+ret = eng.triarea(1.0,5.0)
+print(ret)
 
 class Engine_Cool(Constants):
     def __init__(self):

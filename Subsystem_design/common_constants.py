@@ -26,11 +26,11 @@ class Constants():
 
 
         """Properties of H2"""
-        self.H2_ed = 33.5                                       # Energy density of hydrogen                         [kWh/kg]
-        self.LHV_h2 = 119.96                                       # Lower heating value hydrogen                   [MJ/kg]
+        self.H2_ed = 33.5                                       # Energy density of hydrogen                   [kWh/kg]
+        self.LHV_h2 = 119.96                                    # Lower heating value hydrogen                 [MJ/kg]
 
         """Properties of kerosene"""
-        self.k_ed = 12.0                                    # Energy density of kerosene                         [kWh/kg]
+        self.k_ed = 12.0                                    # Energy density of kerosene                       [kWh/kg]
         self.LHV_ker = 43.2                                 # Lower heating value of kerosene                   [MJ/kg]
 
         '''Performance'''
@@ -130,9 +130,10 @@ class Constants():
         self.k_d = 810.0                                            # Mass density of kerosene                      [kg/m^3]
 
         """Tank design constants""" #Plsss automate these, for design changes
-        self.center_tank_mass = 115.4953 * 2                       # Mass of center tanks in total (2 tanks)       [kg]
-        self.fuselage_tank_mass = 419.5118                         # Mass of aft tank (1 tank)                     [kg]
-
+        self.center_tank_mass = 78.5018                       # Mass of each center tank (we have 2 tanks)       [kg]
+        self.pod_tank_mass = 352.6451                         # Mass of each pod tank (we have 2 tank)           [kg]
+        self.x_cg_pod = 0.26
+        self.x_cg_centertank = 1.1
         """Weights of HACK"""
         self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                     [kg]
 
@@ -145,6 +146,10 @@ class Constants():
         self.OEW_320neo = 44560                                     # Operational Empty weight of A320neo           [kg]
         self.Fuel_idel_taxi_take_off_320neo = 400                   # Fuel for before take -off                     [kg]
         self.Max_fuel_mass_capacity_320neo = self.fuel_capacity_320neo * self.k_d #Maximum kerosene mass of A320neo [kg]
+        self.x_cg_320neo_zf = 0.29
+        self.x_cg_320neo_mtow = 0.275
+        self.x_cg_hack = self.x_cg_320neo_zf * self.MZFW_320neo + \
+                        (self.x_cg_320neo_mtow -self.x_cg_320neo_zf)*self.Max_fuel_mass_capacity_320neo
 
         """Weights of A321neo"""
         self.MTOW_321neo = 89000                                    # Maximum Take-Off weight of A321neo            [kg]
@@ -167,24 +172,27 @@ class Constants():
         self.k_air = 1.4                                            # Ration of specific heat for air
         self.k_gas = 1.33                                           # Ration of specific heat for air
 
-        self.N2_cp_data = np.array(np.genfromtxt('N2_cp.dat'))      # cp vs. T data for N2                          T[K]; cp[kJ/(kg*K)]
-        self.molarmass_N2 = 28.01340                                # Molar mass of N2                              [g/mol]
+        # self.N2_cp_data = np.array(np.genfromtxt('N2_cp.dat'))      # cp vs. T data for N2          T[K]; cp[kJ/(kg*K)]
+        self.molarmass_N2 = 28.01340                                # Molar mass of N2                          [g/mol]
 
-        self.h2_cp_data = np.array(np.genfromtxt('h2_cp.dat'))      # cp vs. T data for h2                          T[K]; cp[kJ/(kg*K)]
-        self.molarmass_h2 = 2.01588                                 # Molar mass of h2                              [g/mol]
+        # self.h2_cp_data = np.array(np.genfromtxt('h2_cp.dat'))      # cp vs. T data for h2          T[K]; cp[kJ/(kg*K)]
+        self.molarmass_h2 = 2.01588                                 # Molar mass of h2                          [g/mol]
 
-        self.C12H26_cp_data = np.array(np.genfromtxt('C12H26_cp.dat'))  # cp vs. T data for dodecane                T[K]; cp[J/(mol*K)]
+        # self.C12H26_cp_data = np.array(np.genfromtxt('C12H26_cp.dat'))  # cp vs. T data for dodecane                T[K]; cp[J/(mol*K)]
         self.h0_C12H26 = -290.90                                        # Zero enthalpy of dodecane                 [kJ/mol]         # https://www.chemeo.com/cid/34-125-5/n-Dodecane
         self.molarmass_C12H26 = 170.3348                                # Molar mass of dodecane                    [g/mol]
 
+        self.stoich_ratio_ker = 1/15.66 #FAR
+        self.stoich_ratio_h2 = 1/34.3 #FAR
+
         """"Altitude and speed"""
         self.phases = np.array(['idle', 'taxi out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi in'])
-        self.M0 = np.array([0.73, 0.2, 0.5, 0.5, 0.78, 0.5, 0.2])  # [-] Mach number
+        self.M0 = np.array([0.2, 0.2, 0.5, 0.5, 0.78, 0.5, 0.2])  # [-] Mach number
         self.h = np.array([10, 10, 50, 3000, 11280, 3000, 10])  # [m] altitude
         self.T0, self.p0, self.rho0, self.a0 = np.array([]), np.array([]), np.array([]), np.array([])
 
         for i in self.h:
-            self.ISA_calculator(h_input = i)
+            self.ISA_calculator(h_input=i)
             self.T0 = np.append(self.T0, self.T)
             self.p0 = np.append(self.p0, self.p)
             self.rho0 = np.append(self.rho0, self.rho)
@@ -256,69 +264,9 @@ class Constants():
 
         self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))
         self.mf_bleed = 0  # [kg/s]
-        self.stoich_ratio_ker = 1/15.66 #FAR
-        self.stoich_ratio_h2 = 1/34.3 #FAR
 
-        """"Altitude and speed"""
-        self.phases = np.array(['idle', 'taxi out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi in'])
-        self.M0 = np.array([0.2, 0.2, 0.5, 0.5, 0.78, 0.5, 0.2])  # [-] Mach number
-        self.h = np.array([10, 10, 50, 3000, 11280, 3000, 10])  # [m] altitude
-        self.T0, self.p0, self.rho0, self.a0 = np.array([]), np.array([]), np.array([]), np.array([])
-
-        for i in self.h:
-            self.ISA_calculator(h_input = i)
-            self.T0 = np.append(self.T0, self.T)
-            self.p0 = np.append(self.p0, self.p)
-            self.rho0 = np.append(self.rho0, self.rho)
-            self.a0 = np.append(self.a0, self.a)
-
-        self.v0 = self.M0 * self.a0
-
-    def engine_data_neo(self):
-        self.eta_inlet = 0.97
-        self.PR_fan = 1.6
-        self.eta_fan = 0.93
-        self.BR = 11.1
-        self.eta_LPC = 0.92
-        self.eta_HPC = 0.92
-        self.eta_LPT = 0.94
-        self.eta_HPT = 0.94
-        self.eta_mech = 0.9
-        self.eta_cc = 0.99
-        self.PR_LPC = 2
-        self.PR_HPC = 11.93
-        self.eta_nozzle = 0.98
-        self.PR_cc = 0.96
-        self.T04 = 1630 # [K]
-        self.LHV_f = 43.2 # [MJ/kg]
-
-    def engine_data_hack(self):
-        self.eta_inlet = 0.97
-        self.PR_fan = 1
-        self.eta_fan = 0.93
-        self.BR = 12
-        self.eta_LPC = 0.92
-        self.eta_HPC = 0.92
-        self.eta_LPT = 0.94
-        self.eta_HPT = 0.94
-        self.eta_mech = 0.9
-        self.eta_cc = 0.99
-        self.PR_LPC = 2.3
-        self.PR_HPC = 13
-        self.eta_nozzle = 0.98
-        self.PR_cc = 0.96
-        self.T04 = 1630 # [K]
-
-        # Fuel properties
-
-        self.mr_h2 = np.array([ 1, 1, 0.1376, 0.1376, 0.1376, 0.1376, 1  ])
-        self.mr_ker = 1 - self.mr_h2
-
-        self.ER_h2 = ( self.mr_h2*self.LHV_h2 ) / (  self.mr_h2*self.LHV_h2 + self.mr_ker*self.LHV_ker)
-        self.ER_ker = ( self.mr_ker*self.LHV_ker ) / (  self.mr_h2*self.LHV_h2 + self.mr_ker*self.LHV_ker)
-
-        # find LHV_f for each phase, according to mass fractions
-        self.LHV_f = self.ER_h2*self.LHV_h2 + self.ER_ker*self.LHV_ker  # [MJ/kg]
+        """ STRUCTURES"""
+        self.pylon_height = 0.38                                                # [m] height of the pylon of the tank
 
     # def fuselage_length(self,vol_eff, vol_fus):
     #     """
@@ -476,5 +424,6 @@ if __name__ == '__main__':
     print('\n T = ', c.T, ' K',
           '\n P = ', c.p, ' Pa',
           '\n rho = ', c.rho, ' kg/m^3')
-    print(c.V_H2)
-    print(c.V_k)
+
+
+    print(c.x_cg_hack)

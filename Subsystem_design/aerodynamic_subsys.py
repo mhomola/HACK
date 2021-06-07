@@ -281,6 +281,8 @@ class AerodynamicCharacteristics(Constants):
         ax2.set_ylabel(r'$\frac{C_L}{C_D}$', size=15)
         plt.show()
 
+
+
 # Try out the class
 
 if __name__ == '__main__':
@@ -310,4 +312,9 @@ if __name__ == '__main__':
 
     # ae.plot_lift_drag_characteristics()
     ae.empennage_drag()
+
+    print(ae.C_L_start_cruise)
+
+    ae.plot_lift_drag_characteristics()
+
 
