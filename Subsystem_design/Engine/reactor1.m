@@ -1,4 +1,4 @@
-function TPZ = reactor1(g, P_input, T_input)
+function TPZ = reactor1(g, P_input, T_input, eqr_input)
 
 %    REACTOR1 Zero-dimensional kinetics: adiabatic, constant pressure.
 %
@@ -16,7 +16,7 @@ function TPZ = reactor1(g, P_input, T_input)
             i = 1;
             for c = 1:(length(slope)-1)
                 disp(slope(c))
-                if (perc >= slope(c)) & (perc <= slope(c+1))
+                if (perc >= slope(c)) && (perc <= slope(c+1))
                     i = c+1;
                     break;
                 end
@@ -31,7 +31,7 @@ function TPZ = reactor1(g, P_input, T_input)
             end
 
             time_idx1 = i;
-            time_idx2 = j
+            time_idx2 = j;
     end
 
 help reactor1
@@ -73,7 +73,7 @@ end
 
 p_o2 = 14.76;
 p_n2 = 55.45;
-eqr = 1; %0.3;
+eqr = eqr_input; %0.3;
 
 p_o2_new = p_o2/eqr;
 p_n2_new = p_n2/eqr;
