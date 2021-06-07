@@ -3,7 +3,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from math import pi
 from Subsystem_design.fuel_required import V_H2, V_k
-from Subsystem_design.Tank_Design.Main_PreliminaryTank import mass_pod
+from Subsystem_design.Tank_Design.Main_PreliminaryTank import mass_pod, mass_center_tank
 
 
 
@@ -131,10 +131,11 @@ class Constants():
         self.k_d = 810.0                                            # Mass density of kerosene                      [kg/m^3]
 
         """Tank design constants""" #Plsss automate these, for design changes
-        self.center_tank_mass = 78.5018                       # Mass of each center tank (we have 2 tanks)       [kg]
+        self.center_tank_mass = mass_center_tank              # Mass of each center tank (we have 2 tanks)       [kg]
         self.pod_tank_mass = mass_pod                         # Mass of each pod tank (we have 2 tank)           [kg]
         self.x_cg_pod = 0.26
         self.x_cg_centertank = 1.1
+        self.y_cg_pod = 0.55*self.b/2
         """Weights of HACK"""
         self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                     [kg]
 
