@@ -75,7 +75,6 @@ class Loads_w(Constants):
         self.D_eng = ae.C_D_o_engine * self.q_crit * self.S
 
     def mc_step(self, dist, i):
-        print(max(0, dist-self.dx/2))
         return max(0, dist-self.dx/2)**(i + 1) / (dist-self.dx/2)
 
     def S_y(self, x):
@@ -86,17 +85,18 @@ class Loads_w(Constants):
               self.mc_step(dist=x-self.b_in/2, i=0)
               + (self.m2 * (x**2/2 - (self.b_in/2)**2/2 - self.b_in/2 * (x - self.b_in/2)) + self.c_kink_out *
                  (x - self.b_in/2)) * self.mc_step(dist=x-self.b_in/2, i=0))
-
         return Sy
 
     def S_x(self, x):
+        self.component_drag()
         Sx = self.C_D_crit * self.q_crit * \
              (+ (self.m1 * (x**2/2 - (0.5*self.width_f)**2/2) + self.c_root * (x - 0.5*self.width_f)) *
               self.mc_step(dist=x-0.5*self.width_f, i=0)
               - (self.m1 * (x**2/2 - (self.b_in/2)**2/2) + self.c_root * (x - self.b_in/2)) *
               self.mc_step(dist=x-self.b_in/2, i=0)
               + (self.m2 * (x**2/2 - (self.b_in/2)**2/2 - self.b_in/2 * (x - self.b_in/2)) + self.c_kink_out *
-                 (x - self.b_in/2)) * self.mc_step(dist=x-self.b_in/2, i=0)) + self.
+                 (x - self.b_in/2)) * self.mc_step(dist=x-self.b_in/2, i=0)) \
+             + self.D_tank_sys * self.mc_step(dist=x-) + self.D_eng * self.mc_step(dist=x-)
 
 
 
