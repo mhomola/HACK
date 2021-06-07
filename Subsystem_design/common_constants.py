@@ -56,7 +56,8 @@ class Constants():
 
         self.b_in = 2 * 6.4                                         # Span of inner wing trapezoid                  [m]
         self.b_out = 2 * 10.616                                     # Span of outer wing trapezoid                  [m]
-        self.b = self.b_in + self.b_out                             # Span of the entire wing
+        self.b = self.b_in + self.b_out                             # Span of the entire wing                       [m]
+        self.c_fus = 6.0465                                         # Chord right where the fuselage ends           [m]
         self.c_root = 7.0465                                        # Root chord including the kink                 [m]
         self.c_kink_out = 3.72                                      # Chord at the point where the kink ends        [m]
         self.c_tip = 1.488                                          # Chord at the tip of the wing excl sharklet    [m]
@@ -101,6 +102,11 @@ class Constants():
         self.X_root_htail = 31.60                                   # Distance from nose to root of horizontal tail [m]
         self.D_fan = 78 * 0.0254                                    # Fan diameter, 78 [in]                         [m]
         self.A_fan = np.pi * self.D_fan**2 / 4                      # Area of the fan                               [m2]
+        self.D_h = 2.3                                              # Diameter of cowling inlet                     [m]
+        self.D_n = 2.5                                              # Diameter of the cowling                       [m]
+        self.D_e = 2.2                                              # Diameter of the cowling exit                  [m]
+        self.l_n = 3.75                                             # Length of the fan cowling                     [m]
+        self.l_eng = 5.44                                           # Length of the complete engine                 [m]
 
         """Fuel constant A320-HACK"""
 
@@ -185,6 +191,13 @@ class Constants():
             self.a0 = np.append(self.a0, self.a)
 
         self.v0 = self.M0 * self.a0
+
+    def chord(self, x):
+        if x <= 0.5*self.b_in:
+            c = (self.c_kink_out - self.c_root) / (0.5 * self.b_in) * x + self.c_root
+        else:
+            c = (self.c_tip - self.c_kink_out) / (0.5 * self.b_out) * (x - 0.5 * self.b_in) + self.c_kink_out
+        return c
 
     def engine_data_neo(self):
         self.eta_inlet = 0.9208608681597723
