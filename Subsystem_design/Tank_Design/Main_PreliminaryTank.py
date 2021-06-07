@@ -59,6 +59,7 @@ volume_all = central_tank.inner_vol_inner_wall * 2 + pod_tank.inner_vol_inner_wa
 
 l_wing_pod = pod.length
 d_wing_pod = pod_tank.r4 * 2
+mass_pod = pod_tank.mass_tank
 
 if __name__ == '__main__':
 

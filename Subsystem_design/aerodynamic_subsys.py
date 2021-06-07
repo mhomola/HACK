@@ -244,10 +244,6 @@ class AerodynamicCharacteristics(Constants):
         ax2.set_ylabel(r'$\frac{C_L}{C_D}$', size=15)
         plt.show()
 
-    def pitching_moment(self):
-
-        self.Cma = 0
-
 
 
 # Try out the class
@@ -276,6 +272,8 @@ if __name__ == '__main__':
 
     print('\n rho = ', ae.rho,
           '\n V = ', ae.M * ae.a)
+
+    print(ae.C_L_start_cruise)
 
     ae.plot_lift_drag_characteristics()
 
