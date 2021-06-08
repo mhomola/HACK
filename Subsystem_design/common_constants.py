@@ -103,8 +103,8 @@ class Constants():
         """Fuel constant A320-HACK"""
 
         self.V_H2 = V_H2                                            # Volume required of hydrogen                  [m^3]
-        self.V_k = V_k
-        self.V_H2_usable = V_H2 * 0.965                             # Volume required of kerosene                  [m^3]
+        self.V_k = V_k                                              # Volume required of kerosene                  [m^3]
+        self.V_H2_usable = V_H2 * 0.965
         # self.V_H2_centre = 5.68952 * 2                             # Volume in the centre of the fuselage         [m^3]
         # self.V_H2_aft = 26.44275                                   # Volume in
         self.W1_Wto = 0.990
@@ -317,5 +317,6 @@ if __name__ == '__main__':
     print('\n T = ', c.T, ' K',
           '\n P = ', c.p, ' Pa',
           '\n rho = ', c.rho, ' kg/m^3')
-    print(c.V_H2)
-    print(c.V_k)
+    print('V_H2',c.V_H2)
+    print('V_k',c.V_k)
+    print('V_H2_usable',c.V_H2_usable)
