@@ -7,7 +7,7 @@ class Valid_Engine(Constants):
     def __init__(self):
         super().__init__()
 
-    def true_vals_cruise(self, p0, W_HPC, mf_airfuel):
+    def true_vals_cruise(self, p0, mf_airfuel):  # self, p0, W_HPC, mf_airfuel
         self.v0_real = 230.17168   # [m/s]
         self.T00_real = 243.01197 # [K]
         self.p00_real = 0.32366 * 10**5 # [Pa]
@@ -36,14 +36,14 @@ class Valid_Engine(Constants):
 
         self.OPR_real = 37.27031
 
-        self.eta_inlet_real = ( ( (self.p02_real/p0)**( (self.k_air-1)/self.k_air ) ) - 1 ) / ( (self.k_air-1)/2*(self.M0[i]**2) )
-        self.W_HPT_real = ( self.T04_real - self.T045_real ) * mf_airfuel * self.cp_gas
-        self.eta_mech_H_real = W_HPC / self.W_HPT_real
-        self.PR_cc_real = self.p04_real/self.p03_real
-
-        self.eta_HPT_real = ( 1 - self.T045_real/self.T04_real ) / ( 1 - (self.p045_real/self.p04_real) ** ((self.k_gas-1)/self.k_gas) )
-        self.PR_nozzle_real = self.p05_real/self.p8_real
-        self.eta_nozzle_real = (self.k_gas-1)/(self.k_gas+1)  *  1/( 1 - (1/self.PR_nozzle_real)**((self.k_gas-1)/self.k_gas) )
+        # self.eta_inlet_real = ( ( (self.p02_real/p0)**( (self.k_air-1)/self.k_air ) ) - 1 ) / ( (self.k_air-1)/2*(self.M0[i]**2) )
+        # self.W_HPT_real = ( self.T04_real - self.T045_real ) * mf_airfuel * self.cp_gas
+        # self.eta_mech_H_real = W_HPC / self.W_HPT_real
+        # self.PR_cc_real = self.p04_real/self.p03_real
+        #
+        # self.eta_HPT_real = ( 1 - self.T045_real/self.T04_real ) / ( 1 - (self.p045_real/self.p04_real) ** ((self.k_gas-1)/self.k_gas) )
+        # self.PR_nozzle_real = self.p05_real/self.p8_real
+        # self.eta_nozzle_real = (self.k_gas-1)/(self.k_gas+1)  *  1/( 1 - (1/self.PR_nozzle_real)**((self.k_gas-1)/self.k_gas) )
 
         # self.eta_nozzle_real = (1 - self.T8_real/self.T05_real) / ( 1 - (self.p8_real/self.p05_real)**((self.k_gas-1)/self.k_gas) )
 
@@ -55,7 +55,7 @@ if __name__ == "__main__":
     cycle.cycle_analysis(aircraft='neo', i=index)
     e = 0.1
     i = index
-    val.true_vals_cruise(const.p0[i], cycle.W_HPC, cycle.mf_airfuel)
+    val.true_vals_cruise(const.p0[i], cycle.mf_airfuel)
 
     print( 'Error in v0: ', (const.v0[i] - val.v0_real)/val.v0_real )
     print('Error in T00: ', (cycle.T00 - val.T00_real) / val.T00_real)
@@ -85,9 +85,9 @@ if __name__ == "__main__":
     print('Error in OPR: ', (cycle.OPR - val.OPR_real) / val.OPR_real)
 
     print('\nREAL VALUES\nReal eta_inlet: ', val.eta_inlet_real)
-    print('Real W_HPT:', val.W_HPT_real, 'Computed W_HPT:', cycle.W_HPT)
-    print('Real eta_mech HPT:', val.eta_mech_H_real)
-    print('Real PR_cc:', val.PR_cc_real, 'Real eta_HPT:', val.eta_HPT_real)
-    print('Real eta_nozzle:', val.eta_nozzle_real, 'PR nozzle real:', val.PR_nozzle_real)
+    # print('Real W_HPT:', val.W_HPT_real, 'Computed W_HPT:', cycle.W_HPT)
+    # print('Real eta_mech HPT:', val.eta_mech_H_real)
+    # print('Real PR_cc:', val.PR_cc_real, 'Real eta_HPT:', val.eta_HPT_real)
+    # print('Real eta_nozzle:', val.eta_nozzle_real, 'PR nozzle real:', val.PR_nozzle_real)
 
 
