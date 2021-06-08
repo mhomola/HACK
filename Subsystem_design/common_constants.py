@@ -3,7 +3,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from math import pi
 from Subsystem_design.fuel_required import V_H2, V_k
-from Subsystem_design.Tank_Design.Main_PreliminaryTank import mass_pod, mass_center_tank
+from Subsystem_design.Tank_Design.Main_PreliminaryTank import mass_pod, mass_center_tank, volume_pod, volume_centre_tank
 
 
 
@@ -112,11 +112,9 @@ class Constants():
 
         """Fuel constant A320-HACK"""
 
-        self.V_H2 = V_H2                                            # Volume required of hydrogen                  [m^3]
-        self.V_k = V_k
-        self.V_H2_usable = V_H2 * 0.965                             # Volume required of kerosene                  [m^3]
-        # self.V_H2_centre = 5.68952 * 2                             # Volume in the centre of the fuselage        [m^3]
-        # self.V_H2_aft = 26.44275                                   # Volume in
+        self.V_H2 = V_H2/1000 * 0.885                                 # Volume required of hydrogen                [m^3]
+        self.V_k = V_k/1000                                           # Volume required of kerosene                [m^3]
+
         self.W1_Wto = 0.990
         self.W2_W1 = 0.990
         self.W3_W2 = 0.995
@@ -134,7 +132,11 @@ class Constants():
         """Tank design constants""" # Plsss automate these, for design changes
         self.center_tank_mass = mass_center_tank              # Mass of each center tank (we have 2 tanks)       [kg]
         self.pod_tank_mass = mass_pod                         # Mass of each pod tank (we have 2 tank)           [kg]
-        self.x_cg_pod = 0.26
+        self.V_centre_tank = volume_centre_tank               # Volume of each centre tank                       [m^3]
+        self.V_centre_pod = volume_pod                        # Volume of each wing pod                          [m^3]
+        self.V_H2_centre = volume_centre_tank * 0.885         # Volume of H2 in each centre tank                 [m^3]
+        self.V_H2_pod = volume_pod * 0.885                    # Volume of H2 in each wing pod                    [m^3]
+        self.x_cg_pod = 0.26                                  # MAC
         self.x_cg_centertank = 1.1
         self.y_cg_pod = 0.55*self.b/2                         # Y location of the pods on the wing                   [m]
 
@@ -154,8 +156,8 @@ class Constants():
         self.Max_fuel_mass_capacity_320neo = self.fuel_capacity_320neo * self.k_d #Maximum kerosene mass of A320neo [kg]
         self.x_cg_320neo_zf = 0.29
         self.x_cg_320neo_mtow = 0.275
-        self.x_cg_hack = self.x_cg_320neo_zf * self.MZFW_320neo + \
-                        (self.x_cg_320neo_mtow -self.x_cg_320neo_zf)*self.Max_fuel_mass_capacity_320neo
+        # self.x_cg_hack = self.x_cg_320neo_zf * self.MZFW_320neo + \
+        #                 (self.x_cg_320neo_mtow -self.x_cg_320neo_zf)*self.Max_fuel_mass_capacity_320neo
 
         """Weights of A321neo"""
         self.MTOW_321neo = 89000                                    # Maximum Take-Off weight of A321neo            [kg]
@@ -224,21 +226,21 @@ class Constants():
         self.eta_HPT = 0.91898 #(given) BEFORE: 1 # 1.072044268921447 (computed)
         self.eta_mech_H =  0.644335665181638
         self.eta_mech_L = 1
-        self.eta_cc = 0.995 # that of Leap-1B
+        self.eta_cc = 0.995                          # that of Leap-1B
         self.PR_LPC = 2.69419
         self.PR_HPC = 9.73784
-        self.eta_nozzle = 1 # 1.0737340755627587 (computed) # previous assumption: 0.98
+        self.eta_nozzle = 1                          # 1.0737340755627587 (computed) # previous assumption: 0.98
         self.PR_cc = 0.9395309126896629
         self.T04 = 1459.30433 # [K]
 
-        self.mr_h2 = np.array([ 0, 0, 0, 0, 0, 0, 0  ])
+        self.mr_h2 = np.array([0, 0, 0, 0, 0, 0, 0])
         self.mr_ker = 1 - self.mr_h2
         self.ER_h2 = np.array([0, 0, 0, 0, 0, 0, 0])
         self.ER_ker = 1 - self.mr_h2
         self.LHV_f = np.array([self.LHV_ker]*7) # [MJ/kg]
 
-        self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_neo.dat'))                                   # percentage of core air that is used in combustion
-        self.mf_bleed = 0.667 # [kg/s]
+        self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_neo.dat')) # percentage of core air that is used in combustion
+        self.mf_bleed = 0.667                                                                                   # [kg/s]
 
     def engine_data_hack(self):
         self.eta_inlet = 0.9208608681597723
@@ -249,17 +251,17 @@ class Constants():
         self.eta_HPC = 0.91449
         self.eta_LPT = 0.9405
         self.eta_HPT = 1
-        self.eta_mech_H =  0.7465403131365893
+        self.eta_mech_H = 0.7465403131365893
         self.eta_mech_L = 1
         self.eta_cc = 0.995
         self.PR_LPC = 2.69419
         self.PR_HPC = 9.73784
         self.eta_nozzle = 1
         self.PR_cc = 0.9395309126896629
-        self.T04 = 1459.30433 # [K]
+        self.T04 = 1459.30433                                               # [K]
 
         # Fuel properties
-        self.mr_h2 = np.array([ 1, 1, 0.1376, 0.1376, 0.1376, 0.1376, 1  ])
+        self.mr_h2 = np.array([1, 1, 0.1376, 0.1376, 0.1376, 0.1376, 1])
         self.mr_ker = 1 - self.mr_h2
 
         self.ER_h2 = ( self.mr_h2*self.LHV_h2 ) / (  self.mr_h2*self.LHV_h2 + self.mr_ker*self.LHV_ker)
@@ -432,4 +434,4 @@ if __name__ == '__main__':
           '\n rho = ', c.rho, ' kg/m^3')
 
 
-    print(c.pod_tank_mass)
+
