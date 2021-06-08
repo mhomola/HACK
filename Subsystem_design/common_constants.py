@@ -188,13 +188,13 @@ class Constants():
         self.k_air = 1.4                                            # Ration of specific heat for air
         self.k_gas = 1.33                                           # Ration of specific heat for air
 
-        # self.N2_cp_data = np.array(np.genfromtxt('N2_cp.dat'))      # cp vs. T data for N2          T[K]; cp[kJ/(kg*K)]
+        self.N2_cp_data = np.array(np.genfromtxt('Engine\\N2_cp.dat'))      # cp vs. T data for N2          T[K]; cp[kJ/(kg*K)]
         self.molarmass_N2 = 28.01340                                # Molar mass of N2                          [g/mol]
 
-        # self.h2_cp_data = np.array(np.genfromtxt('h2_cp.dat'))      # cp vs. T data for h2          T[K]; cp[kJ/(kg*K)]
+        self.h2_cp_data = np.array(np.genfromtxt('Engine\\H2_cp.dat'))      # cp vs. T data for h2          T[K]; cp[kJ/(kg*K)]
         self.molarmass_h2 = 2.01588                                 # Molar mass of h2                          [g/mol]
 
-        # self.C12H26_cp_data = np.array(np.genfromtxt('C12H26_cp.dat'))  # cp vs. T data for dodecane                T[K]; cp[J/(mol*K)]
+        self.C12H26_cp_data = np.array(np.genfromtxt('Engine\\C12H26_cp.dat'))  # cp vs. T data for dodecane                T[K]; cp[J/(mol*K)]
         self.h0_C12H26 = -290.90                                        # Zero enthalpy of dodecane                 [kJ/mol]         # https://www.chemeo.com/cid/34-125-5/n-Dodecane
         self.molarmass_C12H26 = 170.3348                                # Molar mass of dodecane                    [g/mol]
 
@@ -247,25 +247,26 @@ class Constants():
             self.PR_noz_core = 1.014772 # Between stations 5 and 7
             self.PR_cr_noz_core = 1.653828 # computed
             self.PR_noz_fan = 0.98744 # Between stations 21 and 16
+
         elif phase == 'takeoff':
             self.eta_inlet = 0.9208608681597723 # calculated
-            self.PR_fan = 1.4206
-            self.eta_fan = 0.90445
-            self.BPR = 11.24426
-            self.eta_LPC = 0.90019
-            self.eta_HPC = 0.95469 # calculated # 0.91449 given
-            self.PR_LPC = 2.69419
-            self.PR_HPC = 9.73784
+            self.PR_fan = 1.4
+            self.eta_fan = 0.93
+            self.BPR = 11.1
+            self.eta_LPC = 0.92
+            self.eta_HPC = 0.92 # calculated # 0.91449 given
+            self.PR_LPC = 2
+            self.PR_HPC = 11.93
             # self.eta_mech_H =  0.644335665181638
             # self.eta_mech_L = 1
             self.eta_mech = 0.9 # not used
             self.eta_cc = 0.995 # that of Leap-1B, assumed
             self.PR_cc = 0.9395309126896629
-            self.T04 = 1459.30433 # [K]
-            self.eta_LPT = 0.9405
-            self.eta_HPT = 0.9328 # computed # 0.91898 #(given)
-            self.PR_LPT = 7.9204
-            self.PR_HPT = 3.81933
+            self.T04 = 1630.39416 # [K]
+            self.eta_LPT = 0.94
+            self.eta_HPT = 0.94 # computed # 0.91898 #(given)
+            self.PR_LPT = 6.36219
+            self.PR_HPT = 3.82808
             self.eta_nozzle = 0.981797 # 1.0737340755627587 (computed) # previous assumption: 0.98
             self.PR_noz_core = 1.014772 # Between stations 5 and 7
             self.PR_cr_noz_core = 1.653828 # computed
