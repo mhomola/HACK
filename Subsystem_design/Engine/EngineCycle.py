@@ -20,13 +20,7 @@ Created on Wed Jun  2 09:39:04 2021
 
 from Subsystem_design.common_constants import Constants
 import numpy as np
-import pandas as pd
 
-import matlab.engine
-eng = matlab.engine.start_matlab()
-
-ret = eng.triarea(1.0,5.0)
-print(ret)
 
 class Engine_Cycle(Constants):
     def __init__(self):
@@ -35,13 +29,11 @@ class Engine_Cycle(Constants):
     def data(self, aircraft):
         if aircraft == 'neo':
             self.engine_data_neo()
-            print("Efficiency cc: ",self.eta_cc)
         elif aircraft == 'hack':
             self.engine_data_hack()
 
     def cycle_analysis(self, aircraft, i): # i = phase
         self.data(aircraft)
-        print( 'Bleed: ', self.mf_bleed )
 
         self.mf_air_init = self.rho0 * self.A_fan * self.v0
         self.mf_air_init[0] = 298 # [kg/s]
