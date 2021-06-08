@@ -103,6 +103,8 @@ class Constants():
         self.X_root_htail = 31.60                                   # Distance from nose to root of horizontal tail [m]
         self.D_fan = 78 * 0.0254                                    # Fan diameter, 78 [in]                         [m]
         self.A_fan = np.pi * self.D_fan**2 / 4                      # Area of the fan                               [m2]
+        self.D_fan_eff = 1.787                                      # Effective fan diameter for air ingestion      [m]
+        self.A_fan_eff = np.pi * self.D_fan_eff**2 / 4              # Area of the fan                               [m2]
         self.D_h = 2.3                                              # Diameter of cowling inlet                     [m]
         self.D_n = 2.5                                              # Diameter of the cowling                       [m]
         self.D_e = 2.2                                              # Diameter of the cowling exit                  [m]
@@ -176,15 +178,15 @@ class Constants():
         self.cp_air = 1000                                          # Specific heat constant air                    [J/kg/K]
         self.cp_gas = 1150                                          # Specific heat constant gas                    [J/kg/K]
         self.k_air = 1.4                                            # Ration of specific heat for air
-        self.k_gas = 1.3379776344421168                             # Ration of specific heat for air
+        self.k_gas = 1.33                                           # Ration of specific heat for air
 
-        # self.N2_cp_data = np.array(np.genfromtxt('N2_cp.dat'))      # cp vs. T data for N2          T[K]; cp[kJ/(kg*K)]
+        self.N2_cp_data = np.array(np.genfromtxt('N2_cp.dat'))      # cp vs. T data for N2          T[K]; cp[kJ/(kg*K)]
         self.molarmass_N2 = 28.01340                                # Molar mass of N2                          [g/mol]
 
-        # self.h2_cp_data = np.array(np.genfromtxt('h2_cp.dat'))      # cp vs. T data for h2          T[K]; cp[kJ/(kg*K)]
+        self.h2_cp_data = np.array(np.genfromtxt('h2_cp.dat'))      # cp vs. T data for h2          T[K]; cp[kJ/(kg*K)]
         self.molarmass_h2 = 2.01588                                 # Molar mass of h2                          [g/mol]
 
-        # self.C12H26_cp_data = np.array(np.genfromtxt('C12H26_cp.dat'))  # cp vs. T data for dodecane                T[K]; cp[J/(mol*K)]
+        self.C12H26_cp_data = np.array(np.genfromtxt('C12H26_cp.dat'))  # cp vs. T data for dodecane                T[K]; cp[J/(mol*K)]
         self.h0_C12H26 = -290.90                                        # Zero enthalpy of dodecane                 [kJ/mol]         # https://www.chemeo.com/cid/34-125-5/n-Dodecane
         self.molarmass_C12H26 = 170.3348                                # Molar mass of dodecane                    [g/mol]
 
@@ -213,23 +215,53 @@ class Constants():
             c = (self.c_tip - self.c_kink_out) / (0.5 * self.b_out) * (x - 0.5 * self.b_in) + self.c_kink_out
         return c
 
-    def engine_data_neo(self):
-        self.eta_inlet = 0.9208608681597723
-        self.PR_fan = 1.4206
-        self.eta_fan = 0.90445
-        self.BR = 11.24426
-        self.eta_LPC = 0.90019
-        self.eta_HPC = 0.91449
-        self.eta_LPT = 0.9405
-        self.eta_HPT = 0.91898 #(given) BEFORE: 1 # 1.072044268921447 (computed)
-        self.eta_mech_H =  0.644335665181638
-        self.eta_mech_L = 1
-        self.eta_cc = 0.995 # that of Leap-1B
-        self.PR_LPC = 2.69419
-        self.PR_HPC = 9.73784
-        self.eta_nozzle = 1 # 1.0737340755627587 (computed) # previous assumption: 0.98
-        self.PR_cc = 0.9395309126896629
-        self.T04 = 1459.30433 # [K]
+    def engine_data_neo(self, phase):
+        if phase == 'cruise':
+            self.eta_inlet = 0.9208608681597723 # calculated
+            self.PR_fan = 1.4206
+            self.eta_fan = 0.90445
+            self.BPR = 11.24426
+            self.eta_LPC = 0.90019
+            self.eta_HPC = 0.95469 # calculated # 0.91449 given
+            self.PR_LPC = 2.69419
+            self.PR_HPC = 9.73784
+            # self.eta_mech_H =  0.644335665181638
+            # self.eta_mech_L = 1
+            self.eta_mech = 0.9 # not used
+            self.eta_cc = 0.995 # that of Leap-1B, assumed
+            self.PR_cc = 0.9395309126896629
+            self.T04 = 1459.30433 # [K]
+            self.eta_LPT = 0.9405
+            self.eta_HPT = 0.9328 # computed # 0.91898 #(given)
+            self.PR_LPT = 7.9204
+            self.PR_HPT = 3.81933
+            self.eta_nozzle = 0.981797 # 1.0737340755627587 (computed) # previous assumption: 0.98
+            self.PR_noz_core = 1.014772 # Between stations 5 and 7
+            self.PR_cr_noz_core = 1.653828 # computed
+            self.PR_noz_fan = 0.98744 # Between stations 21 and 16
+        elif phase == 'takeoff':
+            self.eta_inlet = 0.9208608681597723 # calculated
+            self.PR_fan = 1.4206
+            self.eta_fan = 0.90445
+            self.BPR = 11.24426
+            self.eta_LPC = 0.90019
+            self.eta_HPC = 0.95469 # calculated # 0.91449 given
+            self.PR_LPC = 2.69419
+            self.PR_HPC = 9.73784
+            # self.eta_mech_H =  0.644335665181638
+            # self.eta_mech_L = 1
+            self.eta_mech = 0.9 # not used
+            self.eta_cc = 0.995 # that of Leap-1B, assumed
+            self.PR_cc = 0.9395309126896629
+            self.T04 = 1459.30433 # [K]
+            self.eta_LPT = 0.9405
+            self.eta_HPT = 0.9328 # computed # 0.91898 #(given)
+            self.PR_LPT = 7.9204
+            self.PR_HPT = 3.81933
+            self.eta_nozzle = 0.981797 # 1.0737340755627587 (computed) # previous assumption: 0.98
+            self.PR_noz_core = 1.014772 # Between stations 5 and 7
+            self.PR_cr_noz_core = 1.653828 # computed
+            self.PR_noz_fan = 0.98744 # Between stations 21 and 16
 
         self.mr_h2 = np.array([ 0, 0, 0, 0, 0, 0, 0  ])
         self.mr_ker = 1 - self.mr_h2
@@ -238,13 +270,13 @@ class Constants():
         self.LHV_f = np.array([self.LHV_ker]*7) # [MJ/kg]
 
         self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_neo.dat'))                                   # percentage of core air that is used in combustion
-        self.mf_bleed = 0.667 # [kg/s]
+        self.mf_bleed = 0 # [kg/s]
 
     def engine_data_hack(self):
         self.eta_inlet = 0.9208608681597723
         self.PR_fan = 1.4206
         self.eta_fan = 0.90445
-        self.BR = 11.24426
+        self.BPR = 11.24426
         self.eta_LPC = 0.90019
         self.eta_HPC = 0.91449
         self.eta_LPT = 0.9405
