@@ -46,7 +46,7 @@ def kerosene_calc():
     cr = 3.4            #play with this until you obtain volume from Airport manual
     taper = 0.240       #wing taper ratio elsevier
 
-    spanwise = np.arange(0,l,dy)
+    spanwise = np.arange(0, l, dy)
 
     rho = 810   #[kg/m^3] density of kerosene
     weight = [] #list for storing spanwise weight
