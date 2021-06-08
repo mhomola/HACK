@@ -140,6 +140,8 @@ class Constants():
 
         """Weights of HACK"""
         self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                       [kg]
+        self.MTOW_320hack = 73500
+        self.MRW_320neo = 73900
 
         """Weights of A320neo"""
         self.MTOW_320neo = 73500                                    # Maximum Take-Off weight of A320neo            [kg]
