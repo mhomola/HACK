@@ -7,6 +7,7 @@ def pylon():
     # Material: AL-2090-T81
     shear_strength = 320 * 10**6    # [Pa]
     tensile_strength = 520 * 10**6  # [Pa]
+    density_al_2090 = 2590          # [kg/m^3]
 
     # Max Loads:
     density_h2 = 71.1
@@ -17,7 +18,7 @@ def pylon():
 
     # Dimensions:
     l_pylon = 3.4                # pylon length [m]
-    h_pylon = 0.38               # pylon height [m]
+    h_pylon = c.pylon_height     # pylon height [m]
     w_pylon = 0.2                # dummy width [m]
 
     """
@@ -62,12 +63,13 @@ def pylon():
     t3 = t3 - 0.000001  # [m]
 
     t_list = [t1, t2, t3]
-    t_pylon = np.max(t_list)
+    t_pylon = np.max(t_list)     # all computed thicknesses
+    mass_pylon = l_pylon * (h_pylon * w_pylon - (h_pylon - 2 * t_pylon) * (w_pylon - 2 * t_pylon)) * density_al_2090
 
-    return t_pylon, l_pylon, h_pylon, w_pylon
+    return t_pylon, l_pylon, h_pylon, w_pylon, mass_pylon
 
 
-t_pylon, l_pylon, h_pylon, w_pylon = pylon()
+t_pylon, l_pylon, h_pylon, w_pylon, mass_pylon = pylon()
 
 if __name__ == '__main__':
     print(" ----- PYLON ----- ")
@@ -75,6 +77,8 @@ if __name__ == '__main__':
     print("Pylon length: ", l_pylon, " [m]")
     print("Pylon height: ", h_pylon, " [m]")
     print("Pylon width: ", w_pylon, " [m]")
+    print("Pylon mass: ", mass_pylon, " [kg]")
+
 
 
 
