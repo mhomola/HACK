@@ -2,10 +2,11 @@ from Subsystem_design.common_constants import Constants
 from Subsystem_design.Performance.flight_envelope import FlightEnvelope
 from Subsystem_design.aerodynamic_subsys import AerodynamicCharacteristics
 import matplotlib.pyplot as plt
+from matplotlib.gridspec import GridSpec
 import numpy as np
 import scipy.integrate as spint
-import pandas as pd
 from Subsystem_design.Wing.Kerosene_distirbution import kerosene_calc
+from Subsystem_design.Tank_Design.Main_PreliminaryTank import d_wing_pod
 
 class Loads_w(Constants):
 
@@ -18,6 +19,7 @@ class Loads_w(Constants):
         self.T_arm = 1.5  # Torque arm of the engine thrust and drag
         self.W_eng_arm = 3.5  # Moment arm from the weight of the engine
         self.max_T = 140000  # Max thrust [N]
+        self.W_wing_arm_c = 0.085  # Moment arm of wing weight over the local chord length
 
     def compute_loads(self):
 
@@ -219,13 +221,18 @@ class Loads_w(Constants):
              - (self.D_eng - self.max_T) * self.mc_step(dist=x-self.y_engine, i=1)
         return My
 
-    def T(self, x):
-        T = self.C_L_crit * self.q_crit * self.xL_c * (self.c_sq_int1(x=x) * self.mc_step(dist=x-0.5*self.width_f, i=0)
-                                                       - self.c_sq_int2(x=x) * self.mc_step(dist=x-self.b_in/2, i=0)
-                                                       + self.c_sq_int3(x=x) * self.mc_step(dist=x-self.b_in/2, i=0)) \
+    def T_z(self, x):
+        Tz = self.C_L_crit * self.q_crit * self.xL_c * (self.c_sq_int1(x=x) * self.mc_step(dist=x-0.5*self.width_f, i=0)
+                                                        - self.c_sq_int2(x=x) * self.mc_step(dist=x-self.b_in/2, i=0)
+                                                        + self.c_sq_int3(x=x) * self.mc_step(dist=x-self.b_in/2, i=0)) \
             + (self.max_T - self.D_eng) * self.T_arm * self.mc_step(dist=x-self.y_engine, i=0) \
             - self.W_engine * self.W_eng_arm * self.mc_step(dist=x-self.y_engine, i=0) \
-            + self.D_tank_sys * (self.
+            + self.D_tank_sys * (self.pylon_height + d_wing_pod/2 + 0.091/2 * self.chord(x=self.y_cg_pod)) * \
+            self.mc_step(dist=x-self.y_cg_pod, i=0) \
+            + self.WwS * self.W_wing_arm_c * (self.c_sq_int1(x=x) * self.mc_step(dist=x-0.5*self.width_f, i=0)
+                                              - self.c_sq_int2(x=x) * self.mc_step(dist=x-self.b_in/2, i=0)
+                                              + self.c_sq_int3(x=x) * self.mc_step(dist=x-self.b_in/2, i=0))
+        return Tz
 
     def plot_loads(self):
         x_arr = np.arange(self.width_f/2, self.b/2 + self.dx, self.dx)
@@ -233,36 +240,49 @@ class Loads_w(Constants):
         Sx_arr = np.zeros(len(x_arr))
         My_arr = np.zeros(len(x_arr))
         Mx_arr = np.zeros(len(x_arr))
+        Tz_arr = np.zeros(len(x_arr))
 
         for i, x in enumerate(x_arr):
             Sy_arr[i] = self.S_y(x=x)
             Sx_arr[i] = self.S_x(x=x)
             My_arr[i] = self.M_y(x=x)
             Mx_arr[i] = self.M_x(x=x)
+            Tz_arr[i] = self.T_z(x=x)
 
-        fig, ax = plt.subplots(2, 2, figsize=(15, 15))
+        fig = plt.figure(constrained_layout=True, figsize=(15, 15))
+        gs = GridSpec(3, 2, figure=fig)
 
-        ax[0, 0].plot(x_arr, Sy_arr/1000)
-        ax[0, 0].set_ylabel(r'$S_y(z)$ [$kN$]', size=15)
-        ax[0, 0].set_title(r'Shear force in $y$', size=20)
+        ax1 = fig.add_subplot(gs[0, 0])
+        ax2 = fig.add_subplot(gs[0, 1])
+        ax3 = fig.add_subplot(gs[1, 0])
+        ax4 = fig.add_subplot(gs[1, 1])
+        ax5 = fig.add_subplot(gs[2, :])
 
-        ax[0, 1].plot(x_arr, Sx_arr/1000)
-        ax[0, 1].set_ylabel(r'$S_x(z)$ [$kN$]', size=15)
-        ax[0, 1].set_title(r'Shear force in $x$', size=20)
+        ax1.plot(x_arr, Sy_arr/1000)
+        ax1.set_ylabel(r'$S_y(z)$ [$kN$]', size=15)
+        ax1.set_title(r'Shear force in $y$', size=20)
 
-        ax[1, 0].plot(x_arr, Mx_arr/1000)
-        ax[1, 0].set_ylabel(r'$M_x(z)$ [$kN/m$]', size=15)
-        ax[1, 0].set_xlabel(r'$z$ [$m$]', size=15)
-        ax[1, 0].set_title(r'Bending moment in $x$', size=20)
+        ax2.plot(x_arr, Sx_arr/1000)
+        ax2.set_ylabel(r'$S_x(z)$ [$kN$]', size=15)
+        ax2.set_title(r'Shear force in $x$', size=20)
 
-        ax[1, 1].plot(x_arr, My_arr/1000)
-        ax[1, 1].set_ylabel(r'$M_y(z)$ [$kN/m$]', size=15)
-        ax[1, 1].set_xlabel(r'$z$ [$m$]', size=15)
-        ax[1, 1].set_title(r'Bending moment in $y$', size=20)
+        ax3.plot(x_arr, Mx_arr/1000)
+        ax3.set_ylabel(r'$M_x(z)$ [$kN/m$]', size=15)
+        ax3.set_xlabel(r'$z$ [$m$]', size=15)
+        ax3.set_title(r'Bending moment around $x$', size=20)
 
-        for i in range(2):
-            for j in range(2):
-                ax[i,j].tick_params(axis='both', which='major', labelsize=10)
+        ax4.plot(x_arr, My_arr/1000)
+        ax4.set_ylabel(r'$M_y(z)$ [$kN/m$]', size=15)
+        ax4.set_xlabel(r'$z$ [$m$]', size=15)
+        ax4.set_title(r'Bending moment around $y$', size=20)
+
+        ax5.plot(x_arr, T_arr/1000)
+        ax5.set_ylabel(r'$T(z)$ [$kN/m$]', size=15)
+        ax5.set_xlabel(r'$z$ [$m$]', size=15)
+        ax5.set_title(r'Torque around $zyy$', size=20)
+
+        for i in [ax1, ax2, ax3, ax4, ax5]:
+            i.tick_params(axis='both', which='major', labelsize=12)
 
         plt.show()
 
