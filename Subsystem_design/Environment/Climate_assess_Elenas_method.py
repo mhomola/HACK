@@ -1,5 +1,3 @@
-
-from Subsystem_design.common_constants import Constants
 import scipy.integrate as integrate
 from scipy.interpolate import interp1d
 from math import exp,log,inf
@@ -11,12 +9,12 @@ import matplotlib.pyplot as plt
 class Climate_assess():
 
     def __init__(self):
-        self.H = 30                                                 # Span of years considered
+        self.H = 30                                                  # Span of years considered
         self.RF_2CO2 = 3.7                                             # Radiative forcing corresponding to   [W/m^2]
                                                                        # a doubling of the concentration
         self.t_0 = 2035
         #self.t = self.t_0 + self.H
-        self.dt = 0.01
+        self.dt = 0.1
         self.sensitivity = 3.0                                         # Sensitivity                              [K]
         self.alpha_t = 0.595
         self.tau_t1 = 8.4                                                                                          #[years]
@@ -92,14 +90,6 @@ class Climate_assess():
         self.eNOx = e_NOx
         self.esoot = e_soot
         self.esulfate = e_sulfate
-
-    # def U(self,rate_increase,time,AC_init):
-    #
-    #     U = AC_init * np.ones(len(time))
-    #     for i in np.arange(1,len(U)):
-    #         U[i] = U[i-1]*(1+rate_increase)
-    #     return U
-
     def E(self,e ,U,time):
         '''
         :param e: Emission of a certain species in [kg]
@@ -107,33 +97,18 @@ class Climate_assess():
         :return: Time-variant annual emissions rate
         '''
         sigma = np.zeros(len(time))
-        sigma[time<=self.t_0 + self.H] = 1.
-        sigma[time>self.t_0 + self.H] = 0.
-
+        sigma[time<=(self.t_0 + self.H)] = 1.
+        sigma[time>(self.t_0 + self.H)] = 0.
+        # if time <= (self.t_0 + self.H):
+        #     sigma = 1
+        # elif time > (self.t_0 + self.H):
+        #     sigma = 0
 
         E = e * U * sigma
+
         return E
 
     '''Start of functions to compute RF of CO2'''
-    def G_X_CO2(self,tau):
-        '''
-        :param t: Time until we want to check the climate impact [year]
-        :return: Impulse responses function G_XCO2
-        '''
-        alphas = np.array([self.alpha_1, self.alpha_2, self.alpha_3, self.alpha_4, self.alpha_5])
-        taus = np.array([self.tau_1, self.tau_2, self.tau_3, self.tau_4, self.tau_5])
-        G_XCO2 = 0
-
-        for i in range(len(taus)):
-            G_XCO2 += alphas[i] * np.exp(-(tau) / taus[i])
-
-
-        t_prime = np.arange(self.t_0, 2195 + self.dt, self.dt)
-        plt.plot(t_prime,G_XCO2,color = 'tab:red',label='Impulse function of CO2')
-        #plt.plot(t_prime,tau,color='tab:green',label = 'tau as a func of time')
-        plt.legend()
-        plt.show()
-        return G_XCO2
 
     def G_X_CO2_second_method(self,tau):
         alphas = np.array([self.alpha_c1, self.alpha_c2, self.alpha_c3])
@@ -148,31 +123,9 @@ class Climate_assess():
 
         return G_CO2
 
-
-    def delta_X_CO2(self,t,e,U,plot=False):
-        '''
-        :param t: Time until we want to check the climate impact [year]
-        :return: Change in atmospheric concentration of CO2
-        '''
-
-        t_prime = np.arange(self.t_0,t+self.dt,self.dt)
-
-        E = self.E(e,U,t_prime)
-
-        delt_XCO2_per_year = self.G_X_CO2(t-t_prime) * E
-
-        if plot == True:
-            plt.plot(t_prime, delta_XCO2_per_year,color = 'tab:red',label='Change in atmospheric CO2 concentration')
-            plt.legend()
-            plt.show()
-
-        #print('$delta_{XCO2} with quad rule:',delta_XCO2_1)
-        #delta_XCO2 = integrate.simps(self.G_X_CO2(t - t_prime) * self.E(e, U, t_prime), t_prime)
-
-        return delt_XCO2_per_year
-
     '''Start of functions to compute RF of NOx (CH4, O3L and O3S)'''
-    def s(self,compound):
+
+    def s(self, compound):
         '''
         :param compound:Name of the species we want the RF of.
                         Can be CO2, CH4,O3L,O3S,soot,sulfate,H2O and contrails
@@ -180,41 +133,43 @@ class Climate_assess():
         to take into account the change in RF of NOx with altitude
         '''
         if compound == 'CH4':
-            forcing_fact = np.array([0.864,0.865,0.920777,0.9592,0.9624,0.945,0.9448,0.9346,0.938,0.9132,
-                                 0.9205,0.9345,0.9728,1.0433,1.1278,1.187,1.2034,1.1885,1.179])
+            forcing_fact = np.array([0.864, 0.865, 0.920777, 0.9592, 0.9624, 0.945, 0.9448, 0.9346, 0.938, 0.9132,
+                                     0.9205, 0.9345, 0.9728, 1.0433, 1.1278, 1.187, 1.2034, 1.1885, 1.179])
 
-            altitude = 0.3048 * np.array([0.0,17582.52,19617.886,21263.886,23302.9859,24712.7742,25293.3739,
-                             26420.091,27505.983,28509.118,29562.49,31242.0659,33433.873,
-                             34645.2834,35564.9354,36792.6272,37579.1538,39084.3820,41220.932])
-            s = interp1d(altitude,forcing_fact,kind='cubic')
+            altitude = 0.3048 * np.array([0.0, 17582.52, 19617.886, 21263.886, 23302.9859, 24712.7742, 25293.3739,
+                                          26420.091, 27505.983, 28509.118, 29562.49, 31242.0659, 33433.873,
+                                          34645.2834, 35564.9354, 36792.6272, 37579.1538, 39084.3820, 41220.932])
+            s = interp1d(altitude, forcing_fact, kind='cubic')
         if compound == 'O3S':
-            forcing_fact = np.array([0.475,0.476,0.545,0.5764,0.6149,0.666,0.7119,0.7029,
-                                     0.7104,0.7681,0.8217,0.8794,0.9579,0.9979,1.060,
-                                     1.1311,1.222,1.314,1.4057,1.497,1.59,1.671,1.7542,1.8288,1.899])
+            forcing_fact = np.array([0.475, 0.476, 0.545, 0.5764, 0.6149, 0.666, 0.7119, 0.7029,
+                                     0.7104, 0.7681, 0.8217, 0.8794, 0.9579, 0.9979, 1.060,
+                                     1.1311, 1.222, 1.314, 1.4057, 1.497, 1.59, 1.671, 1.7542, 1.8288, 1.899])
 
-            altitude = 0.3048 * np.array([0.0,17734.057,19270.4087,20162.2675,21487.656,22736.4962,
-                                 23452.5,24338.567,25615.992,26827.0408,27833.806,28856.331,30201.358,31624.234,
-                                 32571.11,33550.85,34199.759,34816.349,35466.1077,36338.689,37290.789,38163.418,
-                                 39184.116,40136.381,41251.765])
+            altitude = 0.3048 * np.array([0.0, 17734.057, 19270.4087, 20162.2675, 21487.656, 22736.4962,
+                                          23452.5, 24338.567, 25615.992, 26827.0408, 27833.806, 28856.331, 30201.358,
+                                          31624.234,
+                                          32571.11, 33550.85, 34199.759, 34816.349, 35466.1077, 36338.689, 37290.789,
+                                          38163.418,
+                                          39184.116, 40136.381, 41251.765])
             s = interp1d(altitude, forcing_fact, kind='cubic')
 
         if compound == 'contrails':
-            forcing_fact = np.array([0.0243,0.0244,-0.0071,0.0108,0.0978,0.184,0.2763,0.3677,0.459,0.551,0.642,
-                                     0.734,0.826,0.9176,1.007,1.101,1.192,1.28,1.37,1.467,1.559,1.651,1.742,1.83,
-                                     1.926,2.016,2.088,1.983,1.89,1.798,1.706,1.613,1.521,1.429,
-                                     1.336,1.24,1.1524,1.060,0.968,0.8837,0.799])
+            forcing_fact = np.array(
+                [0.0243, 0.0244, -0.0071, 0.0108, 0.0978, 0.184, 0.2763, 0.3677, 0.459, 0.551, 0.642,
+                 0.734, 0.826, 0.9176, 1.007, 1.101, 1.192, 1.28, 1.37, 1.467, 1.559, 1.651, 1.742, 1.83,
+                 1.926, 2.016, 2.088, 1.983, 1.89, 1.798, 1.706, 1.613, 1.521, 1.429,
+                 1.336, 1.24, 1.1524, 1.060, 0.968, 0.8837, 0.799])
 
-            altitude = 0.3048 * np.array([0.0,17688.384,19554.874,21704.664,22710.769,23702.416,24512.913,
-                                 25320.0093,25860.9077,26328.665,26787.919,27251.425,27655.397,
-                                 28080.632,28490.7,28880.073,29297.654,29679.514,30083.487,
-                                 30491.712,30891.433,31311.565,31712.136,32192.651,32651.904,
-                                 33214.7455,33467.646,34199.192,34901.396,35557.107,
-                                 36189.857,36823.456,37445.149,37810.001,38128.927,38452.105,
-                                 38779.536,39106.966,39410.290,40242.343,41221.233])
-            s = interp1d(altitude,forcing_fact,kind='cubic')
+            altitude = 0.3048 * np.array([0.0, 17688.384, 19554.874, 21704.664, 22710.769, 23702.416, 24512.913,
+                                          25320.0093, 25860.9077, 26328.665, 26787.919, 27251.425, 27655.397,
+                                          28080.632, 28490.7, 28880.073, 29297.654, 29679.514, 30083.487,
+                                          30491.712, 30891.433, 31311.565, 31712.136, 32192.651, 32651.904,
+                                          33214.7455, 33467.646, 34199.192, 34901.396, 35557.107,
+                                          36189.857, 36823.456, 37445.149, 37810.001, 38128.927, 38452.105,
+                                          38779.536, 39106.966, 39410.290, 40242.343, 41221.233])
+            s = interp1d(altitude, forcing_fact, kind='cubic')
 
         return s
-
     def G_NOx(self,tau,compound):
         '''
         :param t: Time until we want to check the climate impact [year]
@@ -228,7 +183,6 @@ class Climate_assess():
             GNOx = self.A_O3_L * np.exp(-(tau) / self.tau_n)
         return GNOx
 
-
     def RF_(self,t,h,e,U,compound):
         '''
         :param t: Time until we want to check the climate impact [year]
@@ -239,11 +193,27 @@ class Climate_assess():
                          Can be CO2, CH4,O3L,O3S,soot,sulfate,H2O and contrails
         :return: Radiative forcing  [W/m^2]
         '''
-        t_prime = np.arange(self.t_0, t + self.dt, self.dt)
+        t_prime = np.arange(self.t_0, t + 1,1)
+        E = self.E(e,U,t_prime)
 
         if compound == 'CO2':
             #RF = ((1 / log(2)) * np.log((self.X_CO2_0 + self.delta_X_CO2(t,e,U)) / self.X_CO2_0))
-            RF = self.G_X_CO2_second_method(t-t_prime) * self.E(e,U,t_prime)
+            RF = []
+            delta_T = []
+            tprime_a = self.t_0
+            tprime_b = self.t_0 + 1
+            for anual_E in E:
+                tprime = np.arange(tprime_a,tprime_b +self.dt, self.dt)
+                RF_CO2 = self.G_X_CO2_second_method(t - tprime)
+                RF_CO2_conv = anual_E * integrate.simps(RF_CO2, tprime)
+                delta_T_CO2 = self.G_T(t-tprime) * RF_CO2_conv
+                delta_T_CO2_conv = integrate.simps(delta_T_CO2)
+                RF.append(RF_CO2_conv)
+                delta_T.append(delta_T_CO2_conv)
+                tprime_a +=1
+                tprime_b +=1
+            RF = np.array(RF)
+            delta_T = np.array(delta_T)
             print('The RF of CO2 is:',RF,len(RF))
             plt.plot(t_prime,RF,label='Radiative forcing of'+str(compound))
             plt.legend()
@@ -251,7 +221,23 @@ class Climate_assess():
         if compound == 'CH4':
             s_CH4 = self.s(compound='CH4')
             #RF = s_CH4(h) * integrate.simps(self.G_NOx(t-t_prime,compound)*self.E(e,U,t_prime),t_prime)*np.ones(len(t_prime))
-            RF = s_CH4(h) * self.G_NOx(t-t_prime,compound) * self.E(e,U,t_prime)
+            #RF = s_CH4(h) * self.G_NOx(t-t_prime,compound) * self.E(e,U,t_prime)
+            RF = []
+            delta_T = []
+            tprime_a = self.t_0
+            tprime_b = self.t_0 + 1
+            for anual_E in E:
+                tprime = np.arange(tprime_a,tprime_b +self.dt, self.dt)
+                RF_CH4 = self.G_NOx(t-tprime,compound)
+                RF_CH4_conv = s_CH4(h) * anual_E * integrate.simps(RF_CH4, tprime)
+                delta_T_CH4 = self.G_T(t - tprime) * RF_CH4_conv
+                delta_T_CH4_conv = integrate.simps(delta_T_CH4)
+                RF.append(RF_CH4_conv)
+                delta_T.append(delta_T_CH4_conv)
+                tprime_a +=1
+                tprime_b +=1
+            RF = np.array(RF)
+            delta_T = np.array(delta_T)
             print('The RF of O3-CH4 is:',RF)
             plt.plot(t_prime, RF, label='Radiative forcing of' + str(compound))
             plt.legend()
@@ -259,7 +245,23 @@ class Climate_assess():
         if compound == 'O3L':
             s_O3L = self.s(compound='CH4')
             #RF = s_O3L(h) * integrate.simps(self.G_NOx(t - t_prime, compound) * self.E(e, U,t_prime), t_prime)*np.ones(len(t_prime))
-            RF = s_O3L(h) * self.G_NOx(t - t_prime, compound) * self.E(e, U, t_prime)
+            #RF = s_O3L(h) * self.G_NOx(t - t_prime, compound) * self.E(e, U, t_prime)
+            RF = []
+            delta_T = []
+            tprime_a = self.t_0
+            tprime_b = self.t_0 + 1
+            for anual_E in E:
+                tprime = np.arange(tprime_a,tprime_b +self.dt, self.dt)
+                RF_O3L = self.G_NOx(t-tprime,compound)
+                RF_O3L_conv = s_O3L(h) * anual_E * integrate.simps(RF_O3L, tprime)
+                delta_T_O3L = self.G_T(t - tprime) * RF_O3L_conv
+                delta_T_O3L_conv = integrate.simps(delta_T_O3L)
+                RF.append(RF_O3L_conv)
+                delta_T.append(delta_T_O3L_conv)
+                tprime_a +=1
+                tprime_b +=1
+            RF = np.array(RF)
+            delta_T = np.array(delta_T)
             print('The RF of O3L is:',RF)
             plt.plot(t_prime, RF, label='Radiative forcing of' + str(compound))
             plt.legend()
@@ -267,24 +269,68 @@ class Climate_assess():
         if compound == 'O3S':
             s_O3S = self.s(compound='O3S')
             RF = s_O3S(h) * self.RF_E_ref_NOx * self.E(e,U,t_prime)
+            delta_T = []
+            tprime_a = self.t_0
+            tprime_b = self.t_0 + 1
+            for i in RF:
+                tprime = np.arange(tprime_a, tprime_b + self.dt, self.dt)
+                delta_T_O3S = self.G_T(t - tprime) * i
+                delta_T_O3S_conv = integrate.simps(delta_T_O3S)
+                delta_T.append(delta_T_O3S_conv)
+                tprime_a += 1
+                tprime_b += 1
+            delta_T = np.array(delta_T)
             print('The RF of O3s is:',RF)
             plt.plot(t_prime, RF, label='Radiative forcing of' + str(compound))
             plt.legend()
             plt.show()
         if compound == 'H2O':
             RF = self.RF_E_ref_H2O * self.E(e,U,t_prime)
+            delta_T = []
+            tprime_a = self.t_0
+            tprime_b = self.t_0 + 1
+            for i in RF:
+                tprime = np.arange(tprime_a, tprime_b + self.dt, self.dt)
+                delta_T_H2O = self.G_T(t - tprime) * i
+                delta_T_H2O_conv = integrate.simps(delta_T_H2O)
+                delta_T.append(delta_T_H2O_conv)
+                tprime_a += 1
+                tprime_b += 1
+            delta_T = np.array(delta_T)
             print('The RF of H2O is:',RF)
             plt.plot(t_prime, RF, label='Radiative forcing of' + str(compound))
             plt.legend()
             plt.show()
         if compound == 'soot':
             RF = self.RF_E_ref_soot * self.E(e,U,t_prime)
+            delta_T = []
+            tprime_a = self.t_0
+            tprime_b = self.t_0 + 1
+            for i in RF:
+                tprime = np.arange(tprime_a, tprime_b + self.dt, self.dt)
+                delta_T_soot = self.G_T(t - tprime) * i
+                delta_T_soot_conv = integrate.simps(delta_T_soot)
+                delta_T.append(delta_T_soot_conv)
+                tprime_a += 1
+                tprime_b += 1
+            delta_T = np.array(delta_T)
             print('The RF of soot is:', RF)
             plt.plot(t_prime, RF, label='Radiative forcing of' + str(compound))
             plt.legend()
             plt.show()
         if compound == 'sulfate':
             RF = self.RF_E_ref_SO4 * self.E(e,U,t_prime)
+            delta_T = []
+            tprime_a = self.t_0
+            tprime_b = self.t_0 + 1
+            for i in RF:
+                tprime = np.arange(tprime_a, tprime_b + self.dt, self.dt)
+                delta_T_SO4 = self.G_T(t - tprime) * i
+                delta_T_SO4_conv = integrate.simps(delta_T_SO4)
+                delta_T.append(delta_T_SO4_conv)
+                tprime_a += 1
+                tprime_b += 1
+            delta_T = np.array(delta_T)
             print('The RF of SO4 is:', RF)
             plt.plot(t_prime, RF, label='Radiative forcing of' + str(compound))
             plt.legend()
@@ -293,16 +339,16 @@ class Climate_assess():
             #s_contrails = self.s(compound='contrails')
             #RF = s_contrails(h) * self.RF_L_ref_AIC * L
 
-        return RF
+        return RF,delta_T
 
     def G_T (self,tau):
 
-        GT = (2.246/36.8) * np.exp(-(tau)/36.8)
+        #GT = (2.246/36.8) * np.exp(-(tau)/36.8)
         G_T = self.sensitivity * ((self.alpha_t/self.tau_t1) * np.exp(-tau/self.tau_t1) + ((1-self.alpha_t)/self.tau_t2)*np.exp(-tau/self.tau_t2))
-        plt.plot(tau,GT,label='With first formula')
-        plt.plot(tau,G_T,label= 'With second formula')
-        plt.legend()
-        plt.show()
+        # plt.plot(tau,GT,label='With first formula')
+        # plt.plot(tau,G_T,label= 'With second formula')
+        # plt.legend()
+        # plt.show()
         return G_T
 
     def RF_norm(self,t,h,e_CO2, e_H2O, e_NOx, e_soot, e_sulfate,U):
@@ -329,14 +375,15 @@ class Climate_assess():
         RFnorm_O3L = (self.RF_(t, h, self.eNOx, U, compound='O3L') * self.Eff_O3)
         #RFnorm_sulfate = self.RF(t, h, e, U, compound='sulfate') * self.Eff_SO4
         #RFnorm_contrails = self.RF(t, h, e, U, compound='contrails') * self.Eff_contrails
+
         RF_norm = np.zeros(len(RFnorm_O3S))
         for i in range(len(RFnorm_O3S)):
             RF_norm[i] = RFnorm_O3S[i] + RFnorm_H2O[i] + RFnorm_soot[i] + RFnorm_CH4[i] + RFnorm_O3L[i] + RFnorm_CO2[i]
 
 
-
         '''To check compliance with requirements'''
         RFnorm = (1/self.RF_2CO2) * RF_norm
+        t_prime = np.arange(self.t_0, t + 1, 1)
 
         return RFnorm
 
@@ -353,22 +400,37 @@ class Climate_assess():
         :param plot: If we want to plot the change in Temperature per year
         :return: Change in temperature over the span of years selected [K]
         '''
-        'To check with climate impact requirement'
-        t_prime = np.arange(self.t_0, t + self.dt, self.dt)
-        RF_norm = self.RF_norm(t,h,e_CO2, e_H2O, e_NOx, e_soot, e_sulfate,U)
 
-        delta_T = self.G_T(t-t_prime) * RF_norm
+        'To check with climate impact requirement'
+        self.emissions_level(e_CO2, e_H2O, e_NOx, e_soot, e_sulfate)
+
+        _,delta_T_O3S = self.RF_(t, h, self.eNOx, U, compound='O3S')
+        _,delta_T_H2O = self.RF_(t, h, self.eH2O, U, compound='H2O')
+        _,delta_T_soot = self.RF_(t, h, self.esoot, U, compound='soot')
+        _,delta_T_CO2 = self.RF_(t, h, self.eCO2, U, compound='CO2')
+        _,delta_T_CH4 = self.RF_(t, h, self.eNOx, U, compound='CH4')
+        _,delta_T_O3L = self.RF_(t, h, self.eNOx, U, compound='O3L')
+        delta_T_tot = (1/self.RF_2CO2)*(delta_T_CO2 + delta_T_CH4*self.Eff_CH_4 + delta_T_H2O*self.Eff_H2O + delta_T_O3L*self.Eff_O3 + delta_T_O3S*self.Eff_O3 + delta_T_soot*self.Eff_soot)
+        print(len(delta_T_tot))
+        t_prime = np.arange(self.t_0, t + 1,1)
 
         if plot == True:
-            plt.plot(t_prime,delta_T,color = 'tab:red',label= 'Change in temperature per year')
+            plt.plot(t_prime,delta_T_O3S,color = 'tab:red',label= 'O3S')
+            plt.plot(t_prime, delta_T_H2O, color='tab:orange', label='H2O')
+            plt.plot(t_prime, delta_T_soot, color='tab:blue', label='soot')
+            plt.plot(t_prime, delta_T_CO2, color='tab:green', label='CO2')
+            plt.plot(t_prime, delta_T_CH4, color='black', label='CH4')
+            plt.plot(t_prime, delta_T_O3L, color='grey', label='O3L')
+            plt.plot(t_prime, delta_T_tot, color='navy', label='Total')
+
             plt.xlabel('[years]')
             plt.ylabel('$\Delta_T$ [K]')
             plt.legend()
             plt.show()
 
-        del_T = integrate.simps(self.G_T(t-t_prime) * RF_norm, t_prime)
+        #del_T = integrate.simps(self.G_T(t-t_prime) * RF_norm, t_prime)
 
-        return del_T
+        return delta_T_tot
 
     def ATR(self,t,h,e_CO2, e_H2O, e_NOx, e_soot, e_sulfate,U,plot=False):
         '''
@@ -386,11 +448,9 @@ class Climate_assess():
         #H_array = np.arange(0.,self.H + self.dt,self.dt)
         #H_array = self.H
         #ATR = (1/self.H) * integrate.simps(self.delta_T(t,h,e_CO2, e_H2O, e_NOx, e_soot, e_sulfate,U),H_array)
-        ATR = self.delta_T(t, h, e_CO2, e_H2O, e_NOx, e_soot, e_sulfate, U,plot)/self.H
+        inte_interval = np.arange(0,self.H + 1, 1)
+        ATR = (1/self.H)*integrate.simps(self.delta_T(t, h, e_CO2, e_H2O, e_NOx, e_soot, e_sulfate, U,plot),inte_interval)
         return ATR
-
-
-
 
 if __name__ == '__main__':
     climate = Climate_assess()
@@ -400,12 +460,12 @@ if __name__ == '__main__':
     print('Start analysis for LTO')
     'To plot the change in CO2 concentration in ppmv per year'
 
-    # clim =climate.delta_X_CO2(t = 2195,e=50,U=U,plot= True)
-    # print(clim)
+    #clim =climate.delta_X_CO2(t = 2135,e=50,U=U,plot= True)
+    #print(clim)
     # tau = np.arange(climate.t_0, 2195 + climate.dt, climate.dt)
     # climate.G_T(2195- tau)
 
     e_CO2, e_SO4, e_H2O, e_soot, e_NOx = climate.emissions(13300)
-    print(e_CO2,e_SO4,e_H2O,e_soot,e_NOx)
-    ATR = climate.ATR(t=2135,h=6000,e_CO2= e_CO2, e_H2O= e_H2O, e_NOx=15000,e_soot= e_soot,e_sulfate=e_SO4,U=U,plot = True)
+    # print(e_CO2,e_SO4,e_H2O,e_soot,e_NOx)
+    ATR = climate.ATR(t=2135,h=6000,e_CO2= e_CO2, e_H2O= e_H2O, e_NOx=1000,e_soot= e_soot,e_sulfate=e_SO4,U=U,plot = True)
     print('The average temperature response, A_100, for the LTO of the HACK is:',ATR,'[K]')

@@ -1,6 +1,6 @@
 from Subsystem_design.common_constants import Constants
 from Subsystem_design.Engine.EngineCycle import Engine_Cycle
-from Subsystem_design.Engine.CoolEngine import *
+# from Subsystem_design.Engine.CoolEngine import *
 import numpy as np
 
 class Valid_Engine(Constants):
@@ -42,7 +42,10 @@ class Valid_Engine(Constants):
         self.PR_cc_real = self.p04_real/self.p03_real
 
         self.eta_HPT_real = ( 1 - self.T045_real/self.T04_real ) / ( 1 - (self.p045_real/self.p04_real) ** ((self.k_gas-1)/self.k_gas) )
-        self.eta_nozzle_real = (1 - self.T8_real/self.T05_real) / ( 1 - (self.p8_real/self.p05_real)**((self.k_gas-1)/self.k_gas) )
+        self.PR_nozzle_real = self.p05_real/self.p8_real
+        self.eta_nozzle_real = (self.k_gas-1)/(self.k_gas+1)  *  1/( 1 - (1/self.PR_nozzle_real)**((self.k_gas-1)/self.k_gas) )
+
+        # self.eta_nozzle_real = (1 - self.T8_real/self.T05_real) / ( 1 - (self.p8_real/self.p05_real)**((self.k_gas-1)/self.k_gas) )
 
 
 if __name__ == "__main__":
@@ -83,8 +86,8 @@ if __name__ == "__main__":
 
     print('\nREAL VALUES\nReal eta_inlet: ', val.eta_inlet_real)
     print('Real W_HPT:', val.W_HPT_real, 'Computed W_HPT:', cycle.W_HPT)
-    print('Real eta_mech:', val.eta_mech_H_real)
+    print('Real eta_mech HPT:', val.eta_mech_H_real)
     print('Real PR_cc:', val.PR_cc_real, 'Real eta_HPT:', val.eta_HPT_real)
-    print('Real eta_nozzle:', val.eta_nozzle_real)
+    print('Real eta_nozzle:', val.eta_nozzle_real, 'PR nozzle real:', val.PR_nozzle_real)
 
 
