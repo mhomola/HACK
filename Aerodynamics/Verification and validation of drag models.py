@@ -12,7 +12,7 @@ M = 0.7
 
 S = 122.6 # m^2
 lf = 37.57 #fuselage length in [m]
-df = 4.14  #fuselage maximum diameter in [m]
+df = 4.043884271341107  #fuselage maximum diameter in [m]
 new_df = 5 #modified maximum diameter in [m]
 l_cockpit = 5.04 #[m]
 l_cabin = 29.53 - l_cockpit # [m]
@@ -57,7 +57,7 @@ print('\n For the standard configuration: '
       '\n C_D_b using adsee wetted area = ', C_D_b)
 # 1. Elongated fuselage configuration
 
-S_wet_fus_lg = S_wet_estimation.S_wet_estimation_standard(l_cockpit=l_cockpit, l_cabin=l_cabin + 2.76, l_tail=l_tail,
+S_wet_fus_lg = S_wet_estimation.S_wet_estimation_standard(l_cockpit=l_cockpit, l_cabin=l_cabin + 3., l_tail=l_tail,
                                                           df1=df, df2=df)
 S_wet_fus_lg.calculate_volume()
 S_wet_fus_lg.S_wet()
@@ -66,7 +66,7 @@ V_cpit = S_wet_fus_lg.V_cockpit
 V_cab = S_wet_fus_lg.V_cabin
 V_tail = S_wet_fus_lg.V_tail
 S_wet_fus = S_wet_fus_lg.S_wet_fus
-S_wet_fus_2 = Trade_Aerodynamics.fus_wet_surface(l_cockpit, l_cabin + 2.76, l_tail, df)
+S_wet_fus_2 = Trade_Aerodynamics.fus_wet_surface(l_cockpit, l_cabin + 3., l_tail, df)
 
 roskam = drag_coefficient_estimation_Roskam.Roskam_drag_coefficient(visc=visc, u1=u1, air_d=air_d, l_f=lf+2.76, M=M,
                                                                     S=S)
@@ -108,8 +108,8 @@ _, _, C_D_o_fus_belly = roskam.run_Roskam_drag_coefficient_functions(l_cockpit=l
                                                                                  l_tail=l_tail, S_fus=S_fus, S_b_fus=S_b_fus,
                                                                                  S_wet_fus=S_wet_fus)
 _, _, C_D_o_fus_belly2 = roskam.run_Roskam_drag_coefficient_functions(l_cockpit=l_cockpit, l_cabin=l_cabin,
-                                                                                  l_tail=l_tail, S_fus=S_fus, S_b_fus=S_b_fus,
-                                                                                  S_wet_fus=S_wet_fus_2)
+                                                                      l_tail=l_tail, S_fus=S_fus, S_b_fus=S_b_fus,
+                                                                      S_wet_fus=S_wet_fus_2)
 
 print('\n For flat belly configuration: '
       '\n Surface are of the fuselage cross section = ', S_fus, ' m^2',
@@ -127,10 +127,10 @@ print('\n For flat belly configuration: '
 N_pods = 2
 C_D_o_pods_init = 0.025
 Interf_pods = 1.3
-L1_pods = 0.5
-L2_pods = 4.5
-L3_pods = 1
-d_pods = 2.1  # [m]
+L1_pods = 2
+L2_pods = 3
+L3_pods = 1.55
+d_pods = 3.1  # [m]
 
 S_wet_fus_pod = S_wet_estimation.S_wet_estimation_standard(l_cockpit=L1_pods, l_cabin=L2_pods, l_tail=L3_pods,
                                                            df1=d_pods, df2=d_pods)

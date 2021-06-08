@@ -16,6 +16,7 @@ FF_Climb = 1.9
 FF_Cruise = 0.5
 FF_Descent = 0.45
 FF_Arrival_Roll_Taxi = 0.145
+F_cruise = 18.8
 
 #Thrust
 T_frac_Taxi = 0.124
@@ -29,8 +30,8 @@ t_idle = 1229
 t_taxi = 26*60 #[s]
 t_taxi_out = 17.94*60
 t_taxi_in = 8.06*60
-t_climb = 20*60
-t_descend = 20*60
+t_climb = 23*60
+t_descend = 25*60
 
 V_ker = fc.fuel_capacity_a320neo
 m_ker_all = fc.fuel_capacity_a320neo*fc.k_d/1000
@@ -39,6 +40,7 @@ E_tot = m_ker_all*LHV_k
 E_h2 = (1/3)*E_tot
 
 m_h2 = (E_h2/LHV_H2)
+print(m_h2)
 
 sfc_ker = 14.4*0.9 #Altitude has to be added!!!
 sfc_h2 = sfc_ker*fc.k_ed/fc.H2_ed
@@ -81,7 +83,10 @@ print(r)
 
 
 ff_climb_h2 = fuel_flow(T_frac_Climb,sfc_h2*r)
-ff_cruise_h2 = fuel_flow(T_frac_Cruise,sfc_h2*r)
+ff_cruise_h2_OLD = fuel_flow(T_frac_Cruise,sfc_h2*r)
+ff_cruise_h2 = (r * sfc_h2 * F_cruise)/1000
+print(ff_cruise_h2_OLD)
+print(ff_cruise_h2)
 ff_desc_h2 = fuel_flow(T_frac_Descent,sfc_h2*r)
 #ff_climb = fuel_flow(T_frac_Climb,s)
 
@@ -95,7 +100,8 @@ t_cruise = h2_m_rem2/(2*ff_cruise_h2)
 #masses of kerosene
 mk_init = m_ker
 ff_climb_k = fuel_flow(T_frac_Climb,sfc_ker*(1-r))
-ff_cruise_k = fuel_flow(T_frac_Cruise,sfc_ker*(1-r))
+ff_cruise_k_OLD = fuel_flow(T_frac_Cruise,sfc_ker*(1-r))
+ff_cruise_k = ((1-r)*sfc_ker* F_cruise)/1000
 ff_desc_k = fuel_flow(T_frac_Descent,sfc_ker*(1-r))
 
 mk_climb = mk_init - 2*ff_climb_k*t_climb
@@ -117,6 +123,9 @@ print(x)
 
 print(t2,'s - ',t5)
 
+print(m_h2)
+print(h2m_idle+h2m_taxi_i+h2m_taxi_o, 'kilogram')
+
 #masses of hydrogen in the flight
 mh2_idle = m_h2 - h2m_idle
 mh2_taxi_o = mh2_idle - h2m_taxi_o
@@ -125,17 +134,37 @@ mh2_cruise = mh2_climb - h2_m_rem2
 mh2_desc = mh2_cruise - h2m_desc
 mh2_taxi_i = mh2_desc - h2m_taxi_i
 
-print(r)
 
 t = [t0,t1,t2,t3,t4,t5,t6]
 fuel_h2 = np.array([m_h2,mh2_idle, mh2_taxi_o, mh2_climb, mh2_cruise, mh2_desc, mh2_taxi_i])
 fuel_k = np.array([m_ker, mk_init, mk_init, mk_climb, mk_cruise, mk_desc, mk_desc])
 fuel_tot = fuel_h2+fuel_k
 
+Eh = 119.96*np.array([0,h2m_idle, h2m_taxi_o, h2m_climb, h2_m_rem2, h2m_desc, h2m_taxi_i])
+Ek = 43.2*np.array([0,0,0,2*ff_climb_k*t_climb,2*ff_cruise_k*t_cruise,2*ff_desc_k*t_descend,0])
+
+Em_sum = np.array([])
+Eh_sum = np.array([])
+
+for i in range(len(Eh)):
+    Em_sum = np.append(Em_sum,sum(Ek[:i+1]))
+    Eh_sum = np.append(Eh_sum,sum(Eh[:i+1]))
+    print(Eh_sum)
+
 plt.plot(t,fuel_h2,label = 'H2')
 plt.plot(t,fuel_k,label = 'Kerosene')
 plt.plot(t,fuel_tot,label = 'Total')
 plt.ylabel('Mass of fuel on-board [kg]')
+plt.xlabel('Time [s]')
+plt.legend()
+plt.show()
+
+E_tot = Em_sum + Eh_sum
+
+plt.plot(t,Em_sum,label = 'H2')
+plt.plot(t,Eh_sum,label = 'Kerosene')
+plt.plot(t,E_tot,label = 'Total')
+plt.ylabel('Energy consumed over mission [MJ]')
 plt.xlabel('Time [s]')
 plt.legend()
 plt.show()
@@ -161,6 +190,14 @@ fr_h2_climb = h2m_climb/m_h2
 fr_h2_cruise = h2_m_rem2/m_h2
 fr_h2_desc = h2m_desc/m_h2
 
+print('h2 idle ',h2m_idle)
+print('h2 taxi out ',h2m_taxi_o)
+print('h2 taxi in ',h2m_taxi_i)
+print('h2 climb ',h2m_climb)
+print('h2 cruise ',h2_m_rem2)
+print('h2 descend ',h2m_desc)
+print()
+
 #Kerosene
 fr_k_idle = 0
 fr_k_taxi_o = 0
@@ -168,6 +205,14 @@ fr_k_taxi_i = 0
 fr_k_climb = 2*ff_climb_k*t_climb/m_ker
 fr_k_cruise = 2*ff_cruise_k*t_cruise/m_ker
 fr_k_desc = 2*ff_desc_k*t_descend/m_ker
+
+print('k idle ',0)
+print('k taxi out ',0)
+print('k taxi in ',0)
+print('k climb ', 2*ff_climb_k*t_climb)
+print('k cruise ',2*ff_cruise_k*t_cruise)
+print('k descend ',2*ff_desc_k*t_descend)
+print()
 
 #total
 m_total = m_h2+m_ker
@@ -177,6 +222,7 @@ fr_t_taxi_in = (h2m_taxi_i+0)/m_total
 fr_t_climb = (h2m_climb+2*ff_climb_k*t_climb)/m_total
 fr_t_cruise = (h2_m_rem2+2*ff_cruise_k*t_cruise)/m_total
 fr_t_desc = (h2m_desc+2*ff_desc_k*t_descend)/m_total
+
 
 print(fr_t_idle+fr_t_taxi_out+fr_t_taxi_in+fr_t_climb+fr_t_cruise+fr_t_desc)
 

@@ -93,7 +93,7 @@ def liquid_H_tanks(H2_vol):
     Tank_mass = Tot_mass - H2_mass                         # Tank's mass
 
     return H2_mass,Tank_mass,Tot_mass
-print(liquid_H_tanks(41918.81799273565))
+#print(liquid_H_tanks(41918.81799273565))
 # print(liquid_H_tanks(12702.67))
 # print(liquid_H_tanks(32245.24))
 # print(liquid_H_tanks(46576.46))
@@ -118,13 +118,13 @@ def compare_des_liquid():
     #Raising aisle
     H2_mass_2, Tank_mass_2, Tot_mass_2 = 0,0,0
     #A321
-    H2_mass_3, Tank_mass_3, Tot_mass_3 = liquid_H_tanks(46576.46443)
+    H2_mass_3, Tank_mass_3, Tot_mass_3 = liquid_H_tanks(35244.6)
     #Flat Bottom
     H2_mass_4, Tank_mass_4, Tot_mass_4 = liquid_H_tanks_2(4875)#4875 3250
     #Wing podded
-    H2_mass_5, Tank_mass_5, Tot_mass_5 = liquid_H_tanks(46576.46443)
+    H2_mass_5, Tank_mass_5, Tot_mass_5 = liquid_H_tanks(35244.6)
     #Beluga
-    H2_mass_6, Tank_mass_6, Tot_mass_6 = liquid_H_tanks(46576.46443)
+    H2_mass_6, Tank_mass_6, Tot_mass_6 = liquid_H_tanks(35244.6)
 
     H2Mass_array = np.array([H2_mass_1,H2_mass_2,H2_mass_3,H2_mass_4,H2_mass_5,H2_mass_6])
     TMass_array = np.array([Tank_mass_1, Tank_mass_2, Tank_mass_3, Tank_mass_4, Tank_mass_5, Tank_mass_6])
@@ -143,7 +143,7 @@ def compare_des_liquid():
     plt.show()
 
 #print(liquid_H_tanks(12960))
-#print(liquid_H_tanks(46576.46443))
+#print(liquid_H_tanks(35244.6))
 #print(liquid_H_tanks_2(4875))
 #compare_des_liquid()
 
