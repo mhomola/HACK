@@ -35,24 +35,23 @@ def fuel_volume_calc(d_LH2, d_GH2, d_GH2_g, d_k, Ed_H2, Ed_k, tot_vol_k, e_ratio
         V_LH2 = (E_H2/Ed_H2) * (1/(d_LH2 + d_GH2 * (1 - y)/y))  # y maximum filling of LH2
         V_H2 = V_LH2 * (1 + (1-y) / y) * 1000
 
-
     return V_k, V_H2/0.965
 
 
 def fuel_mass_calc(State, d_k, d_LH2, d_GH2_g):
 
-    #Function to compute mass of kerosene and H2, both for the case in which the hydrogen is stored
-    #in liquid state, as well as when it is stored in gas (compressed) state.
+    # Function to compute mass of kerosene and H2, both for the case in which the hydrogen is stored
+    # in liquid state, as well as when it is stored in gas (compressed) state.
 
     if State == 'liquid':
         Vk, VH2 = fuel_volume_calc(d_LH2=LH2_d, d_GH2=GH2_d, d_GH2_g=GH2_d_g, d_k=k_d, # Volume of kerosene and Liquid H2[l]
                                          Ed_H2=H2_ed, Ed_k=k_ed,
                                          tot_vol_k=fuel_capacity_a320neo,
                                          e_ratio=e_ratios, state=State)
-        V_tot = Vk + VH2                                                              #Total volume [l]
+        V_tot = Vk + VH2                                                           # Total volume [l]
 
-        m_k, m_H2 = Vk * d_k * 0.001, VH2 * LH2_d * 0.001                            #Mass of Kerosene and Liquid H2 [kg]
-        m_tot = m_k + m_H2                                                            #Total mass
+        m_k, m_H2 = Vk * d_k * 0.001, VH2 * LH2_d * 0.001                          # Mass of Kerosene and Liquid H2 [kg]
+        m_tot = m_k + m_H2                                                         # Total mass
 
     if State == 'gas':
         Vk, VH2 = fuel_volume_calc(d_LH2=LH2_d, d_GH2=GH2_d, d_GH2_g=GH2_d_g, d_k=k_d,  # Volume of kerosene and Liquid H2[l]

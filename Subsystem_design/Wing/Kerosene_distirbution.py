@@ -65,6 +65,7 @@ if __name__ == '__main__':
     plt.xlabel("Half_spanwise location [m]")
     plt.ylabel("Weight[N]")
     plt.show()
+    print("chord at 0.55",width_y(y=0.55*14, cr=7.0465, taper=0.240, l=14))
 
 
 
