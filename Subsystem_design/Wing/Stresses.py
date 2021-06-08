@@ -313,17 +313,54 @@ class stresses():
         self.Mx = Mx
         self.My = -My
 
-    def sigma_total(self,x,y):
-        return self.Mx * y/self.Ixx + self.My * x/ self.Iyy
+    def sigma_total(self):
+
+        def sigma1(s):
+            x = s
+            y = -self.h/2
+            return self.Mx * y/self.Ixx + self.My * x/ self.Iyy
+
+        def sigma2(s):
+            x = -self.L/2
+            y = -self.h/2 + s
+            return self.Mx * y/self.Ixx + self.My * x/ self.Iyy
+
+        def sigma3(s):
+            x = self.L/2 - s
+            y = self.h/2
+            return self.Mx * y/self.Ixx + self.My * x/ self.Iyy
+
+        def sigma4(s):
+            x = -self.L/2
+            y = self.h/2-s
+            return self.Mx * y / self.Ixx + self.My * x / self.Iyy
+
+        def sigma5(s):
+            x = -self.L / 2
+            y = - s
+            return self.Mx * y / self.Ixx + self.My * x / self.Iyy
+
+        def sigma6(s):
+            x = - self.L/2 + s
+            y = - self.h/2
+            return self.Mx * y / self.Ixx + self.My * x / self.Iyy
+
+        self.sigma1 = sigma1
+        self.sigma2 = sigma2
+        self.sigma3 = sigma3
+        self.sigma4 = sigma4
+        self.sigma5 = sigma5
+        self.sigma6 = sigma6
 
     def sigma_plotter(self):
 
         n = 1000
 
         ###Region 1
+        s1 = np.linspace(0, self.s1, num=n)
         x1 = np.linspace(0,self.L/2,num=n)
         y1 = -self.h/2 * np.ones(n)
-        sigma1 = self.sigma_total(x1,y1)
+        sigma1 = self.sigma1(s1)
 
         path = mpath.Path(np.column_stack([x1, y1]))
         verts = path.interpolated(steps=1).vertices
@@ -331,9 +368,10 @@ class stresses():
         maxabs = np.max(np.abs(sigma1))
 
         ###Region 2
+        s2 = np.linspace(0, self.s2, num=n)
         x2 = self.L / 2 * np.ones(n)
         y2 = np.linspace(-self.h/2, self.h/2, num=n)
-        sigma2 = self.sigma_total(x2, y2)
+        sigma2 = self.sigma2(s2)
 
         path = mpath.Path(np.column_stack([x2, y2]))
         verts = path.interpolated(steps=1).vertices
@@ -342,9 +380,10 @@ class stresses():
         maxabs = max(maxabs2, maxabs)
 
         ###Region 3
+        s3 = np.linspace(0, self.s3, num=n)
         x3 = np.linspace(self.L/2, -self.L/2, num=n)
         y3 = self.h / 2 * np.ones(n)
-        sigma3 = self.sigma_total(x3, y3)
+        sigma3 = self.sigma3(s3)
 
         path = mpath.Path(np.column_stack([x3, y3]))
         verts = path.interpolated(steps=1).vertices
@@ -353,9 +392,10 @@ class stresses():
         maxabs = max(maxabs3, maxabs)
 
         ###Region 4
+        s4 = np.linspace(0, self.s4, num=n)
         x4 = -self.L/2 * np.ones(n)
         y4 = np.linspace(self.h/2, 0, num=n)
-        sigma4 = self.sigma_total(x4, y4)
+        sigma4 = self.sigma4(s4)
 
         path = mpath.Path(np.column_stack([x4, y4]))
         verts = path.interpolated(steps=1).vertices
@@ -364,9 +404,10 @@ class stresses():
         maxabs = max(maxabs4, maxabs)
 
         ###Region 5
+        s5 = np.linspace(0, self.s5, num=n)
         x5 = -self.L / 2 * np.ones(n)
         y5 = np.linspace(0, -self.h/2, num=n)
-        sigma5 = self.sigma_total(x5, y5)
+        sigma5 = self.sigma5(s5)
         path = mpath.Path(np.column_stack([x5, y5]))
 
         verts = path.interpolated(steps=1).vertices
@@ -375,9 +416,10 @@ class stresses():
         maxabs = max(maxabs5, maxabs)
 
         ###Region 6
+        s6 = np.linspace(0, self.s6, num=n)
         x6 = np.linspace(-self.L/2, 0, num=n)
         y6 = -self.h / 2 * np.ones(n)
-        sigma6 = self.sigma_total(x6, y6)
+        sigma6 = self.sigma6(s6)
         path = mpath.Path(np.column_stack([x6, y6]))
 
         verts = path.interpolated(steps=1).vertices
@@ -413,6 +455,143 @@ class stresses():
         plt.xlabel(r'$z$ [m]')
         plt.ylabel(r'$y$ [m]')
         plt.title('Normal stress distribution')
+        plt.show()
+
+    def von_Misses(self):
+        """
+        Vm = square root ( nromal stress^2 + 3 * shear stress)
+        shear stress = shear flow/thickness
+        :return:
+        """
+
+        def vm1(s):
+            return np.sqrt(self.sigma1(s)**2 + 3 * pow(self.q1_tot(s)/self.t_upper,2))
+
+        def vm2(s):
+            return np.sqrt(self.sigma2(s)**2 + 3 * pow(self.q2_tot(s)/self.t_spar1,2))
+
+        def vm3(s):
+            return np.sqrt(self.sigma3(s)**2 + 3 * pow(self.q3_tot(s)/self.t_lower,2))
+
+        def vm4(s):
+            return np.sqrt(self.sigma4(s) ** 2 + 3 * pow(self.q4_tot(s) / self.t_spar2,2))
+
+        def vm5(s):
+            return np.sqrt(self.sigma5(s) ** 2 + 3 * pow(self.q5_tot(s) / self.t_spar2,2))
+
+        def vm6(s):
+            return np.sqrt(self.sigma6(s) ** 2 + 3 * pow(self.q6_tot(s) / self.t_upper,2))
+
+        self.vm1 = vm1
+        self.vm2 = vm2
+        self.vm3 = vm3
+        self.vm4 = vm4
+        self.vm5 = vm5
+        self.vm6 = vm6
+
+    def vm_plotter(self):
+
+        n = 1000
+
+        ###Region 1
+        s1 = np.linspace(0, self.s1, num=n)
+        x1 = np.linspace(0,self.L/2,num=n)
+        y1 = -self.h/2 * np.ones(n)
+        vm1 = self.vm1(s1)
+
+        path = mpath.Path(np.column_stack([x1, y1]))
+        verts = path.interpolated(steps=1).vertices
+        x1, y1 = verts[:, 0, ], verts[:, 1]
+        maxabs = np.max(np.abs(vm1))
+
+        ###Region 2
+        s2 = np.linspace(0, self.s2, num=n)
+        x2 = self.L / 2 * np.ones(n)
+        y2 = np.linspace(-self.h/2, self.h/2, num=n)
+        vm2 = self.vm2(s2)
+
+        path = mpath.Path(np.column_stack([x2, y2]))
+        verts = path.interpolated(steps=1).vertices
+        x2, y2 = verts[:, 0, ], verts[:, 1]
+        maxabs2 = np.max(np.abs(vm2))
+        maxabs = max(maxabs2, maxabs)
+
+        ###Region 3
+        s3 = np.linspace(0, self.s3, num=n)
+        x3 = np.linspace(self.L/2, -self.L/2, num=n)
+        y3 = self.h / 2 * np.ones(n)
+        vm3 = self.vm3(s3)
+
+        path = mpath.Path(np.column_stack([x3, y3]))
+        verts = path.interpolated(steps=1).vertices
+        x3, y3 = verts[:, 0, ], verts[:, 1]
+        maxabs3 = np.max(np.abs(vm3))
+        maxabs = max(maxabs3, maxabs)
+
+        ###Region 4
+        s4 = np.linspace(0, self.s4, num=n)
+        x4 = -self.L/2 * np.ones(n)
+        y4 = np.linspace(self.h/2, 0, num=n)
+        vm4 = self.vm4(s4)
+
+        path = mpath.Path(np.column_stack([x4, y4]))
+        verts = path.interpolated(steps=1).vertices
+        x4, y4 = verts[:, 0, ], verts[:, 1]
+        maxabs4 = np.max(np.abs(vm4))
+        maxabs = max(maxabs4, maxabs)
+
+        ###Region 5
+        s5 = np.linspace(0, self.s5, num=n)
+        x5 = -self.L / 2 * np.ones(n)
+        y5 = np.linspace(0, -self.h/2, num=n)
+        vm5 = self.vm5(s5)
+        path = mpath.Path(np.column_stack([x5, y5]))
+
+        verts = path.interpolated(steps=1).vertices
+        x5, y5 = verts[:, 0, ], verts[:, 1]
+        maxabs5 = np.max(np.abs(vm5))
+        maxabs = max(maxabs5, maxabs)
+
+        ###Region 6
+        s6 = np.linspace(0, self.s6, num=n)
+        x6 = np.linspace(-self.L/2, 0, num=n)
+        y6 = -self.h / 2 * np.ones(n)
+        vm6 = self.vm6(s6)
+        path = mpath.Path(np.column_stack([x6, y6]))
+
+        verts = path.interpolated(steps=1).vertices
+        x6, y6 = verts[:, 0, ], verts[:, 1]
+        maxabs6 = np.max(np.abs(vm6))
+        maxabs = max(maxabs6, maxabs)
+
+        fig = plt.figure(4)
+
+        l_width = 8
+        colorline(x1, y1, vm1, cmap=plt.get_cmap('jet'),
+                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+        colorline(x2, y2, vm2, cmap=plt.get_cmap('jet'),
+                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+        colorline(x3, y3, vm3, cmap=plt.get_cmap('jet'),
+                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+        colorline(x4, y4, vm4, cmap=plt.get_cmap('jet'),
+                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+        colorline(x5, y5, vm5, cmap=plt.get_cmap('jet'),
+                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+        colorline(x6, y6, vm6, cmap=plt.get_cmap('jet'),
+                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+
+        sm = plt.cm.ScalarMappable(cmap=plt.get_cmap('jet'),
+                                   norm=plt.Normalize(-maxabs, maxabs))
+        sm.set_array([])
+
+        plt.colorbar(sm, label=r'$Von Mises$ [Pa]', fraction=0.20, pad=0.04, orientation="horizontal")
+        plt.xlim(-self.L - 0.1, 0.1)
+        plt.ylim(self.h / 2 - 0.02, -self.h / 2 + 0.02)
+        plt.axis('scaled')
+        plt.gca().invert_xaxis()
+        plt.xlabel(r'$z$ [m]')
+        plt.ylabel(r'$y$ [m]')
+        plt.title('Von Misses stress distribution')
         plt.show()
 
 def colorline(x, y, z=None, cmap=plt.get_cmap('copper'),
@@ -463,6 +642,9 @@ if __name__ == '__main__':
     chord1.shear_loads(Vx=500,Vy=750,T=1000)
     chord1.compute_shear_flows()
     #chord1.shear_flow_plotter(type = "total")
-    chord1.bending_loads(Mx = 5550,My= 5000)
-    chord1.sigma_plotter()
+    chord1.bending_loads(Mx = 5550,My= 0)
+    chord1.sigma_total()
+    #chord1.sigma_plotter()
+    chord1.von_Misses()
+    chord1.vm_plotter()
 
