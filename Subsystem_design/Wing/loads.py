@@ -44,8 +44,8 @@ class Loads_w(Constants):
 
                 # print('\n At an altitude of ', alti, ' m, a weight of ', weight, ' N, the max lift is ', L_tot)
 
-        print('\n At an altitude of ', altitudes[index_j], ' m, a weight of ', weights[index_i],
-              ' N, the max lift is ', self.L_max)
+        # print('\n At an altitude of ', altitudes[index_j], ' m, a weight of ', weights[index_i],
+        #       ' N, the max lift is ', self.L_max)
 
 
         self.ISA_calculator(h_input=altitudes[index_j])
@@ -124,17 +124,17 @@ class Loads_w(Constants):
                    (self.c_kink_out - self.m2*self.b_in/2) * (x**2/2 - self.b_in/2*x + self.b_in**2/4 - self.b_in**2/8)
 
         def c_sq_int1(x):
-            return self.m1 * (x**3/3 - self.width_f**3/24 + self.c_root * (x**2 - self.width_f**2/4)) \
-                   + self.c_root**2 * (x + self.width_f/2)
+            return self.m1**2 * (x**3/3 - self.width_f**3/24) + self.m1 * self.c_root * (x**2 - self.width_f**2/4) \
+                   + self.c_root**2 * (x - self.width_f/2)
 
         def c_sq_int2(x):
-            return self.m1 * (x**3/3 - self.b_in**3/24 + self.c_root * (x**2 - self.b_in**2/4)) \
-                   + self.c_root**2 * (x + self.b_in/2)
+            return self.m1**2 * (x**3/3 - self.b_in**3/24) + self.m1 * self.c_root * (x**2 - self.b_in**2/4) \
+                   + self.c_root**2 * (x - self.b_in/2)
 
         def c_sq_int3(x):
-            return self.m2 * (x**3/3 - self.b_in**3/24 +
-                              (self.c_kink_out - self.m2 * self.b_in/2) * (x**2 - self.b_in**2/4)) \
-                   + (self.c_kink_out - self.m2 * self.b_in/2)**2 * (x + self.b_in/2)
+            return self.m2**2 * (x**3/3 - self.b_in**3/24) + \
+                   self.m2 * (self.c_kink_out - self.m2 * self.b_in/2) * (x**2 - self.b_in**2/4) \
+                   + (self.c_kink_out - self.m2 * self.b_in/2)**2 * (x - self.b_in/2)
 
         self.cint1 = cint1
         self.cint2 = cint2
@@ -221,8 +221,23 @@ class Loads_w(Constants):
              - (self.D_eng - self.max_T) * self.mc_step(dist=x-self.y_engine, i=1)
         return My
 
+    def Reaction_torque(self):
+        x = self.b/2
+        self.RT = self.C_L_crit * self.q_crit * self.xL_c * \
+                     (self.c_sq_int1(x=x) * self.mc_step(dist=x-0.5*self.width_f, i=0)
+                      - self.c_sq_int2(x=x) * self.mc_step(dist=x-self.b_in/2, i=0)
+                      + self.c_sq_int3(x=x) * self.mc_step(dist=x-self.b_in/2, i=0)) \
+                     + (self.max_T - self.D_eng) * self.T_arm * self.mc_step(dist=x-self.y_engine, i=0) \
+                     - self.W_engine * self.W_eng_arm * self.mc_step(dist=x-self.y_engine, i=0) \
+                     + self.D_tank_sys * (self.pylon_height + d_wing_pod/2 + 0.091/2 * self.chord(x=self.y_cg_pod)) * \
+                     self.mc_step(dist=x-self.y_cg_pod, i=0) \
+                     + self.WwS * self.W_wing_arm_c * (self.c_sq_int1(x=x) * self.mc_step(dist=x-0.5*self.width_f, i=0)
+                                                       - self.c_sq_int2(x=x) * self.mc_step(dist=x-self.b_in/2, i=0)
+                                                       + self.c_sq_int3(x=x) * self.mc_step(dist=x-self.b_in/2, i=0))
+
     def T_z(self, x):
-        Tz = self.C_L_crit * self.q_crit * self.xL_c * (self.c_sq_int1(x=x) * self.mc_step(dist=x-0.5*self.width_f, i=0)
+        Tz = - self.RT * self.mc_step(dist=x-self.width_f/2, i=0) + \
+             self.C_L_crit * self.q_crit * self.xL_c * (self.c_sq_int1(x=x) * self.mc_step(dist=x-0.5*self.width_f, i=0)
                                                         - self.c_sq_int2(x=x) * self.mc_step(dist=x-self.b_in/2, i=0)
                                                         + self.c_sq_int3(x=x) * self.mc_step(dist=x-self.b_in/2, i=0)) \
             + (self.max_T - self.D_eng) * self.T_arm * self.mc_step(dist=x-self.y_engine, i=0) \
@@ -276,10 +291,10 @@ class Loads_w(Constants):
         ax4.set_xlabel(r'$z$ [$m$]', size=15)
         ax4.set_title(r'Bending moment around $y$', size=20)
 
-        ax5.plot(x_arr, T_arr/1000)
+        ax5.plot(x_arr, Tz_arr/1000)
         ax5.set_ylabel(r'$T(z)$ [$kN/m$]', size=15)
         ax5.set_xlabel(r'$z$ [$m$]', size=15)
-        ax5.set_title(r'Torque around $zyy$', size=20)
+        ax5.set_title(r'Torque around $z$', size=20)
 
         for i in [ax1, ax2, ax3, ax4, ax5]:
             i.tick_params(axis='both', which='major', labelsize=12)
@@ -291,8 +306,12 @@ if __name__ == '__main__':
     lw = Loads_w()
     lw.compute_loads()
     lw.chord_integrals()
+    print(lw.c_sq_int1(x=lw.width_f/2))
+    print(lw.c_sq_int2(x=lw.b_in/2))
+    print(lw.c_sq_int3(x=lw.b_in/2))
     lw.Reaction_forces()
     lw.Reaction_moments()
+    lw.Reaction_torque()
 
     lw.plot_loads()
 
