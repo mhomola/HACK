@@ -58,6 +58,9 @@ class Loads_w(Constants):
         self.C_D_crit = ae.C_D_0_HACK - ae.C_D_0_fus_neo - ae.C_D_0_tank_sys_HACK - ae.C_D_o_engine - ae.C_D_0_Vtail - \
                         ae.C_D_0_Htail + self.C_L_crit / (np.pi * ae.AR * self.e)
 
+        self.W_body = (self.MZFW_320neo - self.Wing_Weight_320neo - 2*self.W_engine - 2*self.pod_tank_mass) * self.g_0
+        self.WbS = self.W_body / (self.S - S_exp)
+        self.WwS = self.Wing_Weight_320neo * self.g_0 / self.S
 
     def Lift(self, x):
         c = self.chord(x=x)
@@ -67,12 +70,21 @@ class Loads_w(Constants):
     def Drag_w(self, x):
         c = self.chord(x=x)
         D_prime = self.C_D_crit * self.q_crit * c
+        return D_prime
 
     def component_drag(self):
         ae = AerodynamicCharacteristics()
         ae.aero_functions(AoA_cruise=2)
         self.D_tank_sys = ae.C_D_0_tank_sys_HACK * self.q_crit * self.S
         self.D_eng = ae.C_D_o_engine * self.q_crit * self.S
+
+    def body_weight(self, x):
+        Wb_prime = self.WbS * self.chord(x=x)
+        return Wb_prime
+
+    def wing_strcut_weight(self, x):
+        Ww_prime = self.WwS * self.chord(x=x)
+        return Ww_prime
 
     def kerosene_distribution(self):
         self.kerosene,dummy,self.kerosene_max = kerosene_calc()
@@ -83,25 +95,35 @@ class Loads_w(Constants):
         return max(0, dist-self.dx/2)**(i + 1) / (dist-self.dx/2)
 
     def S_y(self, x):
-        Sy = self.C_L_crit * self.q_crit * \
-             (+ (self.m1 * (x**2/2 - (0.5*self.width_f)**2/2) + self.c_root * (x - 0.5*self.width_f)) *
-              self.mc_step(dist=x-0.5*self.width_f, i=0)
-              - (self.m1 * (x**2/2 - (self.b_in/2)**2/2) + self.c_root * (x - self.b_in/2)) *
-              self.mc_step(dist=x-self.b_in/2, i=0)
-              + (self.m2 * (x**2/2 - (self.b_in/2)**2/2 - self.b_in/2 * (x - self.b_in/2)) + self.c_kink_out *
-                 (x - self.b_in/2)) * self.mc_step(dist=x-self.b_in/2, i=0))
-        return Sy
-
-    def S_x(self, x):
-        self.component_drag()
-        Sx = self.C_D_crit * self.q_crit * \
+        Sy = - self.WbS * \
+             (+ (self.m1 * x**2/2 + self.c_root * x)
+              - (self.m1 * (x**2/2 - (0.5*self.width_f)**2/2) + self.c_root * (x - 0.5*self.width_f)) *
+              self.mc_step(dist=x-0.5*self.width_f, i=0)) \
+             - self.WwS * (self.m1 * (x**2/2 - (0.5*self.width_f)**2/2) + self.c_root * (x - 0.5*self.width_f)) * \
+             self.mc_step(dist=x-0.5*self.width_f, i=0) \
+             + self.C_L_crit * self.q_crit * \
              (+ (self.m1 * (x**2/2 - (0.5*self.width_f)**2/2) + self.c_root * (x - 0.5*self.width_f)) *
               self.mc_step(dist=x-0.5*self.width_f, i=0)
               - (self.m1 * (x**2/2 - (self.b_in/2)**2/2) + self.c_root * (x - self.b_in/2)) *
               self.mc_step(dist=x-self.b_in/2, i=0)
               + (self.m2 * (x**2/2 - (self.b_in/2)**2/2 - self.b_in/2 * (x - self.b_in/2)) + self.c_kink_out *
                  (x - self.b_in/2)) * self.mc_step(dist=x-self.b_in/2, i=0)) \
-             + self.D_tank_sys * self.mc_step(dist=x-) + self.D_eng * self.mc_step(dist=x-)
+             - self.W_engine * self.g_0 * self.mc_step(dist=x-self.y_engine, i=0) \
+             - self.pod_tank_mass * self.g_0 * self.mc_step(dist=x-self.y_cg_pod, i=0)
+
+
+        return Sy
+
+    # def S_x(self, x):
+    #     self.component_drag()
+    #     Sx = self.C_D_crit * self.q_crit * \
+    #          (+ (self.m1 * (x**2/2 - (0.5*self.width_f)**2/2) + self.c_root * (x - 0.5*self.width_f)) *
+    #           self.mc_step(dist=x-0.5*self.width_f, i=0)
+    #           - (self.m1 * (x**2/2 - (self.b_in/2)**2/2) + self.c_root * (x - self.b_in/2)) *
+    #           self.mc_step(dist=x-self.b_in/2, i=0)
+    #           + (self.m2 * (x**2/2 - (self.b_in/2)**2/2 - self.b_in/2 * (x - self.b_in/2)) + self.c_kink_out *
+    #              (x - self.b_in/2)) * self.mc_step(dist=x-self.b_in/2, i=0)) \
+    #          + self.D_tank_sys * self.mc_step(dist=x-) + self.D_eng * self.mc_step(dist=x-)
 
 
 
@@ -113,7 +135,7 @@ if __name__ == '__main__':
     lw = Loads_w()
     lw.compute_loads()
 
-    x_arr = np.linspace(0.5*lw.width_f, lw.b/2, 500)
+    x_arr = np.linspace(0, lw.b/2, 500)
     L_arr = np.zeros(len(x_arr))
     Sy_arr = np.zeros(len(x_arr))
     c_arr = np.zeros(len(x_arr))
