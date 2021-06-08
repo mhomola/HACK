@@ -72,6 +72,7 @@ def pylon():
 t_pylon, l_pylon, h_pylon, w_pylon, mass_pylon = pylon()
 
 if __name__ == '__main__':
+
     print(" ----- PYLON ----- ")
     print("Thickness of the cross section: ", t_pylon, " [m]")
     print("Pylon length: ", l_pylon, " [m]")
