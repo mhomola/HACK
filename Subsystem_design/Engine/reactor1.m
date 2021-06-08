@@ -15,7 +15,7 @@ function TPZ = reactor1(g, P_input, T_input, eqr_input)
 
             i = 1;
             for c = 1:(length(slope)-1)
-                disp(slope(c))
+                % disp(slope(c))
                 if (perc >= slope(c)) && (perc <= slope(c+1))
                     i = c+1;
                     break;
@@ -43,22 +43,37 @@ help reactor1
 % P = 11.70102*100000; %101325; %in Pascal
 % T = 724.90893; %800; in Kelvin
 
-% Take-Off:
+% (Take-Off:)
+% Inputs from Python
 P = P_input; %101325; %in Pascal
 T = T_input; %800; in Kelvin
+eqr = eqr_input; %0.3;
 
 %------------------
 
 dt = 1e-4; %time step; -4 originally
-TotalTime = 0.7; % in seconds - includes autoignition phase
+TotalTime = 6; % in seconds - includes autoignition phase
 
 nSteps = ceil(TotalTime/dt); %number of steps. Total time = nSteps*dt
 
 if strcmp(g,'kerosene') %   compare string
    gas = Solution('kerosene.yaml', 'gas');
+   p_o2 = 44.76;
+   p_n2 = 168.3;
+   p_o2_new = p_o2/eqr;
+   p_n2_new = p_n2/eqr;
+   str_ker_h2 = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:60,O2:',string(p_o2_new),',N2:',string(p_n2_new)],""));
+   set(gas,'T',T,'P',P,'X',str_ker_h2) % 50% H2 in volume
+   
    %gas = Solution('nDodecane_Reitz.yaml','nDodecane_IG');
 else
    gas = GRI30('None');
+   p_o2 = 0.5;
+   p_n2 = 1.88;
+   p_o2_new = p_o2/eqr;
+   p_n2_new = p_n2/eqr;
+   str_h2 = convertStringsToChars(join(['H2:1,O2:',string(p_o2_new),',N2:',string(p_n2_new)],""));
+   set(gas,'T',T,'P',P,'X',str_h2); %H2
 end
 
 % set the initial conditions. All values below are for stoichiometric
@@ -71,15 +86,15 @@ end
 
 % Case: Kerosene Only
 
-p_o2 = 14.76;
-p_n2 = 55.45;
-eqr = eqr_input; %0.3;
+%p_o2 = 14.76;
+%p_n2 = 55.45;
+%eqr = eqr_input; %0.3;
 
-p_o2_new = p_o2/eqr;
-p_n2_new = p_n2/eqr;
+%p_o2_new = p_o2/eqr;
+%p_n2_new = p_n2/eqr;
 
-str_kerosene = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,O2:',string(p_o2_new),',N2:',string(p_n2_new)],""));
-set(gas,'T',T,'P',P,'X',str_kerosene) %kerosene
+%str_kerosene = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,O2:',string(p_o2_new),',N2:',string(p_n2_new)],""));
+%set(gas,'T',T,'P',P,'X',str_kerosene) %kerosene
 %set(gas,'T',T,'P',P,'X','NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,O2:14.76,N2:55.45')
 
 %set(gas,'T',T,'P',P,'X','NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:1,O2:15.26,N2:57.38') % 50% H2 in volume
@@ -166,9 +181,9 @@ ylabel('NOX Mass Fraction (ppm)');
 disp(['CO fraction = ' x(end-1,2)])
 disp(['NOx fraction = ' (x(end-1,5)+x(end-1,6))*1e6])
 
-TPZ = temp(end)
+TPZ = temp(length(temp))
 
-clear all
-cleanup
+% clear all
+% cleanup
 % Add a calculation of 5% steep angle
 end
