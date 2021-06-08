@@ -128,7 +128,7 @@ class Engine_Cycle(Constants):
 
         self.T_total = self.T_fan + self.T_core # [N]
 
-        self.stoichiometric_ratio = self.mr_h2[i] * self.stoich_ratio_h2 + self.mr_ker * self.stoich_ratio_ker
+        self.stoichiometric_ratio = self.mr_h2 * self.stoich_ratio_h2 + self.mr_ker * self.stoich_ratio_ker
 
         self.equivalence_ratio = (self.mf_fuel/(self.mf_hot * self.ratio_air_cc)) / self.stoichiometric_ratio #TBD what mf_air to use
 
@@ -177,6 +177,6 @@ if __name__ == '__main__':
         print('Exit of nozzle: T8 = ', ec.T8, '[K]; p8 = ', ec.p8, '[Pa]; v8 = ', ec.v8, '[m/s]')
         print('Exit of fan: T18 = ', ec.T18, '[K]; p18 = ', ec.p18, '[Pa]; v18 = ', ec.v18, '[m/s]')
         print('Provided Trhust: Fan = ', ec.T_fan, '[N]; Core = ', ec.T_core, '[N]; Total = ', ec.T_total, '[N]')
-        print('Equivalence Ratio' = equivalence_ratio)
+        print('Equivalence Ratio' , equivalence_ratio)
 
 
