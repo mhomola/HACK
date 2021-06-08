@@ -144,6 +144,8 @@ class Constants():
         # self.x_cg_centertank = 1.1                            # dummy value! wrt MAC
         self.y_cg_pod = 0.55*self.b/2                           # Y location of the pods on the wing                [m]
 
+        self.pylon_height = 0.38                                # [m] height of the pylon of the tank
+
         """Weights of HACK"""
         self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                       [kg]
         self.MTOW_320hack = 73500
@@ -310,8 +312,7 @@ class Constants():
         self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))
         self.mf_bleed = 0  # [kg/s]
 
-        """ STRUCTURES"""
-        self.pylon_height = 0.38                                                # [m] height of the pylon of the tank
+
 
     # def fuselage_length(self,vol_eff, vol_fus):
     #     """

@@ -293,7 +293,7 @@ class stresses():
 
         plt.colorbar(sm, label=r'$q$ [N/m]', fraction=0.20, pad=0.04, orientation="horizontal")
         plt.xlim(-self.L - 0.1, 0.1)
-        plt.ylim(-self.h / 2 - 0.02, self.h / 2 + 0.02)
+        plt.ylim(self.h / 2 - 0.02, -self.h / 2 + 0.02)
         plt.axis('scaled')
         plt.gca().invert_xaxis()
         plt.xlabel(r'$z$ [m]')
@@ -313,8 +313,107 @@ class stresses():
         self.Mx = Mx
         self.My = -My
 
-    def
+    def sigma_total(self,x,y):
+        return self.Mx * y/self.Ixx + self.My * x/ self.Iyy
 
+    def sigma_plotter(self):
+
+        n = 1000
+
+        ###Region 1
+        x1 = np.linspace(0,self.L/2,num=n)
+        y1 = -self.h/2 * np.ones(n)
+        sigma1 = self.sigma_total(x1,y1)
+
+        path = mpath.Path(np.column_stack([x1, y1]))
+        verts = path.interpolated(steps=1).vertices
+        x1, y1 = verts[:, 0, ], verts[:, 1]
+        maxabs = np.max(np.abs(sigma1))
+
+        ###Region 2
+        x2 = self.L / 2 * np.ones(n)
+        y2 = np.linspace(-self.h/2, self.h/2, num=n)
+        sigma2 = self.sigma_total(x2, y2)
+
+        path = mpath.Path(np.column_stack([x2, y2]))
+        verts = path.interpolated(steps=1).vertices
+        x2, y2 = verts[:, 0, ], verts[:, 1]
+        maxabs2 = np.max(np.abs(sigma2))
+        maxabs = max(maxabs2, maxabs)
+
+        ###Region 3
+        x3 = np.linspace(self.L/2, -self.L/2, num=n)
+        y3 = self.h / 2 * np.ones(n)
+        sigma3 = self.sigma_total(x3, y3)
+
+        path = mpath.Path(np.column_stack([x3, y3]))
+        verts = path.interpolated(steps=1).vertices
+        x3, y3 = verts[:, 0, ], verts[:, 1]
+        maxabs3 = np.max(np.abs(sigma3))
+        maxabs = max(maxabs3, maxabs)
+
+        ###Region 4
+        x4 = -self.L/2 * np.ones(n)
+        y4 = np.linspace(self.h/2, 0, num=n)
+        sigma4 = self.sigma_total(x4, y4)
+
+        path = mpath.Path(np.column_stack([x4, y4]))
+        verts = path.interpolated(steps=1).vertices
+        x4, y4 = verts[:, 0, ], verts[:, 1]
+        maxabs4 = np.max(np.abs(sigma4))
+        maxabs = max(maxabs4, maxabs)
+
+        ###Region 5
+        x5 = -self.L / 2 * np.ones(n)
+        y5 = np.linspace(0, -self.h/2, num=n)
+        sigma5 = self.sigma_total(x5, y5)
+        path = mpath.Path(np.column_stack([x5, y5]))
+
+        verts = path.interpolated(steps=1).vertices
+        x5, y5 = verts[:, 0, ], verts[:, 1]
+        maxabs5 = np.max(np.abs(sigma5))
+        maxabs = max(maxabs5, maxabs)
+
+        ###Region 6
+        x6 = np.linspace(-self.L/2, 0, num=n)
+        y6 = -self.h / 2 * np.ones(n)
+        sigma6 = self.sigma_total(x6, y6)
+        path = mpath.Path(np.column_stack([x6, y6]))
+
+        verts = path.interpolated(steps=1).vertices
+        x6, y6 = verts[:, 0, ], verts[:, 1]
+        maxabs6 = np.max(np.abs(sigma6))
+        maxabs = max(maxabs6, maxabs)
+
+        fig = plt.figure(4)
+
+        l_width = 8
+        colorline(x1, y1, sigma1, cmap=plt.get_cmap('jet'),
+                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+        colorline(x2, y2, sigma2, cmap=plt.get_cmap('jet'),
+                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+        colorline(x3, y3, sigma3, cmap=plt.get_cmap('jet'),
+                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+        colorline(x4, y4, sigma4, cmap=plt.get_cmap('jet'),
+                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+        colorline(x5, y5, sigma5, cmap=plt.get_cmap('jet'),
+                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+        colorline(x6, y6, sigma6, cmap=plt.get_cmap('jet'),
+                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+
+        sm = plt.cm.ScalarMappable(cmap=plt.get_cmap('jet'),
+                                   norm=plt.Normalize(-maxabs, maxabs))
+        sm.set_array([])
+
+        plt.colorbar(sm, label=r'$Sigma$ [Pa]', fraction=0.20, pad=0.04, orientation="horizontal")
+        plt.xlim(-self.L - 0.1, 0.1)
+        plt.ylim(self.h / 2 - 0.02, -self.h / 2 + 0.02)
+        plt.axis('scaled')
+        plt.gca().invert_xaxis()
+        plt.xlabel(r'$z$ [m]')
+        plt.ylabel(r'$y$ [m]')
+        plt.title('Normal stress distribution')
+        plt.show()
 
 def colorline(x, y, z=None, cmap=plt.get_cmap('copper'),
                   norm=plt.Normalize(-1.0, 1.0), linewidth=5, alpha=1.0):
@@ -363,4 +462,7 @@ if __name__ == '__main__':
     chord1 = stresses(Ixx=Ixx,Iyy=Iyy,h=h,L=L,t_upper=t,t_spar1=t,t_spar2=t,t_lower=t)
     chord1.shear_loads(Vx=500,Vy=750,T=1000)
     chord1.compute_shear_flows()
-    chord1.shear_flow_plotter(type = "total")
+    #chord1.shear_flow_plotter(type = "total")
+    chord1.bending_loads(Mx = 5550,My= 5000)
+    chord1.sigma_plotter()
+
