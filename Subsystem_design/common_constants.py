@@ -129,16 +129,18 @@ class Constants():
         self.fuel_capacity_320neo = 23.859                          # Maximum Fuel capacity of A320neo          [m^3]
         self.k_d = 810.0                                            # Mass density of kerosene                  [kg/m^3]
 
-        """Tank design constants""" # Plsss automate these, for design changes
+        """Tank Design Constants"""
         self.center_tank_mass = mass_center_tank              # Mass of each center tank (we have 2 tanks)       [kg]
         self.pod_tank_mass = mass_pod                         # Mass of each pod tank (we have 2 tank)           [kg]
+
         self.V_centre_tank = volume_centre_tank               # Volume of each centre tank                       [m^3]
         self.V_centre_pod = volume_pod                        # Volume of each wing pod                          [m^3]
         self.V_H2_centre = volume_centre_tank * 0.885         # Volume of H2 in each centre tank                 [m^3]
         self.V_H2_pod = volume_pod * 0.885                    # Volume of H2 in each wing pod                    [m^3]
-        self.x_cg_pod = 0.26                                  # MAC
-        self.x_cg_centertank = 1.1
-        self.y_cg_pod = 0.55*self.b/2                         # Y location of the pods on the wing                   [m]
+
+        # self.x_cg_pod = 0.26                                  # dummy value! wrt MAC
+        # self.x_cg_centertank = 1.1                            # dummy value! wrt MAC
+        self.y_cg_pod = 0.55*self.b/2                           # Y location of the pods on the wing                [m]
 
         """Weights of HACK"""
         self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                       [kg]
@@ -435,5 +437,5 @@ if __name__ == '__main__':
           '\n P = ', c.p, ' Pa',
           '\n rho = ', c.rho, ' kg/m^3')
 
-
-
+    print(c.V_H2_pod*71.1)
+    print(c.pod_tank_mass)

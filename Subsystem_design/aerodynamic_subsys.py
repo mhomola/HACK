@@ -312,7 +312,7 @@ if __name__ == '__main__':
 
     # ae.plot_lift_drag_characteristics()
     ae.empennage_drag()
-
     ae.plot_lift_drag_characteristics()
+
 
 
