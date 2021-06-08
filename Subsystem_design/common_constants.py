@@ -159,7 +159,7 @@ class Constants():
         self.cp_air = 1000                                          # Specific heat constant air                    [J/kg/K]
         self.cp_gas = 1150                                          # Specific heat constant gas                    [J/kg/K]
         self.k_air = 1.4                                            # Ration of specific heat for air
-        self.k_gas = 1.33                                           # Ration of specific heat for air
+        self.k_gas = 1.3379776344421168                             # Ration of specific heat for air
 
         self.N2_cp_data = np.array(np.genfromtxt('N2_cp.dat'))      # cp vs. T data for N2                          T[K]; cp[kJ/(kg*K)]
         self.molarmass_N2 = 28.01340                                # Molar mass of N2                              [g/mol]
@@ -197,8 +197,8 @@ class Constants():
         self.eta_LPC = 0.90019
         self.eta_HPC = 0.91449
         self.eta_LPT = 0.9405
-        self.eta_HPT = 1 # 1.072044268921447 (computed)  # 0.91898 (given)
-        self.eta_mech_H =  0.7465403131365893
+        self.eta_HPT = 0.91898 #(given) BEFORE: 1 # 1.072044268921447 (computed)
+        self.eta_mech_H =  0.644335665181638
         self.eta_mech_L = 1
         self.eta_cc = 0.995 # that of Leap-1B
         self.PR_LPC = 2.69419
