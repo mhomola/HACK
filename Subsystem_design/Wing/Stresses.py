@@ -10,8 +10,8 @@ import matplotlib.path as mpath
 class stresses():
     def __init__(self,Ixx,Iyy,h,L,t_upper,t_spar1,t_spar2,t_lower):
         """
-        :param Ixx: [m^4] MOI about x-axis
-        :param Iyy: [m^4] MOI about y-axis
+        :param Ixx: [m^4] MOI about x-axis(normal)
+        :param Iyy: [m^4] MOI about y-axis(normal)
         :param h: [m] height of the wing box
         :param L: [m] width of the wingbox
         :param t_upper: [m] upper plate thickness
@@ -148,12 +148,6 @@ class stresses():
         self.q4_tot = q4_tot
         self.q5_tot = q5_tot
         self.q6_tot = q6_tot
-
-    def compute_shear_flows(self):
-        self.shear_flows_y()
-        self.shear_flows_x()
-        self.shear_flows_torque()
-        self.shear_flows_total()
 
     def shear_flow_plotter(self,type):
 
@@ -489,7 +483,7 @@ class stresses():
         self.vm5 = vm5
         self.vm6 = vm6
 
-    def vm_plotter(self):
+    def vm_plotter(self,show):
 
         n = 1000
 
@@ -564,37 +558,54 @@ class stresses():
         maxabs6 = np.max(np.abs(vm6))
         maxabs = max(maxabs6, maxabs)
 
-        fig = plt.figure(4)
+        if show == True:
+            fig = plt.figure(4)
 
-        l_width = 8
-        colorline(x1, y1, vm1, cmap=plt.get_cmap('jet'),
-                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
-        colorline(x2, y2, vm2, cmap=plt.get_cmap('jet'),
-                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
-        colorline(x3, y3, vm3, cmap=plt.get_cmap('jet'),
-                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
-        colorline(x4, y4, vm4, cmap=plt.get_cmap('jet'),
-                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
-        colorline(x5, y5, vm5, cmap=plt.get_cmap('jet'),
-                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
-        colorline(x6, y6, vm6, cmap=plt.get_cmap('jet'),
-                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+            l_width = 8
+            colorline(x1, y1, vm1, cmap=plt.get_cmap('jet'),
+                      norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+            colorline(x2, y2, vm2, cmap=plt.get_cmap('jet'),
+                      norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+            colorline(x3, y3, vm3, cmap=plt.get_cmap('jet'),
+                      norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+            colorline(x4, y4, vm4, cmap=plt.get_cmap('jet'),
+                      norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+            colorline(x5, y5, vm5, cmap=plt.get_cmap('jet'),
+                      norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+            colorline(x6, y6, vm6, cmap=plt.get_cmap('jet'),
+                      norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
 
-        sm = plt.cm.ScalarMappable(cmap=plt.get_cmap('jet'),
-                                   norm=plt.Normalize(-maxabs, maxabs))
-        sm.set_array([])
+            sm = plt.cm.ScalarMappable(cmap=plt.get_cmap('jet'),
+                                       norm=plt.Normalize(-maxabs, maxabs))
+            sm.set_array([])
 
-        plt.colorbar(sm, label=r'$Von Mises$ [Pa]', fraction=0.20, pad=0.04, orientation="horizontal")
-        plt.xlim(-self.L - 0.1, 0.1)
-        plt.ylim(self.h / 2 - 0.02, -self.h / 2 + 0.02)
-        plt.axis('scaled')
-        plt.gca().invert_xaxis()
-        plt.xlabel(r'$z$ [m]')
-        plt.ylabel(r'$y$ [m]')
-        plt.title('Von Misses stress distribution')
-        plt.show()
+            plt.colorbar(sm, label=r'$Von Mises$ [Pa]', fraction=0.20, pad=0.04, orientation="horizontal")
+            plt.xlim(-self.L - 0.1, 0.1)
+            plt.ylim(self.h / 2 - 0.02, -self.h / 2 + 0.02)
+            plt.axis('scaled')
+            plt.gca().invert_xaxis()
+            plt.xlabel(r'$z$ [m]')
+            plt.ylabel(r'$y$ [m]')
+            plt.title('Von Misses stress distribution')
+            plt.show()
 
-def colorline(x, y, z=None, cmap=plt.get_cmap('copper'),
+        self.vm_max = maxabs
+
+    def compute_stresses(self):
+        self.shear_flows_y()
+        self.shear_flows_x()
+        self.shear_flows_torque()
+        self.shear_flows_total()
+        self.sigma_total()
+        self.von_Misses()
+
+    def max_vm(self):
+        """
+        Compute maximum von mises stress in the cross-section
+        :return:
+        """
+
+def colorline(x, y, z= None, cmap=plt.get_cmap('copper'),
                   norm=plt.Normalize(-1.0, 1.0), linewidth=5, alpha=1.0):
     """
     Source:
@@ -640,11 +651,10 @@ if __name__ == '__main__':
     Iyy = h * L ** 3 / 12 - (h - t) * (L - t) ** 3 / 12
     chord1 = stresses(Ixx=Ixx,Iyy=Iyy,h=h,L=L,t_upper=t,t_spar1=t,t_spar2=t,t_lower=t)
     chord1.shear_loads(Vx=500,Vy=750,T=1000)
-    chord1.compute_shear_flows()
+    chord1.compute_stresses()
     #chord1.shear_flow_plotter(type = "total")
     chord1.bending_loads(Mx = 5550,My= 0)
-    chord1.sigma_total()
     #chord1.sigma_plotter()
-    chord1.von_Misses()
-    chord1.vm_plotter()
+    chord1.vm_plotter(show=True)
+    print(chord1.vm_max)
 
