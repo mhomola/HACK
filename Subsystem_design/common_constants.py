@@ -188,23 +188,23 @@ class Constants():
         self.k_air = 1.4                                            # Ration of specific heat for air
         self.k_gas = 1.33                                           # Ration of specific heat for air
 
-        self.N2_cp_data = np.array(np.genfromtxt('Engine\\N2_cp.dat'))      # cp vs. T data for N2          T[K]; cp[kJ/(kg*K)]
+        self.N2_cp_data = np.array(np.genfromtxt('N2_cp.dat'))      # cp vs. T data for N2          T[K]; cp[kJ/(kg*K)]
         self.molarmass_N2 = 28.01340                                # Molar mass of N2                          [g/mol]
 
-        self.h2_cp_data = np.array(np.genfromtxt('Engine\\H2_cp.dat'))      # cp vs. T data for h2          T[K]; cp[kJ/(kg*K)]
+        self.h2_cp_data = np.array(np.genfromtxt('H2_cp.dat'))      # cp vs. T data for h2          T[K]; cp[kJ/(kg*K)]
         self.molarmass_h2 = 2.01588                                 # Molar mass of h2                          [g/mol]
 
-        self.C12H26_cp_data = np.array(np.genfromtxt('Engine\\C12H26_cp.dat'))  # cp vs. T data for dodecane                T[K]; cp[J/(mol*K)]
+        self.C12H26_cp_data = np.array(np.genfromtxt('C12H26_cp.dat'))  # cp vs. T data for dodecane                T[K]; cp[J/(mol*K)]
         self.h0_C12H26 = -290.90                                        # Zero enthalpy of dodecane                 [kJ/mol]         # https://www.chemeo.com/cid/34-125-5/n-Dodecane
         self.molarmass_C12H26 = 170.3348                                # Molar mass of dodecane                    [g/mol]
 
         self.stoich_ratio_ker = 1/15.66 #FAR
         self.stoich_ratio_h2 = 1/34.3 #FAR
 
-        """"Altitude and speed"""
+        """"Altitude and speed""" # tafeoff: M0 = 0.5, h = 50
         self.phases = np.array(['idle', 'taxi out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi in'])
-        self.M0 = np.array([0.015, 0.02, 0.5, 0.5, 0.78, 0.5, 0.02])  # [-] Mach number
-        self.h = np.array([1, 1, 50, 3000, 11280, 300, 1])  # [m] altitude
+        self.M0 = np.array([0.015, 0.02, 0, 0.5, 0.78, 0.5, 0.02])  # [-] Mach number
+        self.h = np.array([0, 0, 0, 3000, 11280, 300, 0])  # [m] altitude
         self.T0, self.p0, self.rho0, self.a0 = np.array([]), np.array([]), np.array([]), np.array([])
 
         for i in self.h:
@@ -244,33 +244,36 @@ class Constants():
             self.PR_LPT = 7.9204
             self.PR_HPT = 3.81933
             self.eta_nozzle = 0.981797 # 1.0737340755627587 (computed) # previous assumption: 0.98
-            self.PR_noz_core = 1.014772 # Between stations 5 and 7
+            self.PR_noz_core = 0.985443 # Between stations 5 and 7
             self.PR_cr_noz_core = 1.653828 # computed
-            self.PR_noz_fan = 0.98744 # Between stations 21 and 16
+            self.PR_noz_fan = 0.987444 # Between stations 21 and 16
+            self.mf_air_init = self.rho0[4] * self.A_fan_eff * self.v0[4]
 
         elif phase == 'takeoff':
-            self.eta_inlet = 0.9208608681597723 # calculated
+            self.eta_inlet = 0.92 # assumed
+            self.PR_inlet = 0.9699975 # calculated
             self.PR_fan = 1.4
             self.eta_fan = 0.93
             self.BPR = 11.1
             self.eta_LPC = 0.92
-            self.eta_HPC = 0.92 # calculated # 0.91449 given
-            self.PR_LPC = 2
-            self.PR_HPC = 11.93
+            self.eta_HPC = 0.97735 # calculated # 0.92 given
+            self.PR_LPC = 1.99241
+            self.PR_HPC = 11.92998521
             # self.eta_mech_H =  0.644335665181638
             # self.eta_mech_L = 1
             self.eta_mech = 0.9 # not used
             self.eta_cc = 0.995 # that of Leap-1B, assumed
-            self.PR_cc = 0.9395309126896629
+            self.PR_cc = 0.94
             self.T04 = 1630.39416 # [K]
             self.eta_LPT = 0.94
             self.eta_HPT = 0.94 # computed # 0.91898 #(given)
-            self.PR_LPT = 6.36219
+            self.PR_LPT = 6.36217496  # 4.835766
             self.PR_HPT = 3.82808
-            self.eta_nozzle = 0.981797 # 1.0737340755627587 (computed) # previous assumption: 0.98
-            self.PR_noz_core = 1.014772 # Between stations 5 and 7
-            self.PR_cr_noz_core = 1.653828 # computed
-            self.PR_noz_fan = 0.98744 # Between stations 21 and 16
+            self.eta_nozzle = 0.98 # assumed
+            self.PR_noz_core = 0.99 # Between stations 5 and 7
+            self.PR_cr_noz_core = 1.2380755 # computed
+            self.PR_noz_fan = 0.99 # Between stations 21 and 16
+            self.mf_air_init = 510 # [kg/s]
 
         self.mr_h2 = np.array([0, 0, 0, 0, 0, 0, 0])
         self.mr_ker = 1 - self.mr_h2
