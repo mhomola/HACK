@@ -58,20 +58,20 @@ for i, x in enumerate(x_arr):
     Ixx_nostr_arr[i] = MOI.Ixx_no_str
     Iyy_nostr_arr[i] = MOI.Iyy_no_str
 
-lw.plot_loads()
-plt.figure()
+#lw.plot_loads()
+#plt.figure()
 plt.plot(x_arr,vm_arr/10**6)
 plt.xlabel("Span location[m]")
 plt.ylabel("Von Mises Stress [MPa]")
-plt.figure()
+#plt.figure()
 
-
-plt.plot(x_arr,Ixx_arr,"blue")
-plt.plot(x_arr,Iyy_arr,"red")
-plt.title("MOI with stringers")
-plt.figure()
-plt.plot(x_arr, Ixx_nostr_arr, "blue")
-plt.plot(x_arr, Iyy_nostr_arr, "red")
-plt.title("MOI with no stringers")
+###MOI Graphs
+# plt.plot(x_arr,Ixx_arr,"blue")
+# plt.plot(x_arr,Iyy_arr,"red")
+# plt.title("MOI with stringers")
+# plt.figure()
+# plt.plot(x_arr, Ixx_nostr_arr, "blue")
+# plt.plot(x_arr, Iyy_nostr_arr, "red")
+# plt.title("MOI with no stringers")
 
 plt.show()

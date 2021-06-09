@@ -47,6 +47,9 @@ class Constants():
         self.M = 0.78
         self.V_cruise = self.M * self.a_c
 
+        """ STRUCTURES"""
+        self.pylon_height = 0.38  # [m] height of the pylon of the tank
+
         '''Aerodynamics'''
         self.e = 0.992                                              # Oswald efficiency factor
         self.C_D_0_TO_neo = 0.078                                   # Zero-lift drag coefficient of A320neo - TO
@@ -280,8 +283,7 @@ class Constants():
         self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))
         self.mf_bleed = 0  # [kg/s]
 
-        """ STRUCTURES"""
-        self.pylon_height = 0.38                                                # [m] height of the pylon of the tank
+
 
     # def fuselage_length(self,vol_eff, vol_fus):
     #     """
