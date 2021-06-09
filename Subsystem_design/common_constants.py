@@ -142,10 +142,8 @@ class Constants():
 
         """Weights of HACK"""
         self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                       [kg]
-        self.OEW_320hack = 43176                                  # from arvind's sample mission
-        self.fuel_weight_320hack = 18487
-        self.payload_320hack = 13709
-        self.initialw_320hack = self.fuel_weight_320hack + self.OEW_320hack + self.payload_320hack
+        self.MTOW_320hack = 73500
+        self.MRW_320neo = 73900
 
         """Weights of A320neo"""
         self.MTOW_320neo = 73500                                    # Maximum Take-Off weight of A320neo            [kg]
@@ -198,13 +196,9 @@ class Constants():
         self.stoich_ratio_h2 = 1/34.3 #FAR
 
         """"Altitude and speed"""
-        #self.phases = np.array(['idle', 'taxi out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi in'])
-        self.phases = np.array(['idle', 'start of TO', ' start of climb',
-                                'cruise', 'start of descent', 'taxi in'])
-        #self.M0 = np.array([0.015, 0.02, 0.5, 0.5, 0.78, 0.5, 0.02])  # [-] Mach number
-        self.M0 = np.array([0.018, 0.25, 0.25, 0.78, 0.78, 0.2 ])  # [-] Mach number
-        #self.h = np.array([1, 1, 50, 3000, 11280, 300, 1])  # [m] altitude
-        self.h = np.array([1, 1, 1, 11280, 11280, 5])  # [m] altitude
+        self.phases = np.array(['idle', 'taxi out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi in'])
+        self.M0 = np.array([0.015, 0.02, 0.5, 0.5, 0.78, 0.5, 0.02])  # [-] Mach number
+        self.h = np.array([1, 1, 50, 3000, 11280, 300, 1])  # [m] altitude
         self.T0, self.p0, self.rho0, self.a0 = np.array([]), np.array([]), np.array([]), np.array([])
 
         for i in self.h:
