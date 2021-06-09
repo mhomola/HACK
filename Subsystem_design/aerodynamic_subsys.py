@@ -227,6 +227,7 @@ class AerodynamicCharacteristics(Constants):
 
         self.C_D_0_tank_sys_HACK = 2 * 1.3 * self.C_D_0_tank_HACK
         self.C_D_0_HACK = self.C_D_0_clean_neo + self.C_D_0_tank_sys_HACK
+        self.C_D_0_HACK_TO = self.C_D_0_TO_neo + self.C_D_0_tank_sys_HACK
 
     def L_over_D_cruise(self):
         self.ISA_calculator(h_input=self.cruise_altitude)

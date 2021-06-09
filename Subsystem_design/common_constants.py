@@ -47,6 +47,9 @@ class Constants():
         self.M = 0.78
         self.V_cruise = self.M * self.a_c
 
+        """ STRUCTURES"""
+        self.pylon_height = 0.38  # [m] height of the pylon of the tank
+
         '''Aerodynamics'''
         self.e = 0.992                                              # Oswald efficiency factor
         self.C_D_0_TO_neo = 0.078                                   # Zero-lift drag coefficient of A320neo - TO
@@ -172,11 +175,16 @@ class Constants():
         self.OEW_321neo = self.MZFW_321neo - self.MPLW_321neo       # Operational Empty weight of A320neo           [kg]
 
         """Dimensions of A320neo and A321neo"""
-        self.l_f_321neo = 44.51                                      # Fuselage length of A321neo                    [m]
+        self.l_f_321neo = 44.51                                     # Fuselage length of A321neo                    [m]
         self.l_f_320neo = 37.57                                     # Fuselage length of A320neo                    [m]
         self.l_cockpit_320neo = 5.04                                # Length of the cockpit of A320neo              [m]
         self.l_cabin_320neo = 29.53 - self.l_cockpit_320neo         # Length of the cabin of A320neo                [m]
         self.l_tail_320neo = self.l_f_320neo - 29.53                # Length of the tail of A320neo                 [m]
+
+        """Heat exchanger"""
+        self.T_LH2in = 30                                           # Temperature of H2 entering                    [K]
+        self.T_H2out = 264                                          # Temperature of H2 exiting                     [K]
+        self.r_i_nozzle = 0.542                                     # Inner radius heat exchanger                   [K]
 
         """Propulsion"""
         self.cp_air = 1000                                          # Specific heat constant air                    [J/kg/K]
@@ -277,8 +285,7 @@ class Constants():
         self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))
         self.mf_bleed = 0  # [kg/s]
 
-        """ STRUCTURES"""
-        self.pylon_height = 0.38                                                # [m] height of the pylon of the tank
+
 
     # def fuselage_length(self,vol_eff, vol_fus):
     #     """
