@@ -2,6 +2,7 @@
 import numpy as np
 from Subsystem_design.common_constants import Constants
 from math import *
+from Subsystem_design.aerodynamic_subsys import AerodynamicCharacteristics
 '''
 #In constants:
 self.points = np.array(['Station 1: Idle',
@@ -34,50 +35,110 @@ duration_2_to_4_climb_time = 20 #min                 climb phase
 duration_4_to_5_cruise_time = 217 #min
 duration_5_to_7_descent_time = 18 #min
 duration_7_to_8 = 8 #min includes approach + taxi in
-'''
 
+'''
 harmonic_range = 3200000  #m
 
 #climb_angle = np.degrees(np.arcsin(cruise_altitude / (climb_distance_fraction * harmonic_range )))
 #from sara:
-mf_fuel = [1.2,5,7,6,3,2]
+#mf_fuel = [1.2,5,7,6,3,2]
 
-durations = 60* [7.5,1,20,217,18,8] #taxi out, takeoff, climb, cruise, descent, taxi in
-h = [1,1,1,11280,11280,1]
+#durations = 60* [7.5,1,20,217,18,8] #taxi out, takeoff, climb, cruise, descent, taxi in   16290 s total flight
+#h = [0,0,0,10400,11600,0]
 
-v_tas = []
+#v_tas = []
 
-
-
-
+'''
 class thrust_req(Constants):
     def __init__(self):
         super().__init__()
+        #self.C_D_0_HACK =
+        self.durations = [60* 7.5, 60 * 1, 60 * 20, 60 * 217, 60 * 18, 60 * 8]
+        self.mf_fuel = [0.09,1.4,1.4,0.52,0.6,0.05]
+        self.Cd0_takeoff = 0.078
+        self.AR = 10
+
+    def weight(self):  # Calculated using
+        self.ROC = self.cruise_altitude / (self.durations[2] )
+
+        fuel_for_phases=[]
+        for i in range(len(self.mf_fuel)):
+            fuel_for_phases.append(self.mf_fuel[i] * self.durations[i])
+        fuel_weight = sum(fuel_for_phases)
+        self.weight_st_1 = fuel_weight + self.OEW_320hack + self.payload_320hack
+        self.weight_st_12 = self.weight_st_1 - self.mf_fuel[0] * self.durations[0]
+        self.weight_st_2 = self.weight_st_12 - self.mf_fuel[1] * self.durations[1]
+        self.weight_st_3 = self.weight_st_2 - self.mf_fuel[2] * self.durations[2]
+        self.weight_st_4 = self.weight_st_3 - self.mf_fuel[3] * self.durations[3]
+        self.weight_st_5 = self.weight_st_4 - self.mf_fuel[4] * self.durations[4]
+
+        self.T_climb = (self.ROC * self.weight_st_2) / 84.9
+        self.acc = 0.12
+        self.T_Acc = self.weight_st_2 * self.acc
+
+        Cl_takeoff = (self.weight_st_2 * 2) / (1.225 * 84.9 ** 2 * self.S)
+        Cd = self.Cd0_takeoff + Cl_takeoff ** 2 / np.pi * self.AR * self.e
+        self.T_drag = Cd * 0.5 * 1.225 * 84.9 ** 2 ** 2 * self.S
+
+        self.total_T_climb = self.T_climb + self.T_Acc + self.T_drag
+
 
 
     def weight(self,t):
         w = w0 - (t-t0) * mf_fuel[i]
         return w
+'''
+class thrust_req(Constants):
+    def __init__(self):
+        super().__init__()
+        self.durations = 60 * np.array([7.5, 1, 20, 217, 18, 8])
+        self.t_array =np.arange(0, np.sum(self.durations), 30)
+        self.h = np.array([0., 0., 0., 10400., 11600, 0.])
+        self.taxiout_time = 7.5*60
+        self.takeoff_time =8.5*60
+        self.FCA_time = 245.5*60
+        self.land_time = 263.5*60
+        self.stop_time = 271.5*60
+        self.liftoffv = 84.9
+        self.cruisev= 230
+        self.landv = 67.9
+        self.takeoff_acc = self.liftoffv / (self.takeoff_time - self.taxiout_time)
+        self.cruise_altitude = 11600
+        self.ROC = self.cruise_altitude/ (self.FCA_time-self.takeoff_time)
+        self.climb_acc = (self.cruisev-self.liftoffv) / (self.FCA_time-self.takeoff_time)
+        self.descent_acc = (self.landv-self.cruisev)/ (self.land_time-self.FCA_time)       #negative
+        self.land_decc = (0-self.landv) / (self.stop_time-self.land_time)         #negative
 
-    def velocity
 
-    def drag
 
-    def thrust
-
-while t < total time:
-    if t <= taxi_out:
-        i = 0
-        w0 = ini_hack_weight
-        t0 = 0
-
-    if t <= take_off_time and t > taxi out:
-     i = 1
-     w0 = t.weight(taxi_out)
-    t0 = taxi_out
+    def velocity(self):
+        v = np.ones(len(self.t_array))
+        v[self.t_array<self.taxiout_time] = 7
+        v[(self.t_array>=self.taxiout_time) & (self.t_array<self.takeoff_time)] = np.arange(0,self.liftoffv,
+                                                                                        self.takeoff_acc*30)
+        v[(self.t_array>=self.takeoff_time) & (self.t_array<self.FCA_time)] = np.arange(self.liftoffv,self.cruisev ,
+                                                                                    self.climb_acc*30)
+        v[(self.t_array>=self.FCA_time) & (self.t_array<self.land_time)] = np.arange(self.cruisev,self.landv,
+                                                                                 self.descent_acc*30)
+        v[(self.t_array>=self.land_time) & (self.t_array<self.stop_time)] = np.arange(self.landv,0,self.land_decc*30)
+        #v[self.t_array>self.takeoff_time]=
 
 
 
+        return (self.t_array, v)
+
+        #self.ISA_calculator(h_input=h)
+
+
+   # def drag(self):
+        #Cd0 = 0.025409934074969512
+       # CL2 =
+
+   # def thrust
+
+
+
+'''
     def weight(self):#Calculated using
         self.ROC = self.cruise_altitude / (self.durations[2] * 60)
 
@@ -90,27 +151,32 @@ while t < total time:
         self.weight_st_5 = self.weight_st_4 - mf_fuel[4] * durations[4]
 
         self.T_climb = (self.ROC * self.weight_st_2)/84.9
-        self.acc =
+        self.acc = 0.12
+        self.T_Acc = self.weight_st_2 * self.acc
+
+
+        Cl_takeoff = (self.weight_st_2 * 2) / (1.225*84.9**2 * hack_wing_area)
+        Cd = Cd0_takeoff + Cl_takeoff **2 / np.pi * ae.AR * self.e
+        self.T_drag = Cd * 0.5 * rho * 84.9**2 ** 2 * hack_wing_area
+
+        self.total_T_climb = self.T_climb + self.T_Acc + self.T_drag
 
     def thrust(self):
         self.weight()
 
-
-        #self.weight_st_4 = self.weight_st_3 - mf_fuel_climb * duration_3_to_4
-
-
-
-
+'''
 if __name__ == '__main__':
     t = thrust_req()
     con = Constants()
-    t.weight()
+    ae = AerodynamicCharacteristics()
+
+    t.velocity()
 
 
-    print('weight at idle', t.weight_st_1)
+    print('TO T', t.velocity())
 
 
-
+'''
 self.W = np.array([])
 
 T_req_to_climb = ROC * W[i]
@@ -140,5 +206,21 @@ for i in range(len(tb)):
 
 print(summ)
 
+'''
 
 
+'''
+durations = 60 *np.array([7.5, 1, 20, 217, 18, 8])
+print(durations)
+t_array = np.arange(0, np.sum(durations), 0.5)
+print(t_array)
+
+taxi_out = durations[0]
+take_off_time = 8.5
+v_array = []
+for i in t_array:
+    while i <= taxi_out:
+        v_array.append(10.3)
+# while i>taxi_out and i<=take_off_time:
+# velocity_array
+'''
