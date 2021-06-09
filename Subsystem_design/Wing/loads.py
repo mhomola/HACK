@@ -55,10 +55,10 @@ class Loads_w(Constants):
         ae.aero_functions(AoA_cruise=2)
         self.q_crit = 0.5 * self.rho * fe.V_A**2
 
-        x_arr = np.linspace(0.5*lw.width_f, lw.b/2, 1000)
+        x_arr = np.linspace(0.5*self.width_f, self.b/2, 1000)
         c_arr = np.zeros(len(x_arr))
         for i, x in enumerate(x_arr):
-            c_arr[i] = lw.chord(x=x)
+            c_arr[i] = self.chord(x=x)
         S_exp = 2 * spint.simps(y=c_arr, x=x_arr)  # Exposed surface ara [m^2]
         self.C_L_crit = self.L_max / (self.q_crit * S_exp)
         self.C_D_crit = ae.C_D_0_HACK - ae.C_D_0_fus_neo - ae.C_D_0_tank_sys_HACK - ae.C_D_o_engine - ae.C_D_0_Vtail - \
