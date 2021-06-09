@@ -1,21 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-# from Fuel_Masses_Estimation import kff, h2ff
 import math as m
 
 print('\n \n ---> PUMP DESIGN <--- ')
-
-# Fuel flow of hydrogen into the engine:
-
-# F_flow_H2 = [h2ff[0], h2ff[2], h2ff[4], h2ff[6], h2ff[8], h2ff[10]]
-# flight_phases = ['Idle', 'Taxi out', 'Climb', 'Cruise', 'Descent', 'Taxi in']
-#
-# print('\n The fuel flows during: ', flight_phases,
-#       '\n are                  : ', F_flow_H2)
-# plt.bar(flight_phases, F_flow_H2)
-# plt.show()
-#
-# max_ff = max(F_flow_H2)
 
 """
 So mass flow is constant and equal to m_ff = rho * A * V
@@ -56,8 +43,8 @@ class booster_pump():
             :return:
             """
             mu = 13.92 * 10**(-6) #dummy value
-            Re = self.rho * self.v * self.D /mu
-            f_d = 64/Re#Darcy Friction factor
+            self.Re = self.rho * self.v * self.D /mu
+            f_d = 64/self.Re#Darcy Friction factor
             p_L = f_d *self.rho/2* self.v/self.D #pressure loss per meter
             self.p_loss = p_L * self.L
             #self.p_loss = 0
@@ -79,6 +66,7 @@ class booster_pump():
             self.initial_pressure()
 
 if __name__ == '__main__':
-    boost_pump_1 =  booster_pump(L = 10 ,D = 0.05, mf= 0.121, h1 = 0.75, h2 = 0)
+    boost_pump_1 =  booster_pump(L = 10 ,D = 0.02, mf= 0.121, h1 = 0.75, h2 = 0)
     boost_pump_1.compute_booster()
-    print((boost_pump_1.p1/10**5-boost_pump_1.p2)*10**5) #pressure difference in Pascals
+    print((boost_pump_1.p2*10**5-boost_pump_1.p1)) #pressure difference in Pascals
+    print(boost_pump_1.Re)

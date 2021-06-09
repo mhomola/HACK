@@ -1,5 +1,5 @@
-import Mechanical_Design
-import Materials
+import Subsystem_design.Tank_Design.Mechanical_Design as Mechanical_Design
+import Subsystem_design.Tank_Design.Materials as Materials
 import numpy as np
 import math as m
 from Subsystem_design.fuel_required import V_H2
@@ -46,7 +46,7 @@ central_H2_vol = central_tank.inner_vol_inner_wall * m.floor(central.height/(cen
 
 pod_H2_vol = (total_vol - central_H2_vol)/2  # [m^3] the volume of LH2 in each pod
 
-pod = spacial_constraints(length=5.76, width=2, height=2)
+pod = spacial_constraints(length=5.761, width=2, height=2)
 pod_tank = Mechanical_Design.PodTank(constraints=pod, dp=Mechanical_Design.dp, s_a=Mechanical_Design.s_a,
                                       e_w=Mechanical_Design.e_w, material_insulation=Materials.MLI
                                       , material_inner=Materials.Al_2090_T81, material_outer=Materials.Al_2090_T81,
@@ -57,32 +57,40 @@ pod_tank.tank_design()
 weight_addition = central_tank.mass_tank * 2 + pod_tank.mass_tank * 2
 volume_all = central_tank.inner_vol_inner_wall * 2 + pod_tank.inner_vol_inner_wall * 2
 
+""" ---- Important Parameters of Tanks ----"""
+l_centre_tank = central_tank.length
+d_centre_tank = central_tank.r4 * 2
+mass_center_tank = central_tank.mass_tank
+volume_centre_tank = central_tank.inner_vol_inner_wall
+
 l_wing_pod = pod.length
-d_wing_pod = pod_tank.r4 *2
+d_wing_pod = pod_tank.r4 * 2
+mass_pod = pod_tank.mass_tank
+volume_pod = pod_tank.inner_vol_inner_wall
 
 if __name__ == '__main__':
 
     print("#######CENTRAL TANKS######")
-    print("Mass of one tank", central_tank.mass_tank, "[kg]")
+    print("Mass of one tank", mass_center_tank, "[kg]")
     print("Insulation of the tank thickness", central_tank.t_insulation*100, "[cm]")
     print("Thickness inner wall", central_tank.t_wall_inner*1000, "[mm]")
     print("Thickness outer wall", central_tank.t_wall_outer *1000, "[mm]")
-    print("H2 volume that is stored per tank", central_tank.inner_vol_inner_wall, "[m^3]")
-    print("Outer Diameter of the tank[including insulation]", central_tank.r4*2, "[m]")
+    print("H2 volume that is stored per tank", volume_centre_tank, "[m^3]")
+    print("Outer Diameter of the tank[including insulation]", d_centre_tank, "[m]")
     print("Number of tanks tht can be accommodated in the central sector", m.floor(central.height/(central_tank.r4*2)))
     print("Required Heat = ", central_tank.Q_req, "vs Designed Heat =  ", central_tank.Q_tot)
 
-    print("#######PODDED TANKS######")
-    print("Mass of one tank", pod_tank.mass_tank, "[kg]")
+    print("#######PODDED TANKS#######")
+    print("Mass of one tank", mass_pod, "[kg]")
     print("Insulation of the tank thickness", pod_tank.t_insulation * 100, "[cm]")
     print("Thickness inner wall", pod_tank.t_wall_inner * 1000, "[mm]")
     print("Thickness outer wall", pod_tank.t_wall_outer * 1000, "[mm]")
-    print("H2 volume that is stored per tank", pod_tank.inner_vol_inner_wall, "[m^3]")
+    print("H2 volume that is stored per tank", volume_pod, "[m^3]")
     print("Outer Diameter of the tank[including insulation]", d_wing_pod, "[m]")
     print("Length", l_wing_pod, "[m]")
     print("Required Heat = ", pod_tank.Q_req, "vs Designed Heat =  ", pod_tank.Q_tot)
 
-
+    print("#######OVERALL#######")
     print("Added Weight = ", weight_addition, "[kg]")
     print("Volume of all Tanks = ", volume_all, "[m^3]", "complying with the required ", V_H2/1000, "[m^3]")
 

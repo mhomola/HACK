@@ -24,10 +24,7 @@ class FlightEnvelope(Constants):
 
     def create_maneuver_envelope(self):
 
-        w = Compute_weight()
-        w.weight_break_down_HACK(h2_vol_center=11.34, h2_vol_f=30.69)  # todo: Check if values are ok
-
-        W_TO = w.MTOW_HACK * self.g_0
+        W_TO = self.MTOW_320neo * self.g_0
         W_land = self.MLW_320neo * self.g_0  # todo: Check if value is ok
         W_TO_lbs = W_TO * self.conv3 / self.g_0
 
@@ -106,12 +103,10 @@ class FlightEnvelope(Constants):
     def create_gust_envelope_main_wing(self, ):
         ae = AerodynamicCharacteristics()
         ae.aero_functions(AoA_cruise=2)
-        w = Compute_weight()
-        w.weight_break_down_HACK(h2_vol_center=11.34, h2_vol_f=30.69)  # todo: Check if values are ok
 
-        W_TO = w.MTOW_HACK * self.g_0
+        W_TO = self.MTOW_320neo * self.g_0
         W_land = self.MLW_320neo * self.g_0  # todo: Check if value is ok
-        MZFW = w.MZFW_HACK * self.g_0
+        MZFW = self.MZFW_320neo * self.g_0
         W_TO_lbs = W_TO * self.conv3 / self.g_0
 
         Fgz_SL = 1 - self.max_altitude / 76200
