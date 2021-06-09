@@ -102,30 +102,46 @@ class thrust_req(Constants):
         self.liftoffv = 84.9
         self.cruisev= 230
         self.landv = 67.9
-        self.takeoff_acc = self.liftoffv / (self.takeoff_time - self.taxiout_time)
+        self.takeoff_acc = (self.liftoffv-7) / (self.takeoff_time - self.taxiout_time)
         self.cruise_altitude = 11600
         self.ROC = self.cruise_altitude/ (self.FCA_time-self.takeoff_time)
         self.climb_acc = (self.cruisev-self.liftoffv) / (self.FCA_time-self.takeoff_time)
         self.descent_acc = (self.landv-self.cruisev)/ (self.land_time-self.FCA_time)       #negative
         self.land_decc = (0-self.landv) / (self.stop_time-self.land_time)         #negative
 
+        self.mf_fuel = np.array([0.09,1.4,1.4,0.52,0.6,0.05])
+        self.fuel_for_phases = self.mf_fuel * self.durations
+        self.w1 = self.fuel_for_phases + self.OEW_320hack + self.payload_320hack
+        self.w2 = self.w1 - self.mf_fuel[0] * self.durations[0]
+        self.w3 = self.w2 - self.mf_fuel[1] * self.durations[1]
+        self.w4 = self.w3 - self.mf_fuel[2] * self.durations[2]
+        self.w5 = self.w4 - self.mf_fuel[3] * self.durations[3]
+        self.w6 = self.w5 - self.mf_fuel[4] * self.durations[4]
+        self.w7 = self.w6 - self.mf_fuel[5] * self.durations[5]
+
 
 
     def velocity(self):
         v = np.ones(len(self.t_array))
         v[self.t_array<self.taxiout_time] = 7
-        v[(self.t_array>=self.taxiout_time) & (self.t_array<self.takeoff_time)] = np.arange(0,self.liftoffv,
+        v[(self.t_array>=self.taxiout_time) & (self.t_array<self.takeoff_time)] = np.arange(7,self.liftoffv,
                                                                                         self.takeoff_acc*30)
-        v[(self.t_array>=self.takeoff_time) & (self.t_array<self.FCA_time)] = np.arange(self.liftoffv,self.cruisev ,
+        v[(self.t_array>=self.takeoff_time) & (self.t_array<self.FCA_time)] = np.arange(self.liftoffv,self.cruisev,
                                                                                     self.climb_acc*30)
         v[(self.t_array>=self.FCA_time) & (self.t_array<self.land_time)] = np.arange(self.cruisev,self.landv,
                                                                                  self.descent_acc*30)
         v[(self.t_array>=self.land_time) & (self.t_array<self.stop_time)] = np.arange(self.landv,0,self.land_decc*30)
         #v[self.t_array>self.takeoff_time]=
 
-
-
         return (self.t_array, v)
+    def mass(self,t):
+        m = np.ones(len(self.t_array))
+        m[self.t_array < self.taxiout_time] = np.arange(self.w1, self.w2, mf_fuel[0]*30)
+        m[(self.t_array >= self.taxiout_time) & (self.t_array < self.takeoff_time)] = 6
+
+
+
+
 
         #self.ISA_calculator(h_input=h)
 
