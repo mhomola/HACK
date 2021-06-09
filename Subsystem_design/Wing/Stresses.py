@@ -8,10 +8,12 @@ import matplotlib.collections as mcoll
 import matplotlib.path as mpath
 
 class stresses():
-    def __init__(self,Ixx,Iyy,h,L,t_upper,t_spar1,t_spar2,t_lower):
+    def __init__(self,Ixx,Iyy,Ixx_str,Iyy_str,h,L,t_upper,t_spar1,t_spar2,t_lower):
         """
-        :param Ixx: [m^4] MOI about x-axis(normal)
-        :param Iyy: [m^4] MOI about y-axis(normal)
+        :param Ixx: [m^4] MOI about x-axis(normal) no stringer
+        :param Iyy: [m^4] MOI about y-axis(normal) no stringer
+        :param Ixx_str: [m^4] MOI about x-axis(normal) with stringer
+        :param Iyy_str: [m^4] MOI about y-axis(normal) with stringer
         :param h: [m] height of the wing box
         :param L: [m] width of the wingbox
         :param t_upper: [m] upper plate thickness
@@ -21,6 +23,8 @@ class stresses():
         """
         self.Ixx = Ixx
         self.Iyy = Iyy
+        self.Ixx_str = Ixx_str
+        self.Iyy_str = Iyy_str
         self.h = h
         self.L = L
         self.t_upper = t_upper
@@ -312,32 +316,32 @@ class stresses():
         def sigma1(s):
             x = s
             y = -self.h/2
-            return self.Mx * y/self.Ixx + self.My * x/ self.Iyy
+            return self.Mx * y/self.Ixx_str + self.My * x/ self.Iyy_str
 
         def sigma2(s):
             x = -self.L/2
             y = -self.h/2 + s
-            return self.Mx * y/self.Ixx + self.My * x/ self.Iyy
+            return self.Mx * y/self.Ixx_str  + self.My * x/ self.Iyy_str
 
         def sigma3(s):
             x = self.L/2 - s
             y = self.h/2
-            return self.Mx * y/self.Ixx + self.My * x/ self.Iyy
+            return self.Mx * y/self.Ixx_str  + self.My * x/ self.Iyy_str
 
         def sigma4(s):
             x = -self.L/2
             y = self.h/2-s
-            return self.Mx * y / self.Ixx + self.My * x / self.Iyy
+            return self.Mx * y / self.Ixx_str  + self.My * x / self.Iyy_str
 
         def sigma5(s):
             x = -self.L / 2
             y = - s
-            return self.Mx * y / self.Ixx + self.My * x / self.Iyy
+            return self.Mx * y / self.Ixx_str  + self.My * x / self.Iyy_str
 
         def sigma6(s):
             x = - self.L/2 + s
             y = - self.h/2
-            return self.Mx * y / self.Ixx + self.My * x / self.Iyy
+            return self.Mx * y / self.Ixx_str  + self.My * x / self.Iyy_str
 
         self.sigma1 = sigma1
         self.sigma2 = sigma2
@@ -649,12 +653,12 @@ if __name__ == '__main__':
     t = 0.002
     Ixx = L*h**3/12 - (L-t)*(h-t)**3/12
     Iyy = h * L ** 3 / 12 - (h - t) * (L - t) ** 3 / 12
-    chord1 = stresses(Ixx=Ixx,Iyy=Iyy,h=h,L=L,t_upper=t,t_spar1=t,t_spar2=t,t_lower=t)
+    chord1 = stresses(Ixx=Ixx,Iyy=Iyy,Ixx_str = Ixx, Iyy_str=Iyy,h=h,L=L,t_upper=t,t_spar1=t,t_spar2=t,t_lower=t)
     chord1.shear_loads(Vx=500,Vy=750,T=1000)
-    chord1.compute_stresses()
     #chord1.shear_flow_plotter(type = "total")
     chord1.bending_loads(Mx = 5550,My= 0)
     #chord1.sigma_plotter()
+    chord1.compute_stresses()
     chord1.vm_plotter(show=True)
     print(chord1.vm_max)
 

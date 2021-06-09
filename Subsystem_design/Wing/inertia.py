@@ -16,7 +16,7 @@ class Inertia(Constants):
 
     def wb_config(self, x):
 
-        c = self.chord(x=x)
+        c = self.chord(x=x) #spanwise location
 
         sep_str = self.w_sk_c * c / (self.n_str + 1)
         self.x_loc_str = np.zeros(self.n_str)
