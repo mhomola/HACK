@@ -165,7 +165,7 @@ plt.plot(t,Em_sum,label = 'H2')
 plt.plot(t,Eh_sum,label = 'Kerosene')
 plt.plot(t,E_tot,label = 'Total')
 plt.ylabel('Energy consumed over mission [MJ]')
-plt.xlabel('Time [s]')
+plt.xlabel(' Time [s]')
 plt.legend()
 plt.show()
 
@@ -179,7 +179,7 @@ plt.ylabel('Fuel flow [kg/s]')
 plt.xlabel('Time [s]')
 plt.show()
 
-
+print(t2)
 
 # Mission fuel fractions
 #Hydrogen

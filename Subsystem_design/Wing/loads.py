@@ -12,7 +12,7 @@ class Loads_w(Constants):
 
     def __init__(self):
         super().__init__()
-        self.dx = 0.001
+        self.dx = 0.01
         self.m1 = (self.c_kink_out - self.c_root) / (0.5 * self.b_in)
         self.m2 = (self.c_tip - self.c_kink_out) / (0.5 * self.b_out)
         self.xL_c = 0.163  # Distance from the quarter chord to the center of the wing box over the local chord length
@@ -44,8 +44,8 @@ class Loads_w(Constants):
 
                 # print('\n At an altitude of ', alti, ' m, a weight of ', weight, ' N, the max lift is ', L_tot)
 
-        # print('\n At an altitude of ', altitudes[index_j], ' m, a weight of ', weights[index_i],
-        #       ' N, the max lift is ', self.L_max)
+        print('\n At an altitude of ', altitudes[index_j], ' m, a weight of ', weights[index_i],
+              ' N, the max lift is ', self.L_max)
 
 
         self.ISA_calculator(h_input=altitudes[index_j])
@@ -55,10 +55,10 @@ class Loads_w(Constants):
         ae.aero_functions(AoA_cruise=2)
         self.q_crit = 0.5 * self.rho * fe.V_A**2
 
-        x_arr = np.linspace(0.5*lw.width_f, lw.b/2, 1000)
+        x_arr = np.linspace(0.5*self.width_f, self.b/2, 1000)
         c_arr = np.zeros(len(x_arr))
         for i, x in enumerate(x_arr):
-            c_arr[i] = lw.chord(x=x)
+            c_arr[i] = self.chord(x=x)
         S_exp = 2 * spint.simps(y=c_arr, x=x_arr)  # Exposed surface ara [m^2]
         self.C_L_crit = self.L_max / (self.q_crit * S_exp)
         self.C_D_crit = ae.C_D_0_HACK - ae.C_D_0_fus_neo - ae.C_D_0_tank_sys_HACK - ae.C_D_o_engine - ae.C_D_0_Vtail - \
