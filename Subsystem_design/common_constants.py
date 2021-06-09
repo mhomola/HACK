@@ -183,7 +183,7 @@ class Constants():
 
         """Heat exchanger"""
         self.T_LH2in = 30                                           # Temperature of H2 entering                    [K]
-        self.T_H2out = 264                                          # Temperature of H2 exiting                     [K]
+        self.T_H2out = 150                                          # Temperature of H2 exiting                     [K]
         self.r_i_nozzle = 0.542                                     # Inner radius heat exchanger                   [K]
 
         """Propulsion"""

@@ -12,6 +12,7 @@ class Inertia(Constants):
         self.h_str = 0.03  # Stringer height [m]
         self.h_sp_c = 0.091  # Height of the spar over local chord length
         self.n_str = 13  # Number of stringers on top and bottom (n_str * 2 = total_n_str)
+
         self.w_sk_c = 0.43  # Width of the skin over the local chord length
 
     def chord_inertia(self, x):
@@ -41,14 +42,14 @@ class Inertia(Constants):
         sk_bot_x = sk_top_x
         sk_bot_y = - sk_top_y
 
-        # plt.plot(sp_left_x, sp_left_y, color="black")
-        # plt.plot(sp_right_x, sp_right_y, color="black")
-        # plt.plot(sk_top_x, sk_top_y, color="black")
-        # plt.plot(sk_bot_x, sk_bot_y, color="black")
-        # plt.scatter(x=self.x_loc_str, y=y_loc_str, color='red', marker='o')
-        # plt.scatter(x=0, y=0, color='g', marker='+')
-        # plt.axis('equal')
-        # # plt.show()
+        plt.plot(sp_left_x, sp_left_y, color="black")
+        plt.plot(sp_right_x, sp_right_y, color="black")
+        plt.plot(sk_top_x, sk_top_y, color="black")
+        plt.plot(sk_bot_x, sk_bot_y, color="black")
+        plt.scatter(x=self.x_loc_str, y=y_loc_str, color='red', marker='o')
+        plt.scatter(x=0, y=0, color='g', marker='+')
+        plt.axis('equal')
+        plt.show()
 
 
     def compute_inertia(self, x):
