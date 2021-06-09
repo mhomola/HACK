@@ -91,7 +91,7 @@ class thrust_req(Constants):
 class thrust_req(Constants):
     def __init__(self):
         super().__init__()
-        self.durations = 60 * np.array([7.5, 1, 20, 217, 18, 8])
+        self.durations = 60 * np.array([7.5, 1., 20., 217., 18., 8.])
         self.t_array =np.arange(0, np.sum(self.durations)+30, 30)
         self.h = np.array([0., 0., 0., 10400., 11600, 0.])
         self.taxiout_time = 7.5*60
@@ -142,13 +142,27 @@ class thrust_req(Constants):
 
     def mass(self):
         m = np.zeros(len(self.t_array))
-        m[self.t_array < self.taxiout_time] = np.arange(self.w1, self.w2, -self.mf_fuel[0]*30)
-        m[(self.t_array >= self.taxiout_time) & (self.t_array < self.takeoff_time)] = np.arange(self.w2, self.w3, -self.mf_fuel[1]*30)
-        m[(self.t_array >= self.takeoff_time) & (self.t_array < self.cruise_start_time)] = np.arange(self.w3, self.w4, -self.mf_fuel[2] * 30)
-        m[(self.t_array >= self.cruise_start_time) & (self.t_array < self.cruise_end_time)] = np.arange(self.w4, self.w5, -self.mf_fuel[3] * 30)
-        m[(self.t_array >= self.cruise_end_time) & (self.t_array < self.land_time)] = np.arange(self.w5,self.w6, -self.mf_fuel[4] * 30)
-        m[(self.t_array >= self.land_time) & (self.t_array < self.stop_time)] = np.arange(self.w6, self.w7, -self.mf_fuel[5] * 30)
 
+        m[self.t_array <self.taxiout_time] = np.linspace(self.w1, self.w2 -self.mf_fuel[0] * 30, len(self.t_array[self.t_array <self.taxiout_time]))
+        # print(np.linspace(self.w1, self.w2 -self.mf_fuel[0] * 30, len(self.t_array[self.t_array <self.taxiout_time])))
+        # print(np.linspace(self.w2,self.w3-self.mf_fuel[1]*30,len(self.t_array[(self.t_array >= self.taxiout_time) & (self.t_array < self.takeoff_time)])))
+        # print(np.linspace(self.w3,self.w4 -self.mf_fuel[2] * 30,len(self.t_array[(self.t_array >= self.takeoff_time) & (self.t_array < self.cruise_start_time)])))
+        m[(self.t_array >= self.taxiout_time) & (self.t_array < self.takeoff_time)] = np.linspace(self.w2,
+                                                                                                  self.w3-self.mf_fuel[1]*30,
+                                                                                                  len(self.t_array[(self.t_array >= self.taxiout_time) & (self.t_array < self.takeoff_time)]))
+        m[(self.t_array >= self.takeoff_time) & (self.t_array < self.cruise_start_time)] = np.linspace(self.w3,
+                                                                                                       self.w4 -self.mf_fuel[2] * 30,
+                                                                                                       len(self.t_array[(self.t_array >= self.takeoff_time) & (self.t_array < self.cruise_start_time)]))
+        m[(self.t_array >= self.cruise_start_time) & (self.t_array < self.cruise_end_time)] = np.linspace(self.w4,
+                                                                                                        self.w5-self.mf_fuel[3] * 30,
+                                                                                                        len(self.t_array[(self.t_array >= self.cruise_start_time) & (self.t_array < self.cruise_end_time)]))
+        m[(self.t_array >= self.cruise_end_time) & (self.t_array < self.land_time)] = np.linspace(self.w5,
+                                                                                                self.w6-self.mf_fuel[4] * 30,
+                                                                                                len(self.t_array[(self.t_array >= self.cruise_end_time) & (self.t_array < self.land_time)]))
+        m[(self.t_array >= self.land_time) & (self.t_array <= self.stop_time)] = np.linspace(self.w6,
+                                                                                          self.w7-self.mf_fuel[5] * 30,
+                                                                                          len(self.t_array[(self.t_array >= self.land_time) & (self.t_array <= self.stop_time)]))
+        #print(self.t_array[[(self.t_array >= self.land_time) & (self.t_array <= self.stop_time)]])
         return (m)
 
 
@@ -197,7 +211,7 @@ if __name__ == '__main__':
     con = Constants()
     ae = AerodynamicCharacteristics()
 
-    t.velocity()
+    #t.velocity()
     t.mass()
 
 
