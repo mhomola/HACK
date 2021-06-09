@@ -51,9 +51,9 @@ def ISA_t(h):
 
 
 def P_com(h, p2, m):
-    T1 = ISA_t(h)
 
-    nc = 0.7
+    T1 = ISA_t(h)
+    nc = 0.75
     gamma = 1.4
     g = 9.81
     R = 287.05
@@ -90,22 +90,28 @@ def Req_power(mair):
 
     # Altitude of different mission stages
     a_ground = 0
-    a_climb = np.arange(0,11001,1)
+    a_climb = np.arange(0,11000,1)
     a_cruise = 11000
 
-    # Power of different mission stages
-    pc_ground = P_com(a_ground,121590,mair)[0]
-    pc_climb = np.average([P_com(a,121590,mair)[0] for a in a_climb])
-    pc_cruise = P_com(a_cruise,121590,mair)[0]
+    pFC = 101325
 
-    print(pc_ground)
+    # Power of different mission stages
+    pc_ground = P_com(a_ground,pFC,mair)[0]
+    pc_climb = np.average([P_com(a,pFC,mair)[0] for a in a_climb])
+    pc_cruise = P_com(a_cruise,pFC,mair)[0]
+
+    print('powers: ',pc_ground,pc_climb,pc_cruise)
+
+    print('p cruise: ', pc_cruise, 'W')
+
+    print(pc_cruise)
 
     power = np.array([p_ground+pc_ground,p_take_off+pc_ground,p_climb+pc_climb,p_cruise+pc_cruise,p_descend+pc_climb,p_landing+pc_ground])
     time = np.array([t_ground,t_take_off,t_climb,t_cruise,t_descend,t_landing])
 
     average = sum(power*time)/sum(time)
 
-    print('Average power [W]: ', average)
+    #print('Average power [W]: ', average)
 
     avg_arr = average*np.ones(len(power+1))
     difference = average - power
@@ -126,17 +132,16 @@ def Req_power(mair):
         power_tot_upd.append(power_tot[i]-min(power_tot))
         power_bat.append(average-power_all[i])
 
-    #plt.plot(time_tot, power_tot)
-    plt.plot(time_tot, power_tot_upd)
-    #plt.plot(time_tot, avg_arr)
-    plt.ylabel('Energy stored in battery [kJ]')
-    plt.xlabel('Time [min]')
-    plt.show()
+    # #plt.plot(time_tot, power_tot)
+    # plt.plot(time_tot, power_tot_upd)
+    # #plt.plot(time_tot, avg_arr)
+    # plt.ylabel('Energy stored in battery [kJ]')
+    # plt.xlabel('Time [min]')
+    # plt.show()
 
     #print('Maximum energy stored in battery: ', max(power_tot_upd), ' kJ')
 
-    print(average, max(power_tot_upd))
-    return average, max(power_tot_upd)
+    return average, max(power_tot_upd), time_tot, power_tot_upd
 
 # Mass flow required
 Mo2 = 31.998    #g/mol
@@ -145,10 +150,11 @@ lam = 2         #stochiometric ratio
 Pelec = fc.SF*fc.Pele   #FC power output
 Farad = 96485   #Faraday's constant
 Vc = fc.Vc      #Cell voltage
-po2 = 0.21
+po2 = 0.22
 pN2 = 0.78
 Mair = po2*Mo2+pN2*MN2
 W_rat = Mo2*po2/Mair
+print(W_rat)
 
 def mfoAir(Pel):
     mfo2 = (Mo2*Pel*lam)/(4*Vc*Farad)
@@ -157,7 +163,27 @@ def mfoAir(Pel):
 
 if __name__ == '__main__':
 
-    FC_power, bat_E = Req_power(0)
-    print(bat_E)
+    FC_power = 0
+    FC_power_new, bat_E, time_tot1, power_tot1 = Req_power(0)
+
+    print(FC_power_new / 1000, " kW")
+    print(bat_E / 1000000, " MJ")
+
+    while(abs(FC_power-FC_power_new)/FC_power_new >= 0.05):
+        FC_power = FC_power_new
+        mAir = mfoAir(FC_power)
+        FC_power_new, bat_E, time_tot2, power_tot2 = Req_power(mAir)
+
+        print(FC_power_new/1000," kW")
+        print(bat_E/1000000," MJ")
+
+
+    plt.plot(time_tot1, power_tot1, label = 'No compressor')
+    plt.plot(time_tot2, power_tot2, label = 'Compressor')
+    # plt.plot(time_tot, avg_arr)
+    plt.legend()
+    plt.ylabel('Energy stored in battery [kJ]')
+    plt.xlabel('Time [min]')
+    plt.show()
 
 
