@@ -9,8 +9,8 @@ import numpy as np
 class Climb_perdormance(Constants):
     def __init__(self):
         super().__init__()
-        self.max_cont_thrust = 120.64*10**3
-        self.takeoff_thrust = 118.68*10**3
+        self.max_cont_thrust = 118.68*10**3
+        self.takeoff_thrust = 120.64*10**3
 
     def diff_density(self, input_altitude):
         alt_arr = [input_altitude - 1, input_altitude, input_altitude + 1]
@@ -41,8 +41,8 @@ class Climb_perdormance(Constants):
         aerodynamics.wing_AR()
         CD= 4 * aerodynamics.C_D_0_clean_neo
         CL=np.sqrt(3 * aerodynamics.C_D_0_clean_neo*np.pi*aerodynamics.AR*aerodynamics.e)
-        print(CD, CL)
-        maxrc = ((self.max_cont_thrust / W)-(CD/CL))*np.sqrt(2*W/(self.S*self.rho_0*CL))
+        print(CD, CL, 'AR= ', aerodynamics.AR)
+        maxrc = ((2*self.max_cont_thrust / W)-(CD/CL))*np.sqrt(2*W/(self.S*self.rho_0*CL))
         return maxrc
 
     def max_ca(self,W):
@@ -52,13 +52,13 @@ class Climb_perdormance(Constants):
         CD= 2 * aerodynamics.C_D_0_clean_neo
         CL = np.sqrt(aerodynamics.C_D_0_clean_neo*np.pi*aerodynamics.AR*aerodynamics.e)
         print(CD, CL)
-        maxca = ((self.max_cont_thrust/W)-(CD/CL))
+        maxca = ((2*self.max_cont_thrust/W)-(CD/CL))
         return maxca
 
 if __name__ == '__main__':
     p = Climb_perdormance()
     p.diff_density(input_altitude=11000)
     print('Steady rate of climb = ', p.rc_steady(W=702364.53)*197, '[f/m]')
-    print('Max RC = ',p.max_rc(W=702364.53)*197, '[f/m]')
-    print('Max CA = ', p.max_ca(W=702364.53))
+    print('Max RC = ',p.max_rc(W=720300)*197, '[f/m]')
+    print('Max CA = ', p.max_ca(W=720300))
     print('Unsteady rate of climb = ', p.rc_real(p.rc_steady(W=702364.53),V_EAS=150)*197, '[f/m]')

@@ -9,6 +9,9 @@ Tres_XLPE = 3.5 #m*K/W
 Tres_tot = Tres_AIR_45+Tres_XLPE
 Tamb = 40
 
+def wire_sizing(I,Tamb):
+    return 2*np.sqrt((I*I*Cu_res20*(1+alpha*(T-T0))*Tres_tot)/(np.pi*(T-Tamb)))
+
 T = 50
 I = np.arange(100,1501)
 d1 = 2*np.sqrt((I*I*Cu_res20*(1+alpha*(T-T0))*Tres_tot)/(np.pi*(T-Tamb)))

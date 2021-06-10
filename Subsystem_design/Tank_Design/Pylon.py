@@ -63,7 +63,7 @@ def pylon():
     t3 = t3 - 0.000001  # [m]
 
     t_list = [t1, t2, t3]
-    t_pylon = np.max(t_list)      # all computed thicknesses
+    t_pylon = np.max(t_list) * 1.5      # all computed thicknesses
     mass_pylon = l_pylon * (h_pylon * w_pylon - (h_pylon - 2 * t_pylon) * (w_pylon - 2 * t_pylon)) * density_al_2090
 
     return t_pylon, l_pylon, h_pylon, w_pylon, mass_pylon

@@ -2,7 +2,7 @@
 import numpy as np
 from Subsystem_design.common_constants import Constants
 from math import *
-from Subsystem_design.aerodynamic_subsys import AerodynamicCharacteristics
+from Subsystem_design.aerodynamic_subsys.AerodynamicCharacteristics import cd0clean
 '''
 #In constants:
 self.points = np.array(['Station 1: Idle',
@@ -89,7 +89,7 @@ class thrust_req(Constants):
         return w
 '''
 class thrust_req(Constants):
-    def __init__(self):
+    def __init__(self, cd0clean):
         super().__init__()
         self.durations = 60 * np.array([7.5, 1., 20., 217., 18., 8.])
         self.t_array =np.arange(0, np.sum(self.durations)+30, 30)
@@ -120,7 +120,14 @@ class thrust_req(Constants):
         self.w5 = self.w4 - self.mf_fuel[3] * self.durations[3]
         self.w6 = self.w5 - self.mf_fuel[4] * self.durations[4]
         self.w7 = self.w6 - self.mf_fuel[5] * self.durations[5]
-        #self.warray  = np.array([self.w1,self.w2,self.w3,self.w4,self.w5,self.w6,self.w7])
+        self.warray  = np.array([self.w1,self.w2,self.w3,self.w4,self.w5,self.w6,self.w7])
+
+        self.cd0array = self.durations[0]/30 * cd0array.append(cd0clean[0]) + self.durations[1]/30 * cd0array
+        self.cd0_taxiout = cd0clean[0] * self.taxiout_time
+
+
+
+
 
 
 
@@ -138,7 +145,7 @@ class thrust_req(Constants):
         v[(self.t_array>=self.land_time) & (self.t_array<self.stop_time)] = np.arange(self.landv,0,self.land_decc*30)
 
 
-        return (self.t_array, v)
+        return (self.t_array, v, self.t_array[57],v[(self.t_array>=self.taxiout_time) & (self.t_array<self.takeoff_time)])
 
     def mass(self):
         m = np.zeros(len(self.t_array))
@@ -163,10 +170,11 @@ class thrust_req(Constants):
                                                                                           self.w7-self.mf_fuel[5] * 30,
                                                                                           len(self.t_array[(self.t_array >= self.land_time) & (self.t_array <= self.stop_time)]))
         #print(self.t_array[[(self.t_array >= self.land_time) & (self.t_array <= self.stop_time)]])
-        return (m)
 
+        return (m, self.warray, np.where(m==62454.4))
 
-
+    def drag(self):
+        self.CD = self.CD0 + (self.CL) **2 / np.pi * self.Cd
 
         #self.ISA_calculator(h_input=h)
 
@@ -207,9 +215,11 @@ class thrust_req(Constants):
 
 '''
 if __name__ == '__main__':
-    t = thrust_req()
+    t = thrust_req(cd0clean)
     con = Constants()
     ae = AerodynamicCharacteristics()
+    ae.drag_increase_cruise(AoA_cruise=2)
+    cdocruise = ae.C_D_0_HACK
 
     #t.velocity()
     t.mass()
