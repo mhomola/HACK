@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import FCParameters as fc
 import Battery_Sizing as BS
 import Polarization_curve_model as PCM
+import Wires_design as WD
 
 SF = fc.SF
 FC_power = SF*0.001*BS.final_bat_size()[0]
@@ -23,43 +24,54 @@ mMirai = 56 #kg
 VpCell = VMirai/Ncells
 mpCell = mMirai/Ncells
 
-PtoN = 114/370
+PtoN = 120/400
 
 def calc_current(V):
-    return FC_power/V
+    return FC_power*1000/V
 
 def calc_cur_density(Vc):
     return PCM.inverse(Vc)
 
 def FC_sizing():
 
-    V = 1500 #V
+    V = 1200 #V
     n_series = round(V/Vc)
     I = calc_current(V)
     iden = calc_cur_density(Vc)
 
-    n_paral = FC_power/PtoN
-
-    n_cells = n_series*n_paral
+    n_cells = round(FC_power/PtoN)
+    n_paral = round(n_cells/n_series)
+    n_cells = n_paral*n_series
 
     V_stack = n_cells*VpCell
     m_stack = n_cells*mpCell
 
-    A = I/iden
-    l = V_stack/A
+    A = (I/iden)*0.0001
+    l = (V_stack*0.001)/A
     l_cell = l/n_series
 
-    return [n_series, n_paral, n_cells, I, iden, V_stack, m_stack, A, l, l_cell]
+    d_current = WD.wire_sizing(I,40)
+
+    return [n_series, n_paral, n_cells, I, iden, V_stack, m_stack, A/0.0001, l, l_cell,d_current]
+
 
 if __name__ == '__main__':
 
     sizing = FC_sizing()
 
     print()
-    print('Sizing of the fuel cell results:')
-    print('Number of cells in series:')
-    print('Number of cells in parallel:')
-    prin
+    print('Sizing of the fuel cell results: ')
+    print('Number of cells in series: ',round(sizing[0]))
+    print('Number of cells in parallel: ',round(sizing[1]))
+    print('Total number of cells: ',round(sizing[2]))
+    print('Current in the stack: ',round(sizing[3],2), 'A')
+    print('Current density: ',round(sizing[4],2), ' A/cm2')
+    print('Volume of the stack: ',round(sizing[5],2), ' l')
+    print('Mass of the stack: ',round(sizing[6],2), ' kg')
+    print('Active area: ',round(sizing[7],2), ' cm2')
+    print('Length of the stack: ',round(sizing[8],2), ' m')
+    print('length of the cell: ',round(sizing[9],4), ' m')
+    print('Diameter of the current: ', round(sizing[10]*100,2),' cm')
 
 
 
