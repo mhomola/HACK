@@ -54,6 +54,14 @@ def FC_sizing():
 
     return [n_series, n_paral, n_cells, I, iden, V_stack, m_stack, A/0.0001, l, l_cell,d_current]
 
+def total_system():
+
+    cost = B_cost + FC_power*sp_C
+    volume = B_volume + FC_power/sp_W
+    mass = B_mass + FC_power/sp_V
+
+    return [cost, volume, mass]
+
 
 if __name__ == '__main__':
 
@@ -72,6 +80,11 @@ if __name__ == '__main__':
     print('Length of the stack: ',round(sizing[8],2), ' m')
     print('length of the cell: ',round(sizing[9],4), ' m')
     print('Diameter of the current: ', round(sizing[10]*100,2),' cm')
+    print()
+    print('Total FC system mass: ',round(total_system()[2]),' kg')
+    print('Total FC system volume: ',round(total_system()[1]), ' l')
+    print('Total FC system cost: ',round(total_system()[0]),' EUR')
+
 
 
 
