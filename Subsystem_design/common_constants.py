@@ -137,8 +137,9 @@ class Constants():
         self.k_d = 810.0                                            # Mass density of kerosene                  [kg/m^3]
 
         """ STRUCTURES"""
-        self.pylon_height = 0.38     # [m] height of the pylon of the tank
-        self.pylon_weight = 19.126   # [kg]
+        self.pylon_height = 0.38     # height of the pylon of the tank [m]
+        self.pylon_weight = 19.126   # weight of each pylon            [kg]
+        self.x_cg_pylon = 17.14      # From nose                       [m]
 
         """Tank design constants"""
         self.V_centre_tank = volume_centre_tank               # Volume of each centre tank                       [m^3]
@@ -150,6 +151,7 @@ class Constants():
         self.pod_tank_mass = mass_pod                         # Mass of each pod tank (we have 2 tank)           [kg]
         self.centre_H2_mass = self.V_H2_centre * 71.1         # Mass of H2 in each centre tank (we have 2 tank)  [kg]
         self.pod_H2_mass = self.V_H2_pod * 71.1               # Mass of H2 in each pod tank (we have 2 tank)     [kg]
+
         self.x_cg_pod = 18.23                                 # From the nose                                    [m]
         self.x_cg_centertank = 20.21                          # From the nose                                    [m]
         self.y_cg_pod = 0.55*self.b/2                         # Y location of the pods on the wing                [m]
