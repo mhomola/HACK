@@ -79,7 +79,7 @@ def inverse(Vsearch):
     V = np.array([Ecell(j) for j in i])
 
     idx = 0
-    for j in V:
+    for j in range(len(V)):
         if abs(V[j]-Vsearch)/Vsearch < 0.0015:
             idx = j
             break

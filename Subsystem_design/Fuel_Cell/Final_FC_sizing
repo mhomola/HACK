@@ -15,15 +15,55 @@ sp_W = 0.8
 sp_V = 0.8
 sp_C = 35*0.85 #All 3 of them from DOE
 
-print(PCM.inverse(0.8))
+# Mirai data
+PMirai = 114 # kW
+Ncells = 370
+VMirai = 37 #l
+mMirai = 56 #kg
+VpCell = VMirai/Ncells
+mpCell = mMirai/Ncells
+
+PtoN = 114/370
 
 def calc_current(V):
     return FC_power/V
 
+def calc_cur_density(Vc):
+    return PCM.inverse(Vc)
+
 def FC_sizing():
 
     V = 1500 #V
-    n_row = V/Vc
+    n_series = round(V/Vc)
+    I = calc_current(V)
+    iden = calc_cur_density(Vc)
+
+    n_paral = FC_power/PtoN
+
+    n_cells = n_series*n_paral
+
+    V_stack = n_cells*VpCell
+    m_stack = n_cells*mpCell
+
+    A = I/iden
+    l = V_stack/A
+    l_cell = l/n_series
+
+    return [n_series, n_paral, n_cells, I, iden, V_stack, m_stack, A, l, l_cell]
+
+if __name__ == '__main__':
+
+    sizing = FC_sizing()
+
+    print()
+    print('Sizing of the fuel cell results:')
+    print('Number of cells in series:')
+    print('Number of cells in parallel:')
+    prin
+
+
+
+
 
 
 
