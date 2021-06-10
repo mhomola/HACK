@@ -1,0 +1,10 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import FCParameters as fc
+import Battery_Sizing as BS
+
+FC_power = 1.2*0.001*BS.final_bat_size()[0]
+B_cost = BS.final_bat_size()[1]
+B_mass = BS.final_bat_size()[2]
+B_volume = BS.final_bat_size()[3]
+

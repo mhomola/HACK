@@ -184,7 +184,7 @@ def final_bat_size():
     bat_orig = toWh(bat_E)
     print('Battery cost: ', round(0.001*bat_orig*cost), " EUR")
     print('Battery mass: ', round(bat_orig/spec_m), " kg")
-    print('Battery mass: ', round(bat_orig/spec_V), " l")
+    print('Battery volume: ', round(bat_orig/spec_V), " l")
     print()
 
     while(abs(FC_power-FC_power_new)/FC_power_new >= 0.05):
@@ -203,16 +203,16 @@ def final_bat_size():
     bat_orig = toWh(bat_E)
     print('Battery cost: ', round(0.001 * bat_orig * cost), " EUR")
     print('Battery mass: ', round(bat_orig / spec_m), " kg")
-    print('Battery mass: ', round(bat_orig / spec_V), " l")
+    print('Battery volume: ', round(bat_orig / spec_V), " l")
     print()
 
-    plt.plot(time_tot1, power_tot1, label = 'No compressor')
-    plt.plot(time_tot2, power_tot2, 'k', label = 'Compressor')
-    # plt.plot(time_tot, avg_arr)
-    plt.legend()
-    plt.ylabel('Energy stored in battery [kJ]')
-    plt.xlabel('Time [min]')
-    plt.show()
+    # plt.plot(time_tot1, power_tot1, label = 'No compressor')
+    # plt.plot(time_tot2, power_tot2, 'k', label = 'Compressor')
+    # # plt.plot(time_tot, avg_arr)
+    # plt.legend()
+    # plt.ylabel('Energy stored in battery [kJ]')
+    # plt.xlabel('Time [min]')
+    # plt.show()
 
     return FC_power_new, round(0.001 * bat_orig * cost), round(bat_orig / spec_m), round(bat_orig / spec_V)
 
