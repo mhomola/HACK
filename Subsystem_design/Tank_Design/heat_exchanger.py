@@ -8,15 +8,16 @@ class HeatExchanger(Constants):
 
     def __init__(self):
         super().__init__()
-        self.A_i = 2 * np.pi * self.r_i_nozzle * 0.5
-        self.k_therm = 12  # Thermal conductivity of Nickel Chrome Alloys [W/mK]
-        self.T_exhaust = 750 + 273.15  # Minimum exhaust temperature of the engine [K]
+        self.k_therm = 50  # Thermal conductivity of Nickel Chrome Alloys [W/mK]
+        self.T_exhaust = 1060 + 273.15  # Minimum exhaust temperature of the engine [K]
         self.visc_air_eng = 4.25 * 10**(-5)  # https://www.engineersedge.com/physics/viscosity_of_air_dynamic_and_kinematic_14483.htm
         self.thermal_conduct_air = 0.07  # https://www.engineeringtoolbox.com/air-properties-viscosity-conductivity-heat-capacity-d_1509.html
         self.cp_air = 1150  # https://www.engineeringtoolbox.com/air-specific-heat-capacity-d_705.html
 
 
     def heat_flux(self):
+
+        print('\n \n ========= Heat Exchanger ====================================')
 
         # Fuel flow of hydrogen into the engine:
 
@@ -46,39 +47,42 @@ class HeatExchanger(Constants):
         D_T1 = self.T_exhaust - self.T_H2out
         LMTD = (D_T0 - D_T1) / np.log(D_T0 / D_T1)
 
-        Ui = q / (self.A_i * LMTD)
-        print('\n Ui = ', Ui)
+        r_i = 0.2
 
         m_flow_core = 43
 
-        Re_D = 4 * m_flow_core / (np.pi * 2 * self.r_i_nozzle * self.visc_air_eng)
+        Re_D = m_flow_core / (np.pi * r_i**2 * self.visc_air_eng)
         Pr = self.visc_air_eng * self.cp_air / self.thermal_conduct_air
-        h_i = self.thermal_conduct_air * 0.0023 * Re_D**0.8 * Pr**0.3 / (2 * self.r_i_nozzle)
+        h_i = self.thermal_conduct_air * 0.023 * Re_D**0.8 * Pr**0.3 / (2 * r_i)
 
-        # print(h_i)
+        print('\n Re_D = ', Re_D)
+        print('\n Pr = ', Pr)
+        print('\n NuD = ', 0.023 * Re_D**0.8 * Pr**0.3)
+        print('\n h_i = ', h_i)
 
         def h_o_calc(D_o):
-            Dh = D_o - 2 * self.r_i_nozzle
-            Re_Dh = 4 * max_ff / (np.pi * (D_o + 2 * self.r_i_nozzle) * visc_H2)
+            Dh = D_o - 2 * r_i
+            Re_Dh = max_ff / (np.pi * (Dh/4)**2 * visc_H2)
+            print('\n Re_Dh = ', Re_Dh)
             Pr_h = visc_H2 * cp_H2 / k_H2
-            h_out = k_H2 * 0.023 * Re_Dh**0.8 * Pr_h**0.4 / (D_o)
+            h_out = k_H2 * 0.023 * Re_Dh**0.8 * Pr_h**0.4 / (Dh)
+            # h_out = k_H2 * 4.86 / Dh
             h_o_avg = np.average(h_out)
+            plt.plot(T_H2, h_out)
+            plt.show()
 
             return h_o_avg
 
-        D_o_arr = np.arange(2*self.r_i_nozzle, 2, 0.001)
-        h_o_arr = np.zeros(len(D_o_arr))
-        for i, d in enumerate(D_o_arr):
-            h_o_arr[i] = h_o_calc(d)
+        D_o = 2*r_i + 0.05
+        h_o = h_o_calc(D_o)
 
-        print(h_o_arr)
 
-        print(Ui)
-        solver = (1/h_i + self.r_i_nozzle/self.k_therm * np.log(D_o_arr/2 / self.r_i_nozzle)
-                  + self.r_i_nozzle / (h_o_arr * D_o_arr/2))**(-1)
+        Ui = (1/h_i + r_i/self.k_therm * np.log(D_o/2 / r_i)
+              + r_i / (h_o * D_o/2))**(-1)
 
-        plt.plot(D_o_arr, solver)
-        plt.show()
+        L = q / (Ui * 2 * np.pi * r_i * LMTD)
+
+        print(L)
 
 
 

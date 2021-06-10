@@ -4,7 +4,7 @@ from Subsystem_design.Wing.loads import Loads_w
 from Subsystem_design.Wing.Stresses import stresses
 import numpy as np
 import matplotlib.pyplot as plt
-
+import math
 ###Initializing Loads Class
 lw = Loads_w() #wing loads object
 lw.compute_loads()
@@ -20,13 +20,14 @@ My_arr = np.zeros(len(x_arr))
 Mx_arr = np.zeros(len(x_arr))
 T_arr = np.zeros(len(x_arr))
 vm_arr = np.zeros(len(x_arr))
+sigma_arr = np.zeros(len(x_arr))
 
 Ixx_arr = np.zeros(len(x_arr))
 Iyy_arr = np.zeros(len(x_arr))
 Ixx_nostr_arr = np.zeros(len(x_arr))
 Iyy_nostr_arr = np.zeros(len(x_arr))
 ### Initializing Inertia class
-MOI = Inertia()
+MOI = Inertia(n_str = 10)
 
 ##We want to compute the inertia, the loads and the stresses at every span-wise location
 
@@ -50,7 +51,9 @@ for i, x in enumerate(x_arr):
     wing_stress.bending_loads(Mx=Mx_arr[i],My=My_arr[i])
     wing_stress.compute_stresses()
     wing_stress.vm_plotter(show=False)
+    wing_stress.sigma_plotter(show=False)
     vm_arr[i] = wing_stress.vm_max
+    sigma_arr[i] = wing_stress.sigma_max
 
     ###MOI verification
     Ixx_arr[i] = MOI.Ixx
@@ -63,7 +66,10 @@ for i, x in enumerate(x_arr):
 plt.plot(x_arr,vm_arr/10**6)
 plt.xlabel("Span location[m]")
 plt.ylabel("Von Mises Stress [MPa]")
-#plt.figure()
+plt.figure()
+plt.plot(x_arr,sigma_arr/10**6)
+plt.xlabel("Span location[m]")
+plt.ylabel("Bneding stress [MPa]")
 
 ###MOI Graphs
 # plt.plot(x_arr,Ixx_arr,"blue")
@@ -75,3 +81,4 @@ plt.ylabel("Von Mises Stress [MPa]")
 # plt.title("MOI with no stringers")
 
 plt.show()
+
