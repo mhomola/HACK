@@ -19,7 +19,7 @@ class potato_diagram(Constants):
     def oew_cg_hack(self):
         ### --- NEO --- ##
         OEW_neo = self.OEW_320neo                           # [kg]
-        cg_OEW_neo = 0.25* self.mac + self.x_mac           # from nose [m]
+        cg_OEW_neo = 0.25* self.mac + self.x_LEMAC           # from nose [m]
         weight_APU = 145 # [kg] later put in self.weight_APU
         cg_APU = 34.63                                      # from nose [m]
         ### --- HACK --- ##
@@ -27,7 +27,7 @@ class potato_diagram(Constants):
         cg_DPU = 32.5      # from nose [m] later put in self.cg_DPU
         ### -- LH2 tanks --- ##
         weight_LH2_tanks = 2* self.center_tank_mass + 2* self.pod_tank_mass # [kg]
-        cg_LH2_tanks = 0.5* (self.x_cg_pod + self.x_cg_centertank) # From the nose [m]
+        cg_LH2_tanks = 0.5* (self.x_cg_pod + self.x_cg_centertank - 3) # From the nose [m]
         # Calculate A320-HAC.K cg @ OEW
         OEW_HACK = OEW_neo - weight_APU + weight_LH2_tanks + weight_DPU
         cg_OEW_HACK = (self.OEW_320neo*cg_OEW_neo - weight_APU*cg_APU +
@@ -36,6 +36,11 @@ class potato_diagram(Constants):
                                              weight_APU + weight_LH2_tanks + weight_DPU) # from nose [m]
                                      
         cg_OEW_HACK_MAC = (cg_OEW_HACK - self.x_LEMAC) / self.mac # [MAC] CG of OEW_HACK
+        print('\n oew of neo = ', OEW_neo, 'oew of HACK = ', OEW_HACK,
+              '\n oew cg of hack (% of MAC) = ', cg_OEW_HACK_MAC,
+              '\n oew cg of hack (from nose) = ', cg_OEW_HACK,
+              '\n oew cg of neo (from nose) = ', cg_OEW_neo,
+              '\n weight of the central tank = ', self.center_tank_mass, 'weight of pod tank = ', self.pod_tank_mass)
         self.OEW_HACK = OEW_HACK
         self.cg_OEW_HACK_MAC = cg_OEW_HACK_MAC
         # return cg_OEW_HACK_MAC, OEW_HACK
@@ -96,7 +101,7 @@ class potato_diagram(Constants):
         xcg1    =  (xcg0_m * OEW + x_cag_fd * Cargo_fd + x_cag_af * Cargo_af)/W1
 
         ## Step 2: adding window seats
-        Mass_person = (MaxPLW - Cargo_fd - Cargo_af)/180
+        Mass_person = 71                # [kg]
 
         # start from the front
         W2_win_f = [W1]
@@ -259,4 +264,5 @@ class potato_diagram(Constants):
 
 if __name__ == '__main__':
     p = potato_diagram()
+    p.oew_cg_hack()
     p.load_diagram()
