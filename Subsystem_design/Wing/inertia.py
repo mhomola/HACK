@@ -1,19 +1,21 @@
 from Subsystem_design.common_constants import Constants
 import numpy as np
 import matplotlib.pyplot as plt
+import math as m
 
-class Inertia(Constants):
 
-    def __init__(self):
+class Inertia_initial(Constants):
+
+    def __init__(self,n_str):
         super().__init__()
-        self.t_str = 0.02 # Stringer thickness [m]
-        self.t_sp = 0.05  # Spar thickness [m]
-        self.t_sk = 9.1/1000  # Skin thickness [m]
-        self.h_str = 0.03  # Stringer height [m]
-        self.h_sp_c = 0.091  # Height of the spar over local chord length
-        self.n_str = 13  # Number of stringers on top and bottom (n_str * 2 = total_n_str)
-
-        self.w_sk_c = 0.43  # Width of the skin over the local chord length
+        self.t_str = 0.0025   # Stringer thickness [m]                                          #VARIABLE
+        self.t_sp = 0.01      # Spar thickness [m]                                              #VARIABLE
+        self.t_sk = 9.1/1000  # Skin thickness [m]                                              #FIXED
+        self.h_str = 0.03     # Stringer height [m]                                             #VARIABLE
+        self.w_str = 0.03     # Stringer width [m]
+        self.h_sp_c = 0.091   # Height of the spar over local chord length                      #FIXED
+        self.n_str = n_str    # Number of stringers on top and bottom (n_str * 2 = total_n_str)
+        self.w_sk_c = 0.43    # Width of the skin over the local chord length                   #FIXED
 
     def chord_inertia(self, x):
         return (self.c_tip - self.c_kink_out) / (0.5 * self.b_out) * (x - 0.5 * self.b_in) + self.c_kink_out
@@ -76,9 +78,87 @@ class Inertia(Constants):
         self.Iyy_no_str = 2 * Iyy_sp + 2 * Iyy_sk
         self.Iyy = 2 * Iyy_sp + 2 * Iyy_sk + np.sum(Iyy_str)
 
+class Inertia(Constants):
+
+    def __init__(self,n_str):
+        super().__init__()
+        self.t_str = 0.0025 # Stringer thickness [m]                                          #VARIABLE
+        self.t_sp = 0.01  # Spar thickness [m]                                               #VARIABLE
+        self.t_sk = 9.1/1000  # Skin thickness [m]                                           #FIXED
+        self.h_str = 0.03   # Stringer height [m]                                             #VARIABLE
+        self.w_str = 0.03   # Stringer width [m]
+        self.h_sp_c = 0.091  # Height of the spar over local chord length                    #FIXED
+        self.n_str = n_str # Number of stringers on top and bottom (n_str * 2 = total_n_str)
+        self.w_sk_c = 0.43  # Width of the skin over the local chord length                  #FIXED
+
+    def chord_inertia(self, x):
+        return (self.c_tip - self.c_kink_out) / (0.5 * self.b_out) * (x - 0.5 * self.b_in) + self.c_kink_out
+
+    def compute_inertia(self,x):
+        c = self.chord_inertia(x=x)
+        height = c*self.h_sp_c #sizing the spar height to the corresponding chord
+        width = c*self.w_sk_c  #sizing the skin width to the corresponding chord
+
+        ###Calculate the skin MOI
+
+        skin_Ixx = 2 * (1/12) * pow(height,3) * self.t_sp + \
+                        2 * (1/12) * pow(self.t_sk,3) * width + 2 * width * self.t_sk * (height/2-self.t_sk/2)**2
+
+        skin_Iyy = 2 * (1/12) * pow(self.t_sp,3) * height + 2 * height * self.t_sp * (width/2 - self.t_sp/2)**2 +\
+                        2 * (1/12) * pow(width,3) * self.t_sk
+
+        ###MOI around for stringers I-beam
+
+        str_Ixx = 1/12 * self.t_str * pow(self.h_str,3) + 2 * 1/12 * pow(self.t_str,3) * self.w_str # MOI for just oen stringer
+        str_Ixx_steiner = self.w_str * self.t_str * pow(height/2-self.h_str + self.t_str/2,2) + \
+                          self.w_str * self.t_str * pow(height/2-self.t_str/2,2) +\
+                          self.h_str * self.t_str * pow(height/2 - self.h_str/2,2)
+
+        str_Ixx = self.n_str * str_Ixx
+        str_Ixx_steiner  = self.n_str * str_Ixx_steiner
+
+        ###MOI around y for I-beams
+        ###Here the distribution of the stringers is important as they change the distancce from x
+
+        if self.n_str == 0:
+            str_Iyy = 0
+            str_Iyy_steiner = 0
+
+        if self.n_str == 1:
+            str_Iyy = 1 / 12 * pow(self.t_str, 3) * self.h_str + 2 * 1 / 12 * self.t_str * pow(self.w_str, 3)
+            str_Iyy_steiner = 0
+
+        elif self.n_str%2 ==0:
+            str_Iyy = 1/12 * pow(self.t_str,3) * self.h_str + 2 * 1/12 * self.t_str * pow(self.w_str,3)
+            spacing = width/(self.n_str-1) #distance between the stringers
+            str_Iyy_steiner = 0
+            for i in range(1,m.ceil(self.n_str/2)+1):
+                str_Iyy_steiner = str_Iyy_steiner + 2 * self.w_str * self.t_str * (spacing * i)**2 + self.h_str * self.t_str * (spacing * i)**2
+            str_Iyy = str_Iyy * self.n_str
+            str_Iyy_steiner = str_Iyy_steiner * 2 # we already looked at one side, we need to multiply by 2
+
+        elif self.n_str%2 == 1: #odd number of stringers
+            str_Iyy = 1/12 * pow(self.t_str,3) * self.h_str + 2 * 1/12 * self.t_str * pow(self.w_str,3)
+            spacing = width/(self.n_str-1) #distance between the stringers
+            str_Iyy_steiner = 0
+            for i in range(1, m.ceil((self.n_str-1) / 2) + 1):
+                str_Iyy_steiner = str_Iyy_steiner + 2 * self.w_str * self.t_str * (
+                            spacing * i) ** 2 + self.h_str * self.t_str * (spacing * i) ** 2
+            str_Iyy = str_Iyy * self.n_str
+            str_Iyy_steiner = str_Iyy_steiner * 2  # we already looked at one side, we need to multiply by 2
+
+        self.Ixx_no_str = skin_Ixx
+        self.Ixx = self.Ixx_no_str + str_Ixx + str_Ixx_steiner
+        self.Iyy_no_str = skin_Iyy
+        self.Iyy = self.Iyy_no_str + str_Iyy + str_Iyy_steiner
+
 if __name__ == '__main__':
-    ia = Inertia()
-    ia.wb_config(x=0)
-    ia.wb_config(x=ia.b/2)
-    ia.compute_inertia(x=0)
-    print(ia.Iyy)
+    MOI_initial = Inertia_initial(n_str = 10)
+    MOI_ibeam = Inertia(n_str = 10)
+    x = 6
+    MOI_initial.compute_inertia(x=x)
+    MOI_ibeam.compute_inertia(x=x)
+    print("Ixx no stringers: " ,"FIRST BEAM" , MOI_initial.Ixx_no_str , "IBEAM", MOI_ibeam.Ixx_no_str)
+    print("Iyy no stringers: ", "FIRST BEAM", MOI_initial.Iyy_no_str, "IBEAM", MOI_ibeam.Iyy_no_str)
+    print("Ixx with stringers: ", "FIRST BEAM", MOI_initial.Ixx, "IBEAM", MOI_ibeam.Ixx)
+    print("Iyy with stringers: ", "FIRST BEAM", MOI_initial.Iyy, "IBEAM", MOI_ibeam.Iyy)
