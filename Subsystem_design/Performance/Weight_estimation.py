@@ -36,7 +36,7 @@ class Compute_weight(Constants):
         self.m_H2_center_w,_, _ = liquid_H_tanks(h2_vol_center*1000)                    # Hydrogen mass             [kg]
         self.m_tank_center_w = self.center_tank_mass                                    # Center Tank's mass       [kg]
         self.m_H2_ext_f,_, _ = liquid_H_tanks(h2_vol_f * 1000)                          # Hydrogen mass             [kg]
-        self.m_tank_ext_f = self.fuselage_tank_mass                                     # Fuselage tank's mass      [kg]
+        self.m_tank_ext_f = self.pod_tank_mass                                     # Fuselage tank's mass      [kg]
 
         return self.m_H2_center_w, self.m_tank_center_w,self.m_H2_ext_f, self.m_tank_ext_f
 
@@ -185,14 +185,14 @@ if __name__ == '__main__':
     """Weights of A320-HACK"""
 
     AC_weights = Compute_weight()                                               # Initiallize class of weight estimation
-    AC_weights.weight_break_down_HACK(h2_vol_center=const.V_H2_centre,h2_vol_f=const.V_H2_aft)       # Based on H2 volume estimates
+    AC_weights.weight_break_down_HACK(h2_vol_center=const.V_H2_centre,h2_vol_f=const.V_H2_pod)       # Based on H2 volume estimates
     AC_weights.Struc_m()
 
     Aerodynamic_charac = AerodynamicCharacteristics()
     Aerodynamic_charac.L_over_D_cruise()
 
     Performance = performance()
-    Performance.payload_range_dia_HACK(L_over_D=Aerodynamic_charac.L_D_ratio_HACK,h2_vol_center=11.34,h2_vol_f=30.69,SFC= const.c_j_k_H2_cruise)
+    #Performance.payload_range_dia_HACK(L_over_D=Aerodynamic_charac.L_D_ratio_HACK,h2_vol_center=11.34,h2_vol_f=30.69,SFC= const.c_j_k_H2_cruise)
     #Performance.payload_range_dia_320neo(L_over_D=Aerodynamic_charac.L_D_ratio_HACK,SFC = const.c_j_kerosene)
     #W4_W5 = (3200*10**3)/(((const.M * Aerodynamic_charac.a)/(const.c_j_k_H2_cruise*const.g_0)) * Aerodynamic_charac.L_D_ratio_HACK)
 

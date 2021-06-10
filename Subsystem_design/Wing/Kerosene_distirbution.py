@@ -46,7 +46,7 @@ def kerosene_calc():
     cr = 3.4            #play with this until you obtain volume from Airport manual
     taper = 0.240       #wing taper ratio elsevier
 
-    spanwise = np.arange(0,l,dy)
+    spanwise = np.arange(0, l, dy)
 
     rho = 810   #[kg/m^3] density of kerosene
     weight = [] #list for storing spanwise weight
@@ -65,6 +65,7 @@ if __name__ == '__main__':
     plt.xlabel("Half_spanwise location [m]")
     plt.ylabel("Weight[N]")
     plt.show()
+    print("chord at 0.55",width_y(y=0.55*14, cr=7.0465, taper=0.240, l=14))
 
 
 
