@@ -18,6 +18,7 @@ Created on Wed Jun  2 09:39:04 2021
 
 
 from Subsystem_design.common_constants import Constants
+from DataEngine import DataFrame
 import numpy as np
 
 
@@ -31,10 +32,10 @@ class Engine_Cycle(Constants):
         elif aircraft == 'hack':
             self.engine_data_hack(phase)
 
-    def cycle_analysis(self, aircraft, i): # i = phase
+    def cycle_analysis(self, aircraft, i, T_tot): # i = phase
         self.data(aircraft, self.phases[i])
 
-            # self.mf_air_init = self.rho0[i] * self.A_fan_eff * self.v0[i]
+        self.mf_air_init = self.rho0[i] * self.A_fan_eff * self.v0[i]
 
         # Total temperature and pressure at inlet
         self.T00 = self.T0[i] * ( 1 + (self.k_air-1)/2 * self.M0[i]**2 )
@@ -61,14 +62,14 @@ class Engine_Cycle(Constants):
         self.p016 = self.p021 * self. PR_noz_fan
 
         """ USE THIS WHEN WE HAVE THE REQUIRED THRUST SETTINGS """
-        # if self.v0[i] == 0.:
-        #     self.T_fan_tot = (104340.3935 / 12401.48002) * T_tot # T_tot from Elena's program
-        #     self.p18 = self.p0[i]
-        #     self.T18 = self.T016 - self.T016 * self.eta_fan * ( 1 - (self.p18/self.p016) ** ( (self.k_air-1)/self.k_air ) )
-        #     self.v18 = np.sqrt( 2 * self.cp_air * (self.T016 - self.T18) )
-        #     self.mf_cold = self.T_fan / self.v18
-        #     self.mf_air_init = (self.BPR+1)/self.BPR * self.mf_cold
-        #     self.mf_hot = self.mf_air_init / (self.BPR + 1)
+        if self.v0[i] == 0.:
+            self.T_fan_tot = T_tot / (1 + 12401.48002 / 104340.3935 ) # T_tot from Elena's program
+            self.p18 = self.p0[i]
+            self.T18 = self.T016 - self.T016 * self.eta_fan * ( 1 - (self.p18/self.p016) ** ( (self.k_air-1)/self.k_air ) )
+            self.v18 = np.sqrt( 2 * self.cp_air * (self.T016 - self.T18) )
+            self.mf_cold = self.T_fan_tot / self.v18
+            self.mf_air_init = (self.BPR+1)/self.BPR * self.mf_cold
+            self.mf_hot = self.mf_air_init / (self.BPR + 1)
 
 
         # Exit of LPC - Entrance of HPC
@@ -91,32 +92,31 @@ class Engine_Cycle(Constants):
         self.p04 = self.p03 * self.PR_cc
 
         # Power to drive fan, LPC, HPC, HPT, LPT [W]
-        # self.W_fan = self.mf_air_init[i] * self.cp_air * (self.T021-self.T00)
-        # self.W_LPC = self.mf_hot * self.cp_air * (self.T025-self.T021)
-        # self.W_HPC = self.mf_hot * self.cp_air * (self.T03-self.T025)
-        # self.W_HPT = self.W_HPC / self.eta_mech
-        # self.W_LPT = (self.W_fan + self.W_LPC) / self.eta_mech
+        self.W_fan = self.mf_air_init * self.cp_air * (self.T021-self.T00)
+        self.W_LPC = self.mf_hot * self.cp_air * (self.T025-self.T021)
+        self.W_HPC = self.mf_hot * self.cp_air * (self.T03-self.T025)
+        self.W_HPT = self.W_HPC / self.eta_mech
+        self.W_LPT = (self.W_fan + self.W_LPC) / self.eta_mech
 
         # Exit of HPT - Entrance of LPT
-        self.T045 = self.T04 + (self.T04/self.eta_HPT) * ( (1/self.PR_HPT)**((self.k_gas-1)/self.k_gas) - 1 )
-        self.p045 = self.p04 / self.PR_HPT
-        # self.T045 = self.T04 - self.W_HPT / ( self.mf_airfuel * self.cp_gas )
-        # self.p045 = self.p04 * ( 1 - ( 1 - self.T045/self.T04 ) / self.eta_HPT ) ** ( self.k_gas / (self.k_gas-1) )
+        # self.T045 = self.T04 + (self.T04/self.eta_HPT) * ( (1/self.PR_HPT)**((self.k_gas-1)/self.k_gas) - 1 )
+        # self.p045 = self.p04 / self.PR_HPT
+        self.T045 = self.T04 - self.W_HPT / ( self.mf_airfuel * self.cp_gas )
+        self.p045 = self.p04 * ( 1 - ( 1 - self.T045/self.T04 ) / self.eta_HPT ) ** ( self.k_gas / (self.k_gas-1) )
 
 
         # Exit of LPT - Entrance of nozzle
-        self.T05 = self.T04 + (self.T04/self.eta_LPT) * ( (1/self.PR_LPT)**((self.k_gas-1)/self.k_gas) - 1 )
-        self.p05 = self.p045 / self.PR_LPT
-        # self.T05 = self.T045 - self.W_LPT / (self.mf_airfuel * self.cp_gas)
-        # self.p05 = self.p045 * ( 1 - ( 1 - self.T05/self.T045 ) / self.eta_LPT ) ** ( self.k_gas / (self.k_gas-1) )
+        # self.T05 = self.T04 + (self.T04/self.eta_LPT) * ( (1/self.PR_LPT)**((self.k_gas-1)/self.k_gas) - 1 )
+        # self.p05 = self.p045 / self.PR_LPT
+        self.T05 = self.T045 - self.W_LPT / (self.mf_airfuel * self.cp_gas)
+        self.p05 = self.p045 * ( 1 - ( 1 - self.T05/self.T045 ) / self.eta_LPT ) ** ( self.k_gas / (self.k_gas-1) )
 
         # Nozzle
         self.T07 = self.T05
         self.p07 = self.p05 * self.PR_noz_core
 
         # Is the nozzle chocked?
-        if aircraft == 'hack':
-            self.PR_cr_nozzle = 1 / ( ( 1 - (self.k_gas-1)/(self.k_gas+1)/self.eta_nozzle) ** (self.k_gas / (self.k_gas-1)) )
+        self.PR_cr_nozzle = 1 / ( ( 1 - (self.k_gas-1)/(self.k_gas+1)/self.eta_nozzle) ** (self.k_gas / (self.k_gas-1)) )
 
         # Exit of the nozzle
         if self.p07/self.p0[i] > self.PR_cr_noz_core:
@@ -187,10 +187,10 @@ if __name__ == '__main__':
     c = Constants()
 
     # for i in range(len(c.phases)):
-    index = [2,4]
-    for i in index:
+    # index = [2,4]
+    for i in [2]:
         print('\n** Analysis for', c.phases[i], ' **')
-        ec.cycle_analysis(aircraft=aircraft, i=i)
+        ec.cycle_analysis(aircraft=aircraft, i=i, T_tot=c.Thrust[i] )
 
 
         print('\nInlet: T0 = ', c.T0[i], '[K]; p0 = ', c.p0[i], '[Pa]; v0 = ', c.v0[i], '[m/s]')
@@ -224,9 +224,9 @@ if __name__ == '__main__':
                     ['PR_cc', ec.PR_cc , '-'], ['PR_HPT', ec.PR_HPT , '-'], ['PR_LPT', ec.PR_LPT , '-'],
                     ['PR_HPC', ec.PR_HPC , '-'], ['PR_noz_core', ec.PR_noz_core , '-']]
 
-        if index == 4:
+        if c.v0[i] != 0 :
             eff = eff.insert(0, ['eta_inlet', ec.eta_inlet, '-'])
-        elif index == 2:
+        elif c.v0[i] == 0:
             PR = PR.insert(0, ['PR_inlet', ec.PR_inlet, '-'])
 
 
@@ -248,13 +248,13 @@ if __name__ == '__main__':
         Thr = [ ['T_fan', ec.T_fan, 'N'], ['T_core', ec.T_core, 'N'], ['T_tot', ec.T_total, 'N'] ]
         OPR = ['OPR', ec.OPR, '-']
 
-        save_txt = amb + air + st0 + st2 + st21 + st25 + st3 + st4 + fuel + st45 + st5 + st7 + st8 + st16 + st18 + Thr + [OPR]
-        name = aircraft+'_'+ec.phases[i]+'.txt'
-
-        F = open(name,'w')
-        for i in range(len(save_txt)):
-            for j in range(0,3):
-                F.write(str(save_txt[i][j]) + ' ')
-            F.write('\n')
-
-        F.close()
+        # save_txt = amb + air + st0 + st2 + st21 + st25 + st3 + st4 + fuel + st45 + st5 + st7 + st8 + st16 + st18 + Thr + [OPR]
+        # name = aircraft+'_'+c.phases[i]+'.txt'
+        #
+        # F = open(name,'w')
+        # for i in range(len(save_txt)):
+        #     for j in range(0,3):
+        #         F.write(str(save_txt[i][j]) + ' ')
+        #     F.write('\n')
+        #
+        # F.close()
