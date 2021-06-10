@@ -2,19 +2,20 @@ from Subsystem_design.common_constants import Constants
 import numpy as np
 import matplotlib.pyplot as plt
 import math as m
+
+
 class Inertia_initial(Constants):
 
     def __init__(self,n_str):
         super().__init__()
-        self.t_str = 0.0025 # Stringer thickness [m]                                          #VARIABLE
-        self.t_sp = 0.01  # Spar thickness [m]                                               #VARIABLE
-        self.t_sk = 9.1/1000  # Skin thickness [m]                                           #FIXED
-        self.h_str = 0.03   # Stringer height [m]                                             #VARIABLE
-        self.w_str = 0.03   # Stringer width [m]
-        self.h_sp_c = 0.091  # Height of the spar over local chord length                    #FIXED
-        self.n_str = n_str # Number of stringers on top and bottom (n_str * 2 = total_n_str)
-        self.w_sk_c = 0.43  # Width of the skin over the local chord length                  #FIXED
-
+        self.t_str = 0.0025   # Stringer thickness [m]                                          #VARIABLE
+        self.t_sp = 0.01      # Spar thickness [m]                                              #VARIABLE
+        self.t_sk = 9.1/1000  # Skin thickness [m]                                              #FIXED
+        self.h_str = 0.03     # Stringer height [m]                                             #VARIABLE
+        self.w_str = 0.03     # Stringer width [m]
+        self.h_sp_c = 0.091   # Height of the spar over local chord length                      #FIXED
+        self.n_str = n_str    # Number of stringers on top and bottom (n_str * 2 = total_n_str)
+        self.w_sk_c = 0.43    # Width of the skin over the local chord length                   #FIXED
 
     def chord_inertia(self, x):
         return (self.c_tip - self.c_kink_out) / (0.5 * self.b_out) * (x - 0.5 * self.b_in) + self.c_kink_out
