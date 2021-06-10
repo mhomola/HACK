@@ -57,9 +57,13 @@ class Constants():
         self.e = 0.992                                              # Oswald efficiency factor
         self.C_D_0_TO_neo = 0.078                                   # Zero-lift drag coefficient of A320neo - TO
         self.C_D_0_clean_neo = 0.023                                # Zero-lift drag coefficient of A320neo - cruise
-        self.C_L_max_clean = 1.8                                    # Max lift coefficient clean
-        self.C_L_max_TO = 2.2                                       # Max lift coefficient during TO
-        self.C_L_max_land = 3.0                                     # Max lift coefficient during landing
+        self.C_D_0_land_neo = 0.12                                  # Zero-lift drag coefficient of A320neo - land
+        self.C_D_0_climb_neo = 0.043                                # Zero-lift drag coefficient of A320neo - climb
+        self.C_D_0_approach_neo = 0.053                             # Zero-lift drag coefficient of A320neo - approach
+        self.C_D_0_taxi_neo = 0.055                                 # Zero-lift drag coefficient of A320neo - taxi
+        self.C_L_max_clean = 1.8                                    # Max lift coefficient clean (Roskam)
+        self.C_L_max_TO = 2.2                                       # Max lift coefficient during TO (Roskam)
+        self.C_L_max_land = 3.0                                     # Max lift coefficient during landing (Roskam)
 
         self.b_in = 2 * 6.4                                         # Span of inner wing trapezoid                  [m]
         self.b_out = 2 * 10.616                                     # Span of outer wing trapezoid                  [m]
