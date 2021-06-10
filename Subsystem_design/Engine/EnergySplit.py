@@ -68,8 +68,8 @@ class Energy_Split():
 
 es = Energy_Split()
 LHV_hack = es.LHV_hack
-ER_h2 = es.ER_h2
-ER_ker = es.ER_ker
+ER_h2, MR_h2 = es.ER_h2, es.MR_h2
+ER_ker, MR_ker = es.ER_ker, es.MR_ker
 
 if __name__ == '__main__':
     print('Phases: ', np.array(['idle', 'taxi out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi in']))
