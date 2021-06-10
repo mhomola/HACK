@@ -6,12 +6,13 @@ class Inertia(Constants):
 
     def __init__(self):
         super().__init__()
-        self.t_str = 0.002  # Stringer thickness [m]
-        self.t_sp = 0.005  # Spar thickness [m]
-        self.t_sk = 0.002  # Skin thickness [m]
+        self.t_str = 0.02 # Stringer thickness [m]
+        self.t_sp = 0.05  # Spar thickness [m]
+        self.t_sk = 9.1/1000  # Skin thickness [m]
         self.h_str = 0.03  # Stringer height [m]
         self.h_sp_c = 0.091  # Height of the spar over local chord length
-        self.n_str = 12  # Number of stringers on top and bottom (n_str * 2 = total_n_str)
+        self.n_str = 13  # Number of stringers on top and bottom (n_str * 2 = total_n_str)
+
         self.w_sk_c = 0.43  # Width of the skin over the local chord length
 
     def chord_inertia(self, x):
