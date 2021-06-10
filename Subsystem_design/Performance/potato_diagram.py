@@ -5,13 +5,38 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ###
-# Up to line 214, kerosene and hydrogen are added together and shown as fuel. After line 214 they're shown separately (the code is basically the same though, of course)
-### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ###
 
-### Define relevant parameters ### test for the A320 (some rough estimations)
+# Strting from the A320neo OEW and its cg, calculate the A320-HAC.K and its cg
+
+OEW_neo = 1 # [kg]
+cg_OEW_neo = x_LEMAC + 0.25*MAC # from nose [m]
+
+weight_APU = 1 # [kg]
+cg_APU = 1 # from nose [m]
+
+# new HAC.K stuff
+
+weight_LH2_tanks = 1 # [kg]
+cg_LH2_tanks = x_LEMAC + 0.25*MAC # from nose [m]
+
+weight_DPU = 1 # [kg]
+cg_DPU = 1 # from nose [m]
+
+# Calculate A320-HAC.K cg @ OEW
+
+OEW_HACK = OEW_neo - weight_APU + weight_LH2_tanks + weight_DPU 
+
+cg_OEW_HACK = (OEW_neo*cg_OEW_neo - weight_APU*cg_APU + 
+               weight_LH2_tanks*cg_LH2_tanks + 
+               weight_DPU*cg_DPU) / (OEW_neo - 
+                                     weight_APU + weight_LH2_tanks + weight_DPU) # from nose [m]
+                                     
+cg_OEW_HACK_MAC = (cg_OEW_HACK - x_LEMAC) / MAC # [MAC] CG of OEW_HACK
+
+### Define relevant parameters ### 
 
 # Weight (all values in [kg])
-OEW         = 44560  
+OEW         = OEW_HACK  
 MTOW        = 73500  
 FuelW_ker   = 10000
 FuelW_H2    = 0
@@ -23,7 +48,7 @@ Cargo_fd    =   3170
 Cargo_af    =   3170
 
 # Wing configuration
-xcg0    =   0.25                # [MAC] CG of OEW
+xcg0    =   cg_OEW_HACK_MAC     # [MAC] CG of OEW
 MAC     =   4.19                # [m]
 b       =   37.57               # [m]
 tap     =   0.240               # [-]
@@ -49,9 +74,6 @@ y_MAC   = b/2 * (1 + 2*tap)/(3 + 3*tap)
 xcg0_m = x_LEMAC + xcg0 * MAC           # xcg in meters
 MaxPLW      =   MTOW-OEW-FuelW
 xcg_fuel = x_LEMAC + x_frontspar * MAC + 0.5*(x_rearspar -  x_frontspar) * MAC
-
-# CoM of fuel is calculated by assuming the fuel tank is a trapezoid
-# It is found that CoM of fuel tank coincides with MAC
 
 ### Calculate cg shift ###
 
