@@ -41,6 +41,7 @@ class potato_diagram(Constants):
               '\n oew cg of hack (from nose) = ', cg_OEW_HACK,
               '\n oew cg of neo (from nose) = ', cg_OEW_neo,
               '\n weight of the central tank = ', self.center_tank_mass, 'weight of pod tank = ', self.pod_tank_mass)
+        self.cg_LH2_tanks = cg_LH2_tanks
         self.OEW_HACK = OEW_HACK
         self.cg_OEW_HACK_MAC = cg_OEW_HACK_MAC
         # return cg_OEW_HACK_MAC, OEW_HACK
@@ -80,7 +81,8 @@ class potato_diagram(Constants):
         y_MAC   = b/2 * (1 + 2*tap)/(3 + 3*tap)
         xcg0_m = x_LEMAC + xcg0 * MAC           # xcg in meters
         MaxPLW      =  self.MTOW_320neo-OEW-FuelW
-        xcg_fuel = x_LEMAC + x_frontspar * MAC + 0.5*(x_rearspar -  x_frontspar) * MAC
+        xcg_fuel_ker = x_LEMAC + x_frontspar * MAC + 0.5*(x_rearspar -  x_frontspar) * MAC
+        xcg_fuel_H2 = self.cg_LH2_tanks
 
         # CoM of fuel is calculated by assuming the fuel tank is a trapezoid
         # It is found that CoM of fuel tank coincides with MAC
@@ -176,11 +178,11 @@ class potato_diagram(Constants):
 
         # kerosene
         W5 = W4 + FuelW_ker
-        xcg5 = (W4 * xcg4 + FuelW_ker * xcg_fuel)/W5
+        xcg5 = (W4 * xcg4 + FuelW_ker * xcg_fuel_ker)/W5
 
         # hydrogen
         W6 = W5 + FuelW_H2
-        xcg6 = (W5 * xcg5 + FuelW_H2 * xcg_fuel)/W6
+        xcg6 = (W5 * xcg5 + FuelW_H2 * xcg_fuel_H2)/W6
 
 
         ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ###
