@@ -105,7 +105,7 @@ class Engine_Cycle(Constants):
 
 
         # Exit of LPT - Entrance of nozzle
-        self.T05 = self.T045 + (self.T045/self.eta_LPT) * ( (1/self.PR_LPT)**((self.k_gas-1)/self.k_gas) - 1 )
+        self.T05 = self.T04 + (self.T04/self.eta_LPT) * ( (1/self.PR_LPT)**((self.k_gas-1)/self.k_gas) - 1 )
         self.p05 = self.p045 / self.PR_LPT
         # self.T05 = self.T045 - self.W_LPT / (self.mf_airfuel * self.cp_gas)
         # self.p05 = self.p045 * ( 1 - ( 1 - self.T05/self.T045 ) / self.eta_LPT ) ** ( self.k_gas / (self.k_gas-1) )
