@@ -153,7 +153,7 @@ class stresses():
         self.q5_tot = q5_tot
         self.q6_tot = q6_tot
 
-    def shear_flow_plotter(self,type):
+    def shear_flow_plotter(self,type,show):
 
         """
         Define for which type of shear you want the plotting
@@ -262,42 +262,43 @@ class stresses():
         maxabs6 = np.max(np.abs(q6))
         maxabs = max(maxabs6, maxabs)
 
-        fig = plt.figure(4)
+        if show == True:
+            fig = plt.figure(4)
 
-        #the negative/positive comnvention only shows if the initial coord syst is respected
-        q1 = np.absolute(q1)
-        q2 = np.absolute(q2)
-        q3 = np.absolute(q3)
-        q4 = np.absolute(q4)
-        q5 = np.absolute(q5)
-        q6 = np.absolute(q6)
+            #the negative/positive comnvention only shows if the initial coord syst is respected
+            q1 = np.absolute(q1)
+            q2 = np.absolute(q2)
+            q3 = np.absolute(q3)
+            q4 = np.absolute(q4)
+            q5 = np.absolute(q5)
+            q6 = np.absolute(q6)
 
-        colorline(x1, y1, q1, cmap=plt.get_cmap('jet'),
-                  norm=plt.Normalize(-maxabs, maxabs), linewidth=2)
-        colorline(x2, y2, q2, cmap=plt.get_cmap('jet'),
-                  norm=plt.Normalize(-maxabs, maxabs), linewidth=2)
-        colorline(x3, y3, q3, cmap=plt.get_cmap('jet'),
-                  norm=plt.Normalize(-maxabs, maxabs), linewidth=2)
-        colorline(x4, y4, q4, cmap=plt.get_cmap('jet'),
-                  norm=plt.Normalize(-maxabs, maxabs), linewidth=2)
-        colorline(x5, y5, q5, cmap=plt.get_cmap('jet'),
-                  norm=plt.Normalize(-maxabs, maxabs), linewidth=2)
-        colorline(x6, y6, q6, cmap=plt.get_cmap('jet'),
-                  norm=plt.Normalize(-maxabs, maxabs), linewidth=2)
+            colorline(x1, y1, q1, cmap=plt.get_cmap('jet'),
+                      norm=plt.Normalize(-maxabs, maxabs), linewidth=2)
+            colorline(x2, y2, q2, cmap=plt.get_cmap('jet'),
+                      norm=plt.Normalize(-maxabs, maxabs), linewidth=2)
+            colorline(x3, y3, q3, cmap=plt.get_cmap('jet'),
+                      norm=plt.Normalize(-maxabs, maxabs), linewidth=2)
+            colorline(x4, y4, q4, cmap=plt.get_cmap('jet'),
+                      norm=plt.Normalize(-maxabs, maxabs), linewidth=2)
+            colorline(x5, y5, q5, cmap=plt.get_cmap('jet'),
+                      norm=plt.Normalize(-maxabs, maxabs), linewidth=2)
+            colorline(x6, y6, q6, cmap=plt.get_cmap('jet'),
+                      norm=plt.Normalize(-maxabs, maxabs), linewidth=2)
 
-        sm = plt.cm.ScalarMappable(cmap=plt.get_cmap('jet'),
-                                   norm=plt.Normalize(-maxabs, maxabs))
-        sm.set_array([])
+            sm = plt.cm.ScalarMappable(cmap=plt.get_cmap('jet'),
+                                       norm=plt.Normalize(-maxabs, maxabs))
+            sm.set_array([])
 
-        plt.colorbar(sm, label=r'$q$ [N/m]', fraction=0.20, pad=0.04, orientation="horizontal")
-        plt.xlim(-self.L - 0.1, 0.1)
-        plt.ylim(self.h / 2 - 0.02, -self.h / 2 + 0.02)
-        plt.axis('scaled')
-        plt.gca().invert_xaxis()
-        plt.xlabel(r'$z$ [m]')
-        plt.ylabel(r'$y$ [m]')
-        plt.title('Shear flow distribution')
-        plt.show()
+            plt.colorbar(sm, label=r'$q$ [N/m]', fraction=0.20, pad=0.04, orientation="horizontal")
+            plt.xlim(-self.L - 0.1, 0.1)
+            plt.ylim(self.h / 2 - 0.02, -self.h / 2 + 0.02)
+            plt.axis('scaled')
+            plt.gca().invert_xaxis()
+            plt.xlabel(r'$z$ [m]')
+            plt.ylabel(r'$y$ [m]')
+            plt.title('Shear flow distribution')
+            plt.show()
 
     ### NORMAL STRESSES
 
@@ -350,7 +351,7 @@ class stresses():
         self.sigma5 = sigma5
         self.sigma6 = sigma6
 
-    def sigma_plotter(self):
+    def sigma_plotter(self,show):
 
         n = 1000
 
@@ -425,35 +426,38 @@ class stresses():
         maxabs6 = np.max(np.abs(sigma6))
         maxabs = max(maxabs6, maxabs)
 
-        fig = plt.figure(4)
+        if show == True:
+            fig = plt.figure(4)
 
-        l_width = 8
-        colorline(x1, y1, sigma1, cmap=plt.get_cmap('jet'),
-                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
-        colorline(x2, y2, sigma2, cmap=plt.get_cmap('jet'),
-                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
-        colorline(x3, y3, sigma3, cmap=plt.get_cmap('jet'),
-                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
-        colorline(x4, y4, sigma4, cmap=plt.get_cmap('jet'),
-                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
-        colorline(x5, y5, sigma5, cmap=plt.get_cmap('jet'),
-                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
-        colorline(x6, y6, sigma6, cmap=plt.get_cmap('jet'),
-                  norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+            l_width = 8
+            colorline(x1, y1, sigma1, cmap=plt.get_cmap('jet'),
+                      norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+            colorline(x2, y2, sigma2, cmap=plt.get_cmap('jet'),
+                      norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+            colorline(x3, y3, sigma3, cmap=plt.get_cmap('jet'),
+                      norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+            colorline(x4, y4, sigma4, cmap=plt.get_cmap('jet'),
+                      norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+            colorline(x5, y5, sigma5, cmap=plt.get_cmap('jet'),
+                      norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
+            colorline(x6, y6, sigma6, cmap=plt.get_cmap('jet'),
+                      norm=plt.Normalize(-maxabs, maxabs), linewidth=l_width )
 
-        sm = plt.cm.ScalarMappable(cmap=plt.get_cmap('jet'),
-                                   norm=plt.Normalize(-maxabs, maxabs))
-        sm.set_array([])
+            sm = plt.cm.ScalarMappable(cmap=plt.get_cmap('jet'),
+                                       norm=plt.Normalize(-maxabs, maxabs))
+            sm.set_array([])
 
-        plt.colorbar(sm, label=r'$Sigma$ [Pa]', fraction=0.20, pad=0.04, orientation="horizontal")
-        plt.xlim(-self.L - 0.1, 0.1)
-        plt.ylim(self.h / 2 - 0.02, -self.h / 2 + 0.02)
-        plt.axis('scaled')
-        plt.gca().invert_xaxis()
-        plt.xlabel(r'$z$ [m]')
-        plt.ylabel(r'$y$ [m]')
-        plt.title('Normal stress distribution')
-        plt.show()
+            plt.colorbar(sm, label=r'$Sigma$ [Pa]', fraction=0.20, pad=0.04, orientation="horizontal")
+            plt.xlim(-self.L - 0.1, 0.1)
+            plt.ylim(self.h / 2 - 0.02, -self.h / 2 + 0.02)
+            plt.axis('scaled')
+            plt.gca().invert_xaxis()
+            plt.xlabel(r'$z$ [m]')
+            plt.ylabel(r'$y$ [m]')
+            plt.title('Normal stress distribution')
+            plt.show()
+
+        self.sigma_max = maxabs
 
     def von_Misses(self):
         """
