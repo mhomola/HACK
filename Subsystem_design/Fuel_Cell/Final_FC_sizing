@@ -2,9 +2,30 @@ import numpy as np
 import matplotlib.pyplot as plt
 import FCParameters as fc
 import Battery_Sizing as BS
+import Polarization_curve_model as PCM
 
-FC_power = 1.2*0.001*BS.final_bat_size()[0]
+SF = fc.SF
+FC_power = SF*0.001*BS.final_bat_size()[0]
 B_cost = BS.final_bat_size()[1]
 B_mass = BS.final_bat_size()[2]
 B_volume = BS.final_bat_size()[3]
+
+Vc = fc.Vc
+sp_W = 0.8
+sp_V = 0.8
+sp_C = 35*0.85 #All 3 of them from DOE
+
+print(PCM.inverse(0.8))
+
+def calc_current(V):
+    return FC_power/V
+
+def FC_sizing():
+
+    V = 1500 #V
+    n_row = V/Vc
+
+
+
+
 

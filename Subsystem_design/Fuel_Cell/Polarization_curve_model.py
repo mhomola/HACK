@@ -73,6 +73,17 @@ def P_com(h,p2,m):
     
     return cp*(T1/nc)*((p2/p1)**((gamma-1)/gamma)-1)*m, p1
 
+def inverse(Vsearch):
+
+    i = np.arange(0, 1.6, 0.01)
+    V = np.array([Ecell(j) for j in i])
+
+    idx = 0
+    for j in V:
+        if abs(V[j]-Vsearch)/Vsearch < 0.0015:
+            idx = j
+            break
+    return i[idx]
 
 print(ISA_p(281.65))
 
