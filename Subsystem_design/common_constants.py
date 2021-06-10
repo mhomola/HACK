@@ -74,6 +74,9 @@ class Constants():
         self.h_sharklet = 2.43                                      # Height of the wing sharklets                  [m]
         self.sweep_025 = 25                                         # Sweep at the quarter chord                   [deg]
         self.sweep_05 = 22.4                                        # Sweep at the half chord                      [deg]
+        self.x_mac = 3.295                                          # x distance from root chord to lemac           [m]
+        self.x_LEMAC = 11.88 + self.x_mac                           # nose to lemac                                 [m]
+        self.mac = 4.312                                            # length of MAC                                 [m]
 
         self.b_h = 2 * 6.12                                         # Span of the horizontal tail                   [m]
         self.c_r_h = 3.814                                          # Root chord of the horizontal tail             [m]
@@ -197,7 +200,6 @@ class Constants():
         """Heat exchanger"""
         self.T_LH2in = 30                                           # Temperature of H2 entering                    [K]
         self.T_H2out = 150                                          # Temperature of H2 exiting                     [K]
-        self.r_i_nozzle = 0.542                                     # Inner radius heat exchanger                   [K]
 
         """Propulsion"""
         self.cp_air = 1000                                          # Specific heat constant air                    [J/kg/K]
