@@ -243,6 +243,8 @@ class FlightEnvelope(Constants):
 
 if __name__ == '__main__':
     fe = FlightEnvelope(altitude=0, W=45000*9.80665)
+    fe.create_maneuver_envelope()
+    fe.V_s1
     fe.plot_envelope()
     print('\n n_max = ', fe.n_max,
           '\n V_D = ', fe.V_D)
