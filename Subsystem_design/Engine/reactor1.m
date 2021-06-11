@@ -57,7 +57,7 @@ TotalTime = 6; % in seconds - includes autoignition phase
 nSteps = ceil(TotalTime/dt); %number of steps. Total time = nSteps*dt
 
 if strcmp(g,'kerosene') %   compare string
-   gas = Solution('kerosene.yaml', 'gas');
+   gas = Solution('kerosene.cti', 'gas');
    p_o2 = 44.76;
    p_n2 = 168.3;
    p_o2_new = p_o2/eqr;

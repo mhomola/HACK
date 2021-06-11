@@ -171,6 +171,20 @@ class Climate_assess():
         delta_T = np.array([0.0,0.001,0.003,0.004,0.004])
 
         return E_CO2,CO2_concentration,years,RF_CO2,delta_T
+
+    def errors(self,e,U):
+        '''Errors in CO2 concentration'''
+        Conc_study = self.verification()[1]
+        Conc_model = self.delta_X_CO2(e,U)[self.t_prime==self.verification()[2]]
+
+        Errors_conc = np.absolute(Conc_study - Conc_model)/Conc_study
+        Error_conc = np.max(Errors_conc)
+
+
+
+
+        return Error_conc
+
     '''Start of functions to compute RF of CO2'''
     def G_X_CO2(self,tau):
         '''
@@ -449,14 +463,14 @@ class Climate_assess():
         #delta_T = np.convolve(RF_norm,self.G_T(t-t_prime),'full')
 
         if plot == True:
-            # plt.plot(self.t_prime, delta_T_O3S, color='tab:red', label='O3S')
-            # plt.plot(self.t_prime, delta_T_H2O, color='tab:orange', label='H2O')
-            # plt.plot(self.t_prime, delta_T_soot, color='tab:blue', label='soot')
+            plt.plot(self.t_prime, delta_T_O3S, color='tab:red', label='O3S')
+            plt.plot(self.t_prime, delta_T_H2O, color='tab:orange', label='H2O')
+            plt.plot(self.t_prime, delta_T_soot, color='tab:blue', label='soot')
             plt.plot(self.t_prime, delta_T_CO2, color='tab:green', label='CO2_$\Delta_T$ from model')
-            plt.plot(self.verification()[2],self.verification()[4],marker='+',label='CO2_$\Delta_T$ from study')
-            # plt.plot(self.t_prime, delta_T_CH4, color='black', label='CH4')
-            # plt.plot(self.t_prime, delta_T_O3L, color='grey', label='O3L')
-            # plt.plot(self.t_prime,delta_T_tot,color = 'yellow',label= 'Change in temperature per year')
+           # plt.plot(self.verification()[2],self.verification()[4],marker='+',label='CO2_$\Delta_T$ from study')
+            plt.plot(self.t_prime, delta_T_CH4, color='black', label='CH4')
+            plt.plot(self.t_prime, delta_T_O3L, color='grey', label='O3L')
+            plt.plot(self.t_prime,delta_T_tot,color = 'yellow',label= 'Change in temperature per year')
             plt.xlabel('years')
             plt.ylabel('$\Delta_T$ [K]')
             plt.legend()
