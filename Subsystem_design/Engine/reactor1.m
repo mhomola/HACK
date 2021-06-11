@@ -62,8 +62,10 @@ if strcmp(g,'kerosene') %   compare string
    p_n2 = 168.3;
    p_o2_new = p_o2/eqr;
    p_n2_new = p_n2/eqr;
-   str_ker_h2 = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:60,O2:',string(p_o2_new),',N2:',string(p_n2_new)],""));
+   str_ker_h2 = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:60,O2:',string(p_o2_new),',N2:',string(p_n2_new)],"")); % kerosene and H2, 50% in volume
    set(gas,'T',T,'P',P,'X',str_ker_h2) % 50% H2 in volume
+   str_ker = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,O2:',string(p_o2_new),',N2:',string(p_n2_new)],"")); % only kerosene
+   set(gas,'T',T,'P',P,'X',str_ker) % only kerosene
    
    %gas = Solution('nDodecane_Reitz.yaml','nDodecane_IG');
 else
@@ -95,7 +97,8 @@ end
 
 %str_kerosene = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,O2:',string(p_o2_new),',N2:',string(p_n2_new)],""));
 %set(gas,'T',T,'P',P,'X',str_kerosene) %kerosene
-%set(gas,'T',T,'P',P,'X','NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,O2:14.76,N2:55.45')
+
+%set(gas,'T',T,'P',P,'X','NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,O2:14.76,N2:55.45')% kerosene, stoich
 
 %set(gas,'T',T,'P',P,'X','NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:1,O2:15.26,N2:57.38') % 50% H2 in volume
 %set(gas,'T',T,'P',P,'X','NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:60,O2:44.76,N2:168.3') % 50% H2 in volume
