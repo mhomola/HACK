@@ -1,4 +1,5 @@
 from Subsystem_design.common_constants import Constants
+from Subsystem_design.aerodynamic_subsys import AerodynamicCharacteristics
 
 
 from math import *
