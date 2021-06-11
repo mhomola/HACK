@@ -83,12 +83,15 @@ class Constants():
         self.c_t_h = 1.186                                          # Tip chord of the horizontal tail              [m]
         self.taper_h = self.c_t_h / self.c_r_h                      # Taper ratio of the horizontal tail
         self.sweep_LE_h = 33                                        # Sweep of the LE of the horizontal tail       [deg]
+        self.sweep_025_h = 29                                       # Sweep of the 25c of the horizontal tail      [deg]
         self.S_h = 31                                               # Surface area of horizontal tail              [m^2]
         self.AR_h = self.b_h**2 / self.S_h                          # Aspect ratio of horizontal tail
         self.Vh_V = 0.85                                            # Ratio between V_h and V
         self.S_elevator = 7.63                                      # Surface area of the elevators                [m^2]
         self.max_elevator_deflection_nu = 30                        # Max elevator deflection nose up              [deg]
         self.max_elevator_deflection_nd = 17                        # Max elevator deflection nose down            [deg]
+        self.x_LEMAC_h = 31.605 + 1.639                             # x distane from nose to lemac of h             [m]
+        self.lh = 17.67355                                          #tail arm                                       [m]
 
         self.b_v = 2 * 5.87                                         # Double the span of the evrtical tail          [m]
         self.c_r_v = 5.595                                          # Root chord of the vertical tail               [m]
@@ -198,10 +201,6 @@ class Constants():
         self.l_cockpit_320neo = 5.04                                # Length of the cockpit of A320neo              [m]
         self.l_cabin_320neo = 29.53 - self.l_cockpit_320neo         # Length of the cabin of A320neo                [m]
         self.l_tail_320neo = self.l_f_320neo - 29.53                # Length of the tail of A320neo                 [m]
-
-        """Heat exchanger"""
-        self.T_LH2in = 30                                           # Temperature of H2 entering                    [K]
-        self.T_H2out = 150                                          # Temperature of H2 exiting                     [K]
 
         """Propulsion"""
         self.cp_air = 1000                                          # Specific heat constant air                    [J/kg/K]
