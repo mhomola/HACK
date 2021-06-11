@@ -4,6 +4,7 @@ import FCParameters as fc
 import Battery_Sizing as BS
 import Polarization_curve_model as PCM
 import Wires_design as WD
+import math as m
 
 SF = fc.SF
 FC_power = SF*0.001*BS.final_bat_size()[0]
@@ -84,25 +85,26 @@ def total_tank_cooling(T1,T2):
 
     m1 = (n*LHV*mh2)/(tot_cp*(FC_T-T1))
     m2 = (n*LHV*mh2)/(tot_cp*(FC_T-T2))
+    print(m1)
+    print(m2)
 
-    v1 = m1/tot_den
-    v2 = m2/tot_den
+    v1 = m1*10**3/tot_den
+    v2 = m2*10**3/tot_den
 
-    print('blabla',VFC/v1)
+    t = VFC/v1
+    V_tank = t*(v2-v1)
 
-    return 0
+    return V_tank
 
 
 if __name__ == '__main__':
-
-    total_tank_cooling(45,10)
 
     sizing = FC_sizing()
 
     print()
     print('Sizing of the fuel cell results: ')
-    print('Number of cells in series: ',round(sizing[0]))
-    print('Number of cells in parallel: ',round(sizing[1]))
+    print('Number of cells in series: ',m.ceil(sizing[0]))
+    print('Number of cells in parallel: ',m.ceil(sizing[1]))
     print('Total number of cells: ',round(sizing[2]))
     print('Current in the stack: ',round(sizing[3],2), 'A')
     print('Current density: ',round(sizing[4],2), ' A/cm2')
@@ -117,6 +119,8 @@ if __name__ == '__main__':
     print('Total FC system volume: ',round(total_system()[1]), ' l')
     print('Total FC system cost: ',round(total_system()[0]),' EUR')
     print('Only FC volume: ',round(FC_power/sp_V),' l')
+    print()
+    print('Tank with refrigerant volume: ',round(total_tank_cooling(10,40)),' l')
 
 
 
