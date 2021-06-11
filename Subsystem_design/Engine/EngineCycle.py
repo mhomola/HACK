@@ -76,7 +76,7 @@ class Engine_Cycle(Constants):
         self.p025 = self.p021 * self.PR_LPC
 
         # Exit of HPC - Entrance of cc
-        self.T03 = self.T025 + ( self.T025/self.eta_HPC ) * ( self.PR_HPC ** ( (self.k_air-1)/self.k_air ) - 1 )
+        self.T03 = self.T025 + ( self.T02/self.eta_HPC ) * ( self.PR_HPC ** ( (self.k_air-1)/self.k_air ) - 1 )
         self.p03 = self.p025 * self.PR_HPC
         self.OPR = self.p03 / self.p02         # Overall Pressure Ratio
 
@@ -105,7 +105,7 @@ class Engine_Cycle(Constants):
 
 
         # Exit of LPT - Entrance of nozzle
-        self.T05 = self.T045 + (self.T045/self.eta_LPT) * ( (1/self.PR_LPT)**((self.k_gas-1)/self.k_gas) - 1 )
+        self.T05 = self.T045 + (self.T04/self.eta_LPT) * ( (1/self.PR_LPT)**((self.k_gas-1)/self.k_gas) - 1 )
         self.p05 = self.p04 / self.PR_LPT
         # self.T05 = self.T045 - self.W_LPT / (self.mf_airfuel * self.cp_gas)
         # self.p05 = self.p045 * ( 1 - ( 1 - self.T05/self.T045 ) / self.eta_LPT ) ** ( self.k_gas / (self.k_gas-1) )
@@ -191,7 +191,6 @@ if __name__ == '__main__':
     for i in index:
         print('\n** Analysis for', c.phases[i], ' **')
         ec.cycle_analysis(aircraft=aircraft, i=i)
-
 
         print('\nInlet: T0 = ', c.T0[i], '[K]; p0 = ', c.p0[i], '[Pa]; v0 = ', c.v0[i], '[m/s]')
         print('T00 = ', ec.T00, '[K]; p00 = ', ec.p00, '[Pa]')
