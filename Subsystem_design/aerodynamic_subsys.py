@@ -76,6 +76,15 @@ class AerodynamicCharacteristics(Constants):
         #       '\n y position of the MAC = ', self.y_mac_h, ' m',
         #       '\n x position of the LEMAC measured from the start of the root chord = ', self.x_mac_h, ' m')
 
+    def l_h(self):
+        """
+        Compute the distance fro quarter chord of the wing to quarter chord of the horizontal tail
+        :return:
+        """
+        self.wing_MAC()
+        self.h_tail_MAC()
+        self.lh = (self.x_LEMAC_h + 0.25 * self.mac_h) - (self.x_LEMAC + 0.25 * self.mac)
+
     def v_tail_MAC(self):
         """
         The MAC is computed using the ADSEE-II slides.

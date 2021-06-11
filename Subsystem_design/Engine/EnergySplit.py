@@ -50,8 +50,8 @@ class Energy_Split():
         self.ER_h2_flight = self.energy_h2_flight / ( self.energy_h2_flight + self.energy_ker_flight )
         self.ER_ker_flight = self.energy_ker_flight / ( self.energy_h2_flight + self.energy_ker_flight )
 
-        self.ER_h2 = np.array([ 1, 1, self.ER_h2_flight, self.ER_h2_flight, self.ER_h2_flight, self.ER_h2_flight, 1 ]) # idle, taxi out, take-off, climb, cruise, approach, taxi in
-        self.ER_ker = np.array([ 0, 0, self.ER_ker_flight, self.ER_ker_flight, self.ER_ker_flight, self.ER_ker_flight, 0])  # idle, taxi out, take-off, climb, cruise, approach, taxi in
+        self.ER_h2 = np.array([ 1, self.ER_h2_flight, self.ER_h2_flight, self.ER_h2_flight, self.ER_h2_flight, 1, 1 ]) # idle, taxi out, take-off, climb, cruise, approach, taxi in
+        self.ER_ker = np.array([ 0, self.ER_ker_flight, self.ER_ker_flight, self.ER_ker_flight, self.ER_ker_flight, 0, 0])  # idle, taxi out, take-off, climb, cruise, approach, taxi in
 
         # find LHV_f for each phase, according to mass fractions
         self.LHV_hack = self.ER_h2*self.LHV_h2 + self.ER_ker*self.LHV_ker  # [MJ/kg], array of LHV for each phase
@@ -62,17 +62,17 @@ class Energy_Split():
         self.m_ker_flight = self.m_ker
         self.MR_h2_flight = self.m_h2_flight / ( self.m_h2_flight + self.m_ker_flight )
         self.MR_ker_flight = self.m_ker_flight / ( self.m_h2_flight + self.m_ker_flight )
-        self.MR_h2 = np.array([1, 1, self.MR_h2_flight, self.MR_h2_flight, self.MR_h2_flight, self.MR_h2_flight, 1])  # idle, taxi out, take-off, climb, cruise, approach, taxi in
-        self.MR_ker = np.array([0, 0, self.MR_ker_flight, self.MR_ker_flight, self.MR_ker_flight, self.MR_ker_flight, 0])  # idle, taxi out, take-off, climb, cruise, approach, ta
+        self.MR_h2 = np.array([ 1, self.MR_h2_flight, self.MR_h2_flight, self.MR_h2_flight, self.MR_h2_flight, 1, 1])  # idle, taxi out, take-off, climb, cruise, approach, taxi in
+        self.MR_ker = np.array([0, self.MR_ker_flight, self.MR_ker_flight, self.MR_ker_flight, self.MR_ker_flight, 0, 0])  # idle, taxi out, take-off, climb, cruise, approach, ta
 
 
 es = Energy_Split()
 LHV_hack = es.LHV_hack
-ER_h2 = es.ER_h2
-ER_ker = es.ER_ker
+ER_h2, MR_h2 = es.ER_h2, es.MR_h2
+ER_ker, MR_ker = es.ER_ker, es.MR_ker
 
 if __name__ == '__main__':
-    print('Phases: ', np.array(['idle', 'taxi out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi in']))
+    print('Phases: ', np.array(['taxi out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi in', 'idle']))
     print('\nEnergy ratio of H2: ', es.ER_h2)
     print('Energy ratio of kerosene: ', es.ER_ker)
     print('\nMass ratio of H2: ', es.MR_h2)
