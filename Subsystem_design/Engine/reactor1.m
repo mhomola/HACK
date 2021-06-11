@@ -66,7 +66,7 @@ if strcmp(g,'kerosene') %   compare string
    % set(gas,'T',T,'P',P,'X',str_ker_h2) % 50% H2 in volume
    str_ker = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,O2:',string(p_o2_new),',N2:',string(p_n2_new)],"")); % only kerosene
    set(gas,'T',T,'P',P,'X',str_ker) % only kerosene
-   
+
    %gas = Solution('nDodecane_Reitz.yaml','nDodecane_IG');
 else
    gas = GRI30('None');

@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import FCParameters as fc
+import math as m
 
 cp = fc.cp
 
@@ -62,11 +63,15 @@ def P_com(h, p2, m):
     g = 9.81
     R = 287.05
 
-    if h <= 11000:
+    # if h <= 11000:
+    #     p1 = ISA_p(T1)
+    if h <= 1800:
         p1 = ISA_p(T1)
     else:
-        p11 = ISA_p(ISA_t(11000))
-        p1 = p11 * np.exp(-g / (R * ISA_t(11000)) * (h - 11000))
+        p1 = ISA_p(ISA_t(1800))
+
+        # p11 = ISA_p(ISA_t(11000))
+        # p1 = p11 * np.exp(-g / (R * ISA_t(11000)) * (h - 11000))
 
     return cp * (T1 / nc) * ((p2 / p1) ** ((gamma - 1) / gamma) - 1) * m, p1
 
@@ -192,15 +197,28 @@ def final_bat_size():
         mAir = mfoAir(FC_power)
         FC_power_new, bat_E, time_tot2, power_tot2 = Req_power(mAir)
 
+    bat_E = bat_E/0.85
     mair = mfoAir(FC_power_new)
     mh2 = mfoH2(FC_power_new)
+    bat_orig = toWh(bat_E)
+
+    Vbcell = 3.7 # V
+    Ahbcell = 2
+    b_voltage = fc.FCV
+    b_cells_s = m.ceil(b_voltage/Vbcell)
+    b_Ah = bat_orig/b_voltage
+    b_cells_par = m.ceil(b_Ah/Ahbcell)
+    b_tot = b_cells_s*b_cells_par
 
     print('New estimate with compressor')
     print('Air mass flow: ', round(mair*1000,2), ' g/s')
     print('Hydrogen mass flow: ', round(mh2*1000,2), ' g/s')
     print(FC_power_new/1000, " kW")
     print(bat_E/1000000, " MJ")
-    bat_orig = toWh(bat_E)
+    print()
+    print('Battery cells in series: ',b_cells_s)
+    print('Battery cells in parallel: ',b_cells_par)
+    print('Battery cells - total: ',b_tot)
     print('Battery cost: ', round(0.001 * bat_orig * cost), " EUR")
     print('Battery mass: ', round(bat_orig / spec_m), " kg")
     print('Battery volume: ', round(bat_orig / spec_V), " l")
@@ -214,7 +232,7 @@ def final_bat_size():
     # plt.xlabel('Time [min]')
     # plt.show()
 
-    return FC_power_new, round(0.001 * bat_orig * cost), round(bat_orig / spec_m), round(bat_orig / spec_V)
+    return FC_power_new, round(0.001 * bat_orig * cost), round(bat_orig / spec_m), round(bat_orig / spec_V), mh2
 
 
 def compressor_plotter():

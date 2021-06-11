@@ -123,7 +123,7 @@ class Engine_Cycle(Constants):
         self.p025 = self.p021 * self.PR_LPC
 
         # Exit of HPC - Entrance of cc
-        self.T03 = self.T025 + ( self.T025/self.eta_HPC ) * ( self.PR_HPC ** ( (self.k_air-1)/self.k_air ) - 1 )
+        self.T03 = self.T025 + ( self.T02/self.eta_HPC ) * ( self.PR_HPC ** ( (self.k_air-1)/self.k_air ) - 1 )
         self.p03 = self.p025 * self.PR_HPC
         self.OPR = self.p03 / self.p02         # Overall Pressure Ratio
 
