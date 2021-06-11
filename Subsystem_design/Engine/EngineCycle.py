@@ -27,8 +27,7 @@ class Engine_Cycle(Constants):
         super().__init__()
 
     def data(self, aircraft, phase):
-        data = self.get_dataframe(aircraft, phase)
-
+        data, i = self.get_dataframe(aircraft, phase)
         self.M0 = float(data[0])
         self.h = float(data[1])
         self.ISA_calculator(h_input=self.h) # gives self.T0, self.p0, self.rho0, self.a0
@@ -56,10 +55,16 @@ class Engine_Cycle(Constants):
         self.PR_noz_core = float(data[21])
         self.PR_noz_fan = float(data[22])
         self.mr_h2 = float(data[23])
-        self.m_ker = float(data[24])
+        self.mr_ker = float(data[24])
         self.ER_h2 = float(data[25])
         self.ER_ker = float(data[26])
         self.LHV_f = float(data[27])
+
+        # percentage of core air that is used in combustion
+        if aircraft == 'neo':
+            self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_neo.dat'))[i]
+        elif aircraft == 'hack':
+            self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))[i]
 
     def get_dataframe(self, aircraft, phs):
         if aircraft == 'neo':
@@ -68,21 +73,21 @@ class Engine_Cycle(Constants):
             d = DataFrame().hack
         ###################################
         if phs == 'taxi_out':
-            data = d.taxi_out
+            data, i = d.taxi_out, 0
         elif phs == 'take_off':
-            data = d.take_off
+            data, i = d.take_off, 1
         elif phs == 'climb':
-            data = d.climb
+            data, i = d.climb, 2
         elif phs == 'cruise':
-            data = d.cruise
+            data, i = d.cruise, 3
         elif phs == 'approach':
-            data = d.approach
+            data, i = d.approach, 4
         elif phs == 'taxi_in':
-            data = d.taxi_in
+            data, i = d.taxi_in, 5
         elif phs == 'idle':
-            data = d.idle
+            data, i = d.idle, 6
 
-        return data
+        return data, i
 
 
     def cycle_analysis(self, aircraft, phase): # i = phase
@@ -193,6 +198,9 @@ class Engine_Cycle(Constants):
 
         self.T_total = self.T_fan + self.T_core # [N]
         self.TSFC = self.mf_fuel / (self.T_total*10**(-3)) # [g/kN/s]
+        self.stoichiometric_ratio = self.mr_h2 * self.stoich_ratio_h2 + self.mr_ker * self.stoich_ratio_ker
+        self.equivalence_ratio = (self.mf_fuel / (self.mf_hot * self.ratio_air_cc)) / \
+                                 self.stoichiometric_ratio  # TBD what mf_air to use
 
 
 ''' FORMULAE
@@ -230,9 +238,9 @@ if __name__ == '__main__':
             print('Entrance of LPC: T021 = ', round(ec.T021,3), '[K]; p021 = ', round(ec.p021,3), '[Pa]')
             print('Mass flow of air: Total = ', round(ec.mf_air_init,3), '[kg/s]; Core = ', round(ec.mf_hot,3), '[kg/s]; Bypassed = ', round(ec.mf_cold,3),'[kg/s]')
             print('Entrance of HPC: T025 = ', round(ec.T025,3), '[K]; p025 = ', round(ec.p025,3), '[Pa]')
-            print('Entrance of CC: T03 = ', round(ec.T03,3), '[K]; p03 = ', round(ec.p03,3), '[Pa]')
-            print('OPR = ', round(ec.OPR,3))
+            print('Entrance of CC: T03 = ', round(ec.T03,3), '[K]; p03 = ', round(ec.p03,3), '[Pa]; OPR = ', round(ec.OPR,3))
             print('Mass flow CC: Fuel = ', round(ec.mf_fuel,3), '[kg/s]; air CC = ', round(ec.mf_hot,3), '[kg/s]; Total end of CC = ', round(ec.mf_airfuel,3),'[kg/s]')
+            print('m air to cool / m air core', (ec.mf_airfuel*ec.cp_gas*(ec.T04-2000)) / (ec.mf_hot*( ec.cp_air*(ec.T03-ec.T04)+ec.cp_gas*(ec.T04) )) )
             print('Power: Fan = ', round(ec.W_fan,3), '[W]; LPC = ', round(ec.W_LPC,3), '[W]; HPC = ', round(ec.W_HPC,3), '[W]')
             print('LPT = ', round(ec.W_LPT,3), '[W]; HPT = ', round(ec.W_HPT,3), '[W]')
             print('Entrance of HPT: T04 = ', round(ec.T04,3), '[K]; p04 = ', round(ec.p04,3), '[Pa]')
@@ -243,6 +251,7 @@ if __name__ == '__main__':
             print('Exit of fan: T016 = ', round(ec.T016,3), '[K]; p016 = ', round(ec.p016,3), '[Pa]; PR_cr_fan = ', ec.PR_cr_fan)
             print('Exit of fan: T18 = ', round(ec.T18,3), '[K]; p18 = ', round(ec.p18,3), '[Pa]; v18 = ', round(ec.v18,3), '[m/s]')
             print('Provided Thrust: Fan = ', round(ec.T_fan,3), '[N]; Core = ', round(ec.T_core,3), '[N]; Total = ', round(ec.T_total,3), '[N]')
+            print('Thrust SFC = ', round(ec.TSFC,5), '[g/kN/s]; Equivalence ratio = ', round(ec.equivalence_ratio,4))
 
             amb = [['T0', round(ec.T0,3), 'K'], ['p0', round(ec.p0,3), 'Pa'], ['v0', round(ec.v0,3), 'm/s']]
             air = [['m_intake', round(ec.mf_air_init,3), 'kg/s'], ['m_hot', round(ec.mf_hot,3), 'kg/s'], ['m_cold', round(ec.mf_cold,3), 'kg/s']]
@@ -259,7 +268,7 @@ if __name__ == '__main__':
             st8 = [['T8', round(ec.T8,3), 'K'], ['p8', round(ec.p8,3), 'Pa'], ['v8', round(ec.v8,3), 'm/s']]
             st16 = [['T016', round(ec.T016,3), 'K'], ['p016', round(ec.p016,3), 'Pa']]
             st18 = [['T18', round(ec.T18,3), 'K'], ['p18', round(ec.p18,3), 'Pa'], ['v18', round(ec.v18,3), 'm/s']]
-            Thr = [['T_fan', round(ec.T_fan,3), 'N'], ['T_core', round(ec.T_core,3), 'N'], ['T_tot', round(ec.T_total,3), 'N']]
+            Thr = [['T_fan', round(ec.T_fan,3), 'N'], ['T_core', round(ec.T_core,3), 'N'], ['T_tot', round(ec.T_total,3), 'N'], ['TSCF', round(ec.TSFC,5), 'g/kN/s']]
             OPR = ['OPR',round(ec.OPR,3), '-']
 
             save_txt = amb + air + st0 + st2 + st21 + st25 + st3 + st4 + fuel + st45 + st5 + st7 + st8 + st16 + st18 + Thr + [OPR]
