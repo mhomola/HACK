@@ -83,6 +83,7 @@ class Constants():
         self.c_t_h = 1.186                                          # Tip chord of the horizontal tail              [m]
         self.taper_h = self.c_t_h / self.c_r_h                      # Taper ratio of the horizontal tail
         self.sweep_LE_h = 33                                        # Sweep of the LE of the horizontal tail       [deg]
+        self.sweep_025-h = 29                                       # Sweep of the 25c of the horizontal tail      [deg]
         self.S_h = 31                                               # Surface area of horizontal tail              [m^2]
         self.AR_h = self.b_h**2 / self.S_h                          # Aspect ratio of horizontal tail
         self.Vh_V = 0.85                                            # Ratio between V_h and V
