@@ -91,6 +91,7 @@ class Constants():
         self.max_elevator_deflection_nu = 30                        # Max elevator deflection nose up              [deg]
         self.max_elevator_deflection_nd = 17                        # Max elevator deflection nose down            [deg]
         self.x_LEMAC_h = 31.605 + 1.639                             # x distane from nose to lemac of h             [m]
+        self.lh = 17.67355                                          #tail arm                                       [m]
 
         self.b_v = 2 * 5.87                                         # Double the span of the evrtical tail          [m]
         self.c_r_v = 5.595                                          # Root chord of the vertical tail               [m]
