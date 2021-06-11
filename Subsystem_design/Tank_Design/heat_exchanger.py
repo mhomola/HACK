@@ -15,7 +15,7 @@ class HeatExchanger(Constants):
         self.cp_air = 1150  # https://www.engineeringtoolbox.com/air-specific-heat-capacity-d_705.html
 
 
-    def heat_flux(self):
+    def heat_flux(self, r_i, m_flow_core, D_o, D_T0, D_T1):
 
         print('\n \n ========= Heat Exchanger ====================================')
 
@@ -47,14 +47,11 @@ class HeatExchanger(Constants):
         D_T1 = self.T_exhaust - self.T_H2out
         LMTD = (D_T0 - D_T1) / np.log(D_T0 / D_T1)
 
-        r_i = 0.2
-
-        m_flow_core = 43
-
         Re_D = m_flow_core / (np.pi * r_i**2 * self.visc_air_eng)
         Pr = self.visc_air_eng * self.cp_air / self.thermal_conduct_air
         h_i = self.thermal_conduct_air * 0.023 * Re_D**0.8 * Pr**0.3 / (2 * r_i)
 
+        print('q required = ', q, 'W')
         print('\n Re_D = ', Re_D)
         print('\n Pr = ', Pr)
         print('\n NuD = ', 0.023 * Re_D**0.8 * Pr**0.3)
@@ -73,19 +70,28 @@ class HeatExchanger(Constants):
 
             return h_o_avg
 
-        D_o = 2*r_i + 0.05
         h_o = h_o_calc(D_o)
-
 
         Ui = (1/h_i + r_i/self.k_therm * np.log(D_o/2 / r_i)
               + r_i / (h_o * D_o/2))**(-1)
 
         L = q / (Ui * 2 * np.pi * r_i * LMTD)
 
-        print(L)
+        print('Length of the heat exchanger = ', L, ' m')
 
 
 
 if __name__ == "__main__":
     he = HeatExchanger()
-    he.heat_flux()
+
+    # Turbine Heat Exchanger
+    D_T0 = he.T_exhaust - he.T_LH2in
+    D_T1 = he.T_exhaust - he.T_H2out
+
+    # Oil Heat Exchanger
+    D_
+
+    # Nozzle Heat exchanger
+    D_T0 = he.T_exhaust - he.T_LH2in
+    D_T1 = he.T_exhaust - he.T_H2out
+    he.heat_flux(r_i=0.5, D_o=2*0.5+0.005, m_flow_core=43, D_T0=D_T0, D_T1=D_T1)

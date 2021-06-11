@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 from math import pi
 from Subsystem_design.fuel_required import V_H2, V_k
 from Subsystem_design.Tank_Design.Main_PreliminaryTank import mass_pod, mass_center_tank, volume_pod, volume_centre_tank
-from Subsystem_design.Engine.EnergySplit import LHV_hack
+from Subsystem_design.Engine.EnergySplit import LHV_hack, ER_h2, ER_ker, MR_h2, MR_ker
 
 
 
@@ -113,6 +113,8 @@ class Constants():
         self.X_root_htail = 31.60                                   # Distance from nose to root of horizontal tail [m]
         self.D_fan = 78 * 0.0254                                    # Fan diameter, 78 [in]                         [m]
         self.A_fan = np.pi * self.D_fan**2 / 4                      # Area of the fan                               [m2]
+        # self.D_fan_eff = 1.787                                      # Effective fan diameter for air intake in cruise [m]
+        # self.A_fan_eff = np.pi * self.D_fan_eff**2 / 4              # Effective fan area for air intake in cruise   [m2]
         self.D_h = 2.3                                              # Diameter of cowling inlet                     [m]
         self.D_n = 2.5                                              # Diameter of the cowling                       [m]
         self.D_e = 2.2                                              # Diameter of the cowling exit                  [m]
@@ -220,20 +222,22 @@ class Constants():
         self.stoich_ratio_ker = 1/15.66 #FAR
         self.stoich_ratio_h2 = 1/34.3 #FAR
 
-        """"Altitude and speed"""
-        self.phases = np.array(['idle', 'taxi out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi in'])
-        self.M0 = np.array([0.015, 0.02, 0.5, 0.5, 0.78, 0.5, 0.02])  # [-] Mach number
-        self.h = np.array([1, 1, 50, 3000, 11280, 300, 1])  # [m] altitude
-        self.T0, self.p0, self.rho0, self.a0 = np.array([]), np.array([]), np.array([]), np.array([])
+        """" Altitude and speed --- USE DATAFRAME """
+        # self.phases = np.array(['idle', 'taxi_out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi_in'])
+        # self.Thrust = np.array( [0.0993, 0.124, 0.45, 0.77, 0.29, 0.28, 0.068] ) * 35000*4.44822162
+        # self.M0 = np.array([0.0, 0.01, 0, 0.5, 0.78, 0.5, 0.01])  # [-] Mach number
+        # self.h = np.array([0, 0, 0, 3000, 11280, 300, 0])  # [m] altitude
+        # self.T0, self.p0, self.rho0, self.a0 = np.array([]), np.array([]), np.array([]), np.array([])
 
-        for i in self.h:
-            self.ISA_calculator(h_input=i)
-            self.T0 = np.append(self.T0, self.T)
-            self.p0 = np.append(self.p0, self.p)
-            self.rho0 = np.append(self.rho0, self.rho)
-            self.a0 = np.append(self.a0, self.a)
 
-        self.v0 = self.M0 * self.a0
+        # for i in self.h:
+        #     self.ISA_calculator(h_input=i)
+        #     self.T0 = np.append(self.T0, self.T)
+        #     self.p0 = np.append(self.p0, self.p)
+        #     self.rho0 = np.append(self.rho0, self.rho)
+        #     self.a0 = np.append(self.a0, self.a)
+        #
+        # self.v0 = self.M0 * self.a0
 
     def chord(self, x):
         if x <= 0.5*self.b_in:
@@ -242,91 +246,122 @@ class Constants():
             c = (self.c_tip - self.c_kink_out) / (0.5 * self.b_out) * (x - 0.5 * self.b_in) + self.c_kink_out
         return c
 
-    def engine_data_neo(self):
-        self.eta_inlet = 0.9208608681597723
-        self.PR_fan = 1.4206
-        self.eta_fan = 0.90445
-        self.BR = 11.24426
-        self.eta_LPC = 0.90019
-        self.eta_HPC = 0.91449
-        self.eta_LPT = 0.9405
-        self.eta_HPT = 0.91898 #(given) BEFORE: 1 # 1.072044268921447 (computed)
-        self.eta_mech_H =  0.644335665181638
-        self.eta_mech_L = 1
-        self.eta_cc = 0.995                          # that of Leap-1B
-        self.PR_LPC = 2.69419
-        self.PR_HPC = 9.73784
-        self.eta_nozzle = 1                          # 1.0737340755627587 (computed) # previous assumption: 0.98
-        self.PR_cc = 0.9395309126896629
-        self.T04 = 1459.30433 # [K]
-
-        self.mr_h2 = np.array([0, 0, 0, 0, 0, 0, 0])
-        self.mr_ker = 1 - self.mr_h2
-        self.ER_h2 = np.array([0, 0, 0, 0, 0, 0, 0])
-        self.ER_ker = 1 - self.mr_h2
-        self.LHV_f = np.array([self.LHV_ker]*7) # [MJ/kg]
-
-        self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_neo.dat')) # percentage of core air that is used in combustion
-        self.mf_bleed = 0.667                                                                                   # [kg/s]
-
-    def engine_data_hack(self, phase):
-        if phase == 'cruise':
-            self.eta_inlet = 0.9208608681597723  # calculated
-            self.PR_fan = 1.4206
-            self.eta_fan = 0.90445
-            self.BPR = 11.24426
-            self.eta_LPC = 0.90019
-            self.eta_HPC = 0.95469  # calculated # 0.91449 given
-            self.PR_LPC = 2.69419
-            self.PR_HPC = 9.73784
-            # self.eta_mech_H =  0.644335665181638
-            # self.eta_mech_L = 1
-            self.eta_mech = 0.9  # not used
-            self.eta_cc = 0.995  # that of Leap-1B, assumed
-            self.PR_cc = 0.9395309126896629
-            self.T04 = 1459.30433  # [K]
-            self.eta_LPT = 0.9405
-            self.eta_HPT = 0.9328  # computed # 0.91898 #(given)
-            self.PR_LPT = 7.9204
-            self.PR_HPT = 3.81933
-            self.eta_nozzle = 0.981797  # 1.0737340755627587 (computed) # previous assumption: 0.98
-            self.PR_noz_core = 0.985443  # Between stations 5 and 7
-            self.PR_cr_noz_core = 1.653828  # computed
-            self.PR_noz_fan = 0.987444  # Between stations 21 and 16
-            self.mf_air_init = self.rho0[4] * self.A_fan_eff * self.v0[4]
-
-        elif phase == 'takeoff':
-            self.eta_inlet = 0.92  # assumed
-            self.PR_inlet = 0.9699975  # calculated
-            self.PR_fan = 1.4
-            self.eta_fan = 0.93
-            self.BPR = 11.1
-            self.eta_LPC = 0.92
-            self.eta_HPC = 0.97735  # calculated # 0.92 given
-            self.PR_LPC = 1.99241
-            self.PR_HPC = 11.92998521
-            # self.eta_mech_H =  0.644335665181638
-            # self.eta_mech_L = 1
-            self.eta_mech = 0.9  # not used
-            self.eta_cc = 0.995  # that of Leap-1B, assumed
-            self.PR_cc = 0.94
-            self.T04 = 1630.39416  # [K]
-            self.eta_LPT = 0.94
-            self.eta_HPT = 0.94  # computed # 0.91898 #(given)
-            self.PR_LPT = 6.36217496  # 4.835766
-            self.PR_HPT = 3.82808
-            self.eta_nozzle = 0.98  # assumed
-            self.PR_noz_core = 0.99  # Between stations 5 and 7
-            self.PR_cr_noz_core = 1.2380755  # computed
-            self.PR_noz_fan = 0.99  # Between stations 21 and 16
-            self.mf_air_init = 510  # [kg/s]
-
-
-        # Fuel properties
-        self.LHV_f = LHV_hack # [MJ/kg]
-
-        self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))
-        self.mf_bleed = 0  # [kg/s]
+    # def engine_data_neo(self, phase):
+    #     if phase in ['climb','cruise','approach']:
+    #         self.eta_inlet = 0.9208608681597723  # calculated
+    #         self.PR_fan = 1.4206
+    #         self.eta_fan = 0.90445
+    #         self.BPR = 11.24426
+    #         self.eta_LPC = 0.90019
+    #         self.eta_HPC = 0.95469  # calculated # 0.91449 given
+    #         self.PR_LPC = 2.69419
+    #         self.PR_HPC = 9.73784
+    #         self.eta_mech = 0.6 # 0.9  # not used
+    #         self.eta_cc = 0.995  # that of Leap-1B, assumed
+    #         self.PR_cc = 0.9395309126896629
+    #         self.T04 = 1459.30433  # [K]
+    #         self.eta_LPT = 0.9405
+    #         self.eta_HPT = 0.9328  # computed # 0.91898 #(given)
+    #         self.PR_LPT = 7.9204
+    #         self.PR_HPT = 3.81933
+    #         self.eta_nozzle = 0.981797  # 1.0737340755627587 (computed) # previous assumption: 0.98
+    #         self.PR_noz_core = 0.985443  # Between stations 5 and 7
+    #         self.PR_cr_noz_core = 1.653828  # computed
+    #         self.PR_noz_fan = 0.987444  # Between stations 21 and 16
+    #
+    #         self.mf_air_init = self.rho0 * self.A_fan_eff * self.v0
+    #
+    #     elif phase in ['idle', 'taxi_out','takeoff', 'taxi_in']:
+    #         self.eta_inlet = 0.92  # assumed
+    #         self.PR_inlet = 0.9699975  # calculated
+    #         self.PR_fan = 1.4
+    #         self.eta_fan = 0.93
+    #         self.BPR = 11.1
+    #         self.eta_LPC = 0.92
+    #         self.eta_HPC = 0.97735  # calculated # 0.92 given
+    #         self.PR_LPC = 1.99241
+    #         self.PR_HPC = 11.92998521
+    #         self.eta_mech = 0.78  # not used
+    #         self.eta_cc = 0.995  # that of Leap-1B, assumed
+    #         self.PR_cc = 0.94
+    #         self.T04 = 1630.39416  # [K]
+    #         self.eta_LPT = 0.94
+    #         self.eta_HPT = 0.94  # computed # 0.91898 #(given)
+    #         self.PR_LPT = 6.36217496  # 4.835766
+    #         self.PR_HPT = 3.82808
+    #         self.eta_nozzle = 0.98  # assumed
+    #         self.PR_noz_core = 0.99  # Between stations 5 and 7
+    #         self.PR_cr_noz_core = 1.2380755  # computed
+    #         self.PR_noz_fan = 0.99  # Between stations 21 and 16
+    #         self.mf_air_init = 510  # [kg/s] from Arvind's document
+    #
+    #     self.mr_h2 = np.array([0, 0, 0, 0, 0, 0, 0])
+    #     self.mr_ker = 1 - self.mr_h2
+    #     self.ER_h2 = np.array([0, 0, 0, 0, 0, 0, 0])
+    #     self.ER_ker = 1 - self.mr_h2
+    #     self.LHV_f = np.array([self.LHV_ker]*7) # [MJ/kg]
+    #
+    #     self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_neo.dat')) # percentage of core air that is used in combustion                                                                                   # [kg/s]
+    #
+    # def engine_data_hack(self, phase):
+    #     if phase in ['climb','cruise','approach']:
+    #         self.eta_inlet = 0.9208608681597723  # calculated
+    #         self.PR_fan = 1.4206
+    #         self.eta_fan = 0.90445
+    #         self.BPR = 11.24426
+    #         self.eta_LPC = 0.90019
+    #         self.eta_HPC = 0.95469  # calculated # 0.91449 given
+    #         self.PR_LPC = 2.69419
+    #         self.PR_HPC = 9.73784
+    #         # self.eta_mech_H =  0.644335665181638
+    #         # self.eta_mech_L = 1
+    #         self.eta_mech = 0.9  # not used
+    #         self.eta_cc = 0.995  # that of Leap-1B, assumed
+    #         self.PR_cc = 0.9395309126896629
+    #         self.T04 = 1459.30433  # [K]
+    #         self.eta_LPT = 0.9405
+    #         self.eta_HPT = 0.9328  # computed # 0.91898 #(given)
+    #         self.PR_LPT = 7.9204
+    #         self.PR_HPT = 3.81933
+    #         self.eta_nozzle = 0.981797  # 1.0737340755627587 (computed) # previous assumption: 0.98
+    #         self.PR_noz_core = 0.985443  # Between stations 5 and 7
+    #         self.PR_cr_noz_core = 1.653828  # computed
+    #         self.PR_noz_fan = 0.987444  # Between stations 21 and 16
+    #         self.mf_air_init = self.rho0[4] * self.A_fan_eff * self.v0[4]
+    #
+    #     elif phase in ['idle', 'taxi out', 'takeoff', 'taxi in']:
+    #         self.eta_inlet = 0.92  # assumed
+    #         self.PR_inlet = 0.9699975  # calculated
+    #         self.PR_fan = 1.4
+    #         self.eta_fan = 0.93
+    #         self.BPR = 11.1
+    #         self.eta_LPC = 0.92
+    #         self.eta_HPC = 0.97735  # calculated # 0.92 given
+    #         self.PR_LPC = 1.99241
+    #         self.PR_HPC = 11.92998521
+    #         # self.eta_mech_H =  0.644335665181638
+    #         # self.eta_mech_L = 1
+    #         self.eta_mech = 0.9  # not used
+    #         self.eta_cc = 0.995  # that of Leap-1B, assumed
+    #         self.PR_cc = 0.94
+    #         self.T04 = 1630.39416  # [K]
+    #         self.eta_LPT = 0.94
+    #         self.eta_HPT = 0.94  # computed # 0.91898 #(given)
+    #         self.PR_LPT = 6.36217496  # 4.835766
+    #         self.PR_HPT = 3.82808
+    #         self.eta_nozzle = 0.98  # assumed
+    #         self.PR_noz_core = 0.99  # Between stations 5 and 7
+    #         self.PR_cr_noz_core = 1.2380755  # computed
+    #         self.PR_noz_fan = 0.99  # Between stations 21 and 16
+    #         self.mf_air_init = 510  # [kg/s]
+    #
+    #     # Fuel properties
+    #     self.mr_h2 = MR_h2
+    #     self.mr_ker = MR_ker
+    #     self.ER_h2 = ER_h2
+    #     self.ER_ker = ER_ker
+    #     self.LHV_f = LHV_hack # [MJ/kg]
+    #     self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))
 
 
 
