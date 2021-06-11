@@ -89,6 +89,7 @@ class Constants():
         self.S_elevator = 7.63                                      # Surface area of the elevators                [m^2]
         self.max_elevator_deflection_nu = 30                        # Max elevator deflection nose up              [deg]
         self.max_elevator_deflection_nd = 17                        # Max elevator deflection nose down            [deg]
+        self.x_LEMAC_h = 31.605 + 1.639                             # x distane from nose to lemac of h             [m]
 
         self.b_v = 2 * 5.87                                         # Double the span of the evrtical tail          [m]
         self.c_r_v = 5.595                                          # Root chord of the vertical tail               [m]
@@ -198,10 +199,6 @@ class Constants():
         self.l_cockpit_320neo = 5.04                                # Length of the cockpit of A320neo              [m]
         self.l_cabin_320neo = 29.53 - self.l_cockpit_320neo         # Length of the cabin of A320neo                [m]
         self.l_tail_320neo = self.l_f_320neo - 29.53                # Length of the tail of A320neo                 [m]
-
-        """Heat exchanger"""
-        self.T_LH2in = 30                                           # Temperature of H2 entering                    [K]
-        self.T_H2out = 150                                          # Temperature of H2 exiting                     [K]
 
         """Propulsion"""
         self.cp_air = 1000                                          # Specific heat constant air                    [J/kg/K]
