@@ -6,15 +6,15 @@ import matplotlib.pyplot as plt
 
 ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ### --- ###
 
-# Strting from the A320neo OEW and its cg, calculate the A320-HAC.K and its cg
+# Starting from the A320neo OEW and its cg, calculate the A320-HAC.K and its cg
 
 class potato_diagram(Constants):
     def __init__(self):
         super().__init__()
-        self.Cargo_fd = 3170            # [kg]
-        self.Cargo_af = 3170            # [kg]
+        self.Cargo_fd = 3402            # [kg]
+        self.Cargo_af = 0            # [kg]
         self.FuelW_ker = 10000        # [kg]
-        self.FuelW_H2 = 0            # [kg]
+        self.FuelW_H2 = 2690           # [kg]
 
     def oew_cg_hack(self):
         ### --- NEO --- ##
@@ -23,7 +23,7 @@ class potato_diagram(Constants):
         weight_APU = 145 # [kg] later put in self.weight_APU
         cg_APU = 34.63                                      # from nose [m]
         ### --- HACK --- ##
-        weight_DPU = 894 # [kg] later put in self.weight_DPU
+        weight_DPU = 781 # [kg] later put in self.weight_DPU
         cg_DPU = 32.5      # from nose [m] later put in self.cg_DPU
         ### -- LH2 tanks --- ##
         weight_LH2_tanks = 2* self.center_tank_mass + 2* self.pod_tank_mass # [kg]
@@ -210,7 +210,7 @@ class potato_diagram(Constants):
         x3_list_f = (np.array(xcg_ais_f) - x_LEMAC ) /MAC
         W3_list_f = np.array(W3_ais_f)
         plt.scatter(x3_list_f,W3_list_f,color = 'tab:green', marker = 'x')
-        plt.plot(x3_list_f,W3_list_f,color = 'tab:green',linewidth = '1',label = 'Aisle seats')
+        plt.plot(x3_list_f,W3_list_f,color = 'tab:green',linewidth = '1',label = 'Middle seats')
 
         x3_list_a = (np.array(xcg_ais_a) - x_LEMAC ) /MAC
         W3_list_a = np.array(W3_ais_a)
@@ -221,7 +221,7 @@ class potato_diagram(Constants):
         x4_list_f = (np.array(xcg_mid_f) - x_LEMAC ) /MAC
         W4_list_f = np.array(W4_mid_f)
         plt.scatter(x4_list_f,W4_list_f,color = 'tab:orange', marker = 'x')
-        plt.plot(x4_list_f,W4_list_f,color = 'tab:orange',linewidth = '1',label = 'Middle seats')
+        plt.plot(x4_list_f,W4_list_f,color = 'tab:orange',linewidth = '1',label = 'Aisle seats')
 
         x4_list_a = (np.array(xcg_mid_a) - x_LEMAC ) /MAC
         W4_list_a = np.array(W4_mid_a)
