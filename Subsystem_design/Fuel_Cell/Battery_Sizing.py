@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import FCParameters as fc
+import math as m
 
 cp = fc.cp
 
@@ -201,12 +202,12 @@ def final_bat_size():
     mh2 = mfoH2(FC_power_new)
     bat_orig = toWh(bat_E)
 
-    Vbcell = 3.7 # A
+    Vbcell = 3.7 # V
     Ahbcell = 2
     b_voltage = fc.FCV
-    b_cells_s = round(b_voltage/Vbcell)
+    b_cells_s = m.ceil(b_voltage/Vbcell)
     b_Ah = bat_orig/b_voltage
-    b_cells_par = round(b_Ah/Ahbcell)
+    b_cells_par = m.ceil(b_Ah/Ahbcell)
     b_tot = b_cells_s*b_cells_par
 
     print('New estimate with compressor')
