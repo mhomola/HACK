@@ -181,8 +181,9 @@ plot(tim,(x(:,5)+x(:,6))*1e6);
 xlabel('Time (s)');
 ylabel('NOX Mass Fraction (ppm)');
 
-disp(['CO fraction = ' x(end-1,2)])
-disp(['NOx fraction = ' (x(end-1,5)+x(end-1,6))*1e6])
+x(end-1,2)
+disp(['CO fraction = ' x(:,2)])
+disp(['NOx fraction = ' (x(:,5)+x(:,6))*1e6])
 
 TPZ = temp(length(temp))
 
