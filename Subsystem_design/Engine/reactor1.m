@@ -1,4 +1,4 @@
-function TPZ = reactor1(g, P_input, T_input, eqr_input)
+function [TPZ, MF_emissions] = reactor1(g, P_input, T_input, eqr_input)
 
 %    REACTOR1 Zero-dimensional kinetics: adiabatic, constant pressure.
 %
@@ -52,7 +52,7 @@ eqr = eqr_input; %0.3;
 %------------------
 
 dt = 1e-4; %time step; -4 originally
-TotalTime = 6; % in seconds - includes autoignition phase
+TotalTime = 12; % in seconds - includes autoignition phase
 
 nSteps = ceil(TotalTime/dt); %number of steps. Total time = nSteps*dt
 
@@ -62,11 +62,11 @@ if strcmp(g,'kerosene') %   compare string
    p_n2 = 168.3;
    p_o2_new = p_o2/eqr;
    p_n2_new = p_n2/eqr;
-   str_ker_h2 = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:60,O2:',string(p_o2_new),',N2:',string(p_n2_new)],"")); % kerosene and H2, 50% in volume
-   set(gas,'T',T,'P',P,'X',str_ker_h2) % 50% H2 in volume
+   % str_ker_h2 = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:60,O2:',string(p_o2_new),',N2:',string(p_n2_new)],"")); % kerosene and H2, 50% in volume
+   % set(gas,'T',T,'P',P,'X',str_ker_h2) % 50% H2 in volume
    str_ker = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,O2:',string(p_o2_new),',N2:',string(p_n2_new)],"")); % only kerosene
    set(gas,'T',T,'P',P,'X',str_ker) % only kerosene
-   
+
    %gas = Solution('nDodecane_Reitz.yaml','nDodecane_IG');
 else
    gas = GRI30('None');
@@ -145,6 +145,7 @@ for n = 1:nSteps
   kero(n,1:3) = massFraction(gas,{'NC10H22','PHC3H7','CYC9H18'});
 end
 
+MF_emissions =  x(nSteps,1:7)
 disp(['CPU time = ' num2str(cputime - t0)]);
 
 p = 0.005;
@@ -153,7 +154,7 @@ t_five = tim(t_five_i) + dt/2;
 t_com = tim(t_com_i);
 
 t_res = (t_com - t_five)*1000;
-disp(['Residence time = ' t_res ' ms'])
+disp(['Residence time = ', t_res, ' ms']);
 
 clf; %  clear figure
 subplot(2,2,1);
@@ -181,11 +182,12 @@ plot(tim,(x(:,5)+x(:,6))*1e6);
 xlabel('Time (s)');
 ylabel('NOX Mass Fraction (ppm)');
 
-x(end-1,2)
-disp(['CO fraction = ' x(:,2)])
-disp(['NOx fraction = ' (x(:,5)+x(:,6))*1e6])
+% disp(['CO fraction = ' x(end-1,2)])
+% disp(['NOx fraction = ' (x(end-1,5)+x(end-1,6))*1e6])
+% disp(['CO fraction = ', x(nSteps,2)]);
+% disp(['NOx fraction = ', (x(nSteps,5)+x(nSteps,6))*1e6]);
 
-TPZ = temp(length(temp))
+TPZ = temp(length(temp);
 
 % clear all
 % cleanup
