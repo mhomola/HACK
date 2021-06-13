@@ -209,7 +209,7 @@ class Constants():
         self.k_gas = 1.3379776344421168                             # Ration of specific heat for air
 
         # self.N2_cp_data = np.array(np.genfromtxt('N2_cp.dat'))      # cp vs. T data for N2          T[K]; cp[kJ/(kg*K)]
-        self.molarmass_N2 = 28.01340                                # Molar mass of N2                          [g/mol]
+        self.molarmass_N2 = 28.01340                                  # Molar mass of N2                          [g/mol]
 
         # self.h2_cp_data = np.array(np.genfromtxt('h2_cp.dat'))      # cp vs. T data for h2          T[K]; cp[kJ/(kg*K)]
         self.molarmass_h2 = 2.01588                                 # Molar mass of h2                          [g/mol]
