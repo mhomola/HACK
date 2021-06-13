@@ -20,7 +20,7 @@ Created on Wed Jun  2 09:39:04 2021
 import numpy as np
 from DataEngine import DataFrame
 from Subsystem_design.common_constants import Constants
-
+import matlab.engine
 
 class Engine_Cycle(Constants):
     def __init__(self):
@@ -202,6 +202,31 @@ class Engine_Cycle(Constants):
         self.equivalence_ratio = (self.mf_fuel / (self.mf_hot * self.ratio_air_cc)) / \
                                  self.stoichiometric_ratio  # TBD what mf_air to use
 
+        self.air_cool(aircraft, phase)
+
+
+
+    def air_cool(self, aircraft, phase):
+        # eng = matlab.engine.start_matlab()
+        # if aircraft == 'neo':
+        #     (TPZ, MF, MF_names) = eng.reactor1('neo', float(self.p03), float(self.T03), float(self.equivalence_ratio))
+        # else:
+        #     if phase in ['taxi_out', 'taxi_in', 'idle']:
+        #         (TPZ, MF, MF_names) = eng.reactor1('hack_h2', float(self.p03), float(self.T03), float(self.equivalence_ratio))
+        #     else:
+        #         (TPZ, MF, MF_names) = eng.reactor1('hack_mix', float(self.p03), float(self.T03), float(self.equivalence_ratio))
+
+        # TPZ = 2000 # [K]
+
+
+            #(self.mf_airfuel * self.cp_gas * (self.T04 - TPZ)) / (self.mf_hot * (self.cp_air * (self.T03 - self.T04) + self.cp_gas * (self.T04 - TPZ)))
+        self.mr_SZair_simpl1 = (self.mf_airfuel*self.cp_gas*(self.T04-self.T03) - self.mf_fuel*self.eta_cc*self.LHV_f*10**6) /\
+                               (self.mf_hot * (self.T04-self.T03)*(self.cp_gas-self.cp_air))
+        self.TPZ = self.T03 + ( self.mf_fuel*self.eta_cc*self.LHV_f*10**6 ) / (self.cp_gas*( (1-self.mr_SZair_simpl1)*self.mf_hot+self.mf_fuel ))
+
+        self.mr_SZair_simpl = (self.mf_airfuel * self.cp_gas * (self.TPZ - self.T04)) / (
+                    self.mf_hot * (self.cp_air * (self.T04 - self.T03) + self.cp_gas * (self.TPZ - self.T04)))
+
 
 ''' FORMULAE
 
@@ -232,25 +257,26 @@ if __name__ == '__main__':
             print("\n",p)
             ec.cycle_analysis(a, p)
 
-            print('\nInlet: T0 = ', round(ec.T0,3), '[K]; p0 = ', round(ec.p0,3), '[Pa]; v0 = ', round(ec.v0,3), '[m/s]')
-            print('T00 = ', round(ec.T00,3), '[K]; p00 = ', round(ec.p00,3), '[Pa]')
-            print('Entrance of fan: T02 = ', round(ec.T02,3), '[K]; p02 = ', round(ec.p02,3), '[Pa]')
-            print('Entrance of LPC: T021 = ', round(ec.T021,3), '[K]; p021 = ', round(ec.p021,3), '[Pa]')
-            print('Mass flow of air: Total = ', round(ec.mf_air_init,3), '[kg/s]; Core = ', round(ec.mf_hot,3), '[kg/s]; Bypassed = ', round(ec.mf_cold,3),'[kg/s]')
-            print('Entrance of HPC: T025 = ', round(ec.T025,3), '[K]; p025 = ', round(ec.p025,3), '[Pa]')
+            # print('\nInlet: T0 = ', round(ec.T0,3), '[K]; p0 = ', round(ec.p0,3), '[Pa]; v0 = ', round(ec.v0,3), '[m/s]')
+            # print('T00 = ', round(ec.T00,3), '[K]; p00 = ', round(ec.p00,3), '[Pa]')
+            # print('Entrance of fan: T02 = ', round(ec.T02,3), '[K]; p02 = ', round(ec.p02,3), '[Pa]')
+            # print('Entrance of LPC: T021 = ', round(ec.T021,3), '[K]; p021 = ', round(ec.p021,3), '[Pa]')
+            # print('Mass flow of air: Total = ', round(ec.mf_air_init,3), '[kg/s]; Core = ', round(ec.mf_hot,3), '[kg/s]; Bypassed = ', round(ec.mf_cold,3),'[kg/s]')
+            # print('Entrance of HPC: T025 = ', round(ec.T025,3), '[K]; p025 = ', round(ec.p025,3), '[Pa]')
             print('Entrance of CC: T03 = ', round(ec.T03,3), '[K]; p03 = ', round(ec.p03,3), '[Pa]; OPR = ', round(ec.OPR,3))
             print('Mass flow CC: Fuel = ', round(ec.mf_fuel,3), '[kg/s]; air CC = ', round(ec.mf_hot,3), '[kg/s]; Total end of CC = ', round(ec.mf_airfuel,3),'[kg/s]')
-            print('m air to cool / m air core', (ec.mf_airfuel*ec.cp_gas*(ec.T04-2000)) / (ec.mf_hot*( ec.cp_air*(ec.T03-ec.T04)+ec.cp_gas*(ec.T04) )) )
-            print('Power: Fan = ', round(ec.W_fan,3), '[W]; LPC = ', round(ec.W_LPC,3), '[W]; HPC = ', round(ec.W_HPC,3), '[W]')
-            print('LPT = ', round(ec.W_LPT,3), '[W]; HPT = ', round(ec.W_HPT,3), '[W]')
+            print('LHV fuel = ',round(ec.LHV_f,3),'m air to cool / m air core', round(ec.mr_SZair_simpl,4), round(ec.mr_SZair_simpl1, 4) )
+            print('TPZ = ', round(ec.TPZ,3))
+            # print('Power: Fan = ', round(ec.W_fan,3), '[W]; LPC = ', round(ec.W_LPC,3), '[W]; HPC = ', round(ec.W_HPC,3), '[W]')
+            # print('LPT = ', round(ec.W_LPT,3), '[W]; HPT = ', round(ec.W_HPT,3), '[W]')
             print('Entrance of HPT: T04 = ', round(ec.T04,3), '[K]; p04 = ', round(ec.p04,3), '[Pa]')
-            print('Entrance of LPT: T045 = ', round(ec.T045,3), '[K]; p045 = ', round(ec.p045,3), '[Pa]')
-            print('Entrance of nozzle: T05 = ', round(ec.T05,3), '[K]; p05 = ', round(ec.p05,3), '[Pa]')
-            print('Exit of nozzle: T07 = ', round(ec.T07,3), '[K]; p07 = ', round(ec.p07,3), '[Pa]; PR_cr_noz = ', ec.PR_cr_noz_core)
-            print('Exit of nozzle: T8 = ', round(ec.T8,3), '[K]; p8 = ', round(ec.p8,3), '[Pa]; v8 = ', round(ec.v8,3), '[m/s]')
-            print('Exit of fan: T016 = ', round(ec.T016,3), '[K]; p016 = ', round(ec.p016,3), '[Pa]; PR_cr_fan = ', ec.PR_cr_fan)
-            print('Exit of fan: T18 = ', round(ec.T18,3), '[K]; p18 = ', round(ec.p18,3), '[Pa]; v18 = ', round(ec.v18,3), '[m/s]')
-            print('Provided Thrust: Fan = ', round(ec.T_fan,3), '[N]; Core = ', round(ec.T_core,3), '[N]; Total = ', round(ec.T_total,3), '[N]')
+            # print('Entrance of LPT: T045 = ', round(ec.T045,3), '[K]; p045 = ', round(ec.p045,3), '[Pa]')
+            # print('Entrance of nozzle: T05 = ', round(ec.T05,3), '[K]; p05 = ', round(ec.p05,3), '[Pa]')
+            # print('Exit of nozzle: T07 = ', round(ec.T07,3), '[K]; p07 = ', round(ec.p07,3), '[Pa]; PR_cr_noz = ', ec.PR_cr_noz_core)
+            # print('Exit of nozzle: T8 = ', round(ec.T8,3), '[K]; p8 = ', round(ec.p8,3), '[Pa]; v8 = ', round(ec.v8,3), '[m/s]')
+            # print('Exit of fan: T016 = ', round(ec.T016,3), '[K]; p016 = ', round(ec.p016,3), '[Pa]; PR_cr_fan = ', ec.PR_cr_fan)
+            # print('Exit of fan: T18 = ', round(ec.T18,3), '[K]; p18 = ', round(ec.p18,3), '[Pa]; v18 = ', round(ec.v18,3), '[m/s]')
+            # print('Provided Thrust: Fan = ', round(ec.T_fan,3), '[N]; Core = ', round(ec.T_core,3), '[N]; Total = ', round(ec.T_total,3), '[N]')
             print('Thrust SFC = ', round(ec.TSFC,5), '[g/kN/s]; Equivalence ratio = ', round(ec.equivalence_ratio,4))
 
             amb = [['T0', round(ec.T0,3), 'K'], ['p0', round(ec.p0,3), 'Pa'], ['v0', round(ec.v0,3), 'm/s']]
@@ -274,10 +300,10 @@ if __name__ == '__main__':
             save_txt = amb + air + st0 + st2 + st21 + st25 + st3 + st4 + fuel + st45 + st5 + st7 + st8 + st16 + st18 + Thr + [OPR]
             name = a+'_'+p+'.txt'
 
-            F = open(name,'w')
-            for i in range(len(save_txt)):
-                for j in range(0,3):
-                    F.write(str(save_txt[i][j]) + '\t')
-                F.write('\n')
-
-            F.close()
+            # F = open(name,'w')
+            # for i in range(len(save_txt)):
+            #     for j in range(0,3):
+            #         F.write(str(save_txt[i][j]) + '\t')
+            #     F.write('\n')
+            #
+            # F.close()
