@@ -138,11 +138,11 @@ if __name__ == "__main__":
     const = Constants()
     cool = Engine_Cool()
 
-    # Get TPZ from Ivan's code. Inputs are ( gas, P, T, phi )
-    # Tpz = eng.reactor1('kerosene', float(cycle.p03), float(cycle.T03), 1) # [K]
+    #Get TPZ from Ivan's code. Inputs are ( gas, P, T, phi )
+    #Tpz = eng.reactor1('kerosene', float(cycle.p03), float(cycle.T03), 1) # [K]
 
 
-    # (TPZ, MF, MF_names) = eng.reactor1('kerosene', float(cycle.p03), float(cycle.T03), float(cycle.equivalence_ratio))
+    #(TPZ, MF, MF_names) = eng.reactor1('kerosene', float(cycle.p03), float(cycle.T03), float(cycle.equivalence_ratio))
     aircraft = ['neo', 'hack']
 
     phases = ['taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in']
@@ -152,6 +152,9 @@ if __name__ == "__main__":
         for p in phases:
             print("\n", p)
             cycle.cycle_analysis(a,p)
+            # Get TPZ from Ivan's code. Inputs are ( gas, P, T, phi )
+            (TPZ, MF, MF_names) = eng.reactor1('neo', float(cycle.p03), float(cycle.T03), float(cycle.equivalence_ratio))
+
             # cool.SZ_air(Tpz, cycle.mf_hot, cycle.mf_h2, cycle.mf_ker, cycle.T03, cycle.T04)
             cool.SZ_air(cycle.mf_hot, cycle.mf_h2, cycle.mf_ker, cycle.T03, cycle.TPZ, cycle.T04, cycle.mr_SZair_simpl1, cycle.LHV_f)
             print('TPZ from ec:', cycle.TPZ, 'MR from ec:',cycle.mr_SZair_simpl1)
@@ -164,8 +167,8 @@ if __name__ == "__main__":
 
             # print('mf hot = ', cycle.mf_hot, 'mf h2 = ', cycle.mf_h2, 'mf ker = ', cycle.mf_ker, 'T03 = ', cycle.T03, 'T04 = ', cycle.T04)
             # print('P03', cycle.p03)
-            print('Mass ratio of air needed to be injected on secondary zone:', round(cool.mr_SZair,3)
-            print('TPZ = ', round(TPZ,3)
+            print('Mass ratio of air needed to be injected on secondary zone:', round(cool.mr_SZair,3))
+            print('TPZ = ', round(TPZ,3))
             print('Difference between this one and simplified: ', round(cool.err,3))
 
     # if cool.mr_SZair < const.ratio_air_cc:

@@ -14,7 +14,7 @@ class Climate_assess():
         self.H = 40                                                # Span of years considered(larger than 30 years)
         self.RF_2CO2 = 3.7                                             # Radiative forcing corresponding to   [W/m^2]
                                                                        # a doubling of the concentration
-        self.t_0 = 1940
+        self.t_0 = 2035#1940
         self.dt = 1
         self.t = t
         self.t_prime = np.arange(self.t_0, t + self.dt, self.dt)
@@ -22,7 +22,7 @@ class Climate_assess():
         self.alpha_t = 0.595
         self.tau_t1 = 8.4                                                                                          #[years]
         self.tau_t2 = 409.5                                            #                                            [year]
-        self.growth_rate = 0.0015                                      # Growth rate of number of flights between 2017-2040
+        self.growth_rate = 0.015                                      # Growth rate of number of flights between 2017-2040
         self.H2_flights_2035 = 0.08                                   # Percentage of flights on H2 in 2035
         self.H2_flights_2050 = 0.4                                     # Percentage of H2 flights in 2050
         self.flights_EU_2024 = 11411000                                # Number of flights in 2024 post corona, best scenario
@@ -141,7 +141,7 @@ class Climate_assess():
         H2_percentage = self.H2_percentage_trend()
         N_aircraft_H2 = narrow_body_flights * H2_percentage
 
-
+        print('Here',tot_flights_2035)
         return N_aircraft_H2
 
 
@@ -501,31 +501,34 @@ class Climate_assess():
 
 
 if __name__ == '__main__':
-    climate = Climate_assess(t = 1995)
+    climate = Climate_assess(t = 2135) #1995
     climate.s(compound='O3S')
     e_CO2, e_SO4, e_H2O, e_soot, e_NOx = climate.emissions(13300)
     #
-    # U_H2 = climate.number_aircraft_H2()                 # Number of flights in a year
-    # U_ker = climate.number_aircraft_kerosene()
-    # E_H2 = climate.E(e=e_CO2 ,U=U_H2,time=climate.t_prime)
-    # E_ker = climate.E(e=e_CO2, U=U_ker, time=climate.t_prime)
-    # percentages= climate.H2_percentage_trend()
+    U_H2 = climate.number_aircraft_H2()                 # Number of flights in a year
+    U_ker = climate.number_aircraft_kerosene()
+    E_H2 = climate.E(e=e_CO2 ,U=U_H2,time=climate.t_prime)
+    E_ker = climate.E(e=e_CO2, U=U_ker, time=climate.t_prime)
+    percentages= climate.H2_percentage_trend()
     # plt.subplot(131)
     # plt.plot(climate.t_prime,percentages,label='Percentage of H2 flights')
     # plt.legend()
     # plt.subplot(132)
-    # plt.plot(climate.t_prime,U_ker,label='Utilization rate')
-    # plt.legend()
+    plt.plot(climate.t_prime,U_H2,label='Utilization rate')
+    plt.xlabel('years')
+    plt.ylabel('Number of missions per year')
+    plt.legend()
+
     # plt.subplot(133)
-    # plt.plot(climate.t_prime, E_ker,label='Emissions per year')
+    # plt.plot(climate.t_prime, E_H2,label='Emissions per year')
     # plt.legend()
-    #plt.show()
+    plt.show()
     # print('Start analysis for LTO')
     # 'To plot the change in CO2 concentration in ppmv per year'
 
-    clim =climate.delta_X_CO2(e=e_CO2,U=10,plot= True)
-    print(clim)
-
-
-    ATR = climate.ATR(h=11000,e_CO2= e_CO2, e_H2O= e_H2O, e_NOx=e_NOx,e_soot= e_soot,e_sulfate=e_SO4,U=10,plot = True)
-    print('The average temperature response, A_100, for the LTO of the HACK is:',ATR,'[K]')
+    # clim =climate.delta_X_CO2(e=e_CO2,U=10,plot= True)
+    # print(clim)
+    #
+    #
+    # ATR = climate.ATR(h=11000,e_CO2= e_CO2, e_H2O= e_H2O, e_NOx=e_NOx,e_soot= e_soot,e_sulfate=e_SO4,U=10,plot = True)
+    # print('The average temperature response, A_100, for the LTO of the HACK is:',ATR,'[K]')
