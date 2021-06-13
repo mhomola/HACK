@@ -57,9 +57,10 @@ TotalTime = 12; % in seconds - includes autoignition phase
 nSteps = ceil(TotalTime/dt); %number of steps. Total time = nSteps*dt
 
 if strcmp(g,'kerosene') %   compare string
-   gas = Solution('kerosene.cti', 'gas');
-   p_o2 = 44.76;
-   p_n2 = 168.3;
+   %Combustion of only kerosene (possibly )
+   gas = Solution('kerosene.yaml', 'gas');
+   p_o2 = 14.76;%44.76;
+   p_n2 = 55.45;%168.3;
    p_o2_new = p_o2/eqr;
    p_n2_new = p_n2/eqr;
    % str_ker_h2 = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:60,O2:',string(p_o2_new),',N2:',string(p_n2_new)],"")); % kerosene and H2, 50% in volume
@@ -187,7 +188,7 @@ ylabel('NOX Mass Fraction (ppm)');
 % disp(['CO fraction = ', x(nSteps,2)]);
 % disp(['NOx fraction = ', (x(nSteps,5)+x(nSteps,6))*1e6]);
 
-TPZ = temp(length(temp);
+TPZ = temp(length(temp));
 
 % clear all
 % cleanup
