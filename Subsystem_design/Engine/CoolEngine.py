@@ -17,6 +17,7 @@ Created on Tue May 25 11:53:39 2021
 
 from Subsystem_design.common_constants import Constants
 from Subsystem_design.Engine.EngineCycle import Engine_Cycle
+from DataEngine import DataFrame
 import numpy as np
 
 import matlab.engine
@@ -25,6 +26,12 @@ eng = matlab.engine.start_matlab()
 class Engine_Cool(Constants):
     def __init__(self):
         super().__init__()
+        self.N2_cp_data = np.array(np.genfromtxt('N2_cp.dat'))      # cp vs. T data for N2          T[K]; cp[kJ/(kg*K)]
+        self.N2_cp_data[:,1] = self.N2_cp_data[:,1] * 1000 # [J/kg/K]
+        self.h2_cp_data = np.array(np.genfromtxt('h2_cp.dat'))     # cp vs. T data for h2          T[K]; cp[kJ/(kg*K)]
+        self.h2_cp_data[:,1] = self.h2_cp_data[:,1] * 1000 # [J/kg/K]
+        self.C12H26_cp_data = np.array(np.genfromtxt('C12H26_cp.dat'))  # cp vs. T data for dodecane   T[K]; cp [J/(mol*K)]
+        self.C12H26_cp_data[:, 1] = self.C12H26_cp_data[:, 1] / ( self.molarmass_C12H26 / 1000)         # [J/kg/K]
 
     ''' DEFINITION OF THE FUNCTION '''
     def cp_regression(self, data, T):
@@ -67,10 +74,10 @@ class Engine_Cool(Constants):
     def integral(self, data, T0, Tmax):
         self.cp_array, self.T_array = np.array([]), np.array([])
         # Find initial data to retrieve
-        if data[0][0] < 300:
-            T0 = T0
-        elif data[0][0] == 300:
-            T0 = 300 # [K]
+        # if data[0][0] < 300:
+        #     T0 = T0
+        # elif data[0][0] == 300:
+        #     T0 = 300 # [K]
 
         self.cp_first_last(data, T0)
         # Find all other cp's and temperatures
@@ -82,36 +89,47 @@ class Engine_Cool(Constants):
         self.cp_integral = np.array([])
         for i in range(len(self.cp_array)-1):
             self.deltaT = self.T_array[i+1] - self.T_array[i]
-            self.cp_avg = (self.cp_array[i+1] - self.cp_array[i] ) / 2
-            self.cp_integral = np.sum( np.append(self.cp_integral, self.deltaT * self.cp_avg) )
+            self.cp_avg = (self.cp_array[i+1] + self.cp_array[i] ) / 2
+            self.cp_integral = np.append(self.cp_integral, self.deltaT * self.cp_avg)
+
+        self.cp_integral = np.sum(self.cp_integral)
 
 
     def enthalpy(self, h0):
         self.h = h0 + self.cp_integral
 
-    def SZ_air(self, Tpz, mf_hot, mf_h2, mf_ker, T03, T04):
+    # def SZ_air(self, Tpz, mf_hot, mf_h2, mf_ker, T03, T04):
+    def SZ_air(self, mf_hot, mf_h2, mf_ker, T03, Tpz, T04, mr_SZair_simpl, LHV):
 
         # Contribution of air that enters the Primary Zone
         self.integral(self.N2_cp_data, T04, Tpz)
-        # self.A = - self.cp_integral * mf_hot
-        self.A = self.cp_gas * mf_hot * (T04 - Tpz)
+        self.A = self.cp_integral * mf_hot
+        # self.A = self.cp_gas * mf_hot * (T04 - Tpz)
 
         # Contribution of hydrogen
         self.integral(self.h2_cp_data, T04, Tpz)
-        # self.B = - self.cp_integral * mf_h2
-        self.B = self.cp_gas * mf_h2 * (T04 - Tpz)
+        self.B = self.cp_integral * mf_h2
+        # self.B = self.cp_gas * mf_h2 * (T04 - Tpz)
 
         # Contribution of kerosene
         self.integral(self.C12H26_cp_data, T04, Tpz)
-        # self.C = - self.cp_integral * mf_ker
-        self.C = self.cp_gas * mf_ker * (T04 - Tpz)
-
+        self.C = self.cp_integral * mf_ker
+        # self.C = self.cp_gas * mf_ker * (T04 - Tpz)
+        #
         # (Partial) contribution of air that enters the Secondary Zone
         self.integral(self.N2_cp_data, T03, T04)
-        # self.D = self.cp_integral * mf_hot
-        self.D = self.cp_air * mf_hot * (T04 - T03)
+        self.D = self.cp_integral * mf_hot
+        # self.D = self.cp_air * mf_hot * (T04 - T03)
 
         self.mr_SZair = (self.A + self.B + self.C) / (self.A + self.D)
+        #
+
+        # self.mr_SZair = ((mf_hot+mf_h2+mf_ker)* self.cp_gas * (T04 - T03) - (mf_h2+mf_ker)*0.995*LHV*10**6) / (mf_hot * (self.cp_gas - self.cp_air)* (T04 - T03) )
+        # self.TPZ_calc = ((mf_h2+mf_ker)*0.995*LHV*10**6) / ((self.mr_SZair*mf_hot+mf_h2+mf_ker)*self.cp_gas) + T03
+
+        self.err = (self.mr_SZair - mr_SZair_simpl) / mr_SZair_simpl * 100
+
+
 
 
 
@@ -121,14 +139,34 @@ if __name__ == "__main__":
     cool = Engine_Cool()
 
     # Get TPZ from Ivan's code. Inputs are ( gas, P, T, phi )
-    Tpz = eng.reactor1('kerosene', float(cycle.p03), float(cycle.T03), 1) # [K]
-    cycle.cycle_analysis('neo', -3)
-    const.engine_data_neo()
+    # Tpz = eng.reactor1('kerosene', float(cycle.p03), float(cycle.T03), 1) # [K]
 
-    cool.SZ_air(Tpz, cycle.mf_hot, cycle.mf_h2, cycle.mf_ker, cycle.T03, const.T04)
 
-    print('Mass ratio of air needed to be injected on secondary zone:', cool.mr_SZair)
-    print('Mass ratio of air actually injected on secondary zone:', const.ratio_air_cc)
+    # (TPZ, MF, MF_names) = eng.reactor1('kerosene', float(cycle.p03), float(cycle.T03), float(cycle.equivalence_ratio))
+    aircraft = ['neo', 'hack']
+
+    phases = ['taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in']
+
+    for a in aircraft:
+        print("\n= = = = Analysis for A320", a, "= = = =")
+        for p in phases:
+            print("\n", p)
+            cycle.cycle_analysis(a,p)
+            # cool.SZ_air(Tpz, cycle.mf_hot, cycle.mf_h2, cycle.mf_ker, cycle.T03, cycle.T04)
+            cool.SZ_air(cycle.mf_hot, cycle.mf_h2, cycle.mf_ker, cycle.T03, cycle.TPZ, cycle.T04, cycle.mr_SZair_simpl1, cycle.LHV_f)
+            print('TPZ from ec:', cycle.TPZ, 'MR from ec:',cycle.mr_SZair_simpl1)
+            TPZ = cycle.TPZ.copy()
+            while cool.err > 5:
+                print(cool.err)
+                TPZ = cycle.T03 + (cycle.mf_fuel * cycle.eta_cc * cycle.LHV_f * 10 ** 6) / (cycle.cp_gas * ((1 - cool.mr_SZair) * cycle.mf_hot + cycle.mf_fuel))
+                # print('Updated TPZ:', TPZ, ' Updated MR:', cool.mr_SZair)
+                cool.SZ_air(cycle.mf_hot, cycle.mf_h2, cycle.mf_ker, cycle.T03, TPZ, cycle.T04, cool.mr_SZair, cycle.LHV_f)
+
+            # print('mf hot = ', cycle.mf_hot, 'mf h2 = ', cycle.mf_h2, 'mf ker = ', cycle.mf_ker, 'T03 = ', cycle.T03, 'T04 = ', cycle.T04)
+            # print('P03', cycle.p03)
+            print('Mass ratio of air needed to be injected on secondary zone:', round(cool.mr_SZair,3)
+            print('TPZ = ', round(TPZ,3)
+            print('Difference between this one and simplified: ', round(cool.err,3))
 
     # if cool.mr_SZair < const.ratio_air_cc:
     #     const.ratio_air_cc -= 0.1
