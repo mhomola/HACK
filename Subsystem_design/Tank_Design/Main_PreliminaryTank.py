@@ -44,9 +44,9 @@ central_H2_vol = central_tank.inner_vol_inner_wall * m.floor(central.height/(cen
 
 """ ------ Pod Tank Design ------- """
 
-pod_H2_vol = (total_vol - central_H2_vol)/2  # [m^3] the volume of LH2 in each pod
+pod_H2_vol = (total_vol-2*central_H2_vol)/2  # [m^3] the volume of LH2 in each pod
 
-pod = spacial_constraints(length=5.761, width=2, height=2)
+pod = spacial_constraints(length=5.765, width=2, height=2)
 pod_tank = Mechanical_Design.PodTank(constraints=pod, dp=Mechanical_Design.dp, s_a=Mechanical_Design.s_a,
                                       e_w=Mechanical_Design.e_w, material_insulation=Materials.MLI
                                       , material_inner=Materials.Al_2090_T81, material_outer=Materials.Al_2090_T81,
@@ -54,8 +54,10 @@ pod_tank = Mechanical_Design.PodTank(constraints=pod, dp=Mechanical_Design.dp, s
                                       dt=Mechanical_Design.dt, p_tank=Mechanical_Design.p_tank)
 pod_tank.tank_design()
 
-weight_addition = central_tank.mass_tank * 2 + pod_tank.mass_tank * 2
-volume_all = central_tank.inner_vol_inner_wall * 2 + pod_tank.inner_vol_inner_wall * 2
+# weight_addition = central_tank.mass_tank * 2 + pod_tank.mass_tank * 2
+weight_addition = pod_tank.mass_tank * 2
+# volume_all = central_tank.inner_vol_inner_wall * 2 + pod_tank.inner_vol_inner_wall * 2
+volume_all = pod_tank.inner_vol_inner_wall * 2
 
 """ ---- Important Parameters of Tanks ----"""
 l_centre_tank = central_tank.length
@@ -73,8 +75,8 @@ if __name__ == '__main__':
     print("#######CENTRAL TANKS######")
     print("Mass of one tank", mass_center_tank, "[kg]")
     print("Insulation of the tank thickness", central_tank.t_insulation*100, "[cm]")
-    print("Thickness inner wall", central_tank.t_wall_inner*1000, "[mm]")
-    print("Thickness outer wall", central_tank.t_wall_outer *1000, "[mm]")
+    print("Thickness inner wall", central_tank.t_wall_inner * 1000, "[mm]")
+    print("Thickness outer wall", central_tank.t_wall_outer * 1000, "[mm]")
     print("H2 volume that is stored per tank", volume_centre_tank, "[m^3]")
     print("Outer Diameter of the tank[including insulation]", d_centre_tank, "[m]")
     print("Number of tanks tht can be accommodated in the central sector", m.floor(central.height/(central_tank.r4*2)))

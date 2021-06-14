@@ -3,12 +3,15 @@ import matplotlib.pyplot as plt
 import FCParameters as fc
 import Battery_Sizing as BS
 import Polarization_curve_model as PCM
+import Wires_design as WD
+import math as m
 
 SF = fc.SF
 FC_power = SF*0.001*BS.final_bat_size()[0]
 B_cost = BS.final_bat_size()[1]
 B_mass = BS.final_bat_size()[2]
 B_volume = BS.final_bat_size()[3]
+mh2 = BS.final_bat_size()[4]
 
 Vc = fc.Vc
 sp_W = 0.8
@@ -23,43 +26,157 @@ mMirai = 56 #kg
 VpCell = VMirai/Ncells
 mpCell = mMirai/Ncells
 
-PtoN = 114/370
+PtoN = 120/400
 
 def calc_current(V):
-    return FC_power/V
+    return FC_power*1000/V
 
 def calc_cur_density(Vc):
     return PCM.inverse(Vc)
 
 def FC_sizing():
 
-    V = 1500 #V
+    V = 1200 #V
     n_series = round(V/Vc)
     I = calc_current(V)
     iden = calc_cur_density(Vc)
 
-    n_paral = FC_power/PtoN
-
-    n_cells = n_series*n_paral
+    n_cells = round(FC_power/PtoN)
+    n_paral = round(n_cells/n_series)
+    n_cells = n_paral*n_series
 
     V_stack = n_cells*VpCell
     m_stack = n_cells*mpCell
 
-    A = I/iden
-    l = V_stack/A
+    A = (I/iden)*0.0001
+    l = (V_stack*0.001)/A
     l_cell = l/n_series
 
-    return [n_series, n_paral, n_cells, I, iden, V_stack, m_stack, A, l, l_cell]
+    d_current = WD.wire_sizing(I,40)
+
+    return [n_series, n_paral, n_cells, I, iden, V_stack, m_stack, A/0.0001, l, l_cell,d_current]
+
+def total_system():
+
+    cost = B_cost + FC_power*sp_C
+    volume = B_volume + FC_power/sp_V
+    mass = B_mass + FC_power/sp_W
+
+    return [cost, volume, mass, FC_power/sp_V, FC_power/sp_W]
+
+def total_tank_cooling(T1,T2):
+
+    FC_T = 90
+    n = 0.4
+    LHV = 120*10**6
+    VFC = 30
+    r = 0.5
+
+    # Water
+    h2oden = 998.21
+    h2ocp = 4180
+
+    # Refrigerant
+    rden = 1225.5
+    rcp = 1415.03
+
+    tot_den = r*h2oden+(1-r)*rden
+    tot_cp = r*h2ocp+(1-r)*rcp
+
+    print(tot_den)
+
+    m1 = (n*LHV*mh2)/(tot_cp*T1)
+    m2 = (n*LHV*mh2)/(tot_cp*T2)
+
+    v1 = m1*10**3/tot_den
+    v2 = m2*10**3/tot_den
+
+    print(v1,v2)
+
+    t = VFC/v1
+    V_tank = t*(v2-v1)
+
+    return V_tank
+
+def total_tank_bat_cooling(T1,T2):
+
+    VFC = 8.67
+    r = 0.6
+
+    # Water
+    h2oden = 998.21
+    h2ocp = 4180
+
+    # Refrigerant
+    rden = 1225.5
+    rcp = 1415.03
+
+    tot_den = r*h2oden+(1-r)*rden
+    tot_cp = r*h2ocp+(1-r)*rcp
+
+    print(tot_den)
+
+    m1 = 46675/(tot_cp*T1)
+    m2 = 46675/(tot_cp*T2)
+
+    print(m1,m2)
+
+    v1 = m1*10**3/tot_den
+    v2 = m2*10**3/tot_den
+
+    t = VFC/v1
+    V_tank = t*(v2-v1)
+
+    return V_tank
+
+def cooling_liquid(Tg):
+
+    FC_T = 90
+    n = 0.4
+    LHV = 120*10**6
+    VFC = 30
+    r = 0.5
+
+    # Water
+    h2oden = 998.21
+    h2ocp = 4180
+
+    # Refrigerant
+    rden = 1225.5
+    rcp = 1415.03
+
+    tot_den = r*h2oden+(1-r)*rden
+    tot_cp = r*h2ocp+(1-r)*rcp
+
+    return (n * LHV * mh2) / (tot_cp * (FC_T - Tg))
+
 
 if __name__ == '__main__':
 
     sizing = FC_sizing()
 
     print()
-    print('Sizing of the fuel cell results:')
-    print('Number of cells in series:')
-    print('Number of cells in parallel:')
-    prin
+    print('Sizing of the fuel cell results: ')
+    print('Number of cells in series: ',m.ceil(sizing[0]))
+    print('Number of cells in parallel: ',m.ceil(sizing[1]))
+    print('Total number of cells: ',round(sizing[2]))
+    print('Current in the stack: ',round(sizing[3],2), 'A')
+    print('Current density: ',round(sizing[4],2), ' A/cm2')
+    print('Volume of the stack: ',round(sizing[5],2), ' l')
+    print('Mass of the stack: ',round(sizing[6],2), ' kg')
+    print('Active area: ',round(sizing[7],2), ' cm2')
+    print('Length of the stack: ',round(sizing[8],2), ' m')
+    print('length of the cell: ',round(sizing[9],4), ' m')
+    print('Diameter of the current: ', round(sizing[10]*100,2),' cm')
+    print()
+    print('Total FC system mass: ',round(total_system()[2]),' kg')
+    print('Total FC system volume: ',round(total_system()[1]), ' l')
+    print('Total FC system cost: ',round(total_system()[0]),' EUR')
+    print('Only FC volume: ',round(FC_power/sp_V),' l')
+    print()
+    print('Cooling FC: ', cooling_liquid(40), ' kg/s')
+
+    print(total_tank_bat_cooling(10,80))
 
 
 
