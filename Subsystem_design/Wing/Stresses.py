@@ -598,6 +598,12 @@ class stresses():
             plt.show()
 
         self.vm_max = maxabs
+        self.vm1 = vm1
+        self.vm2 = vm2
+        self.vm3 = vm3
+        self.vm4 = vm4
+        self.vm5 = vm5
+        self.vm6 = vm6
 
     def compute_stresses(self):
         self.shear_flows_y()
@@ -607,11 +613,7 @@ class stresses():
         self.sigma_total()
         self.von_Misses()
 
-    def max_vm(self):
-        """
-        Compute maximum von mises stress in the cross-section
-        :return:
-        """
+
 
 def colorline(x, y, z= None, cmap=plt.get_cmap('copper'),
                   norm=plt.Normalize(-1.0, 1.0), linewidth=5, alpha=1.0):
@@ -652,17 +654,19 @@ def make_segments(x, y):
     return segments
 
 if __name__ == '__main__':
-    h = 5
-    L = 2
+    h = 2
+    L = 5
     t = 0.002
     Ixx = L*h**3/12 - (L-t)*(h-t)**3/12
     Iyy = h * L ** 3 / 12 - (h - t) * (L - t) ** 3 / 12
     chord1 = stresses(Ixx=Ixx,Iyy=Iyy,Ixx_str = Ixx, Iyy_str=Iyy,h=h,L=L,t_upper=t,t_spar1=t,t_spar2=t,t_lower=t)
-    chord1.shear_loads(Vx=500,Vy=750,T=1000)
-    #chord1.shear_flow_plotter(type = "total")
+    #chord1.shear_loads(Vx=500,Vy=750,T=1000)
+    chord1.shear_loads(Vx=508742.32303978031, Vy=-657923.2689075109, T=-587877.5473618811)
     chord1.bending_loads(Mx = 5550,My= 0)
-    #chord1.sigma_plotter()
     chord1.compute_stresses()
-    chord1.vm_plotter(show=True)
-    print(chord1.vm_max)
+    chord1.shear_flow_plotter(type="total", show=True)
+    #chord1.sigma_plotter()
+
+    #chord1.vm_plotter(show=True)
+    #print(chord1.vm_max)
 
