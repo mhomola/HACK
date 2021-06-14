@@ -62,9 +62,9 @@ class Engine_Cycle(Constants):
 
         # percentage of core air that is used in combustion
         if aircraft == 'neo':
-            self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_neo.dat'))[i]
+            self.mr_air_cc = np.array(np.genfromtxt('mr_cc_neo.dat'))[i]
         elif aircraft == 'hack':
-            self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))[i]
+            self.mr_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))[i]
 
     def get_dataframe(self, aircraft, phs):
         if aircraft == 'neo':
@@ -123,7 +123,7 @@ class Engine_Cycle(Constants):
         self.p025 = self.p021 * self.PR_LPC
 
         # Exit of HPC - Entrance of cc
-        self.T03 = self.T025 + ( self.T02/self.eta_HPC ) * ( self.PR_HPC ** ( (self.k_air-1)/self.k_air ) - 1 )
+        self.T03 = self.T025 + ( self.T025/self.eta_HPC ) * ( self.PR_HPC ** ( (self.k_air-1)/self.k_air ) - 1 )
         self.p03 = self.p025 * self.PR_HPC
         self.OPR = self.p03 / self.p02         # Overall Pressure Ratio
 
@@ -198,12 +198,13 @@ class Engine_Cycle(Constants):
 
         self.T_total = self.T_fan + self.T_core # [N]
         self.TSFC = self.mf_fuel / (self.T_total*10**(-3)) # [g/kN/s]
-        self.stoichiometric_ratio = self.mr_h2 * self.stoich_ratio_h2 + self.mr_ker * self.stoich_ratio_ker
-        self.equivalence_ratio = (self.mf_fuel / (self.mf_hot * self.ratio_air_cc)) / \
-                                 self.stoichiometric_ratio  # TBD what mf_air to use
+
+        ''' USE THIS AS INITIAL INPUT TO IVAN'S CODE '''
+        self.stoichiometric_ratio = self.mr_h2 * self.stoich_ratio_h2 + self.mr_ker * self.stoich_ratio_ker # update this @Sofia !!
+        self.equivalence_ratio = (self.mf_fuel / (self.mf_hot * (self.mr_air_cc))) / \
+                                 self.stoichiometric_ratio
 
         self.air_cool(aircraft, phase)
-
 
 
     def air_cool(self, aircraft, phase):
@@ -260,9 +261,9 @@ if __name__ == '__main__':
             # print('\nInlet: T0 = ', round(ec.T0,3), '[K]; p0 = ', round(ec.p0,3), '[Pa]; v0 = ', round(ec.v0,3), '[m/s]')
             # print('T00 = ', round(ec.T00,3), '[K]; p00 = ', round(ec.p00,3), '[Pa]')
             # print('Entrance of fan: T02 = ', round(ec.T02,3), '[K]; p02 = ', round(ec.p02,3), '[Pa]')
-            # print('Entrance of LPC: T021 = ', round(ec.T021,3), '[K]; p021 = ', round(ec.p021,3), '[Pa]')
+            print('Entrance of LPC: T021 = ', round(ec.T021,3), '[K]; p021 = ', round(ec.p021,3), '[Pa]')
             # print('Mass flow of air: Total = ', round(ec.mf_air_init,3), '[kg/s]; Core = ', round(ec.mf_hot,3), '[kg/s]; Bypassed = ', round(ec.mf_cold,3),'[kg/s]')
-            # print('Entrance of HPC: T025 = ', round(ec.T025,3), '[K]; p025 = ', round(ec.p025,3), '[Pa]')
+            print('Entrance of HPC: T025 = ', round(ec.T025,3), '[K]; p025 = ', round(ec.p025,3), '[Pa]')
             print('Entrance of CC: T03 = ', round(ec.T03,3), '[K]; p03 = ', round(ec.p03,3), '[Pa]; OPR = ', round(ec.OPR,3))
             print('Mass flow CC: Fuel = ', round(ec.mf_fuel,3), '[kg/s]; air CC = ', round(ec.mf_hot,3), '[kg/s]; Total end of CC = ', round(ec.mf_airfuel,3),'[kg/s]')
             print('LHV fuel = ',round(ec.LHV_f,3),'m air to cool / m air core', round(ec.mr_SZair_simpl,4), round(ec.mr_SZair_simpl1, 4) )
@@ -276,7 +277,7 @@ if __name__ == '__main__':
             # print('Exit of nozzle: T8 = ', round(ec.T8,3), '[K]; p8 = ', round(ec.p8,3), '[Pa]; v8 = ', round(ec.v8,3), '[m/s]')
             # print('Exit of fan: T016 = ', round(ec.T016,3), '[K]; p016 = ', round(ec.p016,3), '[Pa]; PR_cr_fan = ', ec.PR_cr_fan)
             # print('Exit of fan: T18 = ', round(ec.T18,3), '[K]; p18 = ', round(ec.p18,3), '[Pa]; v18 = ', round(ec.v18,3), '[m/s]')
-            # print('Provided Thrust: Fan = ', round(ec.T_fan,3), '[N]; Core = ', round(ec.T_core,3), '[N]; Total = ', round(ec.T_total,3), '[N]')
+            print('Provided Thrust: Fan = ', round(ec.T_fan,3), '[N]; Core = ', round(ec.T_core,3), '[N]; Total = ', round(ec.T_total,3), '[N]')
             print('Thrust SFC = ', round(ec.TSFC,5), '[g/kN/s]; Equivalence ratio = ', round(ec.equivalence_ratio,4))
 
             amb = [['T0', round(ec.T0,3), 'K'], ['p0', round(ec.p0,3), 'Pa'], ['v0', round(ec.v0,3), 'm/s']]
