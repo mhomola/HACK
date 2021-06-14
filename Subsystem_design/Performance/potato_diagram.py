@@ -12,7 +12,7 @@ class potato_diagram(Constants):
     def __init__(self):
         super().__init__()
         self.Cargo_fd = 3402            # [kg]
-        self.Cargo_af = 0            # [kg]
+        self.Cargo_af = 3402+1497            # [kg]
         self.FuelW_ker = 10000        # [kg]
         self.FuelW_H2 = 2690           # [kg]
 
@@ -26,7 +26,7 @@ class potato_diagram(Constants):
         weight_DPU = 781 # [kg] later put in self.weight_DPU
         cg_DPU = 32.5      # from nose [m] later put in self.cg_DPU
         ### -- LH2 tanks --- ##
-        weight_LH2_tanks = 2* self.pod_tank_mass # [kg]
+        weight_LH2_tanks =  2* self.pod_tank_mass # [kg]
         cg_LH2_tanks = self.x_cg_pod # From the nose [m]
         # Calculate A320-HAC.K cg @ OEW
         OEW_HACK = OEW_neo - weight_APU + weight_LH2_tanks + weight_DPU
