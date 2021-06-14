@@ -30,7 +30,7 @@ Ixx_nostr_arr = np.zeros(len(x_arr))
 Iyy_nostr_arr = np.zeros(len(x_arr))
 ### Initializing Inertia class
 #MOI = Inertia(n_str = 10)
-MOI = Inertia_initial
+MOI = Inertia_initial(n_str = 10 )
 ##We want to compute the inertia, the loads and the stresses at every span-wise location
 
 for i, x in enumerate(x_arr):
