@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math as m
 
-
 class Inertia_initial(Constants):
 
     def __init__(self,n_str):
@@ -13,16 +12,38 @@ class Inertia_initial(Constants):
         self.t_sk = 9.1/1000  # Skin thickness [m]                                              #FIXED
         self.h_str = 0.03     # Stringer height [m]                                             #VARIABLE
         self.w_str = 0.03     # Stringer width [m]
-        self.h_sp_c = 0.091   # Height of the spar over local chord length                      #FIXED
         self.n_str = n_str    # Number of stringers on top and bottom (n_str * 2 = total_n_str)
         self.w_sk_c = 0.43    # Width of the skin over the local chord length                   #FIXED
 
     def chord_inertia(self, x):
         return (self.c_tip - self.c_kink_out) / (0.5 * self.b_out) * (x - 0.5 * self.b_in) + self.c_kink_out
 
+    def t_c_distribution(self, x):
+        y_b_arr = np.array([0.1138, 0.2, 0.2576, 0.2787, 0.306, 0.3276, 0.37, 0.5, 0.6, 0.7, 0.9, 1])
+        t_c_arr = np.array([0.163, 0.1267, 0.117, 0.11546, 0.115, 0.1152, 0.117, 0.1123, 0.110, 0.109, 0.108, 0.108])
+
+        yb = x / self.b * 2
+
+        if yb >= .9:
+            self.tc = 0.108
+
+        elif yb <= 0.1138:
+            self.tc = 0.163
+
+        else:
+            loc = np.where(y_b_arr >= yb)[0][:2] - 1
+            self.tc = np.diff(t_c_arr[loc]) / np.diff(y_b_arr[loc]) * (yb - y_b_arr[loc][0]) + t_c_arr[loc][0]
+
+        self.h_sp_c = 0.83 * self.tc
+
+        # plt.plot(y_b_arr, t_c_arr)
+        # plt.scatter([yb], self.tc)
+        # plt.show()
+
     def wb_config(self, x):
 
         c = self.chord_inertia(x=x)
+        self.t_c_distribution(x=x)
 
         sep_str = self.w_sk_c * c / (self.n_str + 1)
         self.x_loc_str = np.zeros(self.n_str)
@@ -44,14 +65,14 @@ class Inertia_initial(Constants):
         sk_bot_x = sk_top_x
         sk_bot_y = - sk_top_y
 
-        plt.plot(sp_left_x, sp_left_y, color="black")
-        plt.plot(sp_right_x, sp_right_y, color="black")
-        plt.plot(sk_top_x, sk_top_y, color="black")
-        plt.plot(sk_bot_x, sk_bot_y, color="black")
-        plt.scatter(x=self.x_loc_str, y=y_loc_str, color='red', marker='o')
-        plt.scatter(x=0, y=0, color='g', marker='+')
-        plt.axis('equal')
-        plt.show()
+        # plt.plot(sp_left_x, sp_left_y, color="black")
+        # plt.plot(sp_right_x, sp_right_y, color="black")
+        # plt.plot(sk_top_x, sk_top_y, color="black")
+        # plt.plot(sk_bot_x, sk_bot_y, color="black")
+        # plt.scatter(x=self.x_loc_str, y=y_loc_str, color='red', marker='o')
+        # plt.scatter(x=0, y=0, color='g', marker='+')
+        # plt.axis('equal')
+        # plt.show()
 
 
     def compute_inertia(self, x):
@@ -77,6 +98,17 @@ class Inertia_initial(Constants):
 
         self.Iyy_no_str = 2 * Iyy_sp + 2 * Iyy_sk
         self.Iyy = 2 * Iyy_sp + 2 * Iyy_sk + np.sum(Iyy_str)
+
+if __name__ == '__main__':
+    i = Inertia_initial(n_str=12)
+    y_arr = np.linspace(i.width_f/2, i.b/2, 100)
+    Ixx_arr = np.zeros(len(y_arr))
+    for j, y in enumerate(y_arr):
+        i.compute_inertia(x=y)
+        Ixx_arr[j] = i.Ixx
+
+    # plt.plot(y_arr, Ixx_arr)
+    # plt.show()
 
 class Inertia(Constants):
 
@@ -152,13 +184,13 @@ class Inertia(Constants):
         self.Iyy_no_str = skin_Iyy
         self.Iyy = self.Iyy_no_str + str_Iyy + str_Iyy_steiner
 
-if __name__ == '__main__':
-    MOI_initial = Inertia_initial(n_str = 10)
-    MOI_ibeam = Inertia(n_str = 10)
-    x = 6
-    MOI_initial.compute_inertia(x=x)
-    MOI_ibeam.compute_inertia(x=x)
-    print("Ixx no stringers: " ,"FIRST BEAM" , MOI_initial.Ixx_no_str , "IBEAM", MOI_ibeam.Ixx_no_str)
-    print("Iyy no stringers: ", "FIRST BEAM", MOI_initial.Iyy_no_str, "IBEAM", MOI_ibeam.Iyy_no_str)
-    print("Ixx with stringers: ", "FIRST BEAM", MOI_initial.Ixx, "IBEAM", MOI_ibeam.Ixx)
-    print("Iyy with stringers: ", "FIRST BEAM", MOI_initial.Iyy, "IBEAM", MOI_ibeam.Iyy)
+# if __name__ == '__main__':
+#     MOI_initial = Inertia_initial(n_str = 10)
+#     MOI_ibeam = Inertia(n_str = 10)
+#     x = 6
+#     MOI_initial.compute_inertia(x=x)
+#     MOI_ibeam.compute_inertia(x=x)
+#     print("Ixx no stringers: " ,"FIRST BEAM" , MOI_initial.Ixx_no_str , "IBEAM", MOI_ibeam.Ixx_no_str)
+#     print("Iyy no stringers: ", "FIRST BEAM", MOI_initial.Iyy_no_str, "IBEAM", MOI_ibeam.Iyy_no_str)
+#     print("Ixx with stringers: ", "FIRST BEAM", MOI_initial.Ixx, "IBEAM", MOI_ibeam.Ixx)
+#     print("Iyy with stringers: ", "FIRST BEAM", MOI_initial.Iyy, "IBEAM", MOI_ibeam.Iyy)
