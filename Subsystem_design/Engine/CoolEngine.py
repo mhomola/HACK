@@ -134,12 +134,12 @@ class Engine_Cool(Engine_Cycle):
 def get_TPZ(a, p, p03, T03, eqr):
     ''' GET TPZ - RIGHT NOW WITH A MISTAKE THOUGH, WILL FIX THIS (Sara) '''  # Inputs are ( aircraft/phase, P03, T03, phi_PZ )
     if a == 'neo':
-        (TPZ, MF, MF_names) = eng.reactor1('neo', p03, T03, eqr)
+        TPZ, MF, MF_names = eng.reactor1('neo', p03, T03, eqr, nargout=3)
     elif a == 'hack':
         if p in ['idle', 'taxi_out', 'taxi_in']:
-            (TPZ, MF, MF_names) = eng.reactor1('hack_h2', p03, T03, eqr)
+            TPZ, MF, MF_names = eng.reactor1('hack_h2', p03, T03, eqr, nargout=3)
         else:
-            (TPZ, MF, MF_names) = eng.reactor1('hack_mix', p03, T03, eqr)
+            TPZ, MF, MF_names = eng.reactor1('hack_mix', p03, T03, eqr, nargout=3)
 
     return TPZ
 
