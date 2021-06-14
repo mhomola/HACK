@@ -221,7 +221,7 @@ class Constants():
         self.stoich_ratio_ker = 1/15.66 #FAR
         self.stoich_ratio_h2 = 1/34.3 #FAR
 
-        """" Altitude and speed --- USE DATAFRAME """
+        # """" Altitude and speed --- USE DATAFRAME """
         # self.phases = np.array(['idle', 'taxi_out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi_in'])
         # self.Thrust = np.array( [0.0993, 0.124, 0.45, 0.77, 0.29, 0.28, 0.068] ) * 35000*4.44822162
         # self.M0 = np.array([0.0, 0.01, 0, 0.5, 0.78, 0.5, 0.01])  # [-] Mach number
