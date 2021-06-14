@@ -22,13 +22,17 @@ class Inertia_initial(Constants):
         y_b_arr = np.array([0.1138, 0.2, 0.2576, 0.2787, 0.306, 0.3276, 0.37, 0.5, 0.6, 0.7, 0.9, 1])
         t_c_arr = np.array([0.163, 0.1267, 0.117, 0.11546, 0.115, 0.1152, 0.117, 0.1123, 0.110, 0.109, 0.108, 0.108])
 
-
         yb = x / self.b * 2
-        loc = np.where(y_b_arr >= yb)[0][:2] - 1
-        self.tc = np.diff(t_c_arr[loc]) / np.diff(y_b_arr[loc]) * (yb - y_b_arr[loc][0]) + t_c_arr[loc][0]
 
         if yb >= .9:
             self.tc = 0.108
+
+        elif yb <= 0.1138:
+            self.tc = 0.163
+
+        else:
+            loc = np.where(y_b_arr >= yb)[0][:2] - 1
+            self.tc = np.diff(t_c_arr[loc]) / np.diff(y_b_arr[loc]) * (yb - y_b_arr[loc][0]) + t_c_arr[loc][0]
 
         self.h_sp_c = 0.83 * self.tc
 
