@@ -530,5 +530,5 @@ if __name__ == '__main__':
     # print(clim)
     #
     #
-    # ATR = climate.ATR(h=11000,e_CO2= e_CO2, e_H2O= e_H2O, e_NOx=e_NOx,e_soot= e_soot,e_sulfate=e_SO4,U=10,plot = True)
-    # print('The average temperature response, A_100, for the LTO of the HACK is:',ATR,'[K]')
+    ATR = climate.ATR(h=11000,e_CO2= e_CO2, e_H2O= e_H2O, e_NOx=e_NOx,e_soot= e_soot,e_sulfate=e_SO4,U=10,plot = True)
+    print('The average temperature response, A_100, for the LTO of the HACK is:',ATR,'[K]')
