@@ -257,6 +257,7 @@ class AerodynamicCharacteristics(Constants):
         self.C_D_start_cruise_neo = self.C_D_0_clean_neo + self.C_L_start_cruise**2 / (np.pi * self.AR * self.e)
         self.C_D_start_cruise_HACK = self.C_D_0_HACK + self.C_L_start_cruise**2 / (np.pi * self.AR * self.e)
 
+        self.D_start_cruise_neo = self.C_D_start_cruise_neo * 0.5 * self.rho * V**2 * self.S
         self.D_start_cruise_HACK = self.C_D_start_cruise_HACK * 0.5 * self.rho * V**2 * self.S
 
         self.L_D_ratio_neo = self.C_L_start_cruise / self.C_D_start_cruise_neo
@@ -295,6 +296,9 @@ class AerodynamicCharacteristics(Constants):
         ax2.set_xlabel(r'$C_L$', size=15)
         ax2.set_ylabel(r'$\frac{C_L}{C_D}$', size=15)
         plt.show()
+
+    def reynolds(self):
+        self.Re =
 
 
 
