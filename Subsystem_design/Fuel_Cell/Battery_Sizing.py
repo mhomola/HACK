@@ -117,7 +117,7 @@ def Req_power(mair):
     #print('Average power [W]: ', average)
 
     avg_arr = average*np.ones(len(power+1))
-    difference = average - power
+    difference = avg_arr - power
 
     time_all = np.concatenate(([0],time))
     power_all = np.concatenate(([0],difference*time))
@@ -224,13 +224,13 @@ def final_bat_size():
     print('Battery volume: ', round(bat_orig / spec_V), " l")
     print()
 
-    # plt.plot(time_tot1, power_tot1, label = 'No compressor')
-    # plt.plot(time_tot2, power_tot2, 'k', label = 'Compressor')
-    # # plt.plot(time_tot, avg_arr)
-    # plt.legend()
-    # plt.ylabel('Energy stored in battery [kJ]')
-    # plt.xlabel('Time [min]')
-    # plt.show()
+    plt.plot(time_tot1, power_tot1, label = 'No compressor')
+    #plt.plot(time_tot2, power_tot2, 'k', label = 'Compressor')
+    # plt.plot(time_tot, avg_arr)
+    plt.legend()
+    plt.ylabel('Energy stored in battery [kJ]')
+    plt.xlabel('Time [min]')
+    plt.show()
 
     return FC_power_new, round(0.001 * bat_orig * cost), round(bat_orig / spec_m), round(bat_orig / spec_V), mh2
 
@@ -265,5 +265,6 @@ def powers_req():
     print('Cruise: ',round(p_cruise*0.001),'W')
     print('Descend: ', round(p_descend*0.001),'W')
     print('Landing: ',round(p_landing*0.001),'W')
+
 
 

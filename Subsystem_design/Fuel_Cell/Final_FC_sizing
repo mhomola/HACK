@@ -49,6 +49,7 @@ def FC_sizing():
     m_stack = n_cells*mpCell
 
     A = (I/iden)*0.0001
+    print('Area is ', A)
     l = (V_stack*0.001)/A
     l_cell = l/n_series
 
@@ -70,7 +71,7 @@ def total_tank_cooling(T1,T2):
     n = 0.4
     LHV = 120*10**6
     VFC = 30
-    r = 0.5
+    r = 0.7
 
     # Water
     h2oden = 998.21
@@ -101,7 +102,7 @@ def total_tank_cooling(T1,T2):
 def total_tank_bat_cooling(T1,T2):
 
     VFC = 8.67
-    r = 0.6
+    r = 0.7
 
     # Water
     h2oden = 998.21
@@ -116,15 +117,18 @@ def total_tank_bat_cooling(T1,T2):
 
     print(tot_den)
 
-    m1 = 46675/(tot_cp*T1)
-    m2 = 46675/(tot_cp*T2)
+    m1 = 2600/(tot_cp*T1)
+    m2 = 2600/(tot_cp*T2)
 
     print(m1,m2)
 
     v1 = m1*10**3/tot_den
     v2 = m2*10**3/tot_den
 
+    print(v1,v2,'tada')
+
     t = VFC/v1
+    print(t,'time')
     V_tank = t*(v2-v1)
 
     return V_tank
@@ -176,7 +180,8 @@ if __name__ == '__main__':
     print()
     print('Cooling FC: ', cooling_liquid(40), ' kg/s')
 
-    print(total_tank_bat_cooling(10,80))
+    print(total_tank_bat_cooling(40,10), ' l')
+    print(total_tank_cooling(80,50), ' l')
 
 
 
