@@ -126,7 +126,7 @@ class Engine_Cool(Engine_Cycle):
         # self.err = (self.mr_SZair - self.mr_SZair_simpl) / self.mr_SZair_simpl * 100
 
         ''' USE THIS TO GET UPDATED TPZ FROM IVAN'S CODE ''' # eqr at PZ
-        self.eqr = (cycle.mf_fuel / (cycle.mf_hot * (cycle.mr_air_cc))) / cycle.stoichiometric_ratio
+        self.eqr = (cycle.mf_fuel / (cycle.mf_hot * (1-self.mr_SZair))) / cycle.stoichiometric_ratio
 
 
 
@@ -164,15 +164,16 @@ if __name__ == "__main__":
             print('1st TPZ from Matlab:', TPZ)
             cool.SZ_air(a, p, TPZ)
             print('1st MR from engine cycle:', cycle.mr_SZair_simpl1, 'MR with this new TPZ:', cool.mr_SZair)
-            # TPZ = cycle.TPZ.copy()
+            print('1st eqr from engine cycle:', cycle.equivalence_ratio, 'eqr with this new TPZ:', cool.eqr)
 
             ''' LOOP FOR CONVERGENCE OF EQUIVALENCE RATIO '''
             eqr_new = cool.eqr
             err = abs(eqr_new-eqr_old)/eqr_new
+            print('Initial error between eqr from Engine_Cycle and Cool_Engine:', err*100, '[%]')
             eqr_old = eqr_new # to start while loop
 
             while err > 0.02: # error larger than 2%
-                print(err)
+                print('Error at each iteration:', err*100, '[%]')
                 TPZ = get_TPZ(a, p, cycle.p03, cycle.T03, cool.eqr)
                 cool.SZ_air(a, p, TPZ)
                 err = abs(cool.eqr - eqr_old) / cool.eqr
@@ -182,7 +183,7 @@ if __name__ == "__main__":
             save_data.append([1-cool.mr_SZair])
             # print('mf hot = ', cycle.mf_hot, 'mf h2 = ', cycle.mf_h2, 'mf ker = ', cycle.mf_ker, 'T03 = ', cycle.T03, 'T04 = ', cycle.T04)
             # print('P03', cycle.p03)
-            print('Mass ratio of air needed to be injected on secondary zone:', round(cool.mr_SZair,3))
+            print('\nFINAL\nMass ratio of air injected on DZ:', round(cool.mr_SZair,3))
             print('TPZ = ', round(TPZ,3))
 
         if a == 'neo':
