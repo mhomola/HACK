@@ -40,9 +40,10 @@ class SA_Engine_Cycle(Constants):
                 else:
                     save_TSFC = np.append(save_TSFC, 1000) # add a dummy number that will never be the minimum of the TSFC array
 
-                if self.names[k+4] == 'eta_HPC' or  self.names[k+4] == 'eta_LPC':
-                    save_T45 = np.append(save_T45, self.p045)
-                    save_T5 = np.append(save_T5, self.p05)
+                plt.figure()
+                if self.names[k+4] == 'eta_HPC':
+                    # save_T45 = np.append(save_T45, self.p045)
+                    # save_T5 = np.append(save_T5, self.p05)
                     save_thrust = np.append(save_thrust, self.T_core)
 
             # print(save_TSFC)
@@ -53,7 +54,7 @@ class SA_Engine_Cycle(Constants):
             print(self.opt_vars[k])
 
             self.plot(save_var, save_TSFC, k, flag=False)
-            if self.names[k + 4] == 'eta_HPC' or self.names[k + 4] == 'eta_LPC':
+            if self.names[k + 4] == 'eta_HPC':
                 self.plot(save_var, save_T45, k, flag='p045')
                 self.plot(save_var, save_thrust, k, flag='Thrust core')
 
