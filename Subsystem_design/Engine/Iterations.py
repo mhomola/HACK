@@ -42,11 +42,8 @@ printing = False                                                            #Cha
 '-------------------------NEO----------------------------------'
 print("\n= = = = Analysis for A320", aircraft[0], "= = = =")
 
-T_neo = []
-TSFC_neo = []
-
 'CH4, CO, CO2, H2O, NO, NO2, H2'
-Emissions_array = np.zeros(7)
+Emissions_array_neo = np.zeros(7)
 
 for b in phases:
     print("\n", b)
@@ -116,66 +113,96 @@ for b in phases:
 
 
 
-#
-# '''--------------------------------HACK--------------------------------------------'''
-# print("\n= = = = Analysis for A320", aircraft[1], "= = = =")
-#
-# Range_requirement = False
-# Thrust_requirement = False
-# Emissions_requirement = False
-# Flamability_requirement = False
-#
-# while Range_requirement != True:
-#     for b in phases:
-#         print("\n", b)
-#         '''Run cycle analysis, to get TSFC, T_tot'''
-#         ec.cycle_analysis(aircraft[1],b)
-#         if printing== True:
-#             print('\nInlet: T0 = ', round(ec.T0, 3), '[K]; p0 = ', round(ec.p0, 3), '[Pa]; v0 = ', round(ec.v0, 3), '[m/s]')
-#             print('T00 = ', round(ec.T00, 3), '[K]; p00 = ', round(ec.p00, 3), '[Pa]')
-#             print('Entrance of fan: T02 = ', round(ec.T02, 3), '[K]; p02 = ', round(ec.p02, 3), '[Pa]')
-#             print('Entrance of LPC: T021 = ', round(ec.T021, 3), '[K]; p021 = ', round(ec.p021, 3), '[Pa]')
-#             print('Mass flow of air: Total = ', round(ec.mf_air_init, 3), '[kg/s]; Core = ', round(ec.mf_hot, 3),
-#                   '[kg/s]; Bypassed = ', round(ec.mf_cold, 3), '[kg/s]')
-#             print('Entrance of HPC: T025 = ', round(ec.T025, 3), '[K]; p025 = ', round(ec.p025, 3), '[Pa]')
-#             print('Entrance of CC: T03 = ', round(ec.T03, 3), '[K]; p03 = ', round(ec.p03, 3), '[Pa]; OPR = ',
-#                   round(ec.OPR, 3))
-#             print('Mass flow CC: Fuel = ', round(ec.mf_fuel, 3), '[kg/s]; air CC = ', round(ec.mf_hot, 3),
-#                   '[kg/s]; Total end of CC = ', round(ec.mf_airfuel, 3), '[kg/s]')
-#             print('LHV fuel = ', round(ec.LHV_f, 3), 'm air to cool / m air core', round(ec.mr_SZair_simpl, 4),
-#                   round(ec.mr_SZair_simpl1, 4))
-#             print('Initial estimate TPZ = ', round(ec.TPZ, 3))
-#             print('Power: Fan = ', round(ec.W_fan, 3), '[W]; LPC = ', round(ec.W_LPC, 3), '[W]; HPC = ', round(ec.W_HPC, 3),
-#                   '[W]')
-#             print('LPT = ', round(ec.W_LPT, 3), '[W]; HPT = ', round(ec.W_HPT, 3), '[W]')
-#             print('Entrance of HPT: T04 = ', round(ec.T04, 3), '[K]; p04 = ', round(ec.p04, 3), '[Pa]')
-#             print('Entrance of LPT: T045 = ', round(ec.T045, 3), '[K]; p045 = ', round(ec.p045, 3), '[Pa]')
-#             print('Entrance of nozzle: T05 = ', round(ec.T05, 3), '[K]; p05 = ', round(ec.p05, 3), '[Pa]')
-#             print('Exit of nozzle: T07 = ', round(ec.T07, 3), '[K]; p07 = ', round(ec.p07, 3), '[Pa]; PR_cr_noz = ',
-#                   ec.PR_cr_noz_core)
-#             print('Exit of nozzle: T8 = ', round(ec.T8, 3), '[K]; p8 = ', round(ec.p8, 3), '[Pa]; v8 = ', round(ec.v8, 3),
-#                   '[m/s]')
-#             print('Exit of fan: T016 = ', round(ec.T016, 3), '[K]; p016 = ', round(ec.p016, 3), '[Pa]; PR_cr_fan = ',
-#                   ec.PR_cr_fan)
-#             print('Exit of fan: T18 = ', round(ec.T18, 3), '[K]; p18 = ', round(ec.p18, 3), '[Pa]; v18 = ',
-#                   round(ec.v18, 3), '[m/s]')
-#             print('Provided Thrust: Fan = ', round(ec.T_fan, 3), '[N]; Core = ', round(ec.T_core, 3), '[N]; Total = ',
-#                   round(ec.T_total, 3), '[N]')
-#             print('Thrust SFC = ', round(ec.TSFC, 5), '[g/kN/s]; Equivalence ratio = ', round(ec.equivalence_ratio, 4))
-#
-#         #Compare Thrust from cycle analysis to Thrust required
-#         if ec.T_total< Thrust_required:
-#             print('Thrust available for '+b+ ' is too little, change...')
-#         else:
-#             print('Thrust available for '+b+ 'is enough:',ec.T_total.)
-#             Thrust_requirement = True
-#
-#     if range_analysis< 3200:
-#
-#         print('Harmonic Range is:',range_analysis)
-#         print('Requirement of range not met.')
-#     else:
-#         Range_requirement = True
+
+'''--------------------------------HACK--------------------------------------------'''
+print("\n= = = = Analysis for A320", aircraft[1], "= = = =")
+
+T_HACK = []
+TSFC_HACK = []
+Range_requirement = False
+Thrust_requirement = False
+Emissions_requirement = False
+Flamability_requirement = False
+
+'CH4, CO, CO2, H2O, NO, NO2, H2'
+Emissions_array_HACK = np.zeros(7)
+
+while Range_requirement != True:
+    for b in phases:
+        print("\n", b)
+        '''Run cycle analysis, to get TSFC, T_tot'''
+        ec.cycle_analysis(aircraft[1],b)
+        if printing== True:
+            print('\nInlet: T0 = ', round(ec.T0, 3), '[K]; p0 = ', round(ec.p0, 3), '[Pa]; v0 = ', round(ec.v0, 3), '[m/s]')
+            print('T00 = ', round(ec.T00, 3), '[K]; p00 = ', round(ec.p00, 3), '[Pa]')
+            print('Entrance of fan: T02 = ', round(ec.T02, 3), '[K]; p02 = ', round(ec.p02, 3), '[Pa]')
+            print('Entrance of LPC: T021 = ', round(ec.T021, 3), '[K]; p021 = ', round(ec.p021, 3), '[Pa]')
+            print('Mass flow of air: Total = ', round(ec.mf_air_init, 3), '[kg/s]; Core = ', round(ec.mf_hot, 3),
+                  '[kg/s]; Bypassed = ', round(ec.mf_cold, 3), '[kg/s]')
+            print('Entrance of HPC: T025 = ', round(ec.T025, 3), '[K]; p025 = ', round(ec.p025, 3), '[Pa]')
+            print('Entrance of CC: T03 = ', round(ec.T03, 3), '[K]; p03 = ', round(ec.p03, 3), '[Pa]; OPR = ',
+                  round(ec.OPR, 3))
+            print('Mass flow CC: Fuel = ', round(ec.mf_fuel, 3), '[kg/s]; air CC = ', round(ec.mf_hot, 3),
+                  '[kg/s]; Total end of CC = ', round(ec.mf_airfuel, 3), '[kg/s]')
+            print('LHV fuel = ', round(ec.LHV_f, 3), 'm air to cool / m air core', round(ec.mr_SZair_simpl, 4),
+                  round(ec.mr_SZair_simpl1, 4))
+            print('Initial estimate TPZ = ', round(ec.TPZ, 3))
+            print('Power: Fan = ', round(ec.W_fan, 3), '[W]; LPC = ', round(ec.W_LPC, 3), '[W]; HPC = ', round(ec.W_HPC, 3),
+                  '[W]')
+            print('LPT = ', round(ec.W_LPT, 3), '[W]; HPT = ', round(ec.W_HPT, 3), '[W]')
+            print('Entrance of HPT: T04 = ', round(ec.T04, 3), '[K]; p04 = ', round(ec.p04, 3), '[Pa]')
+            print('Entrance of LPT: T045 = ', round(ec.T045, 3), '[K]; p045 = ', round(ec.p045, 3), '[Pa]')
+            print('Entrance of nozzle: T05 = ', round(ec.T05, 3), '[K]; p05 = ', round(ec.p05, 3), '[Pa]')
+            print('Exit of nozzle: T07 = ', round(ec.T07, 3), '[K]; p07 = ', round(ec.p07, 3), '[Pa]; PR_cr_noz = ',
+                  ec.PR_cr_noz_core)
+            print('Exit of nozzle: T8 = ', round(ec.T8, 3), '[K]; p8 = ', round(ec.p8, 3), '[Pa]; v8 = ', round(ec.v8, 3),
+                  '[m/s]')
+            print('Exit of fan: T016 = ', round(ec.T016, 3), '[K]; p016 = ', round(ec.p016, 3), '[Pa]; PR_cr_fan = ',
+                  ec.PR_cr_fan)
+            print('Exit of fan: T18 = ', round(ec.T18, 3), '[K]; p18 = ', round(ec.p18, 3), '[Pa]; v18 = ',
+                  round(ec.v18, 3), '[m/s]')
+            print('Provided Thrust: Fan = ', round(ec.T_fan, 3), '[N]; Core = ', round(ec.T_core, 3), '[N]; Total = ',
+                  round(ec.T_total, 3), '[N]')
+            print('Thrust SFC = ', round(ec.TSFC, 5), '[g/kN/s]; Equivalence ratio = ', round(ec.equivalence_ratio, 4))
+
+
+        '''Get TPZ from Ivan's code. Inputs are ( gas, P, T, phi )'''
+        eqr_old = ec.equivalence_ratio
+        TPZ, Emissions = get_TPZ(aircraft[0], b, ec.p03, ec.T03, ec.equivalence_ratio)
+        print('1st TPZ from Matlab:', TPZ)
+        cool.SZ_air(aircraft[0], b, TPZ)
+        print('1st MR from engine cycle:', ec.mr_SZair_simpl1, 'MR with this new TPZ:', cool.mr_SZair)
+
+        ''' LOOP FOR CONVERGENCE OF EQUIVALENCE RATIO '''
+        eqr_new = cool.eqr
+        err = abs(eqr_new - eqr_old) / eqr_new
+        eqr_old = eqr_new  # to start while loop
+        print('Error', err)
+        while err > 0.02:  # error larger than 2%
+            print(err)
+            TPZ, Emissions = get_TPZ(aircraft[0], b, ec.p03, ec.T03, cool.eqr)
+            cool.SZ_air(aircraft[0], b, TPZ)
+            err = abs(cool.eqr - eqr_old) / cool.eqr
+            eqr_old = cool.eqr
+            print('Updated TPZ:', TPZ, ' Updated MR:', cool.mr_SZair, 'Updated eqr:', cool.eqr)
+
+
+        #Compare Thrust from cycle analysis to Thrust required
+        if ec.T_total< Thrust_required:
+            print('Thrust available for '+b+ ' is too little, change...')
+        else:
+            print('Thrust available for '+b+ 'is enough:',ec.T_total)
+            Thrust_requirement = True
+
+        T_HACK.append(ec.T_total)
+        TSFC_HACK.append(ec.TSFC)
+
+    if range_analysis< 3200:
+
+        print('Harmonic Range is:',range_analysis)
+        print('Requirement of range not met.')
+    else:
+        Range_requirement = True
 
 
 

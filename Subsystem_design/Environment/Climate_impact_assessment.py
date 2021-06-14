@@ -209,19 +209,19 @@ class Climate_assess():
         '''
 
 
-        #delt_XCO2_per_year = np.convolve(self.E(e,U,self.t_prime),self.G_X_CO2(self.t_prime-self.t_0),'full')
-        #delt_XCO2_per_year = delt_XCO2_per_year[:self.t_prime.size]
-        delt_XCO2_per_year = np.convolve(self.verification()[0], self.G_X_CO2(self.t_prime - self.t_0), 'full')
+        delt_XCO2_per_year = np.convolve(self.E(e,U,self.t_prime),self.G_X_CO2(self.t_prime-self.t_0),'full')
         delt_XCO2_per_year = delt_XCO2_per_year[:self.t_prime.size]
-        if plot == True:
-            #plt.plot(self.t_prime,self.E(e,U,self.t_prime),label = 'Emissions per year')
-            #plt.plot(self.t_prime,self.G_X_CO2(self.t_prime-self.t_0),label='Impulse function of CO2')
-            plt.plot(self.t_prime, delt_XCO2_per_year,color = 'tab:red',label='Change in atmospheric CO2 concentration from model')
-            plt.plot(self.verification()[2],self.verification()[1],marker= '+',label='Change in atmospheric CO2 concentration from study')
-            plt.xlabel('years')
-            plt.ylabel('$\Delta_{CO2 concentration}$ [ppmv]')
-            plt.legend()
-            plt.show()
+        #delt_XCO2_per_year = np.convolve(self.verification()[0], self.G_X_CO2(self.t_prime - self.t_0), 'full')
+        #delt_XCO2_per_year = delt_XCO2_per_year[:self.t_prime.size]
+        # if plot == True:
+        #     #plt.plot(self.t_prime,self.E(e,U,self.t_prime),label = 'Emissions per year')
+        #     #plt.plot(self.t_prime,self.G_X_CO2(self.t_prime-self.t_0),label='Impulse function of CO2')
+        #     plt.plot(self.t_prime, delt_XCO2_per_year,color = 'tab:red',label='Change in atmospheric CO2 concentration from model')
+        #     #plt.plot(self.verification()[2],self.verification()[1],marker= '+',label='Change in atmospheric CO2 concentration from study')
+        #     plt.xlabel('years')
+        #     plt.ylabel('$\Delta_{CO2 concentration}$ [ppmv]')
+        #     plt.legend()
+        #     plt.show()
 
         #print('$delta_{XCO2} with quad rule:',delta_XCO2_1)
         #delta_XCO2 = integrate.simps(self.G_X_CO2(t - t_prime) * self.E(e, U, t_prime), t_prime)
@@ -315,12 +315,12 @@ class Climate_assess():
 
             #print('The RF of CO2 is:',RF,len(RF))
 
-            plt.plot(self.t_prime,RF,label='Radiative forcing of '+ str(compound) +' from model')
-            plt.plot(self.verification()[2],self.verification()[3],marker='+',label='Radiative forcing of ' + str(compound) + ' from study')
-            plt.xlabel('years')
-            plt.ylabel('RF [W/m^2]')
-            plt.legend()
-            plt.show()
+            #plt.plot(self.t_prime,RF,label='Radiative forcing of '+ str(compound) +' from model')
+            #plt.plot(self.verification()[2],self.verification()[3],marker='+',label='Radiative forcing of ' + str(compound) + ' from study')
+            #plt.xlabel('years')
+            # plt.ylabel('RF [W/m^2]')
+            # plt.legend()
+            # plt.show()
         if compound == 'CH4':
             s_CH4 = self.s(compound='CH4')
 
@@ -344,25 +344,25 @@ class Climate_assess():
             s_O3S = self.s(compound='O3S')
             RF = s_O3S(h) * self.RF_E_ref_NOx * self.E(e,U,self.t_prime)
 
-            print('The RF of O3s is:',RF)
+            #print('The RF of O3s is:',RF)
             # plt.plot(self.t_prime, RF, label='Radiative forcing of' + str(compound))
             # plt.legend()
             # plt.show()
         if compound == 'H2O':
             RF = self.RF_E_ref_H2O * self.E(e,U,self.t_prime)
-            print('The RF of H2O is:',RF)
+            #print('The RF of H2O is:',RF)
             # plt.plot(self.t_prime, RF, label='Radiative forcing of' + str(compound))
             # plt.legend()
             # plt.show()
         if compound == 'soot':
             RF = self.RF_E_ref_soot * self.E(e,U,self.t_prime)
-            print('The RF of soot is:', RF)
+            #print('The RF of soot is:', RF)
             # plt.plot(self.t_prime, RF, label='Radiative forcing of' + str(compound))
             # plt.legend()
             # plt.show()
         if compound == 'sulfate':
             RF = self.RF_E_ref_SO4 * self.E(e,U,self.t_prime)
-            print('The RF of SO4 is:', RF)
+            #print('The RF of SO4 is:', RF)
             # plt.plot(self.t_prime, RF, label='Radiative forcing of' + str(compound))
             # plt.legend()
             # plt.show()
@@ -410,8 +410,6 @@ class Climate_assess():
         for i in range(len(RFnorm_O3S)):
             RF_norm[i] = RFnorm_O3S[i] + RFnorm_H2O[i] + RFnorm_soot[i] + RFnorm_CH4[i] + RFnorm_O3L[i]
 
-
-
         '''To check compliance with requirements'''
         RFnorm = RFnorm_CO2 + ((1/self.RF_2CO2) * RF_norm)
 
@@ -430,7 +428,6 @@ class Climate_assess():
         :param plot: If we want to plot the change in Temperature per year
         :return: Change in temperature over the span of years selected [K]
         '''
-
 
         self.emissions_level(e_CO2, e_H2O, e_NOx, e_soot, e_sulfate)
 
@@ -505,24 +502,24 @@ if __name__ == '__main__':
     climate.s(compound='O3S')
     e_CO2, e_SO4, e_H2O, e_soot, e_NOx = climate.emissions(13300)
     #
-    U_H2 = climate.number_aircraft_H2()                 # Number of flights in a year
+    #U_H2 = climate.number_aircraft_H2()                 # Number of flights in a year
     U_ker = climate.number_aircraft_kerosene()
-    E_H2 = climate.E(e=e_CO2 ,U=U_H2,time=climate.t_prime)
+    #E_H2 = climate.E(e=e_CO2 ,U=U_H2,time=climate.t_prime)
     E_ker = climate.E(e=e_CO2, U=U_ker, time=climate.t_prime)
-    percentages= climate.H2_percentage_trend()
+    #percentages= climate.H2_percentage_trend()
     # plt.subplot(131)
     # plt.plot(climate.t_prime,percentages,label='Percentage of H2 flights')
     # plt.legend()
     # plt.subplot(132)
-    plt.plot(climate.t_prime,U_H2,label='Utilization rate')
-    plt.xlabel('years')
-    plt.ylabel('Number of missions per year')
-    plt.legend()
+    # plt.plot(climate.t_prime,U_H2,label='Utilization rate')
+    # plt.xlabel('years')
+    # plt.ylabel('Number of missions per year')
+    # plt.legend()
 
     # plt.subplot(133)
     # plt.plot(climate.t_prime, E_H2,label='Emissions per year')
     # plt.legend()
-    plt.show()
+    #plt.show()
     # print('Start analysis for LTO')
     # 'To plot the change in CO2 concentration in ppmv per year'
 
@@ -530,5 +527,5 @@ if __name__ == '__main__':
     # print(clim)
     #
     #
-    ATR = climate.ATR(h=11000,e_CO2= e_CO2, e_H2O= e_H2O, e_NOx=e_NOx,e_soot= e_soot,e_sulfate=e_SO4,U=10,plot = True)
+    ATR = climate.ATR(h=11000,e_CO2= e_CO2, e_H2O= e_H2O, e_NOx=e_NOx,e_soot= e_soot,e_sulfate=e_SO4,U=U_ker,plot = True)
     print('The average temperature response, A_100, for the LTO of the HACK is:',ATR,'[K]')
