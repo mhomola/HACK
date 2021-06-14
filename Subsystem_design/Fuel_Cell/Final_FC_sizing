@@ -70,7 +70,7 @@ def total_tank_cooling(T1,T2):
     n = 0.4
     LHV = 120*10**6
     VFC = 30
-    r = 0.7
+    r = 0.5
 
     # Water
     h2oden = 998.21
@@ -101,7 +101,7 @@ def total_tank_cooling(T1,T2):
 def total_tank_bat_cooling(T1,T2):
 
     VFC = 8.67
-    r = 0.7
+    r = 0.6
 
     # Water
     h2oden = 998.21
@@ -119,6 +119,8 @@ def total_tank_bat_cooling(T1,T2):
     m1 = 46675/(tot_cp*T1)
     m2 = 46675/(tot_cp*T2)
 
+    print(m1,m2)
+
     v1 = m1*10**3/tot_den
     v2 = m2*10**3/tot_den
 
@@ -133,7 +135,7 @@ def cooling_liquid(Tg):
     n = 0.4
     LHV = 120*10**6
     VFC = 30
-    r = 0.7
+    r = 0.5
 
     # Water
     h2oden = 998.21
@@ -172,7 +174,9 @@ if __name__ == '__main__':
     print('Total FC system cost: ',round(total_system()[0]),' EUR')
     print('Only FC volume: ',round(FC_power/sp_V),' l')
     print()
-    print('Cooling FC: ', cooling_liquid(10), ' kg/s')
+    print('Cooling FC: ', cooling_liquid(40), ' kg/s')
+
+    print(total_tank_bat_cooling(10,80))
 
 
 
