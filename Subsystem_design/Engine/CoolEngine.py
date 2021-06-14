@@ -123,20 +123,25 @@ class Engine_Cool(Engine_Cycle):
         # self.D = self.cp_air * mf_hot * (T04 - T03)
 
         self.mr_SZair = (self.A + self.B + self.C) / (self.A + self.D)
-        #
+        # self.err = (self.mr_SZair - self.mr_SZair_simpl) / self.mr_SZair_simpl * 100
 
-        # self.mr_SZair = ((mf_hot+mf_h2+mf_ker)* self.cp_gas * (T04 - T03) - (mf_h2+mf_ker)*0.995*LHV*10**6) / (mf_hot * (self.cp_gas - self.cp_air)* (T04 - T03) )
-        # self.TPZ_calc = ((mf_h2+mf_ker)*0.995*LHV*10**6) / ((self.mr_SZair*mf_hot+mf_h2+mf_ker)*self.cp_gas) + T03
-
-        self.err = (self.mr_SZair - self.mr_SZair_simpl) / self.mr_SZair_simpl * 100
-
-        ''' USE THIS TO GET UPDATED TPZ FROM IVAN'S CODE '''
-        self.stoichiometric_ratio = self.mr_h2 * self.stoich_ratio_h2 + self.mr_ker * self.stoich_ratio_ker # CHANGE THIS!
-        self.eqr_new = (self.mf_fuel / (self.mf_hot * (self.mr_air_cc))) / \
-                                 self.stoichiometric_ratio
+        ''' USE THIS TO GET UPDATED TPZ FROM IVAN'S CODE ''' # eqr at PZ
+        self.eqr = (self.mf_fuel / (self.mf_hot * (self.mr_air_cc))) / self.stoichiometric_ratio
 
 
 
+
+def get_TPZ(a, p, p03, T03, eqr):
+    ''' GET TPZ - RIGHT NOW WITH A MISTAKE THOUGH, WILL FIX THIS (Sara) '''  # Inputs are ( aircraft/phase, P03, T03, phi_PZ )
+    if a == 'neo':
+        (TPZ, MF, MF_names) = eng.reactor1('neo', p03, T03, eqr)
+    elif a == 'hack':
+        if p in ['idle', 'taxi_out', 'taxi_in']:
+            (TPZ, MF, MF_names) = eng.reactor1('hack_h2', p03, T03, eqr)
+        else:
+            (TPZ, MF, MF_names) = eng.reactor1('hack_mix', p03, T03, eqr)
+
+    return TPZ
 
 
 if __name__ == "__main__":
@@ -153,50 +158,36 @@ if __name__ == "__main__":
         for p in phases:
             print("\n", p)
             cycle.cycle_analysis(a, p)
+            eqr_old = cycle.equivalence_ratio
 
-            ''' GET TPZ '''     # Inputs are ( aircraft/phase, P03, T03, phi_PZ )
-            if a == 'neo':
-                (TPZ, MF, MF_names) = eng.reactor1('neo', float(cycle.p03), float(cycle.T03),
-                                                   float(cycle.equivalence_ratio))
-            elif a == 'hack':
-                if p in ['idle', 'taxi_out', 'taxi_in']:
-                    (TPZ, MF, MF_names) = eng.reactor1('hack_h2', float(cycle.p03), float(cycle.T03),
-                                                       float(cycle.equivalence_ratio))
-                else:
-                    (TPZ, MF, MF_names) = eng.reactor1('hack_mix', float(cycle.p03), float(cycle.T03),
-                                                       float(cycle.equivalence_ratio))
-
-
+            TPZ = get_TPZ(a, p, cycle.p03, cycle.T03, cycle.equivalence_ratio)
             cool.SZ_air(a, p, TPZ)
-
-
             print('1st MR from engine cycle:', cycle.mr_SZair_simpl1, '1st TPZ from Matlab:', TPZ, 'MR with this new TPZ:', cool.mr_SZair)
             # TPZ = cycle.TPZ.copy()
 
-            ''' MAYBE NOT NEEDED ANYMORE '''
-            while cool.err > 5:
-                print(cool.err)
-                TPZ = cycle.T03 + (cycle.mf_fuel * cycle.eta_cc * cycle.LHV_f * 10 ** 6) / (cycle.cp_gas * ((1 - cool.mr_SZair) * cycle.mf_hot + cycle.mf_fuel))
+            ''' LOOP FOR CONVERGENCE OF EQUIVALENCE RATIO '''
+            eqr_new = cool.eqr
+            err = abs(eqr_new-eqr_old)/eqr_new
+            eqr_old = eqr_new # to start while loop
+
+            while err > 0.02: # error larger than 2%
+                print(err)
+                TPZ = get_TPZ(a, p, cycle.p03, cycle.T03, cool.eqr)
                 cool.SZ_air(a, p, TPZ)
-                print('Updated TPZ:', TPZ, ' Updated MR:', cool.mr_SZair, 'Updated eqr:', cool.eqr_new)
+                err = abs(cool.eqr - eqr_old) / cool.eqr
+                eqr_old = cool.eqr
+                print('Updated TPZ:', TPZ, ' Updated MR:', cool.mr_SZair, 'Updated eqr:', cool.eqr)
 
             save_data.append([1-cool.mr_SZair])
             # print('mf hot = ', cycle.mf_hot, 'mf h2 = ', cycle.mf_h2, 'mf ker = ', cycle.mf_ker, 'T03 = ', cycle.T03, 'T04 = ', cycle.T04)
             # print('P03', cycle.p03)
             print('Mass ratio of air needed to be injected on secondary zone:', round(cool.mr_SZair,3))
             print('TPZ = ', round(TPZ,3))
-            print('Difference between this one and simplified: ', round(cool.err,3))
 
         if a == 'neo':
             np.savetxt('mr_cc_neo.dat', np.array(save_data))
         elif a == 'hack':
             np.savetxt('mr_cc_hack.dat', np.array(save_data))
-
-    # if cool.mr_SZair < const.ratio_air_cc:
-    #     const.ratio_air_cc -= 0.1
-    # elif cool.mr_SZair > const.ratio_air_cc:
-    #     const.ratio_air_cc += 0.1
-    # Check if mr_air_SZ == 1 - const.ratio_air_cc, if not iterate
 
 
 
@@ -348,3 +339,4 @@ if __name__ == "__main__":
 # # Find the temperature in case delta Cp is sufficiently small
 # T_linear = Tcc*mr_cc + Tair*mr_cool
 # >>>>>>>>> Temporary merge branch 2
+
