@@ -74,7 +74,7 @@ plt.figure()
 plt.plot(x_arr,sigma_arr/10**6)
 plt.xlabel("Span location[m]")
 plt.ylabel("Bneding stress [MPa]")
-
+plt.show()
 ###MOI Graphs
 # plt.plot(x_arr,Ixx_arr,"blue")
 # plt.plot(x_arr,Iyy_arr,"red")
@@ -90,16 +90,16 @@ plt.ylabel("Bneding stress [MPa]")
 
 #Plot distribution at one span wise point
 
-# ind = 180
-# c = lw.chord(x = x_arr[ind])
-# wing_stress_plot = stresses(Ixx=MOI.Ixx_no_str, Iyy=MOI.Iyy_no_str, Ixx_str=MOI.Ixx, Iyy_str=MOI.Iyy,
-#                        h=MOI.h_sp_c * c, L=MOI.w_sk_c * c, t_upper=MOI.t_sk, t_spar1=MOI.t_sp, t_spar2=MOI.t_sp,
-#                        t_lower=MOI.t_sk)
-#
-# wing_stress_plot.shear_loads(Vx=Sx_arr[ind], Vy=Sy_arr[ind], T=T_arr[ind])
-# wing_stress_plot.bending_loads(Mx=Mx_arr[ind], My=My_arr[ind])
-# wing_stress_plot.compute_stresses()
-# print("Mx=",Mx_arr[ind],"My=",My_arr[ind])
-# print("Vx=",Sx_arr[ind],"Vy=",Sy_arr[ind],"T=",T_arr[ind])
-# wing_stress_plot.shear_flow_plotter(type = "total",show=True)
-#wing_stress_plot.vm_plotter(show=True)
+ind = 180
+c = lw.chord(x = x_arr[ind])
+wing_stress_plot = stresses(Ixx=MOI.Ixx_no_str, Iyy=MOI.Iyy_no_str, Ixx_str=MOI.Ixx, Iyy_str=MOI.Iyy,
+                       h=MOI.h_sp_c * c, L=MOI.w_sk_c * c, t_upper=MOI.t_sk, t_spar1=MOI.t_sp, t_spar2=MOI.t_sp,
+                       t_lower=MOI.t_sk)
+
+wing_stress_plot.shear_loads(Vx=Sx_arr[ind], Vy=Sy_arr[ind], T=T_arr[ind])
+wing_stress_plot.bending_loads(Mx=Mx_arr[ind], My=My_arr[ind])
+wing_stress_plot.compute_stresses()
+print("Mx=",Mx_arr[ind],"My=",My_arr[ind])
+print("Vx=",Sx_arr[ind],"Vy=",Sy_arr[ind],"T=",T_arr[ind])
+wing_stress_plot.shear_flow_plotter(type = "total",show=True)
+wing_stress_plot.vm_plotter(show=True)
