@@ -1,0 +1,194 @@
+
+\chapter{Main Engines Design}\label{chap:main_engines}
+
+% Turbo Gas Prop
+
+\def\arraystretch{1.5}
+\begin{longtable}{ p{0.12\textwidth} p{0.1\textwidth} p{0.1\textwidth} p{0.07\textwidth} p{0.07\textwidth} p{0.1\textwidth} p{0.1\textwidth} p{0.1\textwidth} }
+\caption{}
+\label{tab:tbd}\\
+
+    \toprule[1.5pt]
+    \textbf{Constant} & $(c_p)_{air}$ & $(c_p)_{gas}$ & $\kappa_{air}$ & $\kappa_{gas}$ & $R$ & $LHV_{ker}$ & $LHV_{H_2}$ \\ \bottomrule[1.5pt]
+    \textbf{Value} & 1,000 & 1,150 & 1.4 & 1.33 & 287 & 43 & 120 \\
+    \textbf{Unit} & $[J / (kg \cdot K)]$ & $ [J / (kg \cdot K)]$ & $[-]$ & $[-]$ & $[J / (kg \cdot K)]$ & $[MJ/kg]$ & $[MJ/kg]$ \\ \hline
+
+
+\end{longtable}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = .6\textwidth]{figures/III-Subsystems/Turbofan.PNG}
+    \caption{Schematic of the LEAP-1A turbofan engine}
+    \label{fig:Leap1A_schematic}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{figures/III-Subsystems/A_fan_eff.PNG}
+    \caption{\cite{farokhi_aircraft_2009}}
+    \label{fig:A_fan_eff}
+\end{figure}
+
+\def\arraystretch{1.5}
+\begin{longtable}{ p{0.08\textwidth} p{0.06\textwidth} | p{0.05\textwidth} p{0.06\textwidth} | p{0.06\textwidth} p{0.05\textwidth} | p{0.08\textwidth} p{0.06\textwidth} | p{0.06\textwidth} p{0.06\textwidth} | p{0.06\textwidth} p{0.05\textwidth} }
+\caption{Flight and engine parameters for cruise and take-off for the A320neo  }
+\label{tab:tbd}\\
+
+    \toprule[1.5pt]
+    \multicolumn{6}{c |}{\textbf{Parameters for cruise conditions}} & \multicolumn{6}{c }{\textbf{Parameters for take-off conditions}} \\ \bottomrule[1.5pt]
+    $M_0$ & 0.78 & $\Pi_{fan}$ & 1.421 & $\eta_{LPT}$ & 0.941 & $M_0$ & 0.0 & $\Pi_{fan}$ & 1.4 & $\eta_{LPT}$ & 0.94  \\
+    
+    $h \ [m]$ & 11,280 & $\eta_{LPC}$ & 0.9 &  $\Pi_{LPT}$ & 7.92 & $h \ [m]$ & 0.0 & $\eta_{LPC}$ & 0.92 & $\Pi_{LPT}$ & 6.362   \\
+    
+    $\dot{m}_{air} \ [kg/s]$ & 200.96 & $\Pi_{LPC}$ & 2.694 & $\eta_{HPT}$ & 0.933 & $\dot{m}_{air} \ [kg/s]$ & 510 & $\Pi_{LPC}$ & 1.992 & $\eta_{HPT}$ & 0.94    \\
+    
+    $T_{amb} \ [K]$ & 216.65 & $\eta_{HPC}$ & 0.955 & $\Pi_{HPT}$ & 3.819 & $T_{amb} \ [K]$ & 288.15 & $\eta_{HPC}$ & 0.977 & $\Pi_{HPT}$ & 3.828   \\
+    
+    $p_{amb} \ [bar]$ & 0.216 & $\Pi_{HPC}$ & 9.738  & $\eta_{nozzle}$ & 0.982 & $p_{amb} \ [bar]$ & 1.013 & $\Pi_{HPC}$ & 11.930  & $\eta_{nozzle}$ & 0.98 \\
+    
+    $V_0 \ [m/s]$ & 230.17 & $\eta_{cc}$ & 0.995 & $\Pi_{noz,core}$ & 1.015 & $V_0 \ [m/s]$ & 0.0 & $\eta_{cc}$ & 0.995 & $\Pi_{noz,core}$ & 0.99    \\
+    
+    $\eta_{inlet}$ & 0.921 & $\Pi_{cc}$ & 0.940 & $\Pi_{noz,fan}$ & 0.987 & $\Pi_{inlet}$ & 0.970 & $\Pi_{cc}$ & 0.94 & $\Pi_{noz,fan}$ & 0.99   \\
+    
+    $\eta_{fan}$ & 0.905 & $T_{0,4} \ [K]$ & 1459.30 & &   & $\eta_{fan}$ & 0.93 & $T_{0,4} \ [K]$ & 1630.39 & &   \\\hline                              
+
+\end{longtable}
+
+
+
+
+\def\arraystretch{1.5}
+\begin{longtable}{ p{0.05\textwidth} p{.08\textwidth} | p{0.05\textwidth} p{0.08\textwidth} | p{0.04\textwidth} p{0.08\textwidth} | p{0.05\textwidth} p{0.08\textwidth} | p{0.05\textwidth} p{0.08\textwidth} | p{0.04\textwidth} p{0.08\textwidth} }
+\caption{Engine cycle analysis for cruise and take-off for the A320neo. Temperatures are given in \textit{K} and pressures in \textit{bar}. Mass flows are in \textit{kg/s}, velocities in \textit{m/s}, and thrust in \textit{kN}}
+\label{tab:engine_cycle_neo}\\
+
+    \toprule[1.5pt]
+    \multicolumn{6}{c |}{\textbf{Engine cycle analysis for cruise}} & \multicolumn{6}{c}{\textbf{Engine cycle analysis for take-off}} \\ \bottomrule[1.5pt]
+    $T_{0,0}$     & 243.01  & $p_{0,3}$         & 11.701  & $p_{0,7}$     & 0.358   & $T_{0,0}$ & 288.15  & $p_{0,3}$         & 32.706  & $p_{0,7}$     & 1.250  \\
+    $p_{0,0}$    & 0.324  & $OPR$             & 37.27     & $T_{8}$       & 500.10    & $p_{0,0}$ & 1.013   & $OPR$             & 33.277    & $T_{8}$       & 656.90 \\
+    $T_{0,2}$     & 243.01  & $T_{0,4}$         & 1,459.30  & $p_8 $        & 0.217   & $T_{0,2}$ & 288.15    & $T_{0,4}$         & 1,630.39  & $p_8 $        & 1.013  \\
+    $p_{0,2}$    & 0.314  & $p_{0,4} $        & 10.993  & $v_{8} $      & 436.91    & $p_{0,2}$ & 0.983   & $p_{0,4} $        & 30.744  & $v_{8} $      & 287.923 \\
+    $T_{0,21}$    & 271.36  & $\dot{m}_{fuel}$  & 0.322     & $T_{18}$      & 226.13    & $T_{0,21}$ & 319.42   & $\dot{m}_{fuel}$  & 0.923     & $T_{18}$      & 294.55 \\
+    $p_{0,21}$   & 0.446  & $\phi$            & 0.035   & $p_{18}$      & 0.230   & $p_{0,21}$ & 1.376  & $\phi$            & 0.464     & $p_{18}$      & 1.013  \\
+    $T_{0,25}$    & 370.04  & $T_{0,45}$        & 1,016.77  & $v_{18}$      & 301.43    & $T_{0,25}$ & 394.99   & $T_{0,45}$        & 1,139.06  & $v_{18}$      & 223.02 \\
+    $p_{0,25}$   & 1.202  & $p_{0,45}$        & 2.878   & $T_{core}$    & 3.462     & $p_{0,25}$ & 2.742  & $p_{0,45}$        & 8.031   & $T_{core}$    & 12.401 \\
+    $T_{0,16}$    & 271.36  & $T_{0,5}$         & 582.62    & $T_{fan}$     & 15.435    & $T_{0,16}$ & 319.415  & $T_{0,5}$         & 692.94    & $T_{fan}$     & 104.340 \\
+    $p_{0,16}$   & 0.440  & $p_{0,5}$         & 0.363   & $T_{total}$   & 18.897    & $p_{0,16}$ & 1.362  & $p_{0,5}$         & 1.262   & $T_{total}$   & 116.742  \\
+    $T_{0,3}$     & 725.11  & $T_{0,7}$         & 582.62    &               &           & $T_{0,3}$ & 811.49    & $T_{0,7}$         & 692.94    &               & \\    \hline                              
+
+\end{longtable}
+
+Absolute enthalpy: It is the sum of an enthalpy that takes into the account the energy associated with chemical bonds -the enthalpy of formation -and an enthalpy that is solely associated with the temperature -the  sensible  enthalpy  change. $h_i$ the mass or molar specific enthalpy of species $i$. $c_{p_i}$ [$J(kmol \cdot K)$]. $T_{ref} = 298.15$ $K$ consistent with recognized thermodynamic databases, NASA [5, 6] or Chemkin [8].
+
+\begin{equation}
+    h_i(T) = h_{f,i}^0 (T_{ref}) + \Delta h_{s,i} (T) = h_{f,i}^0 (T_{ref}) + \int_{T_{ref}}^{T} c_{p,i} dT
+\end{equation}
+
+complete, ideal, stoichiometric combustion reaction staged in a well-stirred reactor. Both reactants and products at standard-state conditions - heat must be removed from the reactor. Enthalpy difference:
+
+\begin{equation}
+    \Delta h_c \ [\frac{J}{kmol_{mix}}] = h_{prod} - h_{react}
+\end{equation}
+
+\begin{equation}
+    \Delta h_c \ [\frac{J}{kg_f}] = \Delta h_c \ [\frac{J}{kg_{mix}}] \cdot \frac{\dot{m}_{mix}}{\dot{m}_f}
+\end{equation}
+
+If a fuel-air mixture burns adiabatically at constant pressure, the absolute  enthalpy  of  the reactants  at  the  initial  state  equals  the  absolute  enthalpy  of  the  products  at  the  final  state.  The final-state  temperature  is  defined  as  the  constant-pressure  adiabatic  flame  temperature.
+
+\begin{equation}
+    h_{prod}(T_{ad}) = h_{react}(T_{react})
+\end{equation}
+
+To  accurately  quantify  the  equilibrium  state,  we  shall  abandon  the  assumption  of  ideal combustion.
+
+\textbf{Simplified Combustor Heat Balance}
+
+the  enthalpy  balance  equation  (Eq. 6.14)  may look as follows when applied to a combustion chamber:
+
+\begin{equation}
+    [\dot{m}h_f^0]_{air} + [\dot{m}h_f^0]_{f} - [\dot{m}h_f^0]_{prod} = [\dot{m}\int_{T_{ref}}^{T_{ad}}c_p dT]_{prod} - [\dot{m}\int_{T_{ref}}^{T_{a}}c_p dT]_{air} - [\dot{m}\int_{T_{ref}}^{T_{f}}c_p dT]_{f}
+\end{equation}
+
+$[\dot{m}h_f^0]_{air} = 0$ and $[\dot{m}h_f^0]_{f} = [\dot{m}h_f^0]_{prod}$ so $$0 = [\dot{m}\int_{T_{ref}}^{T_{ad}}c_p dT]_{prod} - [\dot{m}\int_{T_{ref}}^{T_{a}}c_p dT]_{air} - [\dot{m}\int_{T_{ref}}^{T_{f}}c_p dT]_{f}$$
+thus $$\Delta h_{react} = \Delta h_{prod}$$
+
+From the end of the PZ to the end of the DZ, adding cooling air with $c$ the fraction of the core air injected in the SZ:
+
+\begin{equation}
+    \left[ (1-c) \dot{m}_{core} \int_{T_{0,4}}^{T_{PZ}}c_{p_{air}} dT \right] +
+    \left[ \dot{m}_f \int_{T_{0,4}}^{T_{PZ}}c_{p_f} dT \right] = 
+    \left[ c \dot{m}_{core} \int_{T_{0,3}}^{T_{0,4}}c_{p_{air}} dT \right]
+\end{equation}
+
+Simplified:
+\begin{equation}
+    \left[ (1-c) \cdot \dot{m}_{core} + \dot{m}_f \right] c_{p_{g}} (T_{0,4} - T_{PZ}) = c \cdot \dot{m}_{core} c_{p_{air}} (T_{0,3} - T_{0,4})
+\end{equation}
+
+
+\textbf{NEW} \
+
+\noindent The air flow injected directly at the Primary Zone (PZ) is only part of the air entering the combustion chamber as some percentage is ducted around it - creating a cooling air film - and injected in the Secondary (SZ) and Dilution Zones (DZ). As a simplification, it was assumed that the combustion happened entirely in the PZ and that the SZ coincided with the DZ, thus from now on referred to as only DZ. It was also assumed that all the cooling air was injected in this DZ. To determine the percentage of core air used for cooling, a heat balance between the products of the combustion and the injected cool air must be performed.
+
+Assuming an adiabatic reaction at constant pressure, "the absolute enthalpy of the reactants at the initial state equals the absolute enthalpy of the products at the final state" \textbf{CITE READER/BOOK}. This means that the enthalpy decrease of the combustion products must equal the enthalpy increase of the cooling air. \autoref{eq:enth_balance} shows this mathematically.
+
+% The final-state  temperature  is  defined  as  the  constant-pressure  adiabatic  flame  temperature.
+
+\begin{equation} \label{eq:enth_balance}
+    \Delta h_{react,comb} + \Delta h_{air,cool} = 0
+\end{equation}
+$$(-) + (+) = 0$$
+
+\noindent Taking $c$ as the fraction of core air injected in the DZ and modelling this air as only $N_2$, $c$ can be found using \autoref{eq:enth_balance1}.
+
+\begin{equation}\label{eq:enth_balance1}
+    \left[ (1-c) \cdot \dot{m}_{air,core} \int\displaylimits_{T_{PZ}}^{T_{0,4}}c_{p,{N_2}} dT \right] 
+    + \left[ \dot{m}_{H_2} \int\displaylimits_{T_{PZ}}^{T_{0,4}}c_{p,{H_2}} dT \right]
+    + \left[ \dot{m}_{ker} \int\displaylimits_{T_{PZ}}^{T_{0,4}}c_{p,{ker}} dT \right]
+    + c \cdot \left[ \dot{m}_{air,core} \int\displaylimits_{T_{0,3}}^{T_{0,4}}c_{p,{N_2}} dT \right] = 0
+\end{equation}
+
+Used to verify:
+
+\begin{equation}
+    \left[ (1-c) \cdot \dot{m}_{air,core} + \dot{m}_{H_2} + \dot{m}_{ker} \right] c_{p_{gas}} (T_{0,4} - T_{PZ})
+    %+ \left[ \dot{m}_{H_2} c_{p_{gas}} (T_{0,4} - T_{PZ}) \right]
+    %+ \left[ \dot{m}_{ker} c_{p_{gas}} (T_{0,4} - T_{PZ}) \right]
+    + c \cdot \left[ \dot{m}_{air,core} c_{p_{air}} (T_{0,4} - T_{0,3}) \right] = 0
+\end{equation}
+
+$c_{p_{air}} = 1000 \ J/kg/K$, $c_{p_{gas}} = 1150 \ J/kg/K$ \\
+
+- only kerosene (take off): max difference of -5.236\% was found when computing only with kerosene (dodecane) for mf hot =  44.611, mf ker =  1.115, T03 =  700.824, T04 =  1630.39, assumed TPZ = 2000
+
+- kerosene and h2 (take off): max difference of -2.779\%, mf hot =  44.611 mf h2 =  0.203 mf ker =  0.548 T03 =  700.824, T04 =  1630.39, assumed TPZ = 2000
+
+- only h2 (taxi): mas diff of -0.334\%, mf hot =  16.952, mf h2 =  0.152, T03 =  699.013, T04 =  1630.39, assumed TPZ = 2000
+
+\vspace{3\baselineskip}
+find mass flow of fuel
+\begin{equation}
+    \dot{m}_{air} c_{p_{gas}} (T_{0,4} - T_{0,3}) = \dot{m}_f \eta_{cc} LHV_f
+\end{equation}
+
+other cc equations:
+
+\begin{equation}
+    \left[ (1-c)\cdot \dot{m}_{air} + \dot{m}_f \right] c_{p_{gas}} (T_{PZ} - T_{0,3}) = \dot{m}_f \eta_{cc} LHV_f
+\end{equation}
+
+\begin{equation}
+    \left[ (1-c)\cdot \dot{m}_{air} + \dot{m}_f \right] c_{p_{gas}} (T_{0,4} - T_{PZ}) + c \cdot \dot{m}_{air} c_{p_{air}} (T_{0,4} - T_{0,3}) = 0
+\end{equation}
+
+Rearranging:
+
+\begin{equation}
+    c = \frac  { (\dot{m}_{air} + \dot{m}_f) c_{p_{gas}}(T_{0,4}-T_{0,3}) - \dot{m}_f\eta_{cc} LHV_f }    { \dot{m}_{air} (c_{p_{gas}}- c_{p_{air}}) \cdot (T_{0,4} - T_{0,3}) }
+\end{equation}
+
+\begin{equation}
+    T_{PZ} = T_{0,3} + \frac{ \dot{m}_f \eta_{cc} LHV_f }   {\left[ (1-c)\dot{m}_{air} + \dot{m}_f \right] c_{p_{gas}} } 
+\end{equation}

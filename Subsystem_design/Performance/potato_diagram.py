@@ -26,8 +26,8 @@ class potato_diagram(Constants):
         weight_DPU = 781 # [kg] later put in self.weight_DPU
         cg_DPU = 32.5      # from nose [m] later put in self.cg_DPU
         ### -- LH2 tanks --- ##
-        weight_LH2_tanks = 2* self.center_tank_mass + 2* self.pod_tank_mass # [kg]
-        cg_LH2_tanks = 0.5* (self.x_cg_pod + self.x_cg_centertank - 3) # From the nose [m]
+        weight_LH2_tanks = 2* self.pod_tank_mass # [kg]
+        cg_LH2_tanks = self.x_cg_pod # From the nose [m]
         # Calculate A320-HAC.K cg @ OEW
         OEW_HACK = OEW_neo - weight_APU + weight_LH2_tanks + weight_DPU
         cg_OEW_HACK = (self.OEW_320neo*cg_OEW_neo - weight_APU*cg_APU +
