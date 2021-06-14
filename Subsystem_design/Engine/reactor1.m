@@ -1,12 +1,5 @@
 function [TPZ, MF_emis, name_emis] = reactor1(g, P_input, T_input, eqr_input)
-
-%    REACTOR1 Zero-dimensional kinetics: adiabatic, constant pressure.
-%
-%    This example illustrates how to use class 'Reactor' for
-%    zero-dimensional kinetics simulations. Here the parameters are
-%    set so that the reactor is adiabatic and very close to constant
-%    pressure.
-
+% Running Matlab script
     function [time_idx1, time_idx2] = time_res(t,dt,p)
 
             slope = (t(2:end) - t(1:end-1))/dt;
@@ -51,8 +44,8 @@ eqr = eqr_input; %0.3;
 
 %------------------
 
-dt = 1e-4; %time step; -4 originally
-TotalTime = 40; % in seconds - includes autoignition phase
+dt = 1e-1; %time step; -4 originally
+TotalTime = 20; % in seconds - includes autoignition phase
 
 nSteps = ceil(TotalTime/dt); %number of steps. Total time = nSteps*dt
 
@@ -62,16 +55,18 @@ if strcmp(g,'neo') %   compare string
    p_n2 = 55.45;
    p_o2_new = p_o2/eqr;
    p_n2_new = p_n2/eqr;
+   
    str_ker = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,O2:',string(p_o2_new),',N2:',string(p_n2_new)],"")); % only kerosene
    set(gas,'T',T,'P',P,'X',str_ker) % only kerosene
    %gas = Solution('nDodecane_Reitz.yaml','nDodecane_IG');
+
 elseif strcmp(g,'hack_mix')
    gas = Solution('kerosene.yaml', 'gas');
-   p_o2 = 44.76;
-   p_n2 = 168.3;
+   p_o2 = 15.26;%44.76;
+   p_n2 = 57.38;%168.3;
    p_o2_new = p_o2/eqr;
    p_n2_new = p_n2/eqr;
-   str_ker_h2 = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:60,O2:',string(p_o2_new),',N2:',string(p_n2_new)],"")); % kerosene and H2, 50% in volume
+   str_ker_h2 = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:1,O2:',string(p_o2_new),',N2:',string(p_n2_new)],"")); % kerosene and H2, 50% in volume
    set(gas,'T',T,'P',P,'X',str_ker_h2) % 50% H2 in volume - change this (automatically based on mass ratio)
     
 elseif strcmp(g,'hack_h2')
@@ -160,8 +155,8 @@ p = 0.005;
 t_five = tim(t_five_i) + dt/2;
 t_com = tim(t_com_i);
 
-t_res = (t_com - t_five)*1000;
-disp(['Residence time = ', t_res, ' ms']);
+t_res = (t_com - t_five)*1000
+% disp(['Residence time = ', t_res, ' ms']);
 
 clf; %  clear figure
 subplot(2,2,1);
@@ -199,4 +194,12 @@ TPZ = temp(length(temp));
 % clear all
 % cleanup
 % Add a calculation of 5% steep angle
+
+
+%    REACTOR1 Zero-dimensional kinetics: adiabatic, constant pressure.
+%
+%    This example illustrates how to use class 'Reactor' for
+%    zero-dimensional kinetics simulations. Here the parameters are
+%    set so that the reactor is adiabatic and very close to constant
+%    pressure.
 end

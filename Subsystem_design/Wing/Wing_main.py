@@ -1,4 +1,4 @@
-from Subsystem_design.Wing.inertia import Inertia
+from Subsystem_design.Wing.inertia import Inertia, Inertia_initial
 from Subsystem_design.common_constants import Constants
 from Subsystem_design.Wing.loads import Loads_w
 from Subsystem_design.Wing.Stresses import stresses
@@ -29,8 +29,8 @@ Iyy_arr = np.zeros(len(x_arr))
 Ixx_nostr_arr = np.zeros(len(x_arr))
 Iyy_nostr_arr = np.zeros(len(x_arr))
 ### Initializing Inertia class
-MOI = Inertia(n_str = 10)
-
+#MOI = Inertia(n_str = 10)
+MOI = Inertia_initial(n_str = 10 )
 ##We want to compute the inertia, the loads and the stresses at every span-wise location
 
 for i, x in enumerate(x_arr):
@@ -74,7 +74,7 @@ plt.figure()
 plt.plot(x_arr,sigma_arr/10**6)
 plt.xlabel("Span location[m]")
 plt.ylabel("Bneding stress [MPa]")
-
+plt.show()
 ###MOI Graphs
 # plt.plot(x_arr,Ixx_arr,"blue")
 # plt.plot(x_arr,Iyy_arr,"red")
@@ -86,6 +86,9 @@ plt.ylabel("Bneding stress [MPa]")
 
 # sns.heatmap(vm.transpose(),cmap="magma",yticklabels=False,xticklabels=False) #cividis
 # plt.show()
+
+
+#Plot distribution at one span wise point
 
 ind = 180
 c = lw.chord(x = x_arr[ind])
@@ -99,4 +102,4 @@ wing_stress_plot.compute_stresses()
 print("Mx=",Mx_arr[ind],"My=",My_arr[ind])
 print("Vx=",Sx_arr[ind],"Vy=",Sy_arr[ind],"T=",T_arr[ind])
 wing_stress_plot.shear_flow_plotter(type = "total",show=True)
-#wing_stress_plot.vm_plotter(show=True)
+wing_stress_plot.vm_plotter(show=True)

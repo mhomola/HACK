@@ -3,7 +3,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from math import pi
 from Subsystem_design.fuel_required import V_H2, V_k
-from Subsystem_design.Tank_Design.Main_PreliminaryTank import mass_pod, mass_center_tank, volume_pod, volume_centre_tank
+from Subsystem_design.Tank_Design.Main_PreliminaryTank import mass_pod, volume_pod
 from Subsystem_design.Engine.EnergySplit import LHV_hack, ER_h2, ER_ker, MR_h2, MR_ker
 
 
@@ -150,18 +150,12 @@ class Constants():
         self.x_cg_pylon = 17.14      # From nose                       [m]
 
         """Tank design constants"""
-        self.V_centre_tank = volume_centre_tank               # Volume of each centre tank                       [m^3]
-        self.V_centre_pod = volume_pod                        # Volume of each wing pod                          [m^3]
-        self.V_H2_centre = volume_centre_tank * 0.885         # Volume of H2 in each centre tank                 [m^3]
-        self.V_H2_pod = volume_pod * 0.885                    # Volume of H2 in each wing pod                    [m^3]
 
-        self.center_tank_mass = mass_center_tank              # Mass of each center tank (we have 2 tanks)       [kg]
+        self.pod_volume = volume_pod                        # Volume of each wing pod                          [m^3]
+        self.pod_V_H2 = volume_pod * 0.885                    # Volume of H2 in each wing pod                    [m^3]
         self.pod_tank_mass = mass_pod                         # Mass of each pod tank (we have 2 tank)           [kg]
-        self.centre_H2_mass = self.V_H2_centre * 71.1         # Mass of H2 in each centre tank (we have 2 tank)  [kg]
-        self.pod_H2_mass = self.V_H2_pod * 71.1               # Mass of H2 in each pod tank (we have 2 tank)     [kg]
-
+        self.pod_H2_mass = self.pod_V_H2 * 71.1               # Mass of H2 in each pod tank (we have 2 tank)     [kg]
         self.x_cg_pod = 18.23                                 # From the nose                                    [m]
-        self.x_cg_centertank = 20.21                          # From the nose                                    [m]
         self.y_cg_pod = 0.55*self.b/2                         # Y location of the pods on the wing                [m]
 
         """Weights of HACK"""
@@ -218,8 +212,10 @@ class Constants():
         self.h0_C12H26 = -290.90                                        # Zero enthalpy of dodecane                 [kJ/mol]         # https://www.chemeo.com/cid/34-125-5/n-Dodecane
         self.molarmass_C12H26 = 170.3348                                # Molar mass of dodecane                    [g/mol]
 
-        self.stoich_ratio_ker = 1/15.66 #FAR
+
+        self.stoich_ratio_ker = 1/14.79 #1/15.66 #FAR
         self.stoich_ratio_h2 = 1/34.3 #FAR
+        self.stoich_ratio_ker_h2 = 1/15.07
 
         # """" Altitude and speed --- USE DATAFRAME """
         # self.phases = np.array(['idle', 'taxi_out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi_in'])
@@ -362,19 +358,6 @@ class Constants():
     #     self.LHV_f = LHV_hack # [MJ/kg]
     #     self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))
 
-
-
-    # def fuselage_length(self,vol_eff, vol_fus):
-    #     """
-    #
-    #     :param vol_eff: Volumetric efficiency of integral tanks (Ratio of usable tank volume-to-volume occupied
-    #                     in the fuselage                                         [-]
-    #     :param vol_fus: Volume available for tanks in the center wingbox        [m^3]
-    #     :return:
-    #     """
-    #     self.V_H2_center_w = vol_eff * vol_fus  # Volume of hydrogen stored on center wing box [m^3]
-    #     self.V_H2_ext_fus = self.V_H2 - self.V_H2_center_w  # Volume of hydrogen stored on extended fuselage[m^3]
-    #     self.l_f = self.V_H2_ext_fus/(pi * self.width_f/2 * self.height_f/2)
 
     def speed_of_sound(self, T):
         """

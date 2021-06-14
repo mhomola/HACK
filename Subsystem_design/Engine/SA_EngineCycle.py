@@ -14,7 +14,7 @@ class SA_Engine_Cycle(Constants):
         # print(var_OG)
         # self.var_name = np.array(['PR_fan', 'BPR', 'PR_LPC', 'PR_HPC', 'PR_LPT', 'PR_HPT'])
         # self.up_bound = np.array([ 2, 15.808, 7, 15, 0.3, 0.7 ])
-        self.data()
+        self.get_data()
 
         for k in range(len(self.var_OG)): # increase one variable at a time, the remaining stay the original value
             var_loop = self.var_OG.copy()
@@ -35,6 +35,7 @@ class SA_Engine_Cycle(Constants):
                 save_var = np.append(save_var, var_loop[k])
 
                 self.cycle(var_loop)
+
                 if not m.isnan(self.TSFC):
                     save_TSFC = np.append(save_TSFC, self.TSFC)
                 else:
@@ -60,7 +61,7 @@ class SA_Engine_Cycle(Constants):
 
 
 
-    def data(self):
+    def get_data(self):
         data = np.array(DataFrame().neo.cruise)
         self.names = np.array(DataFrame().neo.parameter)
         self.names = np.delete(self.names, np.where(self.names == 'PR_LPT')[0][0])
