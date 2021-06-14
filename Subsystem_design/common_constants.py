@@ -152,16 +152,16 @@ class Constants():
         """Tank design constants"""
         self.V_centre_tank = volume_centre_tank               # Volume of each centre tank                       [m^3]
         self.V_centre_pod = volume_pod                        # Volume of each wing pod                          [m^3]
-        self.V_H2_centre = volume_centre_tank * 0.885         # Volume of H2 in each centre tank                 [m^3]
+        # self.V_H2_centre = volume_centre_tank * 0.885         # Volume of H2 in each centre tank                 [m^3]
         self.V_H2_pod = volume_pod * 0.885                    # Volume of H2 in each wing pod                    [m^3]
 
-        self.center_tank_mass = mass_center_tank              # Mass of each center tank (we have 2 tanks)       [kg]
+        # self.center_tank_mass = mass_center_tank              # Mass of each center tank (we have 2 tanks)       [kg]
         self.pod_tank_mass = mass_pod                         # Mass of each pod tank (we have 2 tank)           [kg]
-        self.centre_H2_mass = self.V_H2_centre * 71.1         # Mass of H2 in each centre tank (we have 2 tank)  [kg]
+        # self.centre_H2_mass = self.V_H2_centre * 71.1         # Mass of H2 in each centre tank (we have 2 tank)  [kg]
         self.pod_H2_mass = self.V_H2_pod * 71.1               # Mass of H2 in each pod tank (we have 2 tank)     [kg]
 
         self.x_cg_pod = 18.23                                 # From the nose                                    [m]
-        self.x_cg_centertank = 20.21                          # From the nose                                    [m]
+        # self.x_cg_centertank = 20.21                          # From the nose                                    [m]
         self.y_cg_pod = 0.55*self.b/2                         # Y location of the pods on the wing                [m]
 
         """Weights of HACK"""
