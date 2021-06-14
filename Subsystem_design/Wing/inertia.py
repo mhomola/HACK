@@ -2,9 +2,6 @@ from Subsystem_design.common_constants import Constants
 import numpy as np
 import matplotlib.pyplot as plt
 import math as m
-from statsmodels.formula.api import ols
-import pandas as pd
-
 
 class Inertia_initial(Constants):
 
@@ -25,13 +22,17 @@ class Inertia_initial(Constants):
         y_b_arr = np.array([0.1138, 0.2, 0.2576, 0.2787, 0.306, 0.3276, 0.37, 0.5, 0.6, 0.7, 0.9, 1])
         t_c_arr = np.array([0.163, 0.1267, 0.117, 0.11546, 0.115, 0.1152, 0.117, 0.1123, 0.110, 0.109, 0.108, 0.108])
 
-
         yb = x / self.b * 2
-        loc = np.where(y_b_arr >= yb)[0][:2] - 1
-        self.tc = np.diff(t_c_arr[loc]) / np.diff(y_b_arr[loc]) * (yb - y_b_arr[loc][0]) + t_c_arr[loc][0]
 
         if yb >= .9:
             self.tc = 0.108
+
+        elif yb <= 0.1138:
+            self.tc = 0.163
+
+        else:
+            loc = np.where(y_b_arr >= yb)[0][:2] - 1
+            self.tc = np.diff(t_c_arr[loc]) / np.diff(y_b_arr[loc]) * (yb - y_b_arr[loc][0]) + t_c_arr[loc][0]
 
         self.h_sp_c = 0.83 * self.tc
 
@@ -64,14 +65,14 @@ class Inertia_initial(Constants):
         sk_bot_x = sk_top_x
         sk_bot_y = - sk_top_y
 
-        plt.plot(sp_left_x, sp_left_y, color="black")
-        plt.plot(sp_right_x, sp_right_y, color="black")
-        plt.plot(sk_top_x, sk_top_y, color="black")
-        plt.plot(sk_bot_x, sk_bot_y, color="black")
-        plt.scatter(x=self.x_loc_str, y=y_loc_str, color='red', marker='o')
-        plt.scatter(x=0, y=0, color='g', marker='+')
-        plt.axis('equal')
-        plt.show()
+        # plt.plot(sp_left_x, sp_left_y, color="black")
+        # plt.plot(sp_right_x, sp_right_y, color="black")
+        # plt.plot(sk_top_x, sk_top_y, color="black")
+        # plt.plot(sk_bot_x, sk_bot_y, color="black")
+        # plt.scatter(x=self.x_loc_str, y=y_loc_str, color='red', marker='o')
+        # plt.scatter(x=0, y=0, color='g', marker='+')
+        # plt.axis('equal')
+        # plt.show()
 
 
     def compute_inertia(self, x):
@@ -99,8 +100,15 @@ class Inertia_initial(Constants):
         self.Iyy = 2 * Iyy_sp + 2 * Iyy_sk + np.sum(Iyy_str)
 
 if __name__ == '__main__':
-    i = Inertia_initial(n_str=5)
+    i = Inertia_initial(n_str=12)
+    y_arr = np.linspace(i.width_f/2, i.b/2, 100)
+    Ixx_arr = np.zeros(len(y_arr))
+    for j, y in enumerate(y_arr):
+        i.compute_inertia(x=y)
+        Ixx_arr[j] = i.Ixx
 
+    # plt.plot(y_arr, Ixx_arr)
+    # plt.show()
 
 class Inertia(Constants):
 

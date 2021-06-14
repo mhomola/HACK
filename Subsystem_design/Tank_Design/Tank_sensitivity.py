@@ -32,7 +32,7 @@ class spacial_constraints():
 
 def tank_length(vol,diameter):
     """
-    Outputs the length of the tank such that 
+    Outputs the length of the tank such that
     """
     length = 1
     pod_constaint1 = spacial_constraints(length=length, width=diameter, height=diameter)

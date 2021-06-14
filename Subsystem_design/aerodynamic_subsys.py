@@ -297,9 +297,6 @@ class AerodynamicCharacteristics(Constants):
         ax2.set_ylabel(r'$\frac{C_L}{C_D}$', size=15)
         plt.show()
 
-    def reynolds(self):
-        self.Re =
-
 
 
 # Try out the class

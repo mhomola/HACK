@@ -185,7 +185,7 @@ if __name__ == '__main__':
     """Weights of A320-HACK"""
 
     AC_weights = Compute_weight()                                               # Initiallize class of weight estimation
-    AC_weights.weight_break_down_HACK(h2_vol_center=const.V_H2_centre,h2_vol_f=const.V_H2_pod)       # Based on H2 volume estimates
+    AC_weights.weight_break_down_HACK(h2_vol_center=const.V_H2_centre, h2_vol_f=const.pod_V_H2)       # Based on H2 volume estimates
     AC_weights.Struc_m()
 
     Aerodynamic_charac = AerodynamicCharacteristics()
