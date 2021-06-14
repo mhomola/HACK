@@ -2,9 +2,6 @@ from Subsystem_design.common_constants import Constants
 import numpy as np
 import matplotlib.pyplot as plt
 import math as m
-from statsmodels.formula.api import ols
-import pandas as pd
-
 
 class Inertia_initial(Constants):
 
@@ -64,14 +61,14 @@ class Inertia_initial(Constants):
         sk_bot_x = sk_top_x
         sk_bot_y = - sk_top_y
 
-        plt.plot(sp_left_x, sp_left_y, color="black")
-        plt.plot(sp_right_x, sp_right_y, color="black")
-        plt.plot(sk_top_x, sk_top_y, color="black")
-        plt.plot(sk_bot_x, sk_bot_y, color="black")
-        plt.scatter(x=self.x_loc_str, y=y_loc_str, color='red', marker='o')
-        plt.scatter(x=0, y=0, color='g', marker='+')
-        plt.axis('equal')
-        plt.show()
+        # plt.plot(sp_left_x, sp_left_y, color="black")
+        # plt.plot(sp_right_x, sp_right_y, color="black")
+        # plt.plot(sk_top_x, sk_top_y, color="black")
+        # plt.plot(sk_bot_x, sk_bot_y, color="black")
+        # plt.scatter(x=self.x_loc_str, y=y_loc_str, color='red', marker='o')
+        # plt.scatter(x=0, y=0, color='g', marker='+')
+        # plt.axis('equal')
+        # plt.show()
 
 
     def compute_inertia(self, x):
@@ -99,8 +96,15 @@ class Inertia_initial(Constants):
         self.Iyy = 2 * Iyy_sp + 2 * Iyy_sk + np.sum(Iyy_str)
 
 if __name__ == '__main__':
-    i = Inertia_initial(n_str=5)
+    i = Inertia_initial(n_str=12)
+    y_arr = np.linspace(i.width_f/2, i.b/2, 100)
+    Ixx_arr = np.zeros(len(y_arr))
+    for j, y in enumerate(y_arr):
+        i.compute_inertia(x=y)
+        Ixx_arr[j] = i.Ixx
 
+    # plt.plot(y_arr, Ixx_arr)
+    # plt.show()
 
 class Inertia(Constants):
 
