@@ -89,9 +89,9 @@ class xplot(Constants):
         # Aerodynamic center of wing + fuselage
         def Xac_w(landing=False):
             if landing == False:
-                return 0.26
+                return 0.25
             elif landing == True:
-                return 0.28
+                return 0.25
 
 
         def fus_cont_1(beta):
@@ -154,30 +154,32 @@ class xplot(Constants):
         r = 2 * lh / b
         Kea = ((0.1124 + 0.1265 * sweep_25c + 0.1766 * sweep_25c ** 2) / (r ** 2)) + 0.1024 / r + 2
         Kea_0 = 0.1124 / r ** 2 + 0.1024 / r + 2
-        e_grad = (Kea / Kea_0) * ((r / (r ** 2 + mtv ** 2)) * (0.4876 / sqrt(r ** 2 + 0.6319 + mtv ** 2)) +
-                      (1 + (1 - sqrt((mtv ** 2) / (1 + mtv ** 2))) * (
-                                  (r ** 2) / (r ** 2 + 0.7915 + 5.0734 * mtv ** 2)) ** 0.3113)) * (
-                 CLaw(beta) / (Aw * pi))
+        #e_grad = (Kea / Kea_0) * ((r / (r ** 2 + mtv ** 2)) * (0.4876 / sqrt(r ** 2 + 0.6319 + mtv ** 2)) +
+                      #(1 + (1 - sqrt((mtv ** 2) / (1 + mtv ** 2))) * (
+                                  #(r ** 2) / (r ** 2 + 0.7915 + 5.0734 * mtv ** 2)) ** 0.3113)) * (
+                 #CLaw(beta) / (Aw * pi))
+        e_grad = 0.4  # source:http://pure.tudelft.nl/ws/files/20290950/template.pdf
 
         # Flap contribution to pitching moment
-        cf_c = 0.3
-        deltac_cf = 0.81
-        c_prime_c = 1 + cf_c * deltac_cf
-        deltaCl_max = 1.6 * c_prime_c
-        deltaCL_max = 0.9 * deltaCl_max * Swf * cos(sweep(0.7, False)) / S
+        #cf_c = 0.3    #chord length of flap / chord length in clean config
+        #deltac_cf = 0.81
+        c_prime_c = 1.15 #1 + cf_c * deltac_cf #chord length with extended flap / chord length in clean config
+        deltaCl_max = 1.2 #clmax landing - cl max clean # 1.6 * c_prime_c
+        #deltaCL_max = 1.2 #clmax landing - cl max clean #0.9 * deltaCl_max * Swf * cos(sweep(0.7, False)) / S
 
         S_land = S * (1 + (Swf / S) * (c_prime_c - 1))
         CL_max_land = (MLW * g) / (0.5 * rho * (S_land) * Vland ** 2)
+        print('new = ',CL_max_land)
         u1 = 0.21
-        u2 = 1.05
-        u3 = 0.275
+        u2 = 0.9
+        u3 = 0.025
         deltaCm_25c = u2 * (-u1 * deltaCl_max * c_prime_c - (CL_max_land + deltaCl_max * (1 - Swf / S)) * c_prime_c * (
         c_prime_c - 1) / 8) + (0.7 * Aw * u3 * deltaCl_max * tan(sweep_25c)) / (1 + 2 / Aw)
         deltaCm_flap = deltaCm_25c - CL_max_land * (0.25 - Xac_contr)
         print('deltaCm_flap = ', deltaCm_flap)
 
         # wing contribution to pitching moment
-        Cm0 = -0.3
+        Cm0 = -0.15
         deltaCm_wing = Cm0 * ((Aw * (cos(sweep_25c)) ** 2) / (Aw + 2 * cos(sweep_25c)))
         print('deltaCm_wing = ', deltaCm_wing)
 
@@ -298,6 +300,8 @@ class xplot(Constants):
             ax1.plot(Xcg, stab_m * Xcg + stab_b, color='tab:red', label='Stability line', marker='8', markevery=70)
             ax1.plot(Xcg, stability(Xcg)[1], linestyle='--', color='tab:red', label='Neutral line', marker='x', markevery=70)
             ax1.plot(Xcg, contr_m * Xcg + contr_b, color='blue', label='Controllability line', marker='*', markevery=70)
+            ax1.vlines(x=0.211, ymin=-0.5, ymax=0.5)
+            ax1.vlines(x=0.529, ymin=-0.5, ymax=0.5)
             if len(ShS_opt) != 0:
                 ax1.axhline(y=ShS_des, linestyle='--', color='k')
             # ax1.set_ylim(( ax1.get_ylim()[0]-ShS_des, ax1.get_ylim()[1]-ShS_des ))

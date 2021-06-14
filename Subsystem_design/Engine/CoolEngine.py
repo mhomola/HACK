@@ -23,7 +23,7 @@ import numpy as np
 import matlab.engine
 eng = matlab.engine.start_matlab()
 
-class Engine_Cool(Constants):
+class Engine_Cool(Engine_Cycle):
     def __init__(self):
         super().__init__()
         self.N2_cp_data = np.array(np.genfromtxt('N2_cp.dat'))      # cp vs. T data for N2          T[K]; cp[kJ/(kg*K)]
@@ -99,26 +99,27 @@ class Engine_Cool(Constants):
         self.h = h0 + self.cp_integral
 
     # def SZ_air(self, Tpz, mf_hot, mf_h2, mf_ker, T03, T04):
-    def SZ_air(self, mf_hot, mf_h2, mf_ker, T03, Tpz, T04, mr_SZair_simpl, LHV):
+    def SZ_air(self, a, p, Tpz):
 
+        cycle.cycle_analysis(a, p)
         # Contribution of air that enters the Primary Zone
-        self.integral(self.N2_cp_data, T04, Tpz)
-        self.A = self.cp_integral * mf_hot
+        self.integral(self.N2_cp_data, self.T04, Tpz)
+        self.A = self.cp_integral * self.mf_hot
         # self.A = self.cp_gas * mf_hot * (T04 - Tpz)
 
         # Contribution of hydrogen
-        self.integral(self.h2_cp_data, T04, Tpz)
-        self.B = self.cp_integral * mf_h2
+        self.integral(self.h2_cp_data, self.T04, Tpz)
+        self.B = self.cp_integral * self.mf_h2
         # self.B = self.cp_gas * mf_h2 * (T04 - Tpz)
 
         # Contribution of kerosene
-        self.integral(self.C12H26_cp_data, T04, Tpz)
-        self.C = self.cp_integral * mf_ker
+        self.integral(self.C12H26_cp_data, self.T04, Tpz)
+        self.C = self.cp_integral * self.mf_ker
         # self.C = self.cp_gas * mf_ker * (T04 - Tpz)
         #
         # (Partial) contribution of air that enters the Secondary Zone
-        self.integral(self.N2_cp_data, T03, T04)
-        self.D = self.cp_integral * mf_hot
+        self.integral(self.N2_cp_data, self.T03, self.T04)
+        self.D = self.cp_integral * self.mf_hot
         # self.D = self.cp_air * mf_hot * (T04 - T03)
 
         self.mr_SZair = (self.A + self.B + self.C) / (self.A + self.D)
@@ -127,7 +128,12 @@ class Engine_Cool(Constants):
         # self.mr_SZair = ((mf_hot+mf_h2+mf_ker)* self.cp_gas * (T04 - T03) - (mf_h2+mf_ker)*0.995*LHV*10**6) / (mf_hot * (self.cp_gas - self.cp_air)* (T04 - T03) )
         # self.TPZ_calc = ((mf_h2+mf_ker)*0.995*LHV*10**6) / ((self.mr_SZair*mf_hot+mf_h2+mf_ker)*self.cp_gas) + T03
 
-        self.err = (self.mr_SZair - mr_SZair_simpl) / mr_SZair_simpl * 100
+        self.err = (self.mr_SZair - self.mr_SZair_simpl) / self.mr_SZair_simpl * 100
+
+        ''' USE THIS TO GET UPDATED TPZ FROM IVAN'S CODE '''
+        self.stoichiometric_ratio = self.mr_h2 * self.stoich_ratio_h2 + self.mr_ker * self.stoich_ratio_ker # CHANGE THIS!
+        self.eqr_new = (self.mf_fuel / (self.mf_hot * (self.mr_air_cc))) / \
+                                 self.stoichiometric_ratio
 
 
 
@@ -137,39 +143,54 @@ if __name__ == "__main__":
     cycle = Engine_Cycle()
     const = Constants()
     cool = Engine_Cool()
-
-    #Get TPZ from Ivan's code. Inputs are ( gas, P, T, phi )
-    #Tpz = eng.reactor1('kerosene', float(cycle.p03), float(cycle.T03), 1) # [K]
-
-
-    #(TPZ, MF, MF_names) = eng.reactor1('kerosene', float(cycle.p03), float(cycle.T03), float(cycle.equivalence_ratio))
     aircraft = ['neo', 'hack']
-
     phases = ['taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in']
 
     for a in aircraft:
         print("\n= = = = Analysis for A320", a, "= = = =")
+        save_data = list()
+
         for p in phases:
             print("\n", p)
-            cycle.cycle_analysis(a,p)
-            # Get TPZ from Ivan's code. Inputs are ( gas, P, T, phi )
-            (TPZ, MF, MF_names) = eng.reactor1('neo', float(cycle.p03), float(cycle.T03), float(cycle.equivalence_ratio))
+            cycle.cycle_analysis(a, p)
 
-            # cool.SZ_air(Tpz, cycle.mf_hot, cycle.mf_h2, cycle.mf_ker, cycle.T03, cycle.T04)
-            cool.SZ_air(cycle.mf_hot, cycle.mf_h2, cycle.mf_ker, cycle.T03, cycle.TPZ, cycle.T04, cycle.mr_SZair_simpl1, cycle.LHV_f)
-            print('TPZ from ec:', cycle.TPZ, 'MR from ec:',cycle.mr_SZair_simpl1)
-            TPZ = cycle.TPZ.copy()
+            ''' GET TPZ '''     # Inputs are ( aircraft/phase, P03, T03, phi_PZ )
+            if a == 'neo':
+                (TPZ, MF, MF_names) = eng.reactor1('neo', float(cycle.p03), float(cycle.T03),
+                                                   float(cycle.equivalence_ratio))
+            elif a == 'hack':
+                if p in ['idle', 'taxi_out', 'taxi_in']:
+                    (TPZ, MF, MF_names) = eng.reactor1('hack_h2', float(cycle.p03), float(cycle.T03),
+                                                       float(cycle.equivalence_ratio))
+                else:
+                    (TPZ, MF, MF_names) = eng.reactor1('hack_mix', float(cycle.p03), float(cycle.T03),
+                                                       float(cycle.equivalence_ratio))
+
+
+            cool.SZ_air(a, p, TPZ)
+
+
+            print('1st MR from engine cycle:', cycle.mr_SZair_simpl1, '1st TPZ from Matlab:', TPZ, 'MR with this new TPZ:', cool.mr_SZair)
+            # TPZ = cycle.TPZ.copy()
+
+            ''' MAYBE NOT NEEDED ANYMORE '''
             while cool.err > 5:
                 print(cool.err)
                 TPZ = cycle.T03 + (cycle.mf_fuel * cycle.eta_cc * cycle.LHV_f * 10 ** 6) / (cycle.cp_gas * ((1 - cool.mr_SZair) * cycle.mf_hot + cycle.mf_fuel))
-                # print('Updated TPZ:', TPZ, ' Updated MR:', cool.mr_SZair)
-                cool.SZ_air(cycle.mf_hot, cycle.mf_h2, cycle.mf_ker, cycle.T03, TPZ, cycle.T04, cool.mr_SZair, cycle.LHV_f)
+                cool.SZ_air(a, p, TPZ)
+                print('Updated TPZ:', TPZ, ' Updated MR:', cool.mr_SZair, 'Updated eqr:', cool.eqr_new)
 
+            save_data.append([1-cool.mr_SZair])
             # print('mf hot = ', cycle.mf_hot, 'mf h2 = ', cycle.mf_h2, 'mf ker = ', cycle.mf_ker, 'T03 = ', cycle.T03, 'T04 = ', cycle.T04)
             # print('P03', cycle.p03)
             print('Mass ratio of air needed to be injected on secondary zone:', round(cool.mr_SZair,3))
             print('TPZ = ', round(TPZ,3))
             print('Difference between this one and simplified: ', round(cool.err,3))
+
+        if a == 'neo':
+            np.savetxt('mr_cc_neo.dat', np.array(save_data))
+        elif a == 'hack':
+            np.savetxt('mr_cc_hack.dat', np.array(save_data))
 
     # if cool.mr_SZair < const.ratio_air_cc:
     #     const.ratio_air_cc -= 0.1
