@@ -209,7 +209,7 @@ class Constants():
         self.k_gas = 1.3379776344421168                             # Ration of specific heat for air
 
         # self.N2_cp_data = np.array(np.genfromtxt('N2_cp.dat'))      # cp vs. T data for N2          T[K]; cp[kJ/(kg*K)]
-        self.molarmass_N2 = 28.01340                                # Molar mass of N2                          [g/mol]
+        self.molarmass_N2 = 28.01340                                  # Molar mass of N2                          [g/mol]
 
         # self.h2_cp_data = np.array(np.genfromtxt('h2_cp.dat'))      # cp vs. T data for h2          T[K]; cp[kJ/(kg*K)]
         self.molarmass_h2 = 2.01588                                 # Molar mass of h2                          [g/mol]
@@ -221,7 +221,7 @@ class Constants():
         self.stoich_ratio_ker = 1/15.66 #FAR
         self.stoich_ratio_h2 = 1/34.3 #FAR
 
-        """" Altitude and speed --- USE DATAFRAME """
+        # """" Altitude and speed --- USE DATAFRAME """
         # self.phases = np.array(['idle', 'taxi_out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi_in'])
         # self.Thrust = np.array( [0.0993, 0.124, 0.45, 0.77, 0.29, 0.28, 0.068] ) * 35000*4.44822162
         # self.M0 = np.array([0.0, 0.01, 0, 0.5, 0.78, 0.5, 0.01])  # [-] Mach number

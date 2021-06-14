@@ -70,7 +70,7 @@ def total_tank_cooling(T1,T2):
     n = 0.4
     LHV = 120*10**6
     VFC = 30
-    r = 0.7
+    r = 0.5
 
     # Water
     h2oden = 998.21
@@ -83,10 +83,43 @@ def total_tank_cooling(T1,T2):
     tot_den = r*h2oden+(1-r)*rden
     tot_cp = r*h2ocp+(1-r)*rcp
 
-    m1 = (n*LHV*mh2)/(tot_cp*(FC_T-T1))
-    m2 = (n*LHV*mh2)/(tot_cp*(FC_T-T2))
-    print(m1)
-    print(m2)
+    print(tot_den)
+
+    m1 = (n*LHV*mh2)/(tot_cp*T1)
+    m2 = (n*LHV*mh2)/(tot_cp*T2)
+
+    v1 = m1*10**3/tot_den
+    v2 = m2*10**3/tot_den
+
+    print(v1,v2)
+
+    t = VFC/v1
+    V_tank = t*(v2-v1)
+
+    return V_tank
+
+def total_tank_bat_cooling(T1,T2):
+
+    VFC = 8.67
+    r = 0.6
+
+    # Water
+    h2oden = 998.21
+    h2ocp = 4180
+
+    # Refrigerant
+    rden = 1225.5
+    rcp = 1415.03
+
+    tot_den = r*h2oden+(1-r)*rden
+    tot_cp = r*h2ocp+(1-r)*rcp
+
+    print(tot_den)
+
+    m1 = 46675/(tot_cp*T1)
+    m2 = 46675/(tot_cp*T2)
+
+    print(m1,m2)
 
     v1 = m1*10**3/tot_den
     v2 = m2*10**3/tot_den
@@ -95,6 +128,27 @@ def total_tank_cooling(T1,T2):
     V_tank = t*(v2-v1)
 
     return V_tank
+
+def cooling_liquid(Tg):
+
+    FC_T = 90
+    n = 0.4
+    LHV = 120*10**6
+    VFC = 30
+    r = 0.5
+
+    # Water
+    h2oden = 998.21
+    h2ocp = 4180
+
+    # Refrigerant
+    rden = 1225.5
+    rcp = 1415.03
+
+    tot_den = r*h2oden+(1-r)*rden
+    tot_cp = r*h2ocp+(1-r)*rcp
+
+    return (n * LHV * mh2) / (tot_cp * (FC_T - Tg))
 
 
 if __name__ == '__main__':
@@ -120,8 +174,9 @@ if __name__ == '__main__':
     print('Total FC system cost: ',round(total_system()[0]),' EUR')
     print('Only FC volume: ',round(FC_power/sp_V),' l')
     print()
-    print('Tank with refrigerant volume: ',round(total_tank_cooling(10,40)),' l')
+    print('Cooling FC: ', cooling_liquid(40), ' kg/s')
 
+    print(total_tank_bat_cooling(10,80))
 
 
 
