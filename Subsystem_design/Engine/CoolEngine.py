@@ -170,9 +170,10 @@ if __name__ == "__main__":
             cool.SZ_air(a, p, TPZ)
 
 
-            print('1st MR from engine cycle:',cycle.mr_SZair_simpl1,'1st TPZ from Matlab:', TPZ, 'MR with this')
+            print('1st MR from engine cycle:', cycle.mr_SZair_simpl1, '1st TPZ from Matlab:', TPZ, 'MR with this new TPZ:', cool.mr_SZair)
             # TPZ = cycle.TPZ.copy()
 
+            ''' MAYBE NOT NEEDED ANYMORE '''
             while cool.err > 5:
                 print(cool.err)
                 TPZ = cycle.T03 + (cycle.mf_fuel * cycle.eta_cc * cycle.LHV_f * 10 ** 6) / (cycle.cp_gas * ((1 - cool.mr_SZair) * cycle.mf_hot + cycle.mf_fuel))
