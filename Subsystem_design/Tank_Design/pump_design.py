@@ -29,6 +29,7 @@ class booster_pump():
             self.h1 = h1
             self.h2 = h2
             self.g = 9.81
+            self.p_tank = 1.2 *10**5 #[Pa] pressure of the tank
 
       def flow_velocity(self):
             """
@@ -66,8 +67,27 @@ class booster_pump():
             self.pressure_loss()
             self.initial_pressure()
 
+      def work(self):
+            """
+            Calculate the work done by the pump. Assume isothermal cycle
+            https://web.mit.edu/16.unified/www/FALL/thermodynamics/notes/node22.html
+            """
+            miu = self.mf/2 #no of moles
+            R = 8.31
+            T = 19.75 #[K]
+            efficiency = 0.6 #efficiency of the pump
+            self.Work = miu * R * T * m.log(self.p1/self.p_tank)
+            #this is the wotk required for each second so we need a constant supply of
+            self.Power = abs(self.Work/efficiency) #[W]
+
+
+
+
+
 if __name__ == '__main__':
-    boost_pump_1 = booster_pump(L=5, D=0.02, mf=0.121, h1=0.75, h2=0)
+    boost_pump_1 = booster_pump(L=(0.55-0.35)*17*1.5, D=0.0127, mf=0.121, h1=0.38, h2=0)
     boost_pump_1.compute_booster()
+    boost_pump_1.work()
     print((boost_pump_1.p2*10**5-boost_pump_1.p1))  # pressure difference in Pascals
-    print(boost_pump_1.Re)
+    print(boost_pump_1.p1/10**5)
+    print(boost_pump_1.Power)

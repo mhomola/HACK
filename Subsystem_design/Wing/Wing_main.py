@@ -3,6 +3,7 @@ from Subsystem_design.common_constants import Constants
 from Subsystem_design.Wing.loads import Loads_w
 from Subsystem_design.Wing.Stresses import stresses
 import numpy as np
+import seaborn as sns
 import matplotlib.pyplot as plt
 import math
 ###Initializing Loads Class
@@ -21,6 +22,7 @@ Mx_arr = np.zeros(len(x_arr))
 T_arr = np.zeros(len(x_arr))
 vm_arr = np.zeros(len(x_arr))
 sigma_arr = np.zeros(len(x_arr))
+vm = np.zeros((len(x_arr),1000))
 
 Ixx_arr = np.zeros(len(x_arr))
 Iyy_arr = np.zeros(len(x_arr))
@@ -53,6 +55,8 @@ for i, x in enumerate(x_arr):
     wing_stress.vm_plotter(show=False)
     wing_stress.sigma_plotter(show=False)
     vm_arr[i] = wing_stress.vm_max
+    vm[i,:] = wing_stress.vm3
+
     sigma_arr[i] = wing_stress.sigma_max
 
     ###MOI verification
@@ -80,5 +84,19 @@ plt.ylabel("Bneding stress [MPa]")
 # plt.plot(x_arr, Iyy_nostr_arr, "red")
 # plt.title("MOI with no stringers")
 
-plt.show()
+# sns.heatmap(vm.transpose(),cmap="magma",yticklabels=False,xticklabels=False) #cividis
+# plt.show()
 
+ind = 180
+c = lw.chord(x = x_arr[ind])
+wing_stress_plot = stresses(Ixx=MOI.Ixx_no_str, Iyy=MOI.Iyy_no_str, Ixx_str=MOI.Ixx, Iyy_str=MOI.Iyy,
+                       h=MOI.h_sp_c * c, L=MOI.w_sk_c * c, t_upper=MOI.t_sk, t_spar1=MOI.t_sp, t_spar2=MOI.t_sp,
+                       t_lower=MOI.t_sk)
+
+wing_stress_plot.shear_loads(Vx=Sx_arr[ind], Vy=Sy_arr[ind], T=T_arr[ind])
+wing_stress_plot.bending_loads(Mx=Mx_arr[ind], My=My_arr[ind])
+wing_stress_plot.compute_stresses()
+print("Mx=",Mx_arr[ind],"My=",My_arr[ind])
+print("Vx=",Sx_arr[ind],"Vy=",Sy_arr[ind],"T=",T_arr[ind])
+wing_stress_plot.shear_flow_plotter(type = "total",show=True)
+#wing_stress_plot.vm_plotter(show=True)
