@@ -45,7 +45,7 @@ eqr = eqr_input; %0.3;
 %------------------
 
 dt = 1e-1; %time step; -4 originally
-TotalTime = 10; % in seconds - includes autoignition phase
+TotalTime = 20; % in seconds - includes autoignition phase
 
 nSteps = ceil(TotalTime/dt); %number of steps. Total time = nSteps*dt
 
