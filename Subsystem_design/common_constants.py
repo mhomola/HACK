@@ -219,8 +219,9 @@ class Constants():
         self.molarmass_C12H26 = 170.3348                                # Molar mass of dodecane                    [g/mol]
 
 
-        self.stoich_ratio_ker = 1/15.66 #FAR
+        self.stoich_ratio_ker = 1/14.79 #1/15.66 #FAR
         self.stoich_ratio_h2 = 1/34.3 #FAR
+        self.stoich_ratio_ker_h2 = 1/15.07
 
         """" Altitude and speed --- USE DATAFRAME """
         # self.phases = np.array(['idle', 'taxi_out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi_in'])
