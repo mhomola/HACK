@@ -58,8 +58,8 @@ nSteps = ceil(TotalTime/dt); %number of steps. Total time = nSteps*dt
 
 if strcmp(g,'neo') %   compare string
    gas = Solution('kerosene.yaml', 'gas');
-   p_o2 = 14.76
-   p_n2 = 55.45
+   p_o2 = 14.76;
+   p_n2 = 55.45;
    p_o2_new = p_o2/eqr;
    p_n2_new = p_n2/eqr;
    str_ker = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,O2:',string(p_o2_new),',N2:',string(p_n2_new)],"")); % only kerosene
