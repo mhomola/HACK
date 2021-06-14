@@ -11,7 +11,7 @@ def pylon():
 
     # Max Loads:
     density_h2 = 71.1
-    W = c.g_0 * (c.pod_tank_mass + c.V_H2_pod*density_h2)
+    W = c.g_0 * (c.pod_tank_mass + c.pod_V_H2 * density_h2)
     W_max = W * 4.5    # Maximum Vertical Load due to 4.5g
     F_max = W * 9      # Maximum Front Load due to 9g
     S_max = W * 1.5    # Maximum Side Load due to 1.5g
