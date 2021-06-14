@@ -103,30 +103,30 @@ class Engine_Cool(Engine_Cycle):
 
         cycle.cycle_analysis(a, p)
         # Contribution of air that enters the Primary Zone
-        self.integral(self.N2_cp_data, self.T04, Tpz)
-        self.A = self.cp_integral * self.mf_hot
+        self.integral(self.N2_cp_data, cycle.T04, Tpz)
+        self.A = self.cp_integral * cycle.mf_hot
         # self.A = self.cp_gas * mf_hot * (T04 - Tpz)
 
         # Contribution of hydrogen
-        self.integral(self.h2_cp_data, self.T04, Tpz)
-        self.B = self.cp_integral * self.mf_h2
+        self.integral(self.h2_cp_data, cycle.T04, Tpz)
+        self.B = self.cp_integral * cycle.mf_h2
         # self.B = self.cp_gas * mf_h2 * (T04 - Tpz)
 
         # Contribution of kerosene
-        self.integral(self.C12H26_cp_data, self.T04, Tpz)
-        self.C = self.cp_integral * self.mf_ker
+        self.integral(self.C12H26_cp_data, cycle.T04, Tpz)
+        self.C = self.cp_integral * cycle.mf_ker
         # self.C = self.cp_gas * mf_ker * (T04 - Tpz)
         #
         # (Partial) contribution of air that enters the Secondary Zone
-        self.integral(self.N2_cp_data, self.T03, self.T04)
-        self.D = self.cp_integral * self.mf_hot
+        self.integral(self.N2_cp_data, cycle.T03, cycle.T04)
+        self.D = self.cp_integral * cycle.mf_hot
         # self.D = self.cp_air * mf_hot * (T04 - T03)
 
         self.mr_SZair = (self.A + self.B + self.C) / (self.A + self.D)
         # self.err = (self.mr_SZair - self.mr_SZair_simpl) / self.mr_SZair_simpl * 100
 
         ''' USE THIS TO GET UPDATED TPZ FROM IVAN'S CODE ''' # eqr at PZ
-        self.eqr = (self.mf_fuel / (self.mf_hot * (self.mr_air_cc))) / self.stoichiometric_ratio
+        self.eqr = (cycle.mf_fuel / (cycle.mf_hot * (cycle.mr_air_cc))) / cycle.stoichiometric_ratio
 
 
 
@@ -134,12 +134,12 @@ class Engine_Cool(Engine_Cycle):
 def get_TPZ(a, p, p03, T03, eqr):
     ''' GET TPZ - RIGHT NOW WITH A MISTAKE THOUGH, WILL FIX THIS (Sara) '''  # Inputs are ( aircraft/phase, P03, T03, phi_PZ )
     if a == 'neo':
-        TPZ, MF, MF_names = eng.reactor1('neo', p03, T03, eqr, nargout=3)
+        TPZ, MF, MF_names = eng.reactor1('neo', float(p03), float(T03), float(eqr), nargout=3)
     elif a == 'hack':
         if p in ['idle', 'taxi_out', 'taxi_in']:
-            TPZ, MF, MF_names = eng.reactor1('hack_h2', p03, T03, eqr, nargout=3)
+            TPZ, MF, MF_names = eng.reactor1('hack_h2', float(p03), float(T03), float(eqr), nargout=3)
         else:
-            TPZ, MF, MF_names = eng.reactor1('hack_mix', p03, T03, eqr, nargout=3)
+            TPZ, MF, MF_names = eng.reactor1('hack_mix', float(p03), float(T03), float(eqr), nargout=3)
 
     return TPZ
 
@@ -161,8 +161,9 @@ if __name__ == "__main__":
             eqr_old = cycle.equivalence_ratio
 
             TPZ = get_TPZ(a, p, cycle.p03, cycle.T03, cycle.equivalence_ratio)
+            print('1st TPZ from Matlab:', TPZ)
             cool.SZ_air(a, p, TPZ)
-            print('1st MR from engine cycle:', cycle.mr_SZair_simpl1, '1st TPZ from Matlab:', TPZ, 'MR with this new TPZ:', cool.mr_SZair)
+            print('1st MR from engine cycle:', cycle.mr_SZair_simpl1, 'MR with this new TPZ:', cool.mr_SZair)
             # TPZ = cycle.TPZ.copy()
 
             ''' LOOP FOR CONVERGENCE OF EQUIVALENCE RATIO '''
