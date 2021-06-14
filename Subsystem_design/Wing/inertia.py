@@ -103,8 +103,8 @@ if __name__ == '__main__':
         i.compute_inertia(x=y)
         Ixx_arr[j] = i.Ixx
 
-    plt.plot(y_arr, Ixx_arr)
-    plt.show()
+    # plt.plot(y_arr, Ixx_arr)
+    # plt.show()
 
 class Inertia(Constants):
 
