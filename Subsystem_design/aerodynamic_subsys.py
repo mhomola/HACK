@@ -334,6 +334,9 @@ if __name__ == '__main__':
 ae = AerodynamicCharacteristics()
 ae.drag_increase_cruise(AoA_cruise=2)
 cd0clean = np.array([ae.C_D_0_HACK_taxi, ae.C_D_0_HACK_TO, ae.C_D_0_HACK, ae.C_D_0_HACK_land])
+ae.wing_AR()
+wingar = ae.AR
+
 
 
 
