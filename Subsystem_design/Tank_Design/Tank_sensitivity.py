@@ -16,6 +16,7 @@ rho = 71.1               # [kg/m^3] liquid hydrogen density
 
 dp = np.abs(p_tank-p_outside)
 dt = np.abs(t_tank-t_outside)
+
 class spacial_constraints():
     def __init__(self, length, width, height):
         """
@@ -29,11 +30,38 @@ class spacial_constraints():
         self.width = width
         self.height = height
 
+def tank_length(vol,diameter):
+    """
+    Outputs the length of the tank such that 
+    """
+    length = 1
+    pod_constaint1 = spacial_constraints(length=length, width=diameter, height=diameter)
+    pod_tank1 = Mechanical_Design.PodTank(constraints=pod_constaint1, dp=dp, s_a=s_a,
+                                         e_w=e_w, material_insulation=Materials.MLI
+                                         , material_inner=Materials.Al_2090_T81, material_outer=Materials.Al_2090_T81,
+                                         rho=rho, t_tank=t_tank,
+                                         dt=dt, p_tank=(1 + p) * p_tank)
+    pod_tank1.tank_design()
+    dl = 0.5
+    while pod_tank1.inner_vol_inner_wall < vol:
+        length = length + dl
+        pod_tank1 = Mechanical_Design.PodTank(constraints=pod_constaint1, dp=dp, s_a=s_a,
+                                              e_w=e_w, material_insulation=Materials.MLI
+                                              , material_inner=Materials.Al_2090_T81,
+                                              material_outer=Materials.Al_2090_T81,
+                                              rho=rho, t_tank=t_tank,
+                                              dt=dt, p_tank=(1 + p) * p_tank)
+        pod_tank1.tank_design()
+    return length
+
+
+
+
 percentages = [-0.5,-0.4,-0.3,-0.2,-0.1,0,0.1,0.2,0.3,0.4,0.5] #list of percentage increase
 
 
 ###INSERT VALUES FOR CURRENTLY DESIGNED TANK
-length_ref = 5.675 #[m]
+length_ref = 4.68 #[m]
 diameter_ref = 2   #[m]
 
 pod_reference = spacial_constraints(length=length_ref, width=diameter_ref, height=diameter_ref)
@@ -65,10 +93,11 @@ for i,p in enumerate(percentages):
 
 sensi_diameter = np.zeros(len(percentages)) #list for storing the results of the sensitivity analysis caused by the diameter variation
 
-for i,p in enumerate(percentages):
+for i, p in enumerate(percentages):
     #For each iteration we need to create new constraints
     diameter = (1+p)*diameter_ref
-    length = (total_vol/2 - 4/3 * m.pi * (diameter/2)**2)/(m.pi * pow(diameter/2,2))
+    #length = (total_vol/2 - 4/3 * m.pi * (diameter/2)**2)/(m.pi * pow(diameter/2,2))
+    length = tank_length(vol = total_vol/2,diameter=diameter)
     pod_constaint = spacial_constraints(length=length,width=diameter,height=diameter)
     pod_tank = Mechanical_Design.PodTank(constraints=pod_constaint, dp=dp, s_a=s_a,
                                          e_w=e_w, material_insulation=Materials.MLI
@@ -87,7 +116,7 @@ sensi_length = np.zeros(len(percentages)) #list for storing the results of the s
 for i,p in enumerate(percentages):
     #For each iteration we need to create new constraints
     length = (1+p) * length_ref
-    diameter = m.sqrt(total_vol/(m.pi*length + m.pi *4/3))
+    diameter = m.sqrt(total_vol/(m.pi*length + m.pi * 4/3))
     pod_constaint = spacial_constraints(length=length, width=diameter, height=diameter)
     pod_tank = Mechanical_Design.PodTank(constraints=pod_constaint, dp=dp, s_a=s_a,
                                          e_w=e_w, material_insulation=Materials.MLI
@@ -100,18 +129,21 @@ for i,p in enumerate(percentages):
         sensi_length[i] = pod_tank_reference.mass_tank
     else:
         sensi_length[i] = pod_tank.mass_tank
+    print(diameter)
+    print(length)
+    print(pod_tank.mass_tank)
 
 plt.plot(percentages,(sensi_pressure-pod_tank_reference.mass_tank)/pod_tank_reference.mass_tank,label="Venting pressure")
 plt.title("Variation of tank mass with variation of venting pressure")
 plt.xlabel("Percentage change in venting pressure")
 plt.ylabel("Percentage change in mass")
-# plt.figure()
+plt.figure()
 
 plt.plot(percentages,(sensi_diameter-pod_tank_reference.mass_tank)/pod_tank_reference.mass_tank,label = "Diameter")
 plt.title("Variation of tank mass with variation of diameter")
 plt.xlabel("Percentage change in diameter")
 plt.ylabel("Percentage change in mass")
-# plt.figure()
+plt.figure()
 
 plt.plot(percentages,(sensi_length-pod_tank_reference.mass_tank)/pod_tank_reference.mass_tank,label = "Length")
 plt.title("Variation of tank mass with variation of tank length")
