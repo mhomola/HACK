@@ -1,4 +1,4 @@
-from Subsystem_design.Wing.inertia import Inertia
+from Subsystem_design.Wing.inertia import Inertia, Inertia_initial
 from Subsystem_design.common_constants import Constants
 from Subsystem_design.Wing.loads import Loads_w
 from Subsystem_design.Wing.Stresses import stresses
@@ -29,8 +29,8 @@ Iyy_arr = np.zeros(len(x_arr))
 Ixx_nostr_arr = np.zeros(len(x_arr))
 Iyy_nostr_arr = np.zeros(len(x_arr))
 ### Initializing Inertia class
-MOI = Inertia(n_str = 10)
-
+#MOI = Inertia(n_str = 10)
+MOI = Inertia_initial
 ##We want to compute the inertia, the loads and the stresses at every span-wise location
 
 for i, x in enumerate(x_arr):
@@ -87,16 +87,19 @@ plt.ylabel("Bneding stress [MPa]")
 # sns.heatmap(vm.transpose(),cmap="magma",yticklabels=False,xticklabels=False) #cividis
 # plt.show()
 
-ind = 180
-c = lw.chord(x = x_arr[ind])
-wing_stress_plot = stresses(Ixx=MOI.Ixx_no_str, Iyy=MOI.Iyy_no_str, Ixx_str=MOI.Ixx, Iyy_str=MOI.Iyy,
-                       h=MOI.h_sp_c * c, L=MOI.w_sk_c * c, t_upper=MOI.t_sk, t_spar1=MOI.t_sp, t_spar2=MOI.t_sp,
-                       t_lower=MOI.t_sk)
 
-wing_stress_plot.shear_loads(Vx=Sx_arr[ind], Vy=Sy_arr[ind], T=T_arr[ind])
-wing_stress_plot.bending_loads(Mx=Mx_arr[ind], My=My_arr[ind])
-wing_stress_plot.compute_stresses()
-print("Mx=",Mx_arr[ind],"My=",My_arr[ind])
-print("Vx=",Sx_arr[ind],"Vy=",Sy_arr[ind],"T=",T_arr[ind])
-wing_stress_plot.shear_flow_plotter(type = "total",show=True)
+#Plot distribution at one span wise point
+
+# ind = 180
+# c = lw.chord(x = x_arr[ind])
+# wing_stress_plot = stresses(Ixx=MOI.Ixx_no_str, Iyy=MOI.Iyy_no_str, Ixx_str=MOI.Ixx, Iyy_str=MOI.Iyy,
+#                        h=MOI.h_sp_c * c, L=MOI.w_sk_c * c, t_upper=MOI.t_sk, t_spar1=MOI.t_sp, t_spar2=MOI.t_sp,
+#                        t_lower=MOI.t_sk)
+#
+# wing_stress_plot.shear_loads(Vx=Sx_arr[ind], Vy=Sy_arr[ind], T=T_arr[ind])
+# wing_stress_plot.bending_loads(Mx=Mx_arr[ind], My=My_arr[ind])
+# wing_stress_plot.compute_stresses()
+# print("Mx=",Mx_arr[ind],"My=",My_arr[ind])
+# print("Vx=",Sx_arr[ind],"Vy=",Sy_arr[ind],"T=",T_arr[ind])
+# wing_stress_plot.shear_flow_plotter(type = "total",show=True)
 #wing_stress_plot.vm_plotter(show=True)
