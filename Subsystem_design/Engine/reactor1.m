@@ -51,17 +51,18 @@ eqr = eqr_input; %0.3;
 
 %------------------
 
-dt = 1e-4; %time step; -4 originally
-TotalTime = 12; % in seconds - includes autoignition phase
+dt = 1e-1; %time step; -4 originally
+TotalTime = 10; % in seconds - includes autoignition phase
 
 nSteps = ceil(TotalTime/dt); %number of steps. Total time = nSteps*dt
 
 if strcmp(g,'neo') %   compare string
    gas = Solution('kerosene.yaml', 'gas');
-   p_o2 = 14.76
-   p_n2 = 55.45
+   p_o2 = 14.76;
+   p_n2 = 55.45;
    p_o2_new = p_o2/eqr;
    p_n2_new = p_n2/eqr;
+   
    str_ker = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,O2:',string(p_o2_new),',N2:',string(p_n2_new)],"")); % only kerosene
    set(gas,'T',T,'P',P,'X',str_ker) % only kerosene
    %gas = Solution('nDodecane_Reitz.yaml','nDodecane_IG');
@@ -152,8 +153,8 @@ for n = 1:nSteps
   kero(n,1:3) = massFraction(gas,{'NC10H22','PHC3H7','CYC9H18'});
 end
 
-name_emis = ['CH4, ','CO, ','CO2',', H2O',', NO',', NO2',', H2']
-MF_emis =  x(nSteps,1:7)
+name_emis = ['CH4, ','CO, ','CO2',', H2O',', NO',', NO2',', H2'];
+MF_emis =  x(nSteps,1:7);
 disp(['CPU time = ' num2str(cputime - t0)]);
 
 p = 0.005;
@@ -161,8 +162,8 @@ p = 0.005;
 t_five = tim(t_five_i) + dt/2;
 t_com = tim(t_com_i);
 
-t_res = (t_com - t_five)*1000;
-disp(['Residence time = ', t_res, ' ms']);
+t_res = (t_com - t_five)*1000
+% disp(['Residence time = ', t_res, ' ms']);
 
 clf; %  clear figure
 subplot(2,2,1);
