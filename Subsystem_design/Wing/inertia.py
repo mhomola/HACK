@@ -10,7 +10,7 @@ class Inertia_initial(Constants):
         self.t_str = 0.0025   # Stringer thickness [m]                                          #VARIABLE
         self.t_sp = 0.01      # Spar thickness [m]                                              #VARIABLE
         self.t_sk = 9.1/1000  # Skin thickness [m]                                              #FIXED
-        self.h_str = 0.03     # Stringer height [m]                                             #VARIABLE
+        self.h_str = 0.05     # Stringer height [m]                                             #VARIABLE
         self.w_str = 0.03     # Stringer width [m]
         self.n_str = n_str    # Number of stringers on top and bottom (n_str * 2 = total_n_str)
         self.w_sk_c = 0.43    # Width of the skin over the local chord length                   #FIXED
@@ -103,12 +103,15 @@ if __name__ == '__main__':
     i = Inertia_initial(n_str=12)
     y_arr = np.linspace(i.width_f/2, i.b/2, 100)
     Ixx_arr = np.zeros(len(y_arr))
+    Iyy_arr = np.zeros(len(y_arr))
     for j, y in enumerate(y_arr):
         i.compute_inertia(x=y)
         Ixx_arr[j] = i.Ixx
+        Iyy_arr[j] = i.Iyy
 
-    # plt.plot(y_arr, Ixx_arr)
-    # plt.show()
+    #plt.plot(y_arr, Ixx_arr)
+    plt.plot(y_arr, Ixx_arr)
+    plt.show()
 
 class Inertia(Constants):
 
