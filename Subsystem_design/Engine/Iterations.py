@@ -3,6 +3,7 @@ from Subsystem_design.Engine.CoolEngine import Engine_Cool
 from Subsystem_design.Engine.EngineCycle import Engine_Cycle
 from Subsystem_design.common_constants import Constants
 from Subsystem_design.Engine.EnergySplit import Energy_Split
+from Subsystem_design.Engine.thrust_req import thrust_req
 import numpy as np
 import matlab.engine
 
@@ -38,6 +39,10 @@ phases = ['taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in']
 #First run it for neo, store the ATR value to later compare with HACK
 '-------------------------NEO----------------------------------'
 print("\n= = = = Analysis for A320", aircraft[0], "= = = =")
+
+T_neo = []
+TSFC_neo = []
+
 for b in phases:
     print("\n", b)
     '''Run cycle analysis, to get TSFC, T_tot'''
@@ -54,3 +59,45 @@ for b in phases:
 
     cool.SZ_air(cycle.mf_hot, cycle.mf_h2, cycle.mf_ker, cycle.T03, TPZ, cycle.T04, cycle.mr_SZair_simpl1,
                 cycle.LHV_f)
+
+
+
+
+
+'''--------------------------------HACK--------------------------------------------'''
+print("\n= = = = Analysis for A320", aircraft[1], "= = = =")
+
+Range_requirement = False
+Thrust_requirement = False
+Emissions_requirement = False
+Flamability_requirement = False
+
+
+for b in phases:
+    print("\n", b)
+    '''Run cycle analysis, to get TSFC, T_tot'''
+    cycle.cycle_analysis(aircraft[1],b)
+    print('Entrance of CC: T03 = ', round(cycle.T03, 3), '[K]; p03 = ', round(cycle.p03, 3), '[Pa]; OPR = ', round(cycle.OPR, 3))
+    print('Mass flow CC: Fuel = ', round(cycle.mf_fuel, 3), '[kg/s]; air CC = ', round(cycle.mf_hot, 3),
+          '[kg/s]; Total end of CC = ', round(cycle.mf_airfuel, 3), '[kg/s]')
+    print('LHV fuel = ', round(cycle.LHV_f, 3), 'm air to cool / m air core', round(cycle.mr_SZair_simpl, 4),
+          round(cycle.mr_SZair_simpl1, 4))
+    print('TPZ = ', round(cycle.TPZ, 3))
+    #Compare Thrust from cycle analysis to Thrust required
+    if Thrust_cycle_analysis< Thrust_required:
+        print('Thrust available for '+b+ ' is too little, change...')
+    else:
+        print('Thrust available for '+b+ 'is enough: Thrust_cycle_analysis.)
+        Thrust_requirement = True
+
+if range_analysis< 3200:
+
+    print('Harmonic Range is:',range_analysis)
+    print('Requirement of range not met.')
+else:
+    Range_requirement = True
+
+
+
+
+
