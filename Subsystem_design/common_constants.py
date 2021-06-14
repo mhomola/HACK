@@ -218,8 +218,10 @@ class Constants():
         self.h0_C12H26 = -290.90                                        # Zero enthalpy of dodecane                 [kJ/mol]         # https://www.chemeo.com/cid/34-125-5/n-Dodecane
         self.molarmass_C12H26 = 170.3348                                # Molar mass of dodecane                    [g/mol]
 
-        self.stoich_ratio_ker = 1/15.66 #FAR
+
+        self.stoich_ratio_ker = 1/14.79 #1/15.66 #FAR
         self.stoich_ratio_h2 = 1/34.3 #FAR
+        self.stoich_ratio_ker_h2 = 1/15.07
 
         # """" Altitude and speed --- USE DATAFRAME """
         # self.phases = np.array(['idle', 'taxi_out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi_in'])
@@ -362,19 +364,6 @@ class Constants():
     #     self.LHV_f = LHV_hack # [MJ/kg]
     #     self.ratio_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))
 
-
-
-    # def fuselage_length(self,vol_eff, vol_fus):
-    #     """
-    #
-    #     :param vol_eff: Volumetric efficiency of integral tanks (Ratio of usable tank volume-to-volume occupied
-    #                     in the fuselage                                         [-]
-    #     :param vol_fus: Volume available for tanks in the center wingbox        [m^3]
-    #     :return:
-    #     """
-    #     self.V_H2_center_w = vol_eff * vol_fus  # Volume of hydrogen stored on center wing box [m^3]
-    #     self.V_H2_ext_fus = self.V_H2 - self.V_H2_center_w  # Volume of hydrogen stored on extended fuselage[m^3]
-    #     self.l_f = self.V_H2_ext_fus/(pi * self.width_f/2 * self.height_f/2)
 
     def speed_of_sound(self, T):
         """

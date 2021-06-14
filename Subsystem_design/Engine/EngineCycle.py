@@ -427,7 +427,7 @@ if __name__ == '__main__':
 
             save_txt = amb + air + st0 + st2 + st21 + st25 + st3 + st4 + fuel + st45 + st5 + st7 + st8 + st16 + st18 + Thr + [OPR]
             name = a+'_'+p+'.txt'
-
+            print(ec.stoichiometric_ratio)
             # F = open(name,'w')
             # for i in range(len(save_txt)):
             #     for j in range(0,3):
