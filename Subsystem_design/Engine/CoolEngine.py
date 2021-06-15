@@ -158,26 +158,22 @@ if __name__ == "__main__":
         for p in phases:
             print("\n", p)
             cycle.cycle_analysis(a, p)
-            eqr_old = cycle.equivalence_ratio
+            cool.SZ_air(a, p, cycle.TPZ)
+            eqr_old = cool.eqr
+            print('Initial TPZ [K]:', cycle.TPZ, ' Initial mr_cool', cool.mr_SZair, ' Initial eqr', cool.eqr)
 
-            TPZ,_ = get_TPZ(a, p, cycle.p03, cycle.T03, cycle.equivalence_ratio)
-            print('1st TPZ from Matlab:', TPZ)
-            cool.SZ_air(a, p, TPZ)
-            print('1st MR from engine cycle:', cycle.mr_SZair_simpl1, 'MR with this new TPZ:', cool.mr_SZair)
-            print('1st eqr from engine cycle:', cycle.equivalence_ratio, 'eqr with this new TPZ:', cool.eqr)
+            ''' LOOP FOR CONVERGENCE OF EQUIVALENCE RATIO
+                USE EQR FROM CoolEngine.py ON THE FIRST ITERATION OF IVAN'S CODE '''
 
-            ''' LOOP FOR CONVERGENCE OF EQUIVALENCE RATIO '''
-            eqr_new = cool.eqr
-            err = abs(eqr_new-eqr_old)/eqr_new
-            print('Initial error between eqr from Engine_Cycle and Cool_Engine:', err*100, '[%]')
-            eqr_old = eqr_new # to start while loop
-
+            # INITIALIZE WHILE LOOP
+            eqr_old = cool.eqr.copy()
+            err = 1
             while err > 0.02: # error larger than 2%
-                print('Error at each iteration:', err*100, '[%]')
-                TPZ,_ = get_TPZ(a, p, cycle.p03, cycle.T03, cool.eqr)
+                TPZ = get_TPZ(a, p, cycle.p03, cycle.T03, cool.eqr)
                 cool.SZ_air(a, p, TPZ)
                 err = abs(cool.eqr - eqr_old) / cool.eqr
-                eqr_old = cool.eqr
+                eqr_old = cool.eqr.copy()
+                print('Error at each iteration:', err * 100, '[%]')
                 print('Updated TPZ:', TPZ, ' Updated MR:', cool.mr_SZair, 'Updated eqr:', cool.eqr)
 
             save_data.append([1-cool.mr_SZair])

@@ -1,5 +1,7 @@
 function [TPZ, MF_emis, name_emis] = reactor1(g, P_input, T_input, eqr_input)
-% Running Matlab script
+
+% Running MATLAB script
+
     function [time_idx1, time_idx2] = time_res(t,dt,p)
 
             slope = (t(2:end) - t(1:end-1))/dt;
@@ -194,7 +196,6 @@ TPZ = temp(length(temp));
 % clear all
 % cleanup
 % Add a calculation of 5% steep angle
-
 
 %    REACTOR1 Zero-dimensional kinetics: adiabatic, constant pressure.
 %
