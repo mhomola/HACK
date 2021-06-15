@@ -32,7 +32,7 @@ class Engine_Cycle(Constants):
         self.T0, self.p0, self.rho0, self.a0 = self.T, self.p, self.rho, self.a
         self.v0 = self.M0 * np.sqrt(self.cp_air * self.R * self.T0)
         self.Thrust = float(data[2])
-        self.A_eff = float(data[3])*self.A_fan
+        self.A_eff = float(data[3]) * np.pi * (float(data[28]) * 0.0254)**2 / 4
         self.eta_inlet = float(data[4])
         self.PR_fan = float(data[5])
         self.eta_fan = float(data[6])
