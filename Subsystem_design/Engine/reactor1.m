@@ -191,7 +191,7 @@ ylabel('NOX Mass Fraction (ppm)');
 % disp(['CO fraction = ', x(nSteps,2)]);
 % disp(['NOx fraction = ', (x(nSteps,5)+x(nSteps,6))*1e6]);
 
-TPZ = temp(length(temp));
+TPZ = temp(length(temp))
 
 % clear all
 % cleanup
