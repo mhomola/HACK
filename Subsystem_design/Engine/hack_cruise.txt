@@ -1,9 +1,9 @@
 T0	216.65	K	
 p0	20582.884	Pa	
 v0	230.133	m/s	
-m_intake	187.88	kg/s	
-m_hot	11.178	kg/s	
-m_cold	176.702	kg/s	
+m_intake	223.115	kg/s	
+m_hot	13.274	kg/s	
+m_cold	209.841	kg/s	
 T00	243.012	K	
 p00	30764.343	Pa	
 T02	243.012	K	
@@ -17,9 +17,9 @@ T03	779.072	K
 p03	1531325.124	Pa	
 T04	1505.0	K	
 p04	1461695.771	Pa	
-m_fuel	0.146	kg/s	
-m_h2	0.04	kg/s	
-m_ker	0.107	kg/s	
+m_fuel	0.174	kg/s	
+m_h2	0.047	kg/s	
+m_ker	0.127	kg/s	
 T045	1138.05	K	
 p045	453603.443	Pa	
 T05	666.374	K	
@@ -34,8 +34,8 @@ p016	43402.81	Pa
 T18	225.499	K	
 p18	22848.361	Pa	
 v18	301.008	m/s	
-T_fan	16290.696	N	
-T_core	3491.459	N	
-T_tot	19782.154	N	
+T_fan	19345.87	N	
+T_core	4146.25	N	
+T_tot	23492.121	N	
 TSCF	0.00739	g/kN/s	
 OPR	49.871	-	
