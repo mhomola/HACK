@@ -46,23 +46,28 @@ class Inertia_normal(Constants):
 
         c = self.chord_inertia(x=x)
         self.t_c_distribution(x=x)
+        self.w_sk = self.w_sk_c(x=x) * c
 
-        sep_str = self.w_sk_c * c / (self.n_str + 1)
+        # sep_str = self.w_sk_c * c / (self.n_str + 1)
+        sep_str = self.w_sk * c / (self.n_str + 1)
         self.x_loc_str = np.zeros(self.n_str)
         y_loc_str = np.ones(self.n_str) * self.h_sp_c * c / 2
 
         for i in range(self.n_str):
-            self.x_loc_str[i] = self.w_sk_c * c / 2 - sep_str * (i + 1)
+            # self.x_loc_str[i] = self.w_sk_c * c / 2 - sep_str * (i + 1)
+            self.x_loc_str[i] = self.w_sk/ 2 - sep_str * (i + 1)
 
         self.x_loc_str = np.hstack((self.x_loc_str, self.x_loc_str))
         y_loc_str = np.hstack((y_loc_str, -y_loc_str))
 
         sp_left_y = np.linspace(-self.h_sp_c * c / 2, self.h_sp_c * c / 2, 3)
-        sp_left_x = np.ones(len(sp_left_y)) * self.w_sk_c * c / 2
+        #sp_left_x = np.ones(len(sp_left_y)) * self.w_sk_c * c / 2
+        sp_left_x = np.ones(len(sp_left_y)) * self.w_sk / 2
         sp_right_y = sp_left_y
         sp_right_x = - sp_left_x
 
-        sk_top_x = np.linspace(-self.w_sk_c * c / 2, self.w_sk_c * c / 2, 5)
+        # sk_top_x = np.linspace(-self.w_sk_c * c / 2, self.w_sk_c * c / 2, 5)
+        sk_top_x = np.linspace(-self.w_sk / 2, self.w_sk/ 2, 5)
         sk_top_y = np.ones(len(sk_top_x)) * (-self.h_sp_c * c / 2)
         sk_bot_x = sk_top_x
         sk_bot_y = - sk_top_y
@@ -85,7 +90,9 @@ class Inertia_normal(Constants):
         # Inertia around x axis
 
         Ixx_sp = 1/12 * self.t_sp * (self.h_sp_c * c)**3
-        Ixx_sk = 1/12 * self.t_sk**3 * (self.w_sk_c * c) + (self.t_sk * (self.w_sk_c * c)) * (self.h_sp_c/2 * c)**2
+        #Ixx_sk = 1/12 * self.t_sk**3 * (self.w_sk_c * c) + (self.t_sk * (self.w_sk_c * c)) * (self.h_sp_c/2 * c)**2
+        Ixx_sk = 1 / 12 * self.t_sk ** 3 * (self.w_sk) + (self.t_sk * (self.w_sk)) * (
+                    self.h_sp_c / 2 * c) ** 2
         Ixx_str = 1/12 * self.t_str**3 * self.w_str + 1/12 * self.t_str * self.h_str**3 \
                   + self.t_str * self.w_str * (self.h_sp_c/2 * c)**2 \
                   + self.t_str * self.h_str * (self.h_sp_c/2 * c - self.h_str/2)**2
@@ -93,8 +100,11 @@ class Inertia_normal(Constants):
         self.Ixx_normal = 2 * Ixx_sp + 2 * Ixx_sk + 2 * self.n_str * Ixx_str
 
         # Inertia around y axis
-        Iyy_sp = 1/12 * self.t_sp**3 * (self.h_sp_c * c) + self.t_sp * (self.h_sp_c * c) * (self.w_sk_c * c / 2)**2
-        Iyy_sk = 1/12 * self.t_sk * (self.w_sk_c * c)**3
+        # Iyy_sp = 1/12 * self.t_sp**3 * (self.h_sp_c * c) + self.t_sp * (self.h_sp_c * c) * (self.w_sk_c * c / 2)**2
+        # Iyy_sk = 1/12 * self.t_sk * (self.w_sk_c * c)**3
+        Iyy_sp = 1 / 12 * self.t_sp ** 3 * (self.h_sp_c * c) + self.t_sp * (self.h_sp_c * c) * (
+                    self.w_sk / 2) ** 2
+        Iyy_sk = 1 / 12 * self.t_sk * (self.w_sk) ** 3
         Iyy_str = 2 * self.n_str * (1/12 * self.t_str**3 * self.h_str + 1/12 * self.t_str * self.w_str**3) \
                   + self.t_str * self.w_str * self.x_loc_str**2 + self.t_str * self.h_str * self.x_loc_str**2
 
@@ -138,17 +148,22 @@ class Inertia_shear(Constants):
 
         c = self.chord_inertia(x=x)
         self.t_c_distribution(x=x)
-
+        self.w_sk = self.w_sk_c(x=x) * c
         # Inertia around x axis
 
         Ixx_sp = 1/12 * self.t_sp * (self.h_sp_c * c)**3
-        Ixx_sk = 1/12 * self.t_sk**3 * (self.w_sk_c * c) + (self.t_sk * (self.w_sk_c * c)) * (self.h_sp_c/2 * c)**2
+        #Ixx_sk = 1/12 * self.t_sk**3 * (self.w_sk_c * c) + (self.t_sk * (self.w_sk_c * c)) * (self.h_sp_c/2 * c)**2
+        Ixx_sk = 1 / 12 * self.t_sk ** 3 * self.w_sk + (self.t_sk * self.w_sk) * (
+                    self.h_sp_c / 2 * c) ** 2
 
         self.Ixx_shear = 2 * Ixx_sp + 2 * Ixx_sk
 
         # Inertia around y axis
-        Iyy_sp = 1/12 * self.t_sp**3 * (self.h_sp_c * c) + self.t_sp * (self.h_sp_c * c) * (self.w_sk_c * c / 2)**2
-        Iyy_sk = 1/12 * self.t_sk * (self.w_sk_c * c)**3
+        # Iyy_sp = 1/12 * self.t_sp**3 * (self.h_sp_c * c) + self.t_sp * (self.h_sp_c * c) * (self.w_sk_c * c / 2)**2
+        # Iyy_sk = 1/12 * self.t_sk * (self.w_sk_c * c)**3
+        Iyy_sp = 1 / 12 * self.t_sp ** 3 * (self.h_sp_c * c) + self.t_sp * (self.h_sp_c * c) * (
+                    self.w_sk  / 2) ** 2
+        Iyy_sk = 1 / 12 * self.t_sk * (self.w_sk) ** 3
 
         self.Iyy_shear = 2 * Iyy_sp + 2 * Iyy_sk
 

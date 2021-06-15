@@ -58,7 +58,7 @@ for i, x in enumerate(x_arr):
 
     ### NORMAL STRESSES
     wing_stress = stresses(Ixx=MOI_shear.Ixx_shear, Iyy=MOI_shear.Iyy_shear, Ixx_str=MOI_normal.Ixx_normal, Iyy_str=MOI_normal.Iyy_normal,
-                           h=MOI_normal.h_sp_c*c, L=MOI_normal.w_sk_c*c, t_upper=MOI_normal.t_sk, t_spar1=MOI_normal.t_sp, t_spar2=MOI_normal.t_sp, t_lower=MOI_normal.t_sk)
+                           h=MOI_normal.h_sp_c*MOI_normal.chord_inertia(x=x), L=MOI_normal.w_sk, t_upper=MOI_normal.t_sk, t_spar1=MOI_normal.t_sp, t_spar2=MOI_normal.t_sp, t_lower=MOI_normal.t_sk)
 
     wing_stress.shear_loads(Vx=Sx_arr[i],Vy=Sy_arr[i],T=T_arr[i])
     wing_stress.bending_loads(Mx=Mx_arr[i],My=My_arr[i])
@@ -73,7 +73,7 @@ for i, x in enumerate(x_arr):
 
     ###SHEAR STRESSES
     wing_stress = stresses(Ixx=MOI_shear.Ixx_shear, Iyy=MOI_shear.Iyy_shear, Ixx_str=MOI_normal.Ixx_normal, Iyy_str=MOI_normal.Iyy_normal,
-                           h=MOI_shear.h_sp_c * c, L=MOI_shear.w_sk_c * c, t_upper=MOI_shear.t_sk, t_spar1=MOI_shear.t_sp, t_spar2=MOI_shear.t_sp, t_lower=MOI_shear.t_sk)
+                           h=MOI_shear.h_sp_c * MOI_shear.chord_inertia(x=x), L=MOI_shear.w_sk, t_upper=MOI_shear.t_sk, t_spar1=MOI_shear.t_sp, t_spar2=MOI_shear.t_sp, t_lower=MOI_shear.t_sk)
 
     wing_stress.shear_loads(Vx=Sx_arr[i], Vy=Sy_arr[i], T=T_arr[i])
     wing_stress.bending_loads(Mx=Mx_arr[i], My=My_arr[i])
