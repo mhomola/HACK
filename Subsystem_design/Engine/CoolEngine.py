@@ -131,15 +131,15 @@ class Engine_Cool(Engine_Cycle):
 
 
 
-def get_TPZ(a, p, p03, T03, eqr):
+def get_TPZ(a, p, p03, T03, eqr,n_h2,n_ker,n_O2,n_N2):
     ''' GET TPZ - RIGHT NOW WITH A MISTAKE THOUGH, WILL FIX THIS (Sara) '''  # Inputs are ( aircraft/phase, P03, T03, phi_PZ )
     if a == 'neo':
-        TPZ, MF, MF_names = eng.reactor1('neo', float(p03), float(T03), float(eqr), nargout=3)
+        TPZ, MF, MF_names = eng.reactor1('neo', float(p03), float(T03), float(eqr),float(n_h2),float(n_ker),float(n_O2),float(n_N2),nargout=3)
     elif a == 'hack':
         if p in ['idle', 'taxi_out', 'taxi_in']:
-            TPZ, MF, MF_names = eng.reactor1('hack_h2', float(p03), float(T03), float(eqr), nargout=3)
+            TPZ, MF, MF_names = eng.reactor1('hack_h2', float(p03), float(T03), float(eqr),float(n_h2),float(n_ker),float(n_O2),float(n_N2), nargout=3)
         else:
-            TPZ, MF, MF_names = eng.reactor1('hack_mix', float(p03), float(T03), float(eqr), nargout=3)
+            TPZ, MF, MF_names = eng.reactor1('hack_mix', float(p03), float(T03), float(eqr),float(n_h2),float(n_ker),float(n_O2),float(n_N2), nargout=3)
 
     return TPZ,MF
 
@@ -158,6 +158,11 @@ if __name__ == "__main__":
         for p in phases:
             print("\n", p)
             cycle.cycle_analysis(a, p)
+
+            '''Getting moles/second of H2 and kerosene'''
+            n_h2, n_ker, n_O2, n_N2 = cycle.n_h2, cycle.n_ker, cycle.n_O2, cycle.n_N2           # Number of moles/sec for a
+                                                                                                # stoichiometric reaction
+
             cool.SZ_air(a, p, cycle.TPZ)
             eqr_old = cool.eqr
             print('Initial TPZ [K]:', cycle.TPZ, ' Initial mr_cool', cool.mr_SZair, ' Initial eqr', cool.eqr)
@@ -169,7 +174,7 @@ if __name__ == "__main__":
             eqr_old = cool.eqr.copy()
             err = 1
             while err > 0.02: # error larger than 2%
-                TPZ,_ = get_TPZ(a, p, cycle.p03, cycle.T03, cool.eqr)
+                TPZ,_ = get_TPZ(a, p, cycle.p03, cycle.T03, cool.eqr,n_h2,n_ker,n_O2,n_N2)
                 cool.SZ_air(a, p, TPZ)
                 err = abs(cool.eqr - eqr_old) / cool.eqr
                 eqr_old = cool.eqr.copy()

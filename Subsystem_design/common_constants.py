@@ -215,7 +215,7 @@ class Constants():
         self.molar_mass_kerosene = 137.238                              #                                           [g/mol]
 
         self.stoich_ratio_ker = 1/14.79 #1/15.66 #FAR
-        self.stoich_ratio_h2 = 1/34.3 #FAR
+        self.stoich_ratio_h2 = 1/33.99#1/34.3 #FAR
         self.stoich_ratio_ker_h2 = 1/15.07
 
         # """" Altitude and speed --- USE DATAFRAME """
