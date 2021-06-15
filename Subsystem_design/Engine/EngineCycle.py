@@ -114,7 +114,7 @@ class Engine_Cycle(Constants):
 
         # Further on the bypass duct
         self.T016 = self.T021
-        self.p016 = self.p021 #* self.PR_noz_fan
+        self.p016 = self.p021 * self.PR_noz_fan
 
         # Exit of LPC - Entrance of HPC
         self.T025 = self.T021 + ( self.T021/self.eta_LPC ) * ( self.PR_LPC ** ( (self.k_air-1)/self.k_air ) - 1 )
@@ -151,7 +151,7 @@ class Engine_Cycle(Constants):
 
         # Nozzle
         self.T07 = self.T05
-        self.p07 = self.p05 #* self.PR_noz_core
+        self.p07 = self.p05 * self.PR_noz_core
 
         # Is the nozzle chocked?
         self.PR_cr_noz_core = 1 / ( ( 1 - (self.k_gas-1)/(self.k_gas+1)/self.eta_nozzle) ** (self.k_gas / (self.k_gas-1)) )
@@ -275,8 +275,9 @@ if __name__ == '__main__':
             air = [['m_intake', round(ec.mf_air_init,3), 'kg/s'], ['m_hot', round(ec.mf_hot,3), 'kg/s'], ['m_cold', round(ec.mf_cold,3), 'kg/s']]
             st0 = [['T00', round(ec.T00,3), 'K'], ['p00', round(ec.p00,3), 'Pa']]
             st2 = [['T02', round(ec.T02,3), 'K'], ['p02', round(ec.p02,3), 'Pa']]
-            st21 = [['T021', round(ec.T021,3), 'K'], ['p02', round(ec.p021,3), 'Pa']]
-            st25 = [['T025', round(ec.T025,3), 'K'], ['p02', round(ec.p025,3), 'Pa']]
+            BPR = ['BPR', round(ec.BPR, 3), '-']
+            st21 = [['T021', round(ec.T021,3), 'K'], ['p021', round(ec.p021,3), 'Pa']]
+            st25 = [['T025', round(ec.T025,3), 'K'], ['p025', round(ec.p025,3), 'Pa']]
             st3 = [['T03', round(ec.T03,3), 'K'], ['p03', round(ec.p03,3), 'Pa']]
             st4 = [['T04', round(ec.T04,3), 'K'], ['p04', round(ec.p04,3), 'Pa']]
             fuel = [['m_fuel', round(ec.mf_fuel,3), 'kg/s'], ['m_h2', round(ec.mf_h2,3), 'kg/s'], ['m_ker', round(ec.mf_ker,3), 'kg/s']]
@@ -289,7 +290,7 @@ if __name__ == '__main__':
             Thr = [['T_fan', round(ec.T_fan,3), 'N'], ['T_core', round(ec.T_core,3), 'N'], ['T_tot', round(ec.T_total,3), 'N'], ['TSCF', round(ec.TSFC,5), 'g/kN/s']]
             OPR = ['OPR',round(ec.OPR,3), '-']
 
-            save_txt = amb + air + st0 + st2 + st21 + st25 + st3 + st4 + fuel + st45 + st5 + st7 + st8 + st16 + st18 + Thr + [OPR]
+            save_txt = amb + air + st0 + st2 + [BPR] + st21 + st25 + st3 + st4 + fuel + st45 + st5 + st7 + st8 + st16 + st18 + Thr + [OPR]
             name = a+'_'+p+'.txt'
 
             F = open(name,'w')
