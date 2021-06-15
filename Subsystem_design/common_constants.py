@@ -159,8 +159,9 @@ class Constants():
         self.pod_length = l_wing_pod
         self.pod_diameter = d_wing_pod
 
-        self.x_cg_pod = 18.23 + self.pod_length/2             # From the nose                                    [m]
+        self.x_cg_pod = 18.23 + self.pod_length/2               # From the nose                                    [m]
         self.y_cg_pod = 0.55 * self.b/2                         # Y location of the pods on the wing                [m]
+
 
         """Weights of HACK"""
         self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                       [kg]
