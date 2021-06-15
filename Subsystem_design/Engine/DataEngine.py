@@ -33,7 +33,8 @@ class DataFrame:
                                         ['mr_ker', 1, 1, 1, 1, 1, 1, 1],
                                         ['ER_h2', 0, 0, 0, 0, 0, 0, 0],
                                         ['ER_ker', 1, 1, 1, 1, 1, 1, 1],
-                                        ['LHV', 43, 43, 43, 43, 43, 43, 43] ]),
+                                        ['LHV', 43, 43, 43, 43, 43, 43, 43],
+                                        ['D_fan', 78, 78, 78, 78, 78, 78, 78]]),
                                 columns=['parameter', 'taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in', 'idle'])
 
 
@@ -68,7 +69,8 @@ class DataFrame:
                                         ['mr_ker', MR_ker[0], MR_ker[1], MR_ker[2], MR_ker[3], MR_ker[4], MR_ker[5], MR_ker[6]],
                                         ['ER_h2', ER_h2[0], ER_h2[1], ER_h2[2], ER_h2[3], ER_h2[4], ER_h2[5], ER_h2[6]],
                                         ['ER_ker', ER_ker[0], ER_ker[1], ER_ker[2], ER_ker[3], ER_ker[4], ER_ker[5], ER_ker[6]],
-                                        ['LHV', LHV_hack[0], LHV_hack[1], LHV_hack[2], LHV_hack[3], LHV_hack[4], LHV_hack[5], LHV_hack[6]]
+                                        ['LHV', LHV_hack[0], LHV_hack[1], LHV_hack[2], LHV_hack[3], LHV_hack[4], LHV_hack[5], LHV_hack[6]],
+                                        ['D_fan', 85, 85, 85, 85, 85, 85, 85]
                                         ], dtype="object"),
                          columns=['parameter', 'taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in', 'idle'])
 
