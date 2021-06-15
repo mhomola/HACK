@@ -34,7 +34,7 @@ function [TPZ, MF_emis, name_emis] = reactor1(g, P_input, T_input, eqr_input,n_h
             time_idx2 = j;
     end
 
-help reactor1
+% help reactor1
 
 %-----------------
 % Phases - based on data from GSP 11
@@ -196,8 +196,8 @@ plot(tim,(x(:,5)+x(:,6))*1e6);
 xlabel('Time (s)');
 ylabel('NOX Mass Fraction (ppm)');
 
-% disp(['CO fraction = ' x(end-1,2)])
-% disp(['NOx fraction = ' (x(end-1,5)+x(end-1,6))*1e6])
+COf = x(end-1,2);
+NOxf =(x(end-1,5)+x(end-1,6))*1e6;
 % disp(['CO fraction = ', x(nSteps,2)]);
 % disp(['NOx fraction = ', (x(nSteps,5)+x(nSteps,6))*1e6]);
 
