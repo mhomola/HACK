@@ -207,11 +207,12 @@ class Constants():
 
         # self.h2_cp_data = np.array(np.genfromtxt('h2_cp.dat'))      # cp vs. T data for h2          T[K]; cp[kJ/(kg*K)]
         self.molarmass_h2 = 2.01588                                 # Molar mass of h2                          [g/mol]
+        self.molarmass_C = 12.01
 
         # self.C12H26_cp_data = np.array(np.genfromtxt('C12H26_cp.dat'))  # cp vs. T data for dodecane                T[K]; cp[J/(mol*K)]
         self.h0_C12H26 = -290.90                                        # Zero enthalpy of dodecane                 [kJ/mol]         # https://www.chemeo.com/cid/34-125-5/n-Dodecane
         self.molarmass_C12H26 = 170.3348                                # Molar mass of dodecane                    [g/mol]
-
+        self.molar_mass_kerosene = 137.238                              #                                           [g/mol]
 
         self.stoich_ratio_ker = 1/14.79 #1/15.66 #FAR
         self.stoich_ratio_h2 = 1/34.3 #FAR

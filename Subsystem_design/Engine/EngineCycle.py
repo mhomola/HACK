@@ -202,7 +202,8 @@ class Engine_Cycle(Constants):
         self.equivalence_ratio = (self.mf_fuel / (self.mf_hot * self.mr_air_cc)) / \
                                   self.stoichiometric_ratio
 
-        self.air_cool()
+        self.air_cool(aircraft, phase)
+        self.mole_rate()
 
 
 
@@ -214,6 +215,9 @@ class Engine_Cycle(Constants):
 
         self.mr_SZair_simpl = (self.mf_airfuel * self.cp_gas * (self.TPZ - self.T04)) / (
                     self.mf_hot * (self.cp_air * (self.T04 - self.T03) + self.cp_gas * (self.TPZ - self.T04))) # just to check but should be the same as simpl1
+    def mole_rate(self):
+        self.n_h2 = self.mf_h2/self.molarmass_h2
+        self.n_ker = self.mf_ker/self.molar_mass_kerosene
 
 
 ''' FORMULAE

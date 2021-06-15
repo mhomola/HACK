@@ -101,32 +101,32 @@ class Engine_Cool(Engine_Cycle):
     # def SZ_air(self, Tpz, mf_hot, mf_h2, mf_ker, T03, T04):
     def SZ_air(self, a, p, Tpz):
 
-        cycle.cycle_analysis(a, p)
+        self.cycle_analysis(a, p)
         # Contribution of air that enters the Primary Zone
-        self.integral(self.N2_cp_data, cycle.T04, Tpz)
-        self.A = self.cp_integral * cycle.mf_hot
+        self.integral(self.N2_cp_data, self.T04, Tpz)
+        self.A = self.cp_integral * self.mf_hot
         # self.A = self.cp_gas * mf_hot * (T04 - Tpz)
 
         # Contribution of hydrogen
-        self.integral(self.h2_cp_data, cycle.T04, Tpz)
-        self.B = self.cp_integral * cycle.mf_h2
+        self.integral(self.h2_cp_data, self.T04, Tpz)
+        self.B = self.cp_integral * self.mf_h2
         # self.B = self.cp_gas * mf_h2 * (T04 - Tpz)
 
         # Contribution of kerosene
-        self.integral(self.C12H26_cp_data, cycle.T04, Tpz)
-        self.C = self.cp_integral * cycle.mf_ker
+        self.integral(self.C12H26_cp_data, self.T04, Tpz)
+        self.C = self.cp_integral * self.mf_ker
         # self.C = self.cp_gas * mf_ker * (T04 - Tpz)
         #
         # (Partial) contribution of air that enters the Secondary Zone
-        self.integral(self.N2_cp_data, cycle.T03, cycle.T04)
-        self.D = self.cp_integral * cycle.mf_hot
+        self.integral(self.N2_cp_data, self.T03, self.T04)
+        self.D = self.cp_integral * self.mf_hot
         # self.D = self.cp_air * mf_hot * (T04 - T03)
 
         self.mr_SZair = (self.A + self.B + self.C) / (self.A + self.D)
         # self.err = (self.mr_SZair - self.mr_SZair_simpl) / self.mr_SZair_simpl * 100
 
         ''' USE THIS TO GET UPDATED TPZ FROM IVAN'S CODE ''' # eqr at PZ
-        self.eqr = (cycle.mf_fuel / (cycle.mf_hot * (1-self.mr_SZair))) / cycle.stoichiometric_ratio
+        self.eqr = (self.mf_fuel / (self.mf_hot * (1-self.mr_SZair))) / self.stoichiometric_ratio
 
 
 
@@ -141,7 +141,7 @@ def get_TPZ(a, p, p03, T03, eqr):
         else:
             TPZ, MF, MF_names = eng.reactor1('hack_mix', float(p03), float(T03), float(eqr), nargout=3)
 
-    return TPZ
+    return TPZ,MF
 
 
 if __name__ == "__main__":
