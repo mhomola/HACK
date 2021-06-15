@@ -202,7 +202,7 @@ class Engine_Cycle(Constants):
         self.equivalence_ratio = (self.mf_fuel / (self.mf_hot * self.mr_air_cc)) / \
                                   self.stoichiometric_ratio
 
-        self.air_cool(aircraft, phase)
+        self.air_cool()
         self.mole_rate()
 
 
