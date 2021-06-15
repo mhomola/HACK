@@ -1,4 +1,4 @@
-function [TPZ, MF_emis, name_emis] = reactor1(g, P_input, T_input, eqr_input)
+function [TPZ, MF_emis, name_emis] = reactor1(g, P_input, T_input, eqr_input,n_h2,n_ker,n_O2,n_N2)
 
 % Running MATLAB script
 
@@ -29,7 +29,7 @@ function [TPZ, MF_emis, name_emis] = reactor1(g, P_input, T_input, eqr_input)
             time_idx2 = j;
     end
 
-help reactor1
+% help reactor1
 
 %-----------------
 % Phases - based on data from GSP 11
@@ -53,31 +53,36 @@ nSteps = ceil(TotalTime/dt); %number of steps. Total time = nSteps*dt
 
 if strcmp(g,'neo') %   compare string
    gas = Solution('kerosene.yaml', 'gas');
-   p_o2 = 14.76;
-   p_n2 = 55.45;
+   p_o2 = n_O2; %14.76;
+   p_n2 = n_N2; %55.45;
+   p_ker = n_ker;
    p_o2_new = p_o2/eqr;
    p_n2_new = p_n2/eqr;
-   
-   str_ker = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,O2:',string(p_o2_new),',N2:',string(p_n2_new)],"")); % only kerosene
+
+   str_ker = convertStringsToChars(join(['NC10H22:',string(0.74*p_ker),',PHC3H7:',string(0.15*p_ker),',CYC9H18:',string(0.11*p_ker),',O2:',string(p_o2_new),',N2:',string(p_n2_new)],"")); % only kerosene
    set(gas,'T',T,'P',P,'X',str_ker) % only kerosene
    %gas = Solution('nDodecane_Reitz.yaml','nDodecane_IG');
 
 elseif strcmp(g,'hack_mix')
    gas = Solution('kerosene.yaml', 'gas');
-   p_o2 = 15.26;%44.76;
-   p_n2 = 57.38;%168.3;
+   p_o2 = n_O2; %15.26;%44.76;
+   p_n2 = n_N2; %57.38;%168.3;
+   p_ker = n_ker;
+   p_h2 = n_h2;
    p_o2_new = p_o2/eqr;
    p_n2_new = p_n2/eqr;
-   str_ker_h2 = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:1,O2:',string(p_o2_new),',N2:',string(p_n2_new)],"")); % kerosene and H2, 50% in volume
+   %str_kerosene = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,O2:',string(p_o2_new),',N2:',string(p_n2_new)],""))
+   str_ker_h2 = convertStringsToChars(join(['NC10H22:',string(0.74 * p_ker),',PHC3H7:',string(0.15*p_ker),',CYC9H18:',string(0.11*p_ker),',H2:',string(p_h2),',O2:',string(p_o2_new),',N2:',string(p_n2_new)],"")); % kerosene and H2, 50% in volume
    set(gas,'T',T,'P',P,'X',str_ker_h2) % 50% H2 in volume - change this (automatically based on mass ratio)
-    
+
 elseif strcmp(g,'hack_h2')
    gas = GRI30('None');
-   p_o2 = 0.5;
-   p_n2 = 1.88;
+   p_o2 = n_O2; %0.5;
+   p_n2 = n_N2; %1.88;
+   p_h2 = n_h2;
    p_o2_new = p_o2/eqr;
    p_n2_new = p_n2/eqr;
-   str_h2 = convertStringsToChars(join(['H2:1,O2:',string(p_o2_new),',N2:',string(p_n2_new)],""));
+   str_h2 = convertStringsToChars(join(['H2:',string(p_h2),',O2:',string(p_o2_new),',N2:',string(p_n2_new)],""));
    set(gas,'T',T,'P',P,'X',str_h2); %H2
 end
 
@@ -148,8 +153,8 @@ for n = 1:nSteps
   kero(n,1:3) = massFraction(gas,{'NC10H22','PHC3H7','CYC9H18'});
 end
 
-name_emis = ['CH4, ','CO, ','CO2',', H2O',', NO',', NO2',', H2'];
-MF_emis =  x(nSteps,1:7);
+name_emis = ['CH4, ','CO, ','CO2',', H2O',', NO',', NO2',', H2']
+MF_emis =  x(nSteps,1:7)
 disp(['CPU time = ' num2str(cputime - t0)]);
 
 p = 0.005;
@@ -186,8 +191,8 @@ plot(tim,(x(:,5)+x(:,6))*1e6);
 xlabel('Time (s)');
 ylabel('NOX Mass Fraction (ppm)');
 
-% disp(['CO fraction = ' x(end-1,2)])
-% disp(['NOx fraction = ' (x(end-1,5)+x(end-1,6))*1e6])
+COf = x(end-1,2);
+NOxf =(x(end-1,5)+x(end-1,6))*1e6;
 % disp(['CO fraction = ', x(nSteps,2)]);
 % disp(['NOx fraction = ', (x(nSteps,5)+x(nSteps,6))*1e6]);
 

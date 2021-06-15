@@ -3,7 +3,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from math import pi
 from Subsystem_design.fuel_required import V_H2, V_k
-from Subsystem_design.Tank_Design.Main_PreliminaryTank import mass_pod, volume_pod
+from Subsystem_design.Tank_Design.Main_PreliminaryTank import mass_pod, volume_pod, l_wing_pod, d_wing_pod
 from Subsystem_design.Engine.EnergySplit import LHV_hack, ER_h2, ER_ker, MR_h2, MR_ker
 
 
@@ -155,8 +155,12 @@ class Constants():
         self.pod_V_H2 = volume_pod * 0.885                    # Volume of H2 in each wing pod                    [m^3]
         self.pod_tank_mass = mass_pod                         # Mass of each pod tank (we have 2 tank)           [kg]
         self.pod_H2_mass = self.pod_V_H2 * 71.1               # Mass of H2 in each pod tank (we have 2 tank)     [kg]
-        self.x_cg_pod = 18.23                                 # From the nose                                    [m]
-        self.y_cg_pod = 0.55*self.b/2                         # Y location of the pods on the wing                [m]
+
+        self.pod_length = l_wing_pod
+        self.pod_diameter = d_wing_pod
+
+        self.x_cg_pod = 15.6 + self.pod_length/2               # From the nose                                    [m]
+        self.y_cg_pod = 0.55 * self.b/2                         # Y location of the pods on the wing              [m]
 
         """Weights of HACK"""
         self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                       [kg]
@@ -215,7 +219,7 @@ class Constants():
         self.molar_mass_kerosene = 137.238                              #                                           [g/mol]
 
         self.stoich_ratio_ker = 1/14.79 #1/15.66 #FAR
-        self.stoich_ratio_h2 = 1/34.3 #FAR
+        self.stoich_ratio_h2 = 1/33.99#1/34.3 #FAR
         self.stoich_ratio_ker_h2 = 1/15.07
 
         # """" Altitude and speed --- USE DATAFRAME """

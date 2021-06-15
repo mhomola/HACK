@@ -198,8 +198,10 @@ class Engine_Cycle(Constants):
         self.TSFC = self.mf_fuel / (self.T_total*10**(-3)) # [g/kN/s]
 
         ''' USE EQR FROM CoolEngine.py ON THE FIRST ITERATION OF IVAN'S CODE '''
-        self.stoichiometric_ratio = self.mr_h2 * self.stoich_ratio_h2 + self.mr_ker * self.stoich_ratio_ker # UPDATE THIS, SOFIA
-        self.equivalence_ratio = (self.mf_fuel / (self.mf_hot * self.mr_air_cc)) / \
+        self.stoichiometric_ratio = self.stoich_ratio_ker_h2
+        #self.stoichiometric_ratio = self.mr_h2 * self.stoich_ratio_h2 + self.mr_ker * self.stoich_ratio_ker # UPDATE THIS, SOFIA
+        self.mf_air_combustion = self.mf_hot * self.mr_air_cc
+        self.equivalence_ratio = (self.mf_fuel / (self.mf_air_combustion)) / \
                                   self.stoichiometric_ratio
 
         self.air_cool()
@@ -215,9 +217,15 @@ class Engine_Cycle(Constants):
 
         self.mr_SZair_simpl = (self.mf_airfuel * self.cp_gas * (self.TPZ - self.T04)) / (
                     self.mf_hot * (self.cp_air * (self.T04 - self.T03) + self.cp_gas * (self.TPZ - self.T04))) # just to check but should be the same as simpl1
+
     def mole_rate(self):
-        self.n_h2 = self.mf_h2/self.molarmass_h2
-        self.n_ker = self.mf_ker/self.molar_mass_kerosene
+        #Gives me mole rate
+        self.n_h2 = self.mf_h2/(self.molarmass_h2 * 10**-3)
+        self.n_ker = self.mf_ker/(self.molar_mass_kerosene*10**-3)
+        self.n_O2 = self.n_h2 * 0.5 + self.n_ker * 14.76
+        self.n_N2 = self.n_h2 * 1.88 + self.n_ker * 55.45
+        self.m_O2 = self.n_O2* 32 *10**-3
+        self.m_N2 = self.n_N2 * self.molarmass_N2 *10**-3
 
 
 ''' FORMULAE
@@ -248,7 +256,8 @@ if __name__ == '__main__':
         for p in phases:
             print("\n",p)
             ec.cycle_analysis(a, p)
-
+            print(ec.m_O2,ec.m_N2)
+            print(ec.mr_air_cc)
             print('\nInlet: T0 = ', round(ec.T0,3), '[K]; p0 = ', round(ec.p0,3), '[Pa]; v0 = ', round(ec.v0,3), '[m/s]')
             print('T00 = ', round(ec.T00,3), '[K]; p00 = ', round(ec.p00,3), '[Pa]')
             print('Entrance of fan: T02 = ', round(ec.T02,3), '[K]; p02 = ', round(ec.p02,3), '[Pa]')

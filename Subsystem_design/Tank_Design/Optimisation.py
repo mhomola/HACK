@@ -29,8 +29,8 @@ diameters = []
 drags = []
 masses = []
 
-d_i = 1.85
-for i in range(0, 170):
+d_i = 2
+for i in range(0, 100):
 
     pod = spacial_constraints(volume=volume_pod, width=d_i, height=d_i)
 
@@ -248,6 +248,12 @@ if __name__ == '__main__':
     ax3.plot(diameters, masses, label='Diameter - Mass relationship')
     ax3.set_xlabel(r'$D$ in m', size=15)
     ax3.set_ylabel(r'$Mass$ in kg', size=15)
+    plt.grid()
+
+    fig4, ax4 = plt.subplots(1, 1)
+    ax4.plot(lengths, masses, label='Length - Mass relationship')
+    ax4.set_xlabel(r'$L$ in m', size=15)
+    ax4.set_ylabel(r'$Mass$ in kg', size=15)
     plt.grid()
 
     plt.show()
