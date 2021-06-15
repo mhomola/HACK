@@ -45,7 +45,9 @@ printing = False                                                            #Cha
 print("\n= = = = Analysis for A320", aircraft[0], "= = = =")
 
 'CH4, CO, CO2, H2O, NO, NO2, H2'
-Emissions_array_neo = np.zeros(7)
+Emissions_array_neo = np.zeros((len(phases),7))
+
+data_list = []
 
 for b in phases:
     print("\n", b)
@@ -86,10 +88,8 @@ for b in phases:
         print('Thrust SFC = ', round(ec.TSFC, 5), '[g/kN/s]; Equivalence ratio = ', round(ec.equivalence_ratio, 4))
 
     '''Getting moles/second of H2 and kerosene'''
-    n_h2,n_ker,n_O2,n_N2 = ec.n_h2,ec.n_ker,ec.n_O2,ec.n_N2
-    print(ec.mf_h2,ec.mf_ker)
-    print(n_h2,n_ker,n_O2,n_N2)
-
+    n_h2,n_ker,n_O2,n_N2 = ec.n_h2,ec.n_ker,ec.n_O2,ec.n_N2                     # Number of moles/sec for a
+                                                                                # stoichiometric reaction
     cool.SZ_air(aircraft[0], b, ec.TPZ)
     eqr_old = cool.eqr
     print('Initial TPZ [K]:', ec.TPZ, ' Initial mr_cool', cool.mr_SZair, ' Initial eqr', cool.eqr)
@@ -99,22 +99,41 @@ for b in phases:
     err = 1
 
     while err > 0.02:  # error larger than 2%
-        print(err)
 
-        TPZ, Emissions = get_TPZ(aircraft[0], b, ec.p03, ec.T03, cool.eqr)
+        TPZ, Emissions = get_TPZ(aircraft[0], b, ec.p03, ec.T03, cool.eqr,n_h2,n_ker,n_O2,n_N2)
         cool.SZ_air(aircraft[0], b, TPZ)
 
         err = abs(cool.eqr - eqr_old) / cool.eqr
         eqr_old = cool.eqr.copy()
 
+        print('Error at each iteration:', err * 100, '[%]')
         print('Updated TPZ:', TPZ, ' Updated MR:', cool.mr_SZair, 'Updated eqr:', cool.eqr)
 
-    '''ASSESSING THE CLIMATE IMPACT OF NEO'''
+    data_list.append([1 - cool.mr_SZair])
+
+    print('\nFINAL\nMass ratio of air injected on DZ:', round(cool.mr_SZair, 3))
+    print('TPZ = ', round(TPZ, 3))
+
+    np.savetxt('mr_cc_neo.dat', np.array(data_list))
+
+
+    '''ASSESSING THE EMISSIONS OF NEO'''
+    #Getting time of phase
     time = T_required.durations[phases==b]
-    print('Time',time)
-    U_ker = climate.number_aircraft_kerosene()
-    ATR = climate.ATR(h=ec.h, e_CO2=e_CO2, e_H2O=e_H2O, e_NOx=e_NOx, e_soot=e_soot, e_sulfate=e_SO4, U=U_ker, plot=True)
-    print('The average temperature response, A_100, for the LTO of the HACK is:', ATR, '[K]')
+    #Getting total emissions in that phase
+    mf_reactants = ec.mf_fuel + ec.mf_air_combustion
+
+    for i in Emissions_array_neo[phases==b]:
+        for j in range(len(Emissions)):
+            i[j] = Emissions[j] * mf_reactants * time
+    print(np.array(['CH4', 'CO', 'CO2', 'H2O', 'NO', 'NO2', 'H2']))
+    print('Emissions array:',Emissions_array_neo)
+
+'''ASSESSING THE CLIMATE IMPACT OF NEO'''
+#For the LTO cycle [taxi-out,take-off,clim-out(until 900m),descend(after 900m),landing,taxi-in]
+U_ker = climate.number_aircraft_kerosene()
+ATR = climate.ATR(h=ec.h, e_CO2=Emissions_array_neo, e_H2O=e_H2O, e_NOx=e_NOx, e_soot=e_soot, e_sulfate=e_SO4, U=U_ker, plot=True)
+print('The average temperature response, A_100, for the LTO of the HACK is:', ATR, '[K]')
 
 
 
@@ -173,25 +192,26 @@ while Range_requirement != True:
                   round(ec.T_total, 3), '[N]')
             print('Thrust SFC = ', round(ec.TSFC, 5), '[g/kN/s]; Equivalence ratio = ', round(ec.equivalence_ratio, 4))
 
-
-        '''Get TPZ from Ivan's code. Inputs are ( gas, P, T, phi )'''
-        eqr_old = ec.equivalence_ratio
-        TPZ, Emissions = get_TPZ(aircraft[0], b, ec.p03, ec.T03, ec.equivalence_ratio)
-        print('1st TPZ from Matlab:', TPZ)
-        cool.SZ_air(aircraft[0], b, TPZ)
-        print('1st MR from engine cycle:', ec.mr_SZair_simpl1, 'MR with this new TPZ:', cool.mr_SZair)
+        '''Getting moles/second of H2 and kerosene'''
+        n_h2, n_ker, n_O2, n_N2 = ec.n_h2, ec.n_ker, ec.n_O2, ec.n_N2                   # Number of moles/sec for a
+                                                                                        # stoichiometric reaction
+        cool.SZ_air(aircraft[1], b, ec.TPZ)
+        eqr_old = cool.eqr
+        print('Initial TPZ [K]:', ec.TPZ, ' Initial mr_cool', cool.mr_SZair, ' Initial eqr', cool.eqr)
 
         ''' LOOP FOR CONVERGENCE OF EQUIVALENCE RATIO '''
-        eqr_new = cool.eqr
-        err = abs(eqr_new - eqr_old) / eqr_new
-        eqr_old = eqr_new  # to start while loop
-        print('Error', err)
+        eqr_old = cool.eqr.copy()
+        err = 1
+
         while err > 0.02:  # error larger than 2%
-            print(err)
-            TPZ, Emissions = get_TPZ(aircraft[0], b, ec.p03, ec.T03, cool.eqr)
-            cool.SZ_air(aircraft[0], b, TPZ)
+
+            TPZ, Emissions = get_TPZ(aircraft[1], b, ec.p03, ec.T03, cool.eqr, n_h2, n_ker, n_O2, n_N2)
+            cool.SZ_air(aircraft[1], b, TPZ)
+
             err = abs(cool.eqr - eqr_old) / cool.eqr
-            eqr_old = cool.eqr
+            eqr_old = cool.eqr.copy()
+
+            print('Error at each iteration:', err * 100, '[%]')
             print('Updated TPZ:', TPZ, ' Updated MR:', cool.mr_SZair, 'Updated eqr:', cool.eqr)
 
 
