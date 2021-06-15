@@ -159,6 +159,7 @@ class Constants():
         self.pod_length = l_wing_pod
         self.pod_diameter = d_wing_pod
 
+
         self.x_cg_pod = 15.6 + self.pod_length/2               # From the nose                                    [m]
         self.y_cg_pod = 0.55 * self.b/2                         # Y location of the pods on the wing              [m]
 
