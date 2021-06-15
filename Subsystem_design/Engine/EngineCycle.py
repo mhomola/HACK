@@ -197,16 +197,16 @@ class Engine_Cycle(Constants):
         self.T_total = self.T_fan + self.T_core # [N]
         self.TSFC = self.mf_fuel / (self.T_total*10**(-3)) # [g/kN/s]
 
-        ''' TO BE USED ON THE FIRST ITERATION OF IVAN'S CODE '''
+        ''' USE EQR FROM CoolEngine.py ON THE FIRST ITERATION OF IVAN'S CODE '''
         self.stoichiometric_ratio = self.mr_h2 * self.stoich_ratio_h2 + self.mr_ker * self.stoich_ratio_ker # UPDATE THIS, SOFIA
         self.equivalence_ratio = (self.mf_fuel / (self.mf_hot * self.mr_air_cc)) / \
-                                 self.stoichiometric_ratio
+                                  self.stoichiometric_ratio
 
-        self.air_cool(aircraft, phase)
+        self.air_cool()
 
 
 
-    def air_cool(self, aircraft, phase):
+    def air_cool(self):
 
         self.mr_SZair_simpl1 = (self.mf_airfuel*self.cp_gas*(self.T04-self.T03) - self.mf_fuel*self.eta_cc*self.LHV_f*10**6) /\
                                (self.mf_hot * (self.T04-self.T03)*(self.cp_gas-self.cp_air))
