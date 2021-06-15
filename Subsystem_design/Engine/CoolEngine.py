@@ -101,32 +101,32 @@ class Engine_Cool(Engine_Cycle):
     # def SZ_air(self, Tpz, mf_hot, mf_h2, mf_ker, T03, T04):
     def SZ_air(self, a, p, Tpz):
 
-        cycle.cycle_analysis(a, p)
+        self.cycle_analysis(a, p)
         # Contribution of air that enters the Primary Zone
-        self.integral(self.N2_cp_data, cycle.T04, Tpz)
-        self.A = self.cp_integral * cycle.mf_hot
+        self.integral(self.N2_cp_data, self.T04, Tpz)
+        self.A = self.cp_integral * self.mf_hot
         # self.A = self.cp_gas * mf_hot * (T04 - Tpz)
 
         # Contribution of hydrogen
-        self.integral(self.h2_cp_data, cycle.T04, Tpz)
-        self.B = self.cp_integral * cycle.mf_h2
+        self.integral(self.h2_cp_data, self.T04, Tpz)
+        self.B = self.cp_integral * self.mf_h2
         # self.B = self.cp_gas * mf_h2 * (T04 - Tpz)
 
         # Contribution of kerosene
-        self.integral(self.C12H26_cp_data, cycle.T04, Tpz)
-        self.C = self.cp_integral * cycle.mf_ker
+        self.integral(self.C12H26_cp_data, self.T04, Tpz)
+        self.C = self.cp_integral * self.mf_ker
         # self.C = self.cp_gas * mf_ker * (T04 - Tpz)
         #
         # (Partial) contribution of air that enters the Secondary Zone
-        self.integral(self.N2_cp_data, cycle.T03, cycle.T04)
-        self.D = self.cp_integral * cycle.mf_hot
+        self.integral(self.N2_cp_data, self.T03, self.T04)
+        self.D = self.cp_integral * self.mf_hot
         # self.D = self.cp_air * mf_hot * (T04 - T03)
 
         self.mr_SZair = (self.A + self.B + self.C) / (self.A + self.D)
         # self.err = (self.mr_SZair - self.mr_SZair_simpl) / self.mr_SZair_simpl * 100
 
         ''' USE THIS TO GET UPDATED TPZ FROM IVAN'S CODE ''' # eqr at PZ
-        self.eqr = (cycle.mf_fuel / (cycle.mf_hot * (1-self.mr_SZair))) / cycle.stoichiometric_ratio
+        self.eqr = (self.mf_fuel / (self.mf_hot * (1-self.mr_SZair))) / self.stoichiometric_ratio
 
 
 
@@ -141,7 +141,7 @@ def get_TPZ(a, p, p03, T03, eqr):
         else:
             TPZ, MF, MF_names = eng.reactor1('hack_mix', float(p03), float(T03), float(eqr), nargout=3)
 
-    return TPZ
+    return TPZ,MF
 
 
 if __name__ == "__main__":
@@ -158,26 +158,22 @@ if __name__ == "__main__":
         for p in phases:
             print("\n", p)
             cycle.cycle_analysis(a, p)
-            eqr_old = cycle.equivalence_ratio
+            cool.SZ_air(a, p, cycle.TPZ)
+            eqr_old = cool.eqr
+            print('Initial TPZ [K]:', cycle.TPZ, ' Initial mr_cool', cool.mr_SZair, ' Initial eqr', cool.eqr)
 
-            TPZ = get_TPZ(a, p, cycle.p03, cycle.T03, cycle.equivalence_ratio)
-            print('1st TPZ from Matlab:', TPZ)
-            cool.SZ_air(a, p, TPZ)
-            print('1st MR from engine cycle:', cycle.mr_SZair_simpl1, 'MR with this new TPZ:', cool.mr_SZair)
-            print('1st eqr from engine cycle:', cycle.equivalence_ratio, 'eqr with this new TPZ:', cool.eqr)
+            ''' LOOP FOR CONVERGENCE OF EQUIVALENCE RATIO
+                USE EQR FROM CoolEngine.py ON THE FIRST ITERATION OF IVAN'S CODE '''
 
-            ''' LOOP FOR CONVERGENCE OF EQUIVALENCE RATIO '''
-            eqr_new = cool.eqr
-            err = abs(eqr_new-eqr_old)/eqr_new
-            print('Initial error between eqr from Engine_Cycle and Cool_Engine:', err*100, '[%]')
-            eqr_old = eqr_new # to start while loop
-
+            # INITIALIZE WHILE LOOP
+            eqr_old = cool.eqr.copy()
+            err = 1
             while err > 0.02: # error larger than 2%
-                print('Error at each iteration:', err*100, '[%]')
-                TPZ = get_TPZ(a, p, cycle.p03, cycle.T03, cool.eqr)
+                TPZ,_ = get_TPZ(a, p, cycle.p03, cycle.T03, cool.eqr)
                 cool.SZ_air(a, p, TPZ)
                 err = abs(cool.eqr - eqr_old) / cool.eqr
-                eqr_old = cool.eqr
+                eqr_old = cool.eqr.copy()
+                print('Error at each iteration:', err * 100, '[%]')
                 print('Updated TPZ:', TPZ, ' Updated MR:', cool.mr_SZair, 'Updated eqr:', cool.eqr)
 
             save_data.append([1-cool.mr_SZair])
