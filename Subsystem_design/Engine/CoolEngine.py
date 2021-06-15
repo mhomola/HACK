@@ -169,7 +169,7 @@ if __name__ == "__main__":
             eqr_old = cool.eqr.copy()
             err = 1
             while err > 0.02: # error larger than 2%
-                TPZ = get_TPZ(a, p, cycle.p03, cycle.T03, cool.eqr)
+                TPZ,_ = get_TPZ(a, p, cycle.p03, cycle.T03, cool.eqr)
                 cool.SZ_air(a, p, TPZ)
                 err = abs(cool.eqr - eqr_old) / cool.eqr
                 eqr_old = cool.eqr.copy()

@@ -215,9 +215,13 @@ class Engine_Cycle(Constants):
 
         self.mr_SZair_simpl = (self.mf_airfuel * self.cp_gas * (self.TPZ - self.T04)) / (
                     self.mf_hot * (self.cp_air * (self.T04 - self.T03) + self.cp_gas * (self.TPZ - self.T04))) # just to check but should be the same as simpl1
+
     def mole_rate(self):
-        self.n_h2 = self.mf_h2/self.molarmass_h2
-        self.n_ker = self.mf_ker/self.molar_mass_kerosene
+        #Gives me mole rate
+        self.n_h2 = self.mf_h2/(self.molarmass_h2 * 10**-3)
+        self.n_ker = self.mf_ker/(self.molar_mass_kerosene*10**-3)
+        self.n_O2 = self.n_h2 * 0.5 + self.n_ker * 14.76
+        self.n_N2 = self.n_h2 * 1.88 + self.n_ker * 55.45
 
 
 ''' FORMULAE

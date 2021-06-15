@@ -84,22 +84,22 @@ if __name__ == '__main__':
     col_neo = list(df_neo.columns)
     col_hack = list(df_hack.columns)
 
-    N = open('engine_data_neo.txt', 'w')
-    for c in range(len(col_neo)):
-        N.write(col_neo[c] + '\t')
-    N.write('\n')
-    for i in range(len(df_neo.values)):
-        for j in range(len(df_neo.values[i])):
-            N.write(str(df_neo.values[i][j]) + '\t')
-        N.write('\n')
-    N.close()
-
-    H = open('engine_data_hack.txt', 'w')
-    for c in range(len(col_hack)):
-        H.write(col_hack[c] + '\t')
-    H.write('\n')
-    for i in range(len(df_hack.values)):
-        for j in range(len(df_hack.values[i])):
-            H.write(str(df_hack.values[i][j]) + '\t')
-        H.write('\n')
-    H.close()
+    # N = open('engine_data_neo.txt', 'w')
+    # for c in range(len(col_neo)):
+    #     N.write(col_neo[c] + '\t')
+    # N.write('\n')
+    # for i in range(len(df_neo.values)):
+    #     for j in range(len(df_neo.values[i])):
+    #         N.write(str(df_neo.values[i][j]) + '\t')
+    #     N.write('\n')
+    # N.close()
+    #
+    # H = open('engine_data_hack.txt', 'w')
+    # for c in range(len(col_hack)):
+    #     H.write(col_hack[c] + '\t')
+    # H.write('\n')
+    # for i in range(len(df_hack.values)):
+    #     for j in range(len(df_hack.values[i])):
+    #         H.write(str(df_hack.values[i][j]) + '\t')
+    #     H.write('\n')
+    # H.close()
