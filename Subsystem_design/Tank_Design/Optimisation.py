@@ -29,8 +29,8 @@ diameters = []
 drags = []
 masses = []
 
-d_i = 1.85
-for i in range(0, 170):
+d_i = 0.5
+for i in range(0, 2000):
 
     pod = spacial_constraints(volume=volume_pod, width=d_i, height=d_i)
 

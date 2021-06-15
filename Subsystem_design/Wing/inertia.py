@@ -8,9 +8,9 @@ class Inertia_normal(Constants):
     def __init__(self,n_str):
         super().__init__()
         self.t_str = 0.0025   # Stringer thickness [m]                                          #VARIABLE
-        self.t_sp = 0.01      # Spar thickness [m]                                              #VARIABLE
-        self.t_sk = 9.1/1000  # Skin thickness [m]                                              #FIXED
-        self.h_str = 0.03     # Stringer height [m]                                             #VARIABLE
+        self.t_sp = 0.01     # Spar thickness [m]                                              #VARIABLE
+        self.t_sk = 7.925/1000  # Skin thickness [m]                                              #FIXED
+        self.h_str = 0.05     # Stringer height [m]                                             #VARIABLE
         self.w_str = 0.03     # Stringer width [m]
         self.n_str = n_str    # Number of stringers on top and bottom (n_str * 2 = total_n_str)
         self.w_sk_c = 0.43    # Width of the skin over the local chord length                   #FIXED
@@ -98,8 +98,8 @@ class Inertia_shear(Constants):
 
     def __init__(self,n_str):
         super().__init__()
-        self.t_sp = 0.01      # Spar thickness [m]                                              #VARIABLE
-        self.t_sk = 9.1/1000  # Skin thickness [m]                                              #FIXED
+        self.t_sp = 1.75/1000   # Spar thickness [m]                                              #VARIABLE
+        self.t_sk = 1.5/1000  # Skin thickness [m]                                              #FIXED
         self.w_sk_c = 0.43    # Width of the skin over the local chord length                   #FIXED
 
     def chord_inertia(self, x):
@@ -145,13 +145,17 @@ if __name__ == '__main__':
     i = Inertia_normal(n_str=12)
     y_arr = np.linspace(0, i.b/2, 100)
     Ixx_arr = np.zeros(len(y_arr))
+    Iyy_arr = np.zeros(len(y_arr))
     tc_arr = np.zeros(len(y_arr))
     for j, y in enumerate(y_arr):
         i.compute_inertia(x=y)
         Ixx_arr[j] = i.Ixx_normal
+        Iyy_arr[j] = i.Ixx_normal
         tc_arr[j] = i.tc
 
-    plt.plot(y_arr, tc_arr)
+    plt.plot(y_arr, Ixx_arr)
+    plt.figure()
+    plt.plot(y_arr, Iyy_arr)
     plt.show()
 
 # class Inertia(Constants):

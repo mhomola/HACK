@@ -30,21 +30,22 @@ class spacial_constraints():
         self.width = width
         self.height = height
 
-def tank_length(vol,diameter):
+def tank_length(vol,diameter1):
     """
-    Outputs the length of the tank such that
+    Outputs the length of the tank for a fixed diameter such that the required volume is attained.
     """
-    length = 1
-    pod_constaint1 = spacial_constraints(length=length, width=diameter, height=diameter)
+    length1 = 1
+    pod_constaint1 = spacial_constraints(length=length1, width=diameter1, height=diameter1)
     pod_tank1 = Mechanical_Design.PodTank(constraints=pod_constaint1, dp=dp, s_a=s_a,
                                          e_w=e_w, material_insulation=Materials.MLI
                                          , material_inner=Materials.Al_2090_T81, material_outer=Materials.Al_2090_T81,
                                          rho=rho, t_tank=t_tank,
                                          dt=dt, p_tank=(1 + p) * p_tank)
     pod_tank1.tank_design()
-    dl = 0.5
+    dl = 0.05
     while pod_tank1.inner_vol_inner_wall < vol:
-        length = length + dl
+        length1 = length1 + dl
+        pod_constaint1 = spacial_constraints(length=length1, width=diameter1, height=diameter1)
         pod_tank1 = Mechanical_Design.PodTank(constraints=pod_constaint1, dp=dp, s_a=s_a,
                                               e_w=e_w, material_insulation=Materials.MLI
                                               , material_inner=Materials.Al_2090_T81,
@@ -52,17 +53,43 @@ def tank_length(vol,diameter):
                                               rho=rho, t_tank=t_tank,
                                               dt=dt, p_tank=(1 + p) * p_tank)
         pod_tank1.tank_design()
-    return length
+        # print("length",length)
+        # print("vol",pod_tank1.inner_vol_inner_wall)
+    return length1
 
+def tank_daiemet(vol,length1):
+    """
+        Outputs the diameter of the tank for a fixed length such that the required volume is attained.
+       """
+    diameter1 = 0.25
+    pod_constaint1 = spacial_constraints(length=length1, width=diameter1, height=diameter1)
+    pod_tank1 = Mechanical_Design.PodTank(constraints=pod_constaint1, dp=dp, s_a=s_a,
+                                          e_w=e_w, material_insulation=Materials.MLI
+                                          , material_inner=Materials.Al_2090_T81, material_outer=Materials.Al_2090_T81,
+                                          rho=rho, t_tank=t_tank,
+                                          dt=dt, p_tank=(1 + p) * p_tank)
+    pod_tank1.tank_design()
+    dl = 0.05
+    while pod_tank1.inner_vol_inner_wall < vol:
+        diameter1 = diameter1 + dl
+        pod_constaint1 = spacial_constraints(length=length1, width=diameter1, height=diameter1)
+        pod_tank1 = Mechanical_Design.PodTank(constraints=pod_constaint1, dp=dp, s_a=s_a,
+                                              e_w=e_w, material_insulation=Materials.MLI
+                                              , material_inner=Materials.Al_2090_T81,
+                                              material_outer=Materials.Al_2090_T81,
+                                              rho=rho, t_tank=t_tank,
+                                              dt=dt, p_tank=(1 + p) * p_tank)
+        pod_tank1.tank_design()
 
+    return diameter1
 
 
 percentages = [-0.5,-0.4,-0.3,-0.2,-0.1,0,0.1,0.2,0.3,0.4,0.5] #list of percentage increase
 
 
 ###INSERT VALUES FOR CURRENTLY DESIGNED TANK
-length_ref = 4.68 #[m]
-diameter_ref = 2   #[m]
+length_ref = 5.73 #[m]
+diameter_ref = 2.23   #[m]
 
 pod_reference = spacial_constraints(length=length_ref, width=diameter_ref, height=diameter_ref)
 pod_tank_reference = Mechanical_Design.PodTank(constraints=pod_reference, dp=dp, s_a=s_a,
@@ -97,7 +124,7 @@ for i, p in enumerate(percentages):
     #For each iteration we need to create new constraints
     diameter = (1+p)*diameter_ref
     #length = (total_vol/2 - 4/3 * m.pi * (diameter/2)**2)/(m.pi * pow(diameter/2,2))
-    length = tank_length(vol = total_vol/2,diameter=diameter)
+    length = tank_length(vol = total_vol/2,diameter1=diameter)
     pod_constaint = spacial_constraints(length=length,width=diameter,height=diameter)
     pod_tank = Mechanical_Design.PodTank(constraints=pod_constaint, dp=dp, s_a=s_a,
                                          e_w=e_w, material_insulation=Materials.MLI
@@ -105,7 +132,7 @@ for i, p in enumerate(percentages):
                                          rho=rho, t_tank=t_tank,
                                          dt=dt, p_tank=p_tank)
     pod_tank.tank_design()
-    if p ==0:
+    if p == 0:
         sensi_diameter[i] = pod_tank_reference.mass_tank
     else:
         sensi_diameter[i] = pod_tank.mass_tank
@@ -116,7 +143,8 @@ sensi_length = np.zeros(len(percentages)) #list for storing the results of the s
 for i,p in enumerate(percentages):
     #For each iteration we need to create new constraints
     length = (1+p) * length_ref
-    diameter = m.sqrt(total_vol/(m.pi*length + m.pi * 4/3))
+    #diameter = m.sqrt(total_vol/(m.pi*length + m.pi * 4/3))
+    diameter = tank_daiemet(vol=total_vol/2,length1=length)
     pod_constaint = spacial_constraints(length=length, width=diameter, height=diameter)
     pod_tank = Mechanical_Design.PodTank(constraints=pod_constaint, dp=dp, s_a=s_a,
                                          e_w=e_w, material_insulation=Materials.MLI
@@ -129,9 +157,7 @@ for i,p in enumerate(percentages):
         sensi_length[i] = pod_tank_reference.mass_tank
     else:
         sensi_length[i] = pod_tank.mass_tank
-    print(diameter)
-    print(length)
-    print(pod_tank.mass_tank)
+    print(sensi_length)
 
 plt.plot(percentages,(sensi_pressure-pod_tank_reference.mass_tank)/pod_tank_reference.mass_tank,label="Venting pressure")
 plt.title("Variation of tank mass with variation of venting pressure")

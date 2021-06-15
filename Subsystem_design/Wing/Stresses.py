@@ -202,6 +202,7 @@ class stresses():
         x1 = np.linspace(0,self.L/2,num=n)
         y1 = -self.h/2 * np.ones(n)
         q1 = q1_plot(s1)
+        shear_stress1 = q1/self.t_upper
         path = mpath.Path(np.column_stack([x1, y1]))
         verts = path.interpolated(steps=1).vertices
         x1, y1 = verts[:, 0, ], verts[:, 1]
@@ -212,6 +213,7 @@ class stresses():
         x2 = self.L / 2 * np.ones(n)
         y2 = np.linspace(-self.h/2, self.h/2, num=n)
         q2 = q2_plot(s2)
+        shear_stress2 = q2 / self.t_spar1
         path = mpath.Path(np.column_stack([x2, y2]))
         verts = path.interpolated(steps=1).vertices
         x2, y2 = verts[:, 0, ], verts[:, 1]
@@ -223,6 +225,7 @@ class stresses():
         x3 = np.linspace(self.L/2, -self.L/2, num=n)
         y3 = self.h / 2 * np.ones(n)
         q3 = q3_plot(s3)
+        shear_stress3 = q3/ self.t_lower
         path = mpath.Path(np.column_stack([x3, y3]))
         verts = path.interpolated(steps=1).vertices
         x3, y3 = verts[:, 0, ], verts[:, 1]
@@ -234,6 +237,7 @@ class stresses():
         x4 = -self.L/2 * np.ones(n)
         y4 = np.linspace(self.h/2, 0, num=n)
         q4 = q4_plot(s4)
+        shear_stress4 = q4/ self.t_spar2
         path = mpath.Path(np.column_stack([x4, y4]))
         verts = path.interpolated(steps=1).vertices
         x4, y4 = verts[:, 0, ], verts[:, 1]
@@ -245,6 +249,7 @@ class stresses():
         x5 = -self.L / 2 * np.ones(n)
         y5 = np.linspace(0, -self.h/2, num=n)
         q5 = q5_plot(s5)
+        shear_stress5 = q5 / self.t_spar2
         path = mpath.Path(np.column_stack([x5, y5]))
         verts = path.interpolated(steps=1).vertices
         x5, y5 = verts[:, 0, ], verts[:, 1]
@@ -256,6 +261,7 @@ class stresses():
         x6 = np.linspace(-self.L/2, 0, num=n)
         y6 = -self.h / 2 * np.ones(n)
         q6 = q6_plot(s6)
+        shear_stress6 = q6 / self.t_upper
         path = mpath.Path(np.column_stack([x6, y6]))
         verts = path.interpolated(steps=1).vertices
         x6, y6 = verts[:, 0, ], verts[:, 1]
@@ -299,7 +305,8 @@ class stresses():
             plt.ylabel(r'$y$ [m]')
             plt.title('Shear flow distribution')
             plt.show()
-
+        self.q_max = maxabs
+        self.shear_stress_max = max([max(shear_stress1), max(shear_stress2), max(shear_stress3), max(shear_stress4), max(shear_stress5), max(shear_stress6)])
     ### NORMAL STRESSES
 
     def bending_loads(self,Mx,My):
@@ -458,6 +465,8 @@ class stresses():
             plt.show()
 
         self.sigma_max = maxabs
+        self.sigma_compressive = min([min(sigma1),min(sigma2),min(sigma3),min(sigma4),min(sigma5),min(sigma6)])
+        self.sigma_tension = max([max(sigma1), max(sigma2), max(sigma3), max(sigma4), max(sigma5), max(sigma6)])
 
     def von_Misses(self):
         """
