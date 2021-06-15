@@ -20,7 +20,7 @@ class spacial_constraints():
 
 
 """ ------ Pod Tank Design ------- """
-total_vol = V_H2 / 1000 #[m^3]
+total_vol = V_H2 / 1000  # [m^3]
 pod_H2_vol = total_vol/2  # [m^3] the volume of LH2 in each pod
 
 pod = spacial_constraints(volume=pod_H2_vol, width=2.2, height=2.2)
