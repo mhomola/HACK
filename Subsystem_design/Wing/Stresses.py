@@ -468,6 +468,7 @@ class stresses():
         self.sigma_compressive = min([min(sigma1),min(sigma2),min(sigma3),min(sigma4),min(sigma5),min(sigma6)])
         self.sigma_tension = max([max(sigma1), max(sigma2), max(sigma3), max(sigma4), max(sigma5), max(sigma6)])
 
+
     def von_Misses(self):
         """
         Vm = square root ( nromal stress^2 + 3 * shear stress)

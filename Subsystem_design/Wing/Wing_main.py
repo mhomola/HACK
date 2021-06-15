@@ -76,7 +76,6 @@ for i, x in enumerate(x_arr):
                            h=MOI_shear.h_sp_c * c, L=MOI_shear.w_sk_c * c, t_upper=MOI_shear.t_sk, t_spar1=MOI_shear.t_sp, t_spar2=MOI_shear.t_sp, t_lower=MOI_shear.t_sk)
 
     wing_stress.shear_loads(Vx=Sx_arr[i], Vy=Sy_arr[i], T=T_arr[i])
-    wing_stress.shear_loads(Vx=Sx_arr[i], Vy=Sy_arr[i], T=T_arr[i])
     wing_stress.bending_loads(Mx=Mx_arr[i], My=My_arr[i])
     wing_stress.compute_stresses()
     wing_stress.shear_flow_plotter(type="total", show=False)
