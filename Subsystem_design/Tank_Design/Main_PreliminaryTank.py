@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
     print("#######PODDED TANKS#######")
     print("Mass of one tank", mass_pod, "[kg]")
-    print("Insulation of the tank thickness", pod_tank.t_insulation * 100, "[cm]")
+    print("Insulation of the tank thickness", pod_tank.t_insulation * 1000, "[mm]")
     print("Thickness inner wall", pod_tank.t_wall_inner * 1000, "[mm]")
     print("Thickness outer wall", pod_tank.t_wall_outer * 1000, "[mm]")
     print("H2 volume that is stored per tank", volume_pod, "[m^3]")
