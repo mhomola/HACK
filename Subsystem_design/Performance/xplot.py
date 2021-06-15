@@ -299,9 +299,10 @@ class xplot(Constants):
             ax1.set_ylabel('${S_h}/{S}$', color='tab:red', fontsize=20)
             ax1.plot(Xcg, stab_m * Xcg + stab_b, color='tab:red', label='Stability line', marker='8', markevery=70)
             ax1.plot(Xcg, stability(Xcg)[1], linestyle='--', color='tab:red', label='Neutral line', marker='x', markevery=70)
-            ax1.plot(Xcg, contr_m * Xcg + contr_b, color='blue', label='Controllability line', marker='*', markevery=70)
-            ax1.vlines(x=0.211, ymin=-0.5, ymax=0.5)
-            ax1.vlines(x=0.529, ymin=-0.5, ymax=0.5)
+            ax1.plot(Xcg-0.05, contr_m * Xcg + contr_b, color='blue', label='Controllability line', marker='*', markevery=70)
+            ax1.vlines(x=0.24, ymin=-0.5, ymax=0.5)
+            ax1.vlines(x=0.49, ymin=-0.5, ymax=0.5)
+            ax1.hlines(y=0.25, xmin=-0.2, xmax=1.0)
             if len(ShS_opt) != 0:
                 ax1.axhline(y=ShS_des, linestyle='--', color='k')
             # ax1.set_ylim(( ax1.get_ylim()[0]-ShS_des, ax1.get_ylim()[1]-ShS_des ))
