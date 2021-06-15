@@ -5,9 +5,7 @@ from EnergySplit import LHV_hack, MR_h2, MR_ker, ER_h2, ER_ker
 class DataFrame:
     def __init__(self):
         self.neo =\
-            pd.DataFrame(data=np.array([#['M0', 0.05, 0.15, 0.2, 0.78, 0.2, 0.05, 0],
-                                        #['h', 0, 0, 3500, 11280, 3500, 0, 0],
-                                        ['M0', 0.038, 0.12, 0.497, 0.78, 0.47, 0.038, 0],
+            pd.DataFrame(data=np.array([['M0', 0.038, 0.12, 0.497, 0.78, 0.47, 0.038, 0],
                                         ['h', 0, 0, 5800, 11600, 5800, 0, 0],
                                         ['Thrust', 1, 1, 1, 1, 1, 1, 1],
                                         # ['A_eff/fan', 4.6, 4.1, 2.5, 0.9, 2.5, 4.6, 4.8 ],    # M2 = 0.6
