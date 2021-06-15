@@ -1,4 +1,4 @@
-function [TPZ, MF_emis, name_emis] = reactor1(g, P_input, T_input, eqr_input)
+function [TPZ, MF_emis, name_emis, COf, NOxf] = reactor1(g, P_input, T_input, eqr_input)
 
 %    REACTOR1 Zero-dimensional kinetics: adiabatic, constant pressure.
 %
@@ -34,7 +34,7 @@ function [TPZ, MF_emis, name_emis] = reactor1(g, P_input, T_input, eqr_input)
             time_idx2 = j;
     end
 
-help reactor1
+% help reactor1
 
 %-----------------
 % Phases - based on data from GSP 11
@@ -51,8 +51,8 @@ eqr = eqr_input; %0.3;
 
 %------------------
 
-dt = 1e-1; %time step; -4 originally
-TotalTime = 10; % in seconds - includes autoignition phase
+dt = 1e-4; %time step; -4 originally
+TotalTime = 0.8; % in seconds - includes autoignition phase
 
 nSteps = ceil(TotalTime/dt); %number of steps. Total time = nSteps*dt
 
@@ -191,8 +191,8 @@ plot(tim,(x(:,5)+x(:,6))*1e6);
 xlabel('Time (s)');
 ylabel('NOX Mass Fraction (ppm)');
 
-% disp(['CO fraction = ' x(end-1,2)])
-% disp(['NOx fraction = ' (x(end-1,5)+x(end-1,6))*1e6])
+COf = x(end-1,2);
+NOxf =(x(end-1,5)+x(end-1,6))*1e6;
 % disp(['CO fraction = ', x(nSteps,2)]);
 % disp(['NOx fraction = ', (x(nSteps,5)+x(nSteps,6))*1e6]);
 
@@ -202,3 +202,4 @@ TPZ = temp(length(temp));
 % cleanup
 % Add a calculation of 5% steep angle
 end
+
