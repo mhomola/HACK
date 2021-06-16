@@ -18,7 +18,7 @@ class Loads_w(Constants):
         self.m1 = (self.c_kink_out - self.c_root) / (0.5 * self.b_in)
         self.m2 = (self.c_tip - self.c_kink_out) / (0.5 * self.b_out)
         self.xL_c = 0.163  # Distance from the quarter chord to the center of the wing box over the local chord length
-        self.T_arm = 1.5  # Torque arm of the engine thrust and drag
+        self.T_arm0 = 1.5  # Torque arm of the engine thrust and drag
         self.W_sharklets = 100  # Weight of the sharkklets [kg]
         self.max_T = 140000  # Max thrust [N]
 
@@ -45,8 +45,8 @@ class Loads_w(Constants):
 
                 # print('\n At an altitude of ', alti, ' m, a weight of ', weight, ' N, the max lift is ', L_tot)
 
-        print('\n At an altitude of ', altitudes[index_j], ' m, a weight of ', weights[index_i],
-              ' N, the max lift is ', self.L_max)
+        # print('\n At an altitude of ', altitudes[index_j], ' m, a weight of ', weights[index_i],
+        #       ' N, the max lift is ', self.L_max)
 
         self.ISA_calculator(h_input=altitudes[index_j])
         fe = FlightEnvelope(altitude=altitudes[index_j], W=weights[index_i])
@@ -254,6 +254,7 @@ class Loads_w(Constants):
         w_sk_c = inertia.w_sk_c(x=x)
 
         self.W_eng_arm = 1.62 + inertia.pos_centroid_c * c + np.tan(self.sweep_LE * np.pi / 180) * (x - self.y_engine)
+        self.T_arm = self.T_arm0 + (x - self.y_engine) * np.tan(self.dihedral * np.pi / 180)
 
     def tank_torque_arm(self, x):
         """
@@ -413,7 +414,7 @@ class Loads_w(Constants):
         for i in [ax1, ax2, ax3, ax4, ax5]:
             i.tick_params(axis='both', which='major', labelsize=12)
 
-        plt.show()
+        # plt.show()
 
 
 if __name__ == '__main__':

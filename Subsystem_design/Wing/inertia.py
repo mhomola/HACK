@@ -7,9 +7,11 @@ class Inertia_normal(Constants):
 
     def __init__(self,n_str):
         super().__init__()
+
         self.t_str = 2.5/1000   # Stringer thickness [m]                                          #VARIABLE
         self.t_sp = 6.25/1000      # Spar thickness [m]                                              #VARIABLE
         self.t_sk = 5/1000  # Skin thickness [m]                                              #FIXED
+
         self.h_str = 0.03     # Stringer height [m]                                             #VARIABLE
         self.w_str = 0.03     # Stringer width [m]
         self.n_str = n_str    # Number of stringers on top and bottom (n_str * 2 = total_n_str)

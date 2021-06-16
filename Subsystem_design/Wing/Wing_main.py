@@ -89,6 +89,7 @@ for i, x in enumerate(x_arr):
 np.save(arr=torsional_J,file="torsional_constant.npy")
 print(torsional_J)
 
+
 def stresses_plotting(mises,compression,tension,shear_flow,shear_stress):
 
     if mises == True:
@@ -127,6 +128,7 @@ def stresses_plotting(mises,compression,tension,shear_flow,shear_stress):
         plt.xlabel("Span location[m]")
         plt.ylabel("Shear Stress [MPa]")
     #plt.show()
+
 
 #stresses_plotting(mises=False,compression=True,tension=False,shear_flow=False,shear_stress=True)
 

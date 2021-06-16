@@ -111,6 +111,7 @@ class Constants():
         self.l_tail = self.l_f - self.l_cabin - self.l_cockpit      # Length of the tail                            [m]
         self.S_b_fus = np.pi * 0.3/2 * 0.45/2                       # Base surface area                            [m^2]
         self.sweep_LE = 27                                          # Wing sweep                                   [deg]
+        self.dihedral = 6                                           # Wing dihedral                                [deg]
         self.X_root_wing = 11.88                                    # Distance from nose to root of wing            [m]
         self.X_root_vtail = 30.11                                   # Distance from nose to root of vertical tail   [m]
         self.X_root_htail = 31.60                                   # Distance from nose to root of horizontal tail [m]
@@ -509,3 +510,4 @@ if __name__ == '__main__':
     print('\n T = ', c.T, ' K',
           '\n P = ', c.p, ' Pa',
           '\n rho = ', c.rho, ' kg/m^3')
+    print(c.pod_length, c.pod_diameter)
