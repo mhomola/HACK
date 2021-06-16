@@ -303,14 +303,24 @@ class xplot(Constants):
             #lemac = np.linspace(lemac_lf[0], lemac_lf[-1], 301)
 
             fig, ax1 = plt.subplots()
-            shift = 0.075
+            # Set by how much the wing shift as percentage of the MAC
+            shift = 0.08                                                            
+            
             ax1.set_xlabel('${x_{CoG}}/{MAC}$', fontsize=20)
             ax1.set_ylabel('${S_h}/{S}$', color='tab:red', fontsize=20)
-            ax1.plot(Xcg, stab_m * Xcg + stab_b, color='tab:red', label='Stability line', marker='8', markevery=70)
-            ax1.plot(Xcg, stability(Xcg)[1], linestyle='--', color='tab:red', label='Neutral line', marker='x', markevery=70)
-            ax1.plot(Xcg, contr_m * Xcg + contr_b, color='blue', label='Controllability line', marker='*', markevery=70)
-            ax1.vlines(x= pd.x_min-0.02, ymin=-0.5, ymax=0.5, label = 'Critical forward cg location')
-            ax1.vlines(x= pd.x_max+0.02, ymin=-0.5, ymax=0.5, label= 'Critical aft cg location')
+            
+            ax1.plot(Xcg+shift, stab_m * Xcg + stab_b, color='tab:red', label='Stability line', marker='8', markevery=70)               # Plot stability
+            ax1.plot(Xcg+shift, stability(Xcg)[1], linestyle='--', color='tab:red', label='Neutral line', marker='x', markevery=70)     # Plot neutral stability
+            ax1.plot(Xcg+shift, contr_m * Xcg + contr_b, color='blue', label='Controllability line', marker='*', markevery=70)          # Plot controllability
+            
+            ax1.vlines(x= pd.x_min-0.02, ymin=-0.5, ymax=0.5, color='green', label = 'Critical forward cg location')                    # Plot forward cg from potato diagram
+            ax1.vlines(x= pd.x_max+0.02, ymin=-0.5, ymax=0.5, color='purple', label= 'Critical aft cg location')                        # Plot aft cg from potato diagram
+
+            ax1.hlines(y=0.25, xmin=-0.2, xmax=1.0, label='Current Sh/S')                                                               # Plot the current Sh/S
+            
+            # Eventually set axis limit
+            ax1.set_ylim(ymin=-0.2, ymax=0.5)
+            ax1.set_xlim(xmin=-0.15, xmax=1.0)
 
             ax1.hlines(y=0.25, xmin=-0.2, xmax=1.0)
             if len(ShS_opt) != 0:
