@@ -428,7 +428,7 @@ if __name__ == '__main__':
     lw.Reaction_moments()
     lw.Reaction_torque()
 
-    lw.plot_loads()
+    # lw.plot_loads()
 
     x_arr = np.arange(lw.width_f / 2, lw.b / 2 + lw.dx, lw.dx)
     L_arr = np.zeros(len(x_arr))
@@ -439,6 +439,8 @@ if __name__ == '__main__':
     Mx_arr = np.zeros(len(x_arr))
 
     for i, x in enumerate(x_arr):
+        L_arr[i] = lw.Lift(x=x)
+        D_arr[i] = lw.Drag_w(x=x)
         Sy_arr[i] = lw.S_y(x=x)
         Sx_arr[i] = lw.S_x(x=x)
         My_arr[i] = lw.M_y(x=x)
@@ -448,7 +450,7 @@ if __name__ == '__main__':
     # print('From the plot it is = ', 2 * spint.simps(y=L_arr, x=x_arr))
     # print('The integrated surface is = ', 2 * spint.simps(y=c_arr, x=x_arr))
 
-    plt.plot(x_arr, Sy_arr)
+    plt.plot(x_arr, L_arr)
     plt.xticks(fontsize=15)
     plt.yticks(fontsize=15)
     plt.xlabel('y', size=15)
