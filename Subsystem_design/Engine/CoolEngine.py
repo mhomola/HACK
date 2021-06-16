@@ -164,7 +164,7 @@ if __name__ == "__main__":
                                                                                                 # stoichiometric reaction
 
             cool.SZ_air(a, p, cycle.TPZ)
-            eqr_old = cool.eqr
+            # eqr_old = cool.eqr
             print('Initial TPZ [K]:', cycle.TPZ, ' Initial mr_cool', cool.mr_SZair, ' Initial eqr', cool.eqr)
 
             ''' LOOP FOR CONVERGENCE OF EQUIVALENCE RATIO
@@ -173,28 +173,28 @@ if __name__ == "__main__":
             # INITIALIZE WHILE LOOP
             # eqr_old = cool.eqr.copy()
             eqr_old = 0.7 # initial value
-            TPZ, MF = get_TPZ(a, p, cycle.p03, cycle.T03, 0.7)
+            TPZ, MF = get_TPZ(a, p, cycle.p03, cycle.T03, 0.7, n_h2, n_ker, n_O2, n_N2)
             cool.SZ_air(a, p, TPZ)
-            print('Initial TPZ [K]:', round(TPZ,3),'Initial mr_cool:', round(cool.mr_SZair,3))
-            print(' Initial eqr:', 0.7, ' Updated eqr:', round(cool.eqr,3))
+            print('Initial TPZ [K]:', round(TPZ, 3),'Initial mr_cool:', round(cool.mr_SZair, 3))
+            print(' Initial eqr:', 0.7, ' Updated eqr:', round(cool.eqr, 3))
 
             err = 1
             while err > 0.02: # error larger than 2%
-                TPZ,_ = get_TPZ(a, p, cycle.p03, cycle.T03, cool.eqr,n_h2,n_ker,n_O2,n_N2)
+                TPZ,_ = get_TPZ(a, p, cycle.p03, cycle.T03, cool.eqr, n_h2, n_ker, n_O2, n_N2)
                 cool.SZ_air(a, p, TPZ)
                 err = abs(cool.eqr - eqr_old) / cool.eqr
                 eqr_old = cool.eqr.copy()
-                print('Error at each iteration:', round(err * 100,3), '[%]')
-                print('Updated TPZ:', round(TPZ,3), ' Updated MR:', round(cool.mr_SZair,3), 'Updated eqr:', round(cool.eqr,3))
+                print('Error at each iteration:', round(err * 100, 3), '[%]')
+                print('Updated TPZ:', round(TPZ, 3), ' Updated MR:', round(cool.mr_SZair, 3), 'Updated eqr:', round(cool.eqr, 3))
 
             save_data.append([1-cool.mr_SZair])
             # print('mf hot = ', cycle.mf_hot, 'mf h2 = ', cycle.mf_h2, 'mf ker = ', cycle.mf_ker, 'T03 = ', cycle.T03, 'T04 = ', cycle.T04)
             # print('P03', cycle.p03)
-            print('\nFINAL\nMass ratio of air injected on DZ:', round(cool.mr_SZair,3))
-            print('TPZ = ', round(TPZ,3), 'Eqr:', round(cool.eqr,3))
+            print('\nFINAL\nMass ratio of air injected on DZ:', round(cool.mr_SZair, 3))
+            print('TPZ = ', round(TPZ, 3), 'Eqr:', round(cool.eqr, 3))
 
             file = open(a+'_'+p+'.txt', 'a')
-            file.write('\nEqr\t'+str(round(cool.eqr,3))+'\t-')
+            file.write('\nEqr\t'+str(round(cool.eqr, 3))+'\t-')
             file.close()
 
         if a == 'neo':
