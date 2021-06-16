@@ -16,7 +16,7 @@ x = 3 #[m]
 ##SELECT A POINT OF REFERENCE
 s1 = 0.05
 
-#type_s = "Point"
+# type_s = "Max"
 type_s = "Point"
 #We will look for a variation from -50 to 50
 percentages = np.arange(-0.5,0.5,0.1)
@@ -103,7 +103,7 @@ class Reference_Data():
             self.max_shear = max_shear
         if type_s == "Point":
             self.max_sigma = point_sigma(s1)
-            self.max_shear = point_shear(s1)
+            self.max_shear = point_shear(s1)/self.t_sk_shear
 
         ###MOI elements for when only the loads are changed
         self.Ixx_shear = MOI_shear.Ixx_shear
@@ -128,7 +128,11 @@ sensi_bending_h_str = np.zeros(len(percentages))
 
 ###Changing moment about x-axis Mx
 for i,p in enumerate(percentages):
-    Mx = (1+p) * ref.Mx
+    if ref.Mx > 0:
+        Mx = (1+p) * ref.Mx
+    else:
+        Mx = (1 - p) * ref.Mx
+
     ws = stresses(Ixx=ref.Ixx_shear, Iyy=ref.Iyy_shear, Ixx_str=ref.Ixx_normal, Iyy_str=ref.Iyy_normal,
                 h=ref.h_sp_c_normal*ref.c, L=ref.w_sk_normal, t_upper=ref.t_sk_normal,
                 t_spar1=ref.t_sp_normal, t_spar2=ref.t_sp_normal, t_lower=ref.t_sk_normal)
@@ -143,7 +147,10 @@ for i,p in enumerate(percentages):
 
 ###Changing moment about y-axis My
 for i,p in enumerate(percentages):
-    My = (1+p) * ref.My
+    if ref.My>0:
+        My = (1+p) * ref.My
+    else:
+        My = (1 - p) * ref.My
     ws = stresses(Ixx=ref.Ixx_shear, Iyy=ref.Iyy_shear, Ixx_str=ref.Ixx_normal, Iyy_str=ref.Iyy_normal,
                 h=ref.h_sp_c_normal*ref.c, L=ref.w_sk_normal, t_upper=ref.t_sk_normal,
                 t_spar1=ref.t_sp_normal, t_spar2=ref.t_sp_normal, t_lower=ref.t_sk_normal)
@@ -249,7 +256,10 @@ sensi_shear_t_sk = np.zeros(len(percentages))
 
 ###Changing the Vx load
 for i,p in enumerate(percentages):
-    Vx = (1+p) * ref.Vx
+    if ref.Vx > 0:
+        Vx = (1+p) * ref.Vx
+    else:
+        Vx = (1 - p) * ref.Vx
     ws = stresses(Ixx=ref.Ixx_shear, Iyy=ref.Iyy_shear, Ixx_str=ref.Ixx_normal, Iyy_str=ref.Iyy_normal,
                 h=ref.h_sp_c_shear*ref.c, L=ref.w_sk_shear , t_upper=ref.t_sk_shear,
                 t_spar1=ref.t_sp_shear, t_spar2=ref.t_sp_shear, t_lower=ref.t_sk_shear)
@@ -262,11 +272,15 @@ for i,p in enumerate(percentages):
     if type_s == "Max":
         sensi_shear_Vx[i] = ws.shear_stress_max
     if type_s == "Point":
-        sensi_shear_Vx[i]= ws.q1_tot(s1)
+        sensi_shear_Vx[i]= ws.q1_tot(s1)/ref.t_sk_shear
 
 ###Changing the Vy load
 for i,p in enumerate(percentages):
-    Vy = (1+p) * ref.Vy
+    if ref.Vy > 0:
+        Vy = (1+p) * ref.Vy
+    else:
+        Vy = (1-p) * ref.Vy
+
     ws = stresses(Ixx=ref.Ixx_shear, Iyy=ref.Iyy_shear, Ixx_str=ref.Ixx_normal, Iyy_str=ref.Iyy_normal,
                 h=ref.h_sp_c_shear*ref.c, L=ref.w_sk_shear, t_upper=ref.t_sk_shear,
                 t_spar1=ref.t_sp_shear, t_spar2=ref.t_sp_shear, t_lower=ref.t_sk_shear)
@@ -279,11 +293,14 @@ for i,p in enumerate(percentages):
     if type_s == "Max":
         sensi_shear_Vy[i] = ws.shear_stress_max
     if type_s == "Point":
-        sensi_shear_Vy[i]= ws.q1_tot(s1)
+        sensi_shear_Vy[i]= ws.q1_tot(s1)/ref.t_sk_shear
 
 ###Changing the T load
 for i,p in enumerate(percentages):
-    T = (1+p) * ref.T
+    if ref.T>0:
+        T = (1 + p) * ref.T
+    else:
+        T = (1 - p) * ref.T
     ws = stresses(Ixx=ref.Ixx_shear, Iyy=ref.Iyy_shear, Ixx_str=ref.Ixx_normal, Iyy_str=ref.Iyy_normal,
                 h=ref.h_sp_c_shear*ref.c, L=ref.w_sk_shear, t_upper=ref.t_sk_shear,
                 t_spar1=ref.t_sp_shear, t_spar2=ref.t_sp_shear, t_lower=ref.t_sk_shear)
@@ -296,7 +313,7 @@ for i,p in enumerate(percentages):
     if type_s == "Max":
         sensi_shear_T[i] = ws.shear_stress_max
     if type_s == "Point":
-        sensi_shear_T[i] = ws.q1_tot(s1)
+        sensi_shear_T[i] = ws.q1_tot(s1)/ref.t_sk_shear
 
 ###Changing the thickness of the spar
 for i,p in enumerate(percentages):
@@ -316,7 +333,7 @@ for i,p in enumerate(percentages):
     if type_s == "Max":
         sensi_shear_t_sp[i] = ws.shear_stress_max
     if type_s == "Point":
-        sensi_shear_t_sp[i] = ws.q1_tot(s1)
+        sensi_shear_t_sp[i] = ws.q1_tot(s1)/ref.t_sk_shear
 
 ###Changing the thickness of the skin
 for i, p in enumerate(percentages):
@@ -336,7 +353,11 @@ for i, p in enumerate(percentages):
     if type_s == "Max":
         sensi_shear_t_sk[i] = ws.shear_stress_max
     if type_s == "Point":
-        sensi_shear_t_sk[i] = ws.q1_tot(s1)
+        sensi_shear_t_sk[i] = ws.q1_tot(s1)/t_sk
+
+    print("Skin thickness",t_sk)
+    print("Ixx shear",MOI.Ixx_shear)
+    print("Iyy shear", MOI.Iyy_shear)
 
 ###Plotting
 def bending_sensitivity_plot(Mx,My,t_str,t_sp,t_sk,h_str,imposed):

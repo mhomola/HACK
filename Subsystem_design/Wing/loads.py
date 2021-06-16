@@ -14,7 +14,7 @@ class Loads_w(Constants):
 
     def __init__(self):
         super().__init__()
-        self.dx = 0.01
+        self.dx = 0.1
         self.m1 = (self.c_kink_out - self.c_root) / (0.5 * self.b_in)
         self.m2 = (self.c_tip - self.c_kink_out) / (0.5 * self.b_out)
         self.xL_c = 0.163  # Distance from the quarter chord to the center of the wing box over the local chord length
