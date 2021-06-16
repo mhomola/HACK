@@ -38,8 +38,8 @@ class thrust_req(Constants):
         #self.w1 = self.fuel_for_phases + self.OEW_320hack + self.payload_320hack
         self.w1 = self.MRW_320HACK
         self.w2 = self.w1 - self.mf_fuel[0] * self.durations[0]
-        self.w3 = self.w2 - self.mf_fuel[1] * self.durations[1]
-        self.w4 = self.w3 - self.mf_fuel[2] * self.durations[2]
+        self.w3 = self.w2 - self.mf_fuel[1] * self.durations[1]     #Weight at lift-off
+        self.w4 = self.w3 - self.mf_fuel[2] * self.durations[2]     #Weight at start of cruise
         self.w5 = self.w4 - self.mf_fuel[3] * self.durations[3]
         self.w6 = self.w5 - self.mf_fuel[4] * self.durations[4]
         self.w7 = self.w6 - self.mf_fuel[5] * self.durations[5]
@@ -49,52 +49,85 @@ class thrust_req(Constants):
                                                                      (np.repeat(cd0clean[3], 36)),(np.repeat(cd0clean[0],17))])  #decided that landing is halfway through descent
         self.acceleration = np.concatenate([(np.repeat(0,15)),(np.repeat(self.takeoff_acc,2)), (np.repeat(self.climb_acc,40)),
                                                                      (np.repeat(0,434)),(np.repeat(self.descent_acc,36)), np.repeat(self.land_decc,17)])
-        self.rates_of_climb_and_descent = np.concatenate([(np.repeat(0,15)), (np.repeat(self.ROC,42)),
-                                                                     (np.repeat(0,434)),(np.repeat(self.ROD,36)), np.repeat(0,17)])
+        self.rates_of_climb_and_descent = np.zeros(len(self.t_array))
+        self.rates_of_climb_and_descent[np.where((self.t_array>self.takeoff_time) & (self.t_array<self.cruise_start_time))] = np.repeat(self.ROC, 39)
+        self.rates_of_climb_and_descent[np.where((self.t_array>self.cruise_end_time) & (self.t_array<self.land_time))] = np.repeat(self.ROD,35)
+            #np.concatenate([(np.repeat(0,18)), (np.repeat(self.ROC,42)),(np.repeat(0,434)),(np.repeat(self.ROD,36)), np.repeat(0,17)])
 
         self.wingar = wingar
 
-        self.rolling_fric_coefficient = 0.05
+        self.rolling_fric_coefficient = 0.04   #for wet runway 0.05. for dry runway: 0.03
+        self.static_fric_coeff = 2 * self.rolling_fric_coefficient
+
+        self.WL_WTO = self.w6/self.w1  #0.84 == good according to Adsee1 slides
+
+
 
     def velocity(self):
+        '''
         self.v = np.zeros(len(self.t_array))
-        self.v[self.t_array<=self.taxiout_time] = self.taxiout_velocity
-        self.v[(self.t_array>self.taxiout_time) & (self.t_array<=self.takeoff_time)] = np.arange(self.taxiout_velocity,self.liftoffv,
+        #self.v[self.t_array<=30] = 0
+        self.v[self.t_array<self.taxiout_time] = self.taxiout_velocity
+        self.v[(self.t_array>=self.taxiout_time) & (self.t_array<self.takeoff_time)] = np.arange(self.taxiout_velocity,self.liftoffv,
                                                                                         self.takeoff_acc*30)
-        self.v[(self.t_array>self.takeoff_time) & (self.t_array<=self.cruise_start_time)] = np.arange(self.liftoffv,self.cruisev,
+        self.v[(self.t_array>=self.takeoff_time) & (self.t_array<self.cruise_start_time)] = np.arange(self.liftoffv,self.cruisev,
                                                                                     self.climb_acc*30)
-        self.v[(self.t_array>self.cruise_start_time) & (self.t_array<=self.cruise_end_time)] = self.cruisev
-        self.v[(self.t_array>self.cruise_end_time) & (self.t_array<=self.land_time)] = np.arange(self.cruisev,self.landv,
+        self.v[(self.t_array>=self.cruise_start_time) & (self.t_array<self.cruise_end_time)] = self.cruisev
+        self.v[(self.t_array>=self.cruise_end_time) & (self.t_array<self.land_time)] = np.arange(self.cruisev,self.landv,
                                                                                  self.descent_acc*30)
-        self.v[(self.t_array>self.land_time) & (self.t_array<=self.stop_time)] = np.arange(self.landv,0,self.land_decc*30)
+        self.v[(self.t_array>=self.land_time) & (self.t_array<self.stop_time)] = np.arange(self.landv,13,self.land_decc*30)
+        self.v[(self.t_array == self.stop_time)] = 0
+        '''
+
+        self.v = np.zeros(len(self.t_array))
+        self.v[self.t_array <= self.taxiout_time] = self.taxiout_velocity
+        self.v[(self.t_array > self.taxiout_time) & (self.t_array <= self.takeoff_time)] = np.arange(
+            self.taxiout_velocity, self.liftoffv,
+            self.takeoff_acc * 30)
+        self.v[(self.t_array > self.takeoff_time) & (self.t_array <= self.cruise_start_time)] = np.arange(self.liftoffv,
+                                                                                                          self.cruisev,
+                                                                                                          self.climb_acc * 30)
+        self.v[(self.t_array > self.cruise_start_time) & (self.t_array <= self.cruise_end_time)] = self.cruisev
+        self.v[(self.t_array > self.cruise_end_time) & (self.t_array <= self.land_time)] = np.arange(self.cruisev,
+                                                                                                     self.landv,
+                                                                                                     self.descent_acc * 30)
+        self.v[(self.t_array > self.land_time) & (self.t_array <= self.stop_time)] = np.arange(self.landv, 0,
+                                                                                               self.land_decc * 30)
 
 
         #return self.v[(self.t_array>=self.taxiout_time) & (self.t_array<self.taxiout_time+30)]
+        return self.v
+        #[np.where(self.t_array == self.takeoff_time)]
 
     def mass(self):
         self.m = np.zeros(len(self.t_array))
-        print('hELLO')
+        #print('hELLO')
         self.m[self.t_array <=self.taxiout_time] = np.linspace(self.w1, self.w2 -self.mf_fuel[0] * 30, len(self.t_array[self.t_array <=self.taxiout_time]))
+        '''
+        self.m[self.t_array <self.taxiout_time] = np.arange(self.w1,self.w2, -self.mf_fuel[0]*30)
+        self.m[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)] = np.arange(self.w2, self.w3-self.mf_fuel[1]*30, -self.mf_fuel[1]*30)
+        self.m[(self.t_array > self.takeoff_time) & (self.t_array < self.cruise_start_time)] = np.arange(self.w3-self.mf_fuel[2]*30, self.w4, -self.mf_fuel[2]*30)
+        self.m[(self.t_array >= self.cruise_start_time) & (self.t_array <= self.cruise_end_time)] = np.arange(self.w4, self.w5, -self.mf_fuel[3]*30)
+        self.m[(self.t_array >= self.cruise_end_time) & (self.t_array < self.land_time)] = np.arange(self.w5, self.w6, -self.mf_fuel[4]*30)
+        self.m[(self.t_array >= self.land_time) & (self.t_array < self.stop_time)] = np.arange(self.w6, self.w7, -self.mf_fuel[5]*30)
+        self.m[self.t_array==self.stop_time] = self.w7
+        #plt.plot(self.t_array, self.m)
+        #plt.show()
+        '''
         # print(np.linspace(self.w1, self.w2 -self.mf_fuel[0] * 30, len(self.t_array[self.t_array <self.taxiout_time])))
         # print(np.linspace(self.w2,self.w3-self.mf_fuel[1]*30,len(self.t_array[(self.t_array >= self.taxiout_time) & (self.t_array < self.takeoff_time)])))
         # print(np.linspace(self.w3,self.w4 -self.mf_fuel[2] * 30,len(self.t_array[(self.t_array >= self.takeoff_time) & (self.t_array < self.cruise_start_time)])))
-        self.m[(self.t_array > self.taxiout_time) & (self.t_array <= self.takeoff_time)] = np.linspace(self.w2,
-                                                                                                  self.w3-self.mf_fuel[1]*30,
-                                                                                                  len(self.t_array[(self.t_array > self.taxiout_time) & (self.t_array <= self.takeoff_time)]))
-        self.m[(self.t_array > self.takeoff_time) & (self.t_array <= self.cruise_start_time)] = np.linspace(self.w3,
-                                                                                                       self.w4 -self.mf_fuel[2] * 30,
-                                                                                                       len(self.t_array[(self.t_array > self.takeoff_time) & (self.t_array <= self.cruise_start_time)]))
-        self.m[(self.t_array > self.cruise_start_time) & (self.t_array <= self.cruise_end_time)] = np.linspace(self.w4,
-                                                                                                        self.w5-self.mf_fuel[3] * 30,
-                                                                                                        len(self.t_array[(self.t_array > self.cruise_start_time) & (self.t_array <= self.cruise_end_time)]))
-        self.m[(self.t_array > self.cruise_end_time) & (self.t_array <= self.land_time)] = np.linspace(self.w5,
-                                                                                                self.w6-self.mf_fuel[4] * 30,
-                                                                                                len(self.t_array[(self.t_array > self.cruise_end_time) & (self.t_array <= self.land_time)]))
-        self.m[(self.t_array > self.land_time) & (self.t_array <= self.stop_time)] = np.linspace(self.w6,
-                                                                                          self.w7-self.mf_fuel[5] * 30,
-                                                                                          len(self.t_array[(self.t_array > self.land_time) & (self.t_array <= self.stop_time)]))
+        self.m[(self.t_array > self.taxiout_time) & (self.t_array <= self.takeoff_time)] = np.linspace(self.w2,self.w3-self.mf_fuel[1]*30,len(self.t_array[(self.t_array > self.taxiout_time) & (self.t_array <= self.takeoff_time)]))
+        self.m[(self.t_array > self.takeoff_time) & (self.t_array <= self.cruise_start_time)] = np.linspace(self.w3,self.w4 -self.mf_fuel[2] * 30,len(self.t_array[(self.t_array > self.takeoff_time) & (self.t_array <= self.cruise_start_time)]))
+        self.m[(self.t_array > self.cruise_start_time) & (self.t_array <= self.cruise_end_time)] = np.linspace(self.w4,self.w5-self.mf_fuel[3] * 30,len(self.t_array[(self.t_array > self.cruise_start_time) & (self.t_array <= self.cruise_end_time)]))
+        self.m[(self.t_array > self.cruise_end_time) & (self.t_array <= self.land_time)] = np.linspace(self.w5,self.w6-self.mf_fuel[4] * 30,len(self.t_array[(self.t_array > self.cruise_end_time) & (self.t_array <= self.land_time)]))
+        self.m[(self.t_array > self.land_time) & (self.t_array <= self.stop_time)] = np.linspace(self.w6,self.w7-self.mf_fuel[5] * 30,len(self.t_array[(self.t_array > self.land_time) & (self.t_array <= self.stop_time)]))
         #print(self.t_array[[(self.t_array >= self.land_time) & (self.t_array <= self.stop_time)]])
-        self.testt = self.m[(self.t_array >= self.takeoff_time) & (self.t_array<self.takeoff_time+30)]
+        #self.testt = self.m[(self.t_array >= self.takeoff_time) & (self.t_array<self.takeoff_time+30)]
+
+        #plt.plot(self.t_array, self.m)
+        #plt.show()
+        #return self.m
 
     def dens(self):
         self.alt = np.zeros(len(self.t_array))
@@ -120,13 +153,14 @@ class thrust_req(Constants):
         self.dens()
         self.mass()
         self.velocity()
-        self.CL = np.ones(len(self.t_array))
+        self.CL = np.zeros(len(self.t_array))
 
-        self.CL[self.t_array < self.taxiout_time] = 0
+        self.CL[self.t_array < self.taxiout_time] = 0.2
 
-        self.CL[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)] =(self.m[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)]* self.g_0 *2) /(self.density_array[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)] *(self.v[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)])**2 * self.S)
+        self.CL[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)] =1.4
+            #(self.m[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)]* self.g_0 *2) /(self.density_array[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)] *(self.v[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)])**2 * self.S)
 
-        self.CL[(self.t_array > self.takeoff_time) & (self.t_array <= self.cruise_start_time)] =(self.m[(self.t_array > self.takeoff_time) & (self.t_array <= self.cruise_start_time)]* self.g_0 *2) /(self.density_array[(self.t_array > self.takeoff_time) & (self.t_array <= self.cruise_start_time)] *(self.v[(self.t_array > self.takeoff_time) & (self.t_array <= self.cruise_start_time)])**2 * self.S)
+        self.CL[(self.t_array > self.takeoff_time) & (self.t_array <= self.cruise_start_time)] =(self.m[(self.t_array > self.takeoff_time) & (self.t_array <= self.cruise_start_time)]* cos(0.26)* self.g_0 *2) /(self.density_array[(self.t_array > self.takeoff_time) & (self.t_array <= self.cruise_start_time)] *(self.v[(self.t_array > self.takeoff_time) & (self.t_array <= self.cruise_start_time)])**2 * self.S)
 
         self.CL[(self.t_array > self.cruise_start_time) & (self.t_array <= self.cruise_end_time)] = (self.m[(self.t_array > self.cruise_start_time) & (self.t_array <= self.cruise_end_time)]
                           * self.g_0 *2) /(self.density_array[(self.t_array > self.cruise_start_time) & (self.t_array <= self.cruise_end_time)]*
@@ -140,6 +174,7 @@ class thrust_req(Constants):
         self.CL[(self.t_array > self.land_time) & (self.t_array <= self.stop_time)] = 0
 
         self.Lift = np.zeros(len(self.t_array))
+        self.Lift[(self.t_array<self.taxiout_time)] = self.CL[(self.t_array<self.taxiout_time)] * 0.5 * self.density_array[(self.t_array<self.taxiout_time)] * self.v[(self.t_array<self.taxiout_time)] **2 * self.S
         self.Lift[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)] = \
             self.CL[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)] * 0.5 * self.density_array[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)] \
             * self.v[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)] **2 * self.S
@@ -150,27 +185,43 @@ class thrust_req(Constants):
         self.T_to_overcome_drag = np.array(self.cdarray*0.5*self.density_array*self.v**2 * self.S)
         self.T_to_Acc = self.m * self.acceleration
         self.T_to_climb_and_descend = (self.rates_of_climb_and_descent * self.m * self.g_0)/self.v
+
         self.T_to_overcome_friction = np.zeros(len(self.t_array))
+        self.T_to_overcome_friction[self.t_array<=self.taxiout_time] = self.rolling_fric_coefficient * (self.m[(self.t_array <= self.taxiout_time)]
+                                                                       * self.g_0 - self.Lift[(self.t_array <= self.taxiout_time)])
         self.T_to_overcome_friction[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)] = self.rolling_fric_coefficient \
-                                                                            * (self.m[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)]
+                                                                         * (self.m[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)]
                                                                        * self.g_0 - self.Lift[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)])
+        self.T_to_overcome_friction[(self.t_array>=self.land_time)] = self.rolling_fric_coefficient * (self.m[(self.t_array>=self.land_time)]
+                                                                       * self.g_0 - self.Lift[(self.t_array>=self.land_time)])
 
-        self.thrust_required = self.T_to_Acc + self.T_to_overcome_drag + self.T_to_climb_and_descend + self.T_to_overcome_friction
 
+        self.T_Static = np.zeros(len(self.t_array))
+        self.T_Static[np.where(self.t_array==self.taxiout_time)] = self.static_fric_coeff * (self.m[np.where(self.t_array==self.taxiout_time)] * self.g_0 - self.Lift[np.where(self.t_array==self.taxiout_time)])
 
-        plt.plot(self.t_array, self.T_to_overcome_drag, label='A320-HACK')
+        self.thrust_required = self.T_to_Acc + self.T_to_overcome_drag + self.T_to_climb_and_descend + self.T_to_overcome_friction + self.T_Static
+
+        #return ('a', self.T_to_overcome_drag[self.t_array==self.taxiout_time],'b', self.T_to_Acc[self.t_array==self.taxiout_time], 'c', self.T_to_climb_and_descend[self.t_array==self.taxiout_time], 'd', self.T_to_overcome_friction[self.t_array==self.taxiout_time])
+        #plt.plot(self.t_array, self.T_to_overcome_drag, label='A320-HACK')
         #ax1.plot(C_L_range, C_D_range_neo, label='A320neo', linestyle='--')
 
-        plt.show()
+        #plt.show()
         # > self.takeoff_time) & (self.t_array <= self.takeoff_time+30))]
 
-        self.ThrustReq_TO = self.thrust_required[np.where((self.t_array == self.takeoff_time))]
+        self.ThrustReq_TO = self.thrust_required[np.where((self.t_array == self.taxiout_time))]
+        self.Thrust_Liftoff = self.thrust_required[np.where(self.t_array == self.takeoff_time)]
         self.ThrustReq_TaxiOut = self.thrust_required[np.where((self.t_array >= self.taxiout_time/2) & (self.t_array < (self.taxiout_time/2)+30))]
+
+        #self.ThrustReq_TaxiOut = self.thrust_required[np.where((self.t_array >=30 ) & (self.t_array <=60 ))]
         self.ThrustReq_Climb =  self.thrust_required[np.where((self.t_array >= self.mid_climb_time) & (self.t_array < self.mid_climb_time+30))]
         self.ThrustReq_Cruise = self.thrust_required[np.where((self.t_array >= self.cruise_start_time) & (self.t_array < self.cruise_start_time+30))]
         self.ThrustReq_Descent = self.thrust_required[np.where((self.t_array >= self.mid_descent_time) & (self.t_array < self.mid_descent_time+30))]
-        self.ThrustReq_TaxiIn = self.thrust_required[np.where((self.t_array >= self.land_time + (self.stop_time-self.land_time)/4) & (self.t_array < self.land_time + (self.stop_time-self.land_time)/4 + 30))]
+        self.ThrustReq_TaxiIn = self.thrust_required[np.where((self.t_array >= self.land_time+30)  & (self.t_array < self.land_time  + 60))]
 
+        #self.ThrustReq_TaxiOut = 0.07 * self.ThrustReq_TO
+        #self.ThrustReq_TaxiIn = 0.07 * self.ThrustReq_TO
+        #+ (self.stop_time - self.land_time) / 4)
+        #+ (self.stop_time-self.land_time)/4
 
         #self.testing = self.CL[(self.t_array > self.taxiout_time) & (self.t_array <= self.takeoff_time)]
         #self.masstest = self.T_to_climb_and_descend
@@ -178,12 +229,10 @@ class thrust_req(Constants):
 
         #return self.thrust_required
         #return self.T_to_overcome_drag
-        #
-        #return self.Cl_Array
-        #return self.Cl_Array
-        return self.T_to_overcome_friction
 
-
+        #return self.CL[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)]
+        #return self.T_to_overcome_drag
+        return self.thrust_required
 
 
 
@@ -230,14 +279,22 @@ class thrust_req(Constants):
 if __name__ == '__main__':
     t = thrust_req(cd0clean,wingar)
     con = Constants()
-
+    #print(t.w6)
     t.drag()
     print(t.drag())
-    t.dens()
+
+    #t.velocity()
+    #print(t.velocity())
     #print(t.drag())
+   # t.dens()
+    #print(t.t_array)
+    #print(t.drag())
+    #t.mass()
+    #print(t.mass())
 
     print('\n Thrust Req TaxiOut = ', t.ThrustReq_TaxiOut/1000 , '[kN]'
           '\n Thrust Req TO = ', t.ThrustReq_TO/1000 , '[kN]'
+            '\n Thrust Req Lift off= ', t.Thrust_Liftoff/1000 , '[kN]'
           '\n Thrust Req Climb = ', t.ThrustReq_Climb/1000,'[kN]'
           '\n Thrust Req Cruise =', t.ThrustReq_Cruise/1000, '[kN]'
           '\n Thrust Req Descend =', t.ThrustReq_Descent/1000, '[kN]'
