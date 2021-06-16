@@ -31,6 +31,7 @@ class potato_diagram(Constants):
         cg_LH2_tanks = self.x_cg_pod # From the nose [m]
         # Calculate A320-HAC.K cg @ OEW
         OEW_HACK = OEW_neo - weight_APU + weight_LH2_tanks + weight_DPU
+        print(OEW_HACK,'oew hack')
         cg_OEW_HACK = (self.OEW_320neo*cg_OEW_neo - weight_APU*cg_APU +
                        weight_LH2_tanks*cg_LH2_tanks +
                        weight_DPU*cg_DPU) / (OEW_neo -
@@ -207,7 +208,7 @@ class potato_diagram(Constants):
         plt.scatter(x2_list_a,W2_list_a,color = 'tab:blue', marker = 'x')
         plt.plot(x2_list_a,W2_list_a,color = 'tab:blue',linewidth = '1')
 
-        #Step 3 plot - pax aisle seats
+        #Step 3 plot - pax middle seats
         x3_list_f = (np.array(xcg_ais_f) - x_LEMAC ) /MAC
         W3_list_f = np.array(W3_ais_f)
         plt.scatter(x3_list_f,W3_list_f,color = 'tab:green', marker = 'x')
@@ -218,7 +219,7 @@ class potato_diagram(Constants):
         plt.scatter(x3_list_a,W3_list_a,color = 'tab:green', marker = 'x')
         plt.plot(x3_list_a,W3_list_a,color = 'tab:green',linewidth = '1')
 
-        #Step 4 plot - pax middle seats
+        #Step 4 plot - pax aisle seats
         x4_list_f = (np.array(xcg_mid_f) - x_LEMAC ) /MAC
         W4_list_f = np.array(W4_mid_f)
         plt.scatter(x4_list_f,W4_list_f,color = 'tab:orange', marker = 'x')

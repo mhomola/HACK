@@ -17,7 +17,6 @@ import matplotlib.pyplot as plt
 class xplot(Constants):
     def __init__(self):
         super().__init__()
-        self.v_approach = 80    #[m/s]
         ## -- from common constants #
 
 
@@ -304,7 +303,7 @@ class xplot(Constants):
 
             fig, ax1 = plt.subplots()
             # Set by how much the wing shift as percentage of the MAC
-            shift = 0.08                                                            
+            shift = 0.075
             
             ax1.set_xlabel('${x_{CoG}}/{MAC}$', fontsize=20)
             ax1.set_ylabel('${S_h}/{S}$', color='tab:red', fontsize=20)
