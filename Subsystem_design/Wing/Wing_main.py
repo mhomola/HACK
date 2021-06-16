@@ -87,7 +87,7 @@ for i, x in enumerate(x_arr):
     torsional_J[i] = wing_stress.J
 
 np.save(arr=torsional_J,file="torsional_constant.npy")
-print(torsional_J)
+# print(torsional_J)
 
 
 def stresses_plotting(mises,compression,tension,shear_flow,shear_stress):
@@ -130,7 +130,7 @@ def stresses_plotting(mises,compression,tension,shear_flow,shear_stress):
     #plt.show()
 
 
-#stresses_plotting(mises=False,compression=True,tension=False,shear_flow=False,shear_stress=True)
+stresses_plotting(mises=False,compression=True,tension=False,shear_flow=False,shear_stress=True)
 
 ###MOI Graphs
 # plt.plot(x_arr,Ixx_arr,"blue")
