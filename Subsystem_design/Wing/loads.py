@@ -45,8 +45,8 @@ class Loads_w(Constants):
 
                 # print('\n At an altitude of ', alti, ' m, a weight of ', weight, ' N, the max lift is ', L_tot)
 
-        print('\n At an altitude of ', altitudes[index_j], ' m, a weight of ', weights[index_i],
-              ' N, the max lift is ', self.L_max)
+        # print('\n At an altitude of ', altitudes[index_j], ' m, a weight of ', weights[index_i],
+        #       ' N, the max lift is ', self.L_max)
 
         self.ISA_calculator(h_input=altitudes[index_j])
         fe = FlightEnvelope(altitude=altitudes[index_j], W=weights[index_i])
@@ -414,7 +414,7 @@ class Loads_w(Constants):
         for i in [ax1, ax2, ax3, ax4, ax5]:
             i.tick_params(axis='both', which='major', labelsize=12)
 
-        plt.show()
+        # plt.show()
 
 
 if __name__ == '__main__':

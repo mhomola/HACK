@@ -28,6 +28,7 @@ sigma_arr = np.zeros(len(x_arr))
 compression_arr = np.zeros(len(x_arr))
 tension_arr = np.zeros(len(x_arr))
 shear_stress_arr = np.zeros(len(x_arr))
+torsional_J = np.zeros(len(x_arr))
 vm = np.zeros((len(x_arr),1000))
 q_arr = np.zeros((len(x_arr),1000))
 
@@ -82,6 +83,11 @@ for i, x in enumerate(x_arr):
     q_arr[i] = wing_stress.q_max
     shear_stress_arr[i] = wing_stress.shear_stress_max
 
+    wing_stress.torsional_constant()
+    torsional_J[i] = wing_stress.J
+
+np.save(arr=torsional_J,file="torsional_constant.npy")
+print(torsional_J)
 
 
 def stresses_plotting(mises,compression,tension,shear_flow,shear_stress):
@@ -123,7 +129,9 @@ def stresses_plotting(mises,compression,tension,shear_flow,shear_stress):
         plt.ylabel("Shear Stress [MPa]")
     #plt.show()
 
-stresses_plotting(mises=False,compression=True,tension=False,shear_flow=False,shear_stress=True)
+
+#stresses_plotting(mises=False,compression=True,tension=False,shear_flow=False,shear_stress=True)
+
 ###MOI Graphs
 # plt.plot(x_arr,Ixx_arr,"blue")
 # plt.plot(x_arr,Iyy_arr,"red")

@@ -55,5 +55,3 @@ if __name__ == '__main__':
     print("#######OVERALL#######")
     print("Added Weight = ", weight_addition, "[kg]")
     print("Volume of all Tanks = ", volume_all, "[m^3]", "complying with the required ", V_H2/1000, "[m^3]")
-
-
