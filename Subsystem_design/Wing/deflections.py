@@ -12,6 +12,7 @@ class Deflections(Constants):
         super(Deflections, self).__init__()
         self.E = 135 * 10**9
         self.G = 5.2 * 10**9
+        self.J = np.load('torsional_constant.npy')
         self.dz = 0.1
 
     def vertical_deflection(self, z):
@@ -70,7 +71,6 @@ class Deflections(Constants):
     def twist(self, z):
 
         z_arr = np.arange(self.width_f/2, z + self.dz/2, self.dz)
-        J_arr = np.zeros(len(z_arr))
         T_arr = np.zeros(len(z_arr))
 
         L = Loads_w()
@@ -84,20 +84,22 @@ class Deflections(Constants):
 
             T_arr[i] = L.T_z(x=z_i)
 
-        integrand = T_arr/J_arr
+        integrand = T_arr/self.J[:i+1]
         theta = 1/self.G * spint.simps(y=integrand, x=z_arr)
 
         return theta
 
     def plot_deflections(self):
 
-        z_values = np.arange(self.width_f / 2, self.b / 2 + self.dz, self.dz*2)
+        z_values = np.arange(self.width_f / 2, self.b / 2 + self.dz, self.dz*5)
         w_slope_arr = np.zeros(len(z_values))
         w_arr = np.zeros(len(z_values))
         v_slope_arr = np.zeros(len(z_values))
         v_arr = np.zeros(len(z_values))
+        theta_arr = np.zeros(len(z_values))
 
         for j, z_j in enumerate(z_values):
+            print(z_j)
 
             w_j, w_slope_j = self.horizontal_deflection(z=z_j)
             w_arr[j] = w_j
@@ -105,6 +107,8 @@ class Deflections(Constants):
             v_j, v_slope_j = self.vertical_deflection(z=z_j)
             v_arr[j] = v_j
             v_slope_arr[j] = v_slope_j
+            theta_j = self.twist(z=z_j)
+            theta_arr[j] = theta_j
 
         L = Loads_w()
         L.compute_loads()
@@ -116,12 +120,13 @@ class Deflections(Constants):
         plt.show()
 
         fig = plt.figure(constrained_layout=True, figsize=(15, 15))
-        gs = GridSpec(3, 2, figure=fig)
+        gs = GridSpec(4, 2, figure=fig)
 
         ax1 = fig.add_subplot(gs[0, 0])
         ax2 = fig.add_subplot(gs[0, 1])
         ax3 = fig.add_subplot(gs[1, :])
         ax4 = fig.add_subplot(gs[2, :])
+        ax5 = fig.add_subplot(gs[3, :])
 
         ax1.plot(z_values, v_slope_arr)
         ax1.set_ylabel(r"$v'(z)$ [$m/m$]", size=15)
@@ -139,10 +144,15 @@ class Deflections(Constants):
 
         ax4.plot(z_values, w_arr)
         ax4.set_ylabel(r"$w(z)$ [$m$]", size=15)
-        ax4.set_xlabel(r'$z$ [$m$]', size=15)
+        # ax4.set_xlabel(r'$z$ [$m$]', size=15)
         ax4.set_title(r'Deflection of the wingbox in the horiozntal direction', size=20)
 
-        for i in [ax1, ax2, ax3, ax4]:
+        ax5.plot(z_values, theta_arr*180/np.pi)
+        ax5.set_ylabel(r"$\theta(z)$ [$deg$]", size=15)
+        ax5.set_xlabel(r'$z$ [$m$]', size=15)
+        ax5.set_title(r'Twist of the wingbox around the $z$ axis', size=20)
+
+        for i in [ax1, ax2, ax3, ax4, ax5]:
             i.tick_params(axis='both', which='major', labelsize=12)
 
         plt.show()
