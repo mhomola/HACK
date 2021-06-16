@@ -32,7 +32,7 @@ class Engine_Cycle(Constants):
         self.T0, self.p0, self.rho0, self.a0 = self.T, self.p, self.rho, self.a
         self.v0 = self.M0 * np.sqrt(self.cp_air * self.R * self.T0)
         self.Thrust = float(data[2])
-        self.A_eff = float(data[3])*self.A_fan
+        self.A_eff = float(data[3]) * np.pi * (float(data[28]) * 0.0254)**2 / 4
         self.eta_inlet = float(data[4])
         self.PR_fan = float(data[5])
         self.eta_fan = float(data[6])
@@ -114,7 +114,7 @@ class Engine_Cycle(Constants):
 
         # Further on the bypass duct
         self.T016 = self.T021
-        self.p016 = self.p021 #* self.PR_noz_fan
+        self.p016 = self.p021 * self.PR_noz_fan
 
         # Exit of LPC - Entrance of HPC
         self.T025 = self.T021 + ( self.T021/self.eta_LPC ) * ( self.PR_LPC ** ( (self.k_air-1)/self.k_air ) - 1 )
@@ -151,7 +151,7 @@ class Engine_Cycle(Constants):
 
         # Nozzle
         self.T07 = self.T05
-        self.p07 = self.p05 #* self.PR_noz_core
+        self.p07 = self.p05 * self.PR_noz_core
 
         # Is the nozzle chocked?
         self.PR_cr_noz_core = 1 / ( ( 1 - (self.k_gas-1)/(self.k_gas+1)/self.eta_nozzle) ** (self.k_gas / (self.k_gas-1)) )
@@ -198,9 +198,11 @@ class Engine_Cycle(Constants):
         self.TSFC = self.mf_fuel / (self.T_total*10**(-3)) # [g/kN/s]
 
         ''' USE EQR FROM CoolEngine.py ON THE FIRST ITERATION OF IVAN'S CODE '''
-        self.stoichiometric_ratio = self.mr_h2 * self.stoich_ratio_h2 + self.mr_ker * self.stoich_ratio_ker # UPDATE THIS, SOFIA
-        self.equivalence_ratio = (self.mf_fuel / (self.mf_hot * self.mr_air_cc)) / \
-                                  self.stoichiometric_ratio
+        self.stoichiometric_ratio = self.stoich_ratio_ker_h2
+        #self.stoichiometric_ratio = self.mr_h2 * self.stoich_ratio_h2 + self.mr_ker * self.stoich_ratio_ker # UPDATE THIS, SOFIA
+        #self.mf_air_combustion = self.mf_hot * self.mr_air_cc
+        #self.equivalence_ratio = (self.mf_fuel / (self.mf_air_combustion)) / \
+                                  #self.stoichiometric_ratio
 
         self.air_cool()
         self.mole_rate()
@@ -222,6 +224,8 @@ class Engine_Cycle(Constants):
         self.n_ker = self.mf_ker/(self.molar_mass_kerosene*10**-3)
         self.n_O2 = self.n_h2 * 0.5 + self.n_ker * 14.76
         self.n_N2 = self.n_h2 * 1.88 + self.n_ker * 55.45
+        self.m_O2 = self.n_O2* 32 *10**-3
+        self.m_N2 = self.n_N2 * self.molarmass_N2 *10**-3
 
 
 ''' FORMULAE
@@ -279,8 +283,9 @@ if __name__ == '__main__':
             air = [['m_intake', round(ec.mf_air_init,3), 'kg/s'], ['m_hot', round(ec.mf_hot,3), 'kg/s'], ['m_cold', round(ec.mf_cold,3), 'kg/s']]
             st0 = [['T00', round(ec.T00,3), 'K'], ['p00', round(ec.p00,3), 'Pa']]
             st2 = [['T02', round(ec.T02,3), 'K'], ['p02', round(ec.p02,3), 'Pa']]
-            st21 = [['T021', round(ec.T021,3), 'K'], ['p02', round(ec.p021,3), 'Pa']]
-            st25 = [['T025', round(ec.T025,3), 'K'], ['p02', round(ec.p025,3), 'Pa']]
+            BPR = ['BPR', round(ec.BPR, 3), '-']
+            st21 = [['T021', round(ec.T021,3), 'K'], ['p021', round(ec.p021,3), 'Pa']]
+            st25 = [['T025', round(ec.T025,3), 'K'], ['p025', round(ec.p025,3), 'Pa']]
             st3 = [['T03', round(ec.T03,3), 'K'], ['p03', round(ec.p03,3), 'Pa']]
             st4 = [['T04', round(ec.T04,3), 'K'], ['p04', round(ec.p04,3), 'Pa']]
             fuel = [['m_fuel', round(ec.mf_fuel,3), 'kg/s'], ['m_h2', round(ec.mf_h2,3), 'kg/s'], ['m_ker', round(ec.mf_ker,3), 'kg/s']]
@@ -293,7 +298,7 @@ if __name__ == '__main__':
             Thr = [['T_fan', round(ec.T_fan,3), 'N'], ['T_core', round(ec.T_core,3), 'N'], ['T_tot', round(ec.T_total,3), 'N'], ['TSCF', round(ec.TSFC,5), 'g/kN/s']]
             OPR = ['OPR',round(ec.OPR,3), '-']
 
-            save_txt = amb + air + st0 + st2 + st21 + st25 + st3 + st4 + fuel + st45 + st5 + st7 + st8 + st16 + st18 + Thr + [OPR]
+            save_txt = amb + air + st0 + st2 + [BPR] + st21 + st25 + st3 + st4 + fuel + st45 + st5 + st7 + st8 + st16 + st18 + Thr + [OPR]
             name = a+'_'+p+'.txt'
 
             F = open(name,'w')
