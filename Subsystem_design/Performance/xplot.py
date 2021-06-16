@@ -303,12 +303,12 @@ class xplot(Constants):
             #lemac = np.linspace(lemac_lf[0], lemac_lf[-1], 301)
 
             fig, ax1 = plt.subplots()
-
+            shift = 0.075
             ax1.set_xlabel('${x_{CoG}}/{MAC}$', fontsize=20)
             ax1.set_ylabel('${S_h}/{S}$', color='tab:red', fontsize=20)
             ax1.plot(Xcg, stab_m * Xcg + stab_b, color='tab:red', label='Stability line', marker='8', markevery=70)
             ax1.plot(Xcg, stability(Xcg)[1], linestyle='--', color='tab:red', label='Neutral line', marker='x', markevery=70)
-            ax1.plot(Xcg-0.05, contr_m * Xcg + contr_b, color='blue', label='Controllability line', marker='*', markevery=70)
+            ax1.plot(Xcg, contr_m * Xcg + contr_b, color='blue', label='Controllability line', marker='*', markevery=70)
             ax1.vlines(x= pd.x_min-0.02, ymin=-0.5, ymax=0.5, label = 'Critical forward cg location')
             ax1.vlines(x= pd.x_max+0.02, ymin=-0.5, ymax=0.5, label= 'Critical aft cg location')
 
