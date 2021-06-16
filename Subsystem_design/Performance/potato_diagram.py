@@ -19,7 +19,7 @@ class potato_diagram(Constants):
     def oew_cg_hack(self):
         ### --- NEO --- ##
         OEW_neo = self.OEW_320neo                           # [kg]
-        cg_OEW_neo = 0.25* self.mac + self.x_LEMAC           # from nose [m]
+        cg_OEW_neo = 0.3* self.mac + self.x_LEMAC           # from nose [m]
         weight_APU = 145 # [kg] later put in self.weight_APU
         cg_APU = 34.63                                      # from nose [m]
         ### --- HACK --- ##
@@ -40,7 +40,7 @@ class potato_diagram(Constants):
               '\n oew cg of hack (% of MAC) = ', cg_OEW_HACK_MAC,
               '\n oew cg of hack (from nose) = ', cg_OEW_HACK,
               '\n oew cg of neo (from nose) = ', cg_OEW_neo,
-              '\n weight of the central tank = ', self.center_tank_mass, 'weight of pod tank = ', self.pod_tank_mass)
+              '\n weight of pod tank = ', self.pod_tank_mass)
         self.cg_LH2_tanks = cg_LH2_tanks
         self.OEW_HACK = OEW_HACK
         self.cg_OEW_HACK_MAC = cg_OEW_HACK_MAC
