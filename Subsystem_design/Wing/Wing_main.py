@@ -84,40 +84,46 @@ for i, x in enumerate(x_arr):
 
 
 
-#lw.plot_loads()
-#plt.figure()
+def stresses_plotting(mises,compression,tension,shear_flow,shear_stress):
 
-###VON MISES STRESS PLOT
-# plt.plot(x_arr,vm_arr/10**6)
-# plt.xlabel("Span location[m]")
-# plt.ylabel("Von Mises Stress [MPa]")
-# plt.figure()
+    if mises == True:
+        ###VON MISES STRESS PLOT
+        plt.plot(x_arr,vm_arr/10**6)
+        plt.xlabel("Span location[m]")
+        plt.ylabel("Von Mises Stress [MPa]")
+        plt.figure()
 
-##COMPRESSION STRESS PLOT
-print("Compression stress",min(compression_arr)/10**6)
-plt.plot(x_arr,compression_arr/10**6)
-plt.xlabel("Span location[m]")
-plt.ylabel("Compression Stress [MPa]")
-plt.figure()
+    if compression == True:
+        ##COMPRESSION STRESS PLOT
+        print("Compression stress",min(compression_arr)/10**6)
+        plt.plot(x_arr,compression_arr/10**6)
+        plt.xlabel("Span location[m]")
+        plt.ylabel("Compression Stress [MPa]")
+        plt.figure()
 
-###TENSION STRESS PLOT
-# plt.plot(x_arr,tension_arr/10**6)
-# plt.xlabel("Span location[m]")
-# plt.ylabel("Tension Stress [MPa]")
-# plt.figure()
+    if tension == True:
+        ###TENSION STRESS PLOT
+        plt.plot(x_arr,tension_arr/10**6)
+        plt.xlabel("Span location[m]")
+        plt.ylabel("Tension Stress [MPa]")
+        plt.figure()
 
-###SHEAR FLOWS PLOT
-# plt.plot(x_arr,q_arr/10**6)
-# plt.xlabel("Span location[m]")
-# plt.ylabel("Shear flows [MPa/m]")
+    if shear_flow == True:
+        ###SHEAR FLOWS PLOT
+        plt.plot(x_arr,q_arr/10**6)
+        plt.xlabel("Span location[m]")
+        plt.ylabel("Shear flows [MPa/m]")
+        plt.figure()
 
-###SHEAR STRESS PLOT
-print("Max shear stress",max(shear_stress_arr)/10**6)
-plt.plot(x_arr,shear_stress_arr/10**6)
-plt.xlabel("Span location[m]")
-plt.ylabel("Shear Stress [MPa]")
-plt.show()
+    if shear_stress == True:
+        ###SHEAR STRESS PLOT
+        print("Max shear stress",max(shear_stress_arr)/10**6)
+        plt.plot(x_arr,shear_stress_arr/10**6)
+        plt.xlabel("Span location[m]")
+        plt.ylabel("Shear Stress [MPa]")
+    #plt.show()
 
+stresses_plotting(mises=False,compression=True,tension=False,shear_flow=False,shear_stress=True)
 ###MOI Graphs
 # plt.plot(x_arr,Ixx_arr,"blue")
 # plt.plot(x_arr,Iyy_arr,"red")

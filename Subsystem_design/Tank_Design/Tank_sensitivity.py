@@ -180,36 +180,52 @@ for i,p in enumerate(percentages):
     else:
         sensi_length[i] = pod_tank.mass_tank
 
+def plotting_sensitivity(p,d,l,imposed):
 
-# plt.plot(percentages,(sensi_pressure-pod_tank_reference.mass_tank)/pod_tank_reference.mass_tank,label="Venting pressure")
-# plt.title("Variation of tank mass with variation of venting pressure")
-# plt.xlabel("Percentage change in venting pressure")
-# plt.ylabel("Percentage change in mass")
-# plt.figure()
+    if p == True:
+        plt.plot(percentages,(sensi_pressure-pod_tank_reference.mass_tank)/pod_tank_reference.mass_tank,label="Venting pressure")
+        plt.title("Variation of tank mass with variation of venting pressure")
+        plt.xlabel("Percentage change in venting pressure")
+        plt.ylabel("Percentage change in mass")
+        plt.figure()
 
-plt.plot(percentages,(sensi_diameter-pod_tank_reference.mass_tank)/pod_tank_reference.mass_tank,label = "Diameter")
-plt.title("Variation of tank mass with variation of diameter")
-plt.xlabel("Percentage change in diameter")
-plt.ylabel("Percentage change in mass")
-# plt.figure()
+    if d == True:
+        plt.plot(percentages,(sensi_diameter-pod_tank_reference.mass_tank)/pod_tank_reference.mass_tank,label = "Diameter")
+        plt.title("Variation of tank mass with variation of diameter")
+        plt.xlabel("Percentage change in diameter")
+        plt.ylabel("Percentage change in mass")
+        plt.figure()
 
-# plt.plot(percentages,(sensi_diameter_micha-pod_tank_reference.mass_tank)/pod_tank_reference.mass_tank,label = "Diameter")
-# plt.title("Variation of tank mass with variation of diameter(Micha program)")
-# plt.xlabel("Percentage change in diameter")
-# plt.ylabel("Percentage change in mass")
-# plt.figure()
+        # plt.plot(percentages,(sensi_diameter_micha-pod_tank_reference.mass_tank)/pod_tank_reference.mass_tank,label = "Diameter")
+        # plt.title("Variation of tank mass with variation of diameter(Micha program)")
+        # plt.xlabel("Percentage change in diameter")
+        # plt.ylabel("Percentage change in mass")
+        # plt.figure()
 
-# plt.plot((1+np.array(percentages))*diameter_ref,sensi_diameter_micha,label = "Diameter")
-# plt.title("Variation of tank mass with variation of diameter(Micha program)")
-# plt.xlabel("Diameter[m]")
-# plt.ylabel("Mass[kg]")
+        # plt.plot((1+np.array(percentages))*diameter_ref,sensi_diameter_micha,label = "Diameter")
+        # plt.title("Variation of tank mass with variation of diameter(Micha program)")
+        # plt.xlabel("Diameter[m]")
+        # plt.ylabel("Mass[kg]")
 
-plt.plot(percentages,(sensi_length-pod_tank_reference.mass_tank)/pod_tank_reference.mass_tank,label = "Length")
-plt.title("Variation of tank mass with variation of tank length")
-plt.xlabel("Percentage change in length")
-plt.ylabel("Percentage change in mass")
-plt.xlim(xmin=-0.6,xmax=0.6)
-plt.xticks(ticks=percentages)
-plt.legend()
-plt.grid()
-plt.show()
+    if l == True:
+        plt.plot(percentages,(sensi_length-pod_tank_reference.mass_tank)/pod_tank_reference.mass_tank,label = "Length")
+        plt.title("Variation of tank mass with variation of tank length")
+        plt.xlabel("Percentage change in length")
+        plt.ylabel("Percentage change in mass")
+        plt.figure()
+
+    if imposed == True:
+        plt.plot(percentages, (sensi_pressure - pod_tank_reference.mass_tank) / pod_tank_reference.mass_tank,
+                 label="Venting pressure")
+        plt.plot(percentages, (sensi_diameter - pod_tank_reference.mass_tank) / pod_tank_reference.mass_tank,
+                 label="Diameter")
+        plt.plot(percentages, (sensi_length - pod_tank_reference.mass_tank) / pod_tank_reference.mass_tank,
+                 label="Length")
+        plt.title("Variation of tank mass with variation of parameters")
+        plt.xlabel("Percentage change in parameter")
+        plt.ylabel("Percentage change in mass")
+        plt.legend()
+
+    plt.show()
+
+plotting_sensitivity(p=True,d=True,l=True,imposed=True)
