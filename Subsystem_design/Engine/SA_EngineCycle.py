@@ -32,20 +32,14 @@ class SA_Engine_Cycle(Constants):
 
             for d in self.deltas: # increase each time by 1%, 2%, etc
                 var_loop[k] = self.var_OG[k].copy() * (d + 1)
-                save_var = np.append(save_var, var_loop[k])
-
                 self.cycle(var_loop)
 
                 if not m.isnan(self.TSFC):
                     save_TSFC = np.append(save_TSFC, self.TSFC)
-                else:
-                    save_TSFC = np.append(save_TSFC, 1000) # add a dummy number that will never be the minimum of the TSFC array
+                    save_var = np.append(save_var, var_loop[k])
+                # else:
+                #     save_TSFC = np.append(save_TSFC, 1000) # add a dummy number that will never be the minimum of the TSFC array
 
-                plt.figure()
-                if self.names[k+4] == 'eta_HPC':
-                    # save_T45 = np.append(save_T45, self.p045)
-                    # save_T5 = np.append(save_T5, self.p05)
-                    save_thrust = np.append(save_thrust, self.T_core)
 
             # print(save_TSFC)
             v_opt = save_var[ np.where( save_TSFC == np.min( save_TSFC ) )[0][0] ]
@@ -55,9 +49,9 @@ class SA_Engine_Cycle(Constants):
             print(self.opt_vars[k])
 
             self.plot(save_var, save_TSFC, k, flag=False)
-            if self.names[k + 4] == 'eta_HPC':
-                self.plot(save_var, save_T45, k, flag='p045')
-                self.plot(save_var, save_thrust, k, flag='Thrust core')
+            # if self.names[k + 4] == 'eta_HPC':
+            #     self.plot(save_var, save_T45, k, flag='p045')
+            #     self.plot(save_var, save_thrust, k, flag='Thrust core')
 
 
 
@@ -249,10 +243,12 @@ class SA_Engine_Cycle(Constants):
         plt.gcf().canvas.set_window_title(self.names[k+4])
         plt.plot(save_var, save_TSFC)
         plt.xlabel(self.names[k + 4], fontsize=20)
-        if flag == False:
-            plt.ylabel('TSFC [g/kN/s]', fontsize=20)
-        else:
-            plt.ylabel(flag+'[K]', fontsize=20)
+        plt.ylabel('TSFC [g/kN/s]', fontsize=20)
+
+        # if flag == False:
+        #     plt.ylabel('TSFC [g/kN/s]', fontsize=20)
+        # else:
+        #     plt.ylabel(flag+'[K]', fontsize=20)
 
         plt.savefig('C:\\Users\\sarar\\OneDrive\\Ambiente de Trabalho\\Folders\\DELFT\\3rd year\\DSE\\HACK\\Subsystem_design\\Engine\\Parameters\\'+self.names[k + 4])
         plt.show()

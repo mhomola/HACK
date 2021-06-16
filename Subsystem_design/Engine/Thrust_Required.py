@@ -95,7 +95,9 @@ class thrust_req(Constants):
                                                                                           len(self.t_array[(self.t_array > self.land_time) & (self.t_array <= self.stop_time)]))
         #print(self.t_array[[(self.t_array >= self.land_time) & (self.t_array <= self.stop_time)]])
         self.testt = self.m[(self.t_array >= self.takeoff_time) & (self.t_array<self.takeoff_time+30)]
-
+        # plt.plot(self.t_array,self.m,label='Mass of A320HACK during flight')
+        # plt.legend()
+        # plt.show()
     def dens(self):
         self.alt = np.zeros(len(self.t_array))
         self.alt[np.where(self.t_array <= self.takeoff_time)] = 0
@@ -231,9 +233,11 @@ if __name__ == '__main__':
     t = thrust_req(cd0clean,wingar)
     con = Constants()
 
-    t.drag()
-    print(t.drag())
-    t.dens()
+    #t.drag()
+    #print(t.drag())
+    #t.dens()
+    t.mass()
+
     #print(t.drag())
 
     print('\n Thrust Req TaxiOut = ', t.ThrustReq_TaxiOut/1000 , '[kN]'
