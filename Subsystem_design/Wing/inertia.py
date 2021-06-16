@@ -111,6 +111,7 @@ class Inertia_normal(Constants):
         self.Iyy_normal = 2 * Iyy_sp + 2 * Iyy_sk + np.sum(Iyy_str)
 
 class Inertia_shear(Constants):
+    
     def __init__(self,n_str):
         super().__init__()
         self.t_sp = 14/1000       # Spar thickness [m]                                              #VARIABLE
