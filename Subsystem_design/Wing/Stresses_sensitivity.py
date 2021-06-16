@@ -16,7 +16,8 @@ x = 3 #[m]
 ##SELECT A POINT OF REFERENCE
 s1 = 0.05
 
-type_s = "Point" #or "Max"
+# type_s = "Max"
+type_s = "Point"
 #We will look for a variation from -50 to 50
 percentages = np.arange(-0.5,0.5,0.1)
 
@@ -28,7 +29,6 @@ class Reference_Data():
         ###INITIALIZE LOADS
         SF = 1.5
         lw = Loads_w()
-        c = lw.chord(x=x)
         lw.compute_loads()
         lw.chord_integrals()
         lw.Reaction_forces()
@@ -51,7 +51,7 @@ class Reference_Data():
         ### NORMAL STRESSES
         wing_stress = stresses(Ixx=MOI_shear.Ixx_shear, Iyy=MOI_shear.Iyy_shear, Ixx_str=MOI_normal.Ixx_normal,
                                Iyy_str=MOI_normal.Iyy_normal,
-                               h=MOI_normal.h_sp_c * c, L=MOI_normal.w_sk_c * c, t_upper=MOI_normal.t_sk,
+                               h=MOI_normal.h_sp_c * MOI_normal.chord_inertia(x=x), L=MOI_normal.w_sk, t_upper=MOI_normal.t_sk,
                                t_spar1=MOI_normal.t_sp, t_spar2=MOI_normal.t_sp, t_lower=MOI_normal.t_sk)
 
         wing_stress.shear_loads(Vx=Vx, Vy=Vy, T=T)
@@ -64,7 +64,7 @@ class Reference_Data():
         ###SHEAR STRESSES
         wing_stress = stresses(Ixx=MOI_shear.Ixx_shear, Iyy=MOI_shear.Iyy_shear, Ixx_str=MOI_normal.Ixx_normal,
                                Iyy_str=MOI_normal.Iyy_normal,
-                               h=MOI_shear.h_sp_c * c, L=MOI_shear.w_sk_c * c, t_upper=MOI_shear.t_sk,
+                               h=MOI_shear.h_sp_c * MOI_shear.chord_inertia(x=x), L=MOI_shear.w_sk, t_upper=MOI_shear.t_sk,
                                t_spar1=MOI_shear.t_sp, t_spar2=MOI_shear.t_sp, t_lower=MOI_shear.t_sk)
 
         wing_stress.shear_loads(Vx=Vx, Vy=Vy, T=T)
@@ -72,7 +72,7 @@ class Reference_Data():
         wing_stress.compute_stresses()
         wing_stress.shear_flow_plotter(type="total", show=False)
         max_shear = wing_stress.shear_stress_max
-        point_shear = wing_stress.sigma1
+        point_shear = wing_stress.q1_tot
 
         ###PARAMETERS NORMAL CROSS SECTION
         self.t_str_normal = MOI_normal.t_str
@@ -81,13 +81,13 @@ class Reference_Data():
         self.h_str_normal = MOI_normal.h_str
         self.w_str_normal = MOI_normal.w_str
         self.n_str_normal = MOI_normal.n_str
-        self.w_sk_c_normal = MOI_normal.w_sk_c
+        self.w_sk_normal = MOI_normal.w_sk
         self.h_sp_c_normal = MOI_normal.h_sp_c
 
         ###PARAMETER SHEAR CROSS SECTION
         self.t_sp_shear = MOI_shear.t_sp
         self.t_sk_shear = MOI_shear.t_sk
-        self.w_sk_c_shear = MOI_shear.w_sk_c
+        self.w_sk_shear = MOI_shear.w_sk
         self.h_sp_c_shear = MOI_shear.h_sp_c
 
         ###STORING THE LOADS
@@ -98,10 +98,12 @@ class Reference_Data():
         self.T  = T
 
         ###STORING THE STRESSES
-        self.max_sigma = max_sigma
-        self.max_shear = max_shear
-        self.point_sigma = point_sigma(s1)
-        self.point_shear = point_shear(s1)
+        if type_s == "Max":
+            self.max_sigma = max_sigma
+            self.max_shear = max_shear
+        if type_s == "Point":
+            self.max_sigma = point_sigma(s1)
+            self.max_shear = point_shear(s1)/self.t_sk_shear
 
         ###MOI elements for when only the loads are changed
         self.Ixx_shear = MOI_shear.Ixx_shear
@@ -110,9 +112,9 @@ class Reference_Data():
         self.Iyy_normal = MOI_normal.Iyy_normal
 
         ###OTHER PARAMETERS
-        self.c = c
+        self.c = MOI_shear.chord_inertia(x=x)
 
-ref = Reference_Data(x=x)
+ref = Reference_Data(x=x,s1=s1)
 
 ###BENDING STRESS VARIATION
 
@@ -126,9 +128,13 @@ sensi_bending_h_str = np.zeros(len(percentages))
 
 ###Changing moment about x-axis Mx
 for i,p in enumerate(percentages):
-    Mx = (1+p) * ref.Mx
+    if ref.Mx > 0:
+        Mx = (1+p) * ref.Mx
+    else:
+        Mx = (1 - p) * ref.Mx
+
     ws = stresses(Ixx=ref.Ixx_shear, Iyy=ref.Iyy_shear, Ixx_str=ref.Ixx_normal, Iyy_str=ref.Iyy_normal,
-                h=ref.h_sp_c_normal*ref.c, L=ref.w_sk_c_normal * ref.c, t_upper=ref.t_sk_normal,
+                h=ref.h_sp_c_normal*ref.c, L=ref.w_sk_normal, t_upper=ref.t_sk_normal,
                 t_spar1=ref.t_sp_normal, t_spar2=ref.t_sp_normal, t_lower=ref.t_sk_normal)
     ws.bending_loads(Mx = Mx,My = ref.My)
     ws.shear_loads(Vx=ref.Vx,Vy=ref.Vy,T=ref.T)
@@ -141,10 +147,14 @@ for i,p in enumerate(percentages):
 
 ###Changing moment about y-axis My
 for i,p in enumerate(percentages):
-    My = (1+p) * ref.My
+    if ref.My>0:
+        My = (1+p) * ref.My
+    else:
+        My = (1 - p) * ref.My
     ws = stresses(Ixx=ref.Ixx_shear, Iyy=ref.Iyy_shear, Ixx_str=ref.Ixx_normal, Iyy_str=ref.Iyy_normal,
-                h=ref.h_sp_c_normal*ref.c, L=ref.w_sk_c_normal * ref.c, t_upper=ref.t_sk_normal,
+                h=ref.h_sp_c_normal*ref.c, L=ref.w_sk_normal, t_upper=ref.t_sk_normal,
                 t_spar1=ref.t_sp_normal, t_spar2=ref.t_sp_normal, t_lower=ref.t_sk_normal)
+
     ws.bending_loads(Mx = ref.Mx,My = My)
     ws.shear_loads(Vx=ref.Vx,Vy=ref.Vy,T=ref.T)
     ws.compute_stresses()
@@ -159,11 +169,11 @@ for i,p in enumerate(percentages):
 for i,p in enumerate(percentages):
     t_str = (1+p)*ref.t_str_normal
     MOI = Inertia_normal_var(n_str=ref.n_str_normal,t_str=t_str,t_sp=ref.t_sp_normal,
-                             t_sk=ref.t_sk_normal,h_str=ref.h_str_normal,w_str=ref.w_str_normal,w_sk_c=ref.w_sk_c_normal)
+                             t_sk=ref.t_sk_normal,h_str=ref.h_str_normal,w_str=ref.w_str_normal)
     MOI.compute_inertia(x=x)
 
     ws = stresses(Ixx=ref.Ixx_shear, Iyy=ref.Iyy_shear, Ixx_str=MOI.Ixx_normal, Iyy_str=MOI.Iyy_normal,
-                  h=ref.h_sp_c_normal * ref.c, L=ref.w_sk_c_normal * ref.c, t_upper=ref.t_sk_normal,
+                  h=ref.h_sp_c_normal * ref.c, L=ref.w_sk_normal, t_upper=ref.t_sk_normal,
                   t_spar1=ref.t_sp_normal, t_spar2=ref.t_sp_normal, t_lower=ref.t_sk_normal)
     ws.bending_loads(Mx=ref.Mx, My=ref.My)
     ws.shear_loads(Vx=ref.Vx, Vy=ref.Vy, T=ref.T)
@@ -179,11 +189,11 @@ for i,p in enumerate(percentages):
 for i,p in enumerate(percentages):
     t_sp = (1+p)*ref.t_sp_normal
     MOI = Inertia_normal_var(n_str=ref.n_str_normal,t_str=ref.t_str_normal,t_sp=t_sp,
-                             t_sk=ref.t_sk_normal,h_str=ref.h_str_normal,w_str=ref.w_str_normal,w_sk_c=ref.w_sk_c_normal)
+                             t_sk=ref.t_sk_normal,h_str=ref.h_str_normal,w_str=ref.w_str_normal)
     MOI.compute_inertia(x=x)
 
     ws = stresses(Ixx=ref.Ixx_shear, Iyy=ref.Iyy_shear, Ixx_str=MOI.Ixx_normal, Iyy_str=MOI.Iyy_normal,
-                  h=ref.h_sp_c_normal * ref.c, L=ref.w_sk_c_normal * ref.c, t_upper=ref.t_sk_normal,
+                  h=ref.h_sp_c_normal * ref.c, L=ref.w_sk_normal, t_upper=ref.t_sk_normal,
                   t_spar1=t_sp, t_spar2=t_sp, t_lower=ref.t_sk_normal)
     ws.bending_loads(Mx=ref.Mx, My=ref.My)
     ws.shear_loads(Vx=ref.Vx, Vy=ref.Vy, T=ref.T)
@@ -199,11 +209,11 @@ for i,p in enumerate(percentages):
 for i,p in enumerate(percentages):
     t_sk = (1+p)*ref.t_sk_normal
     MOI = Inertia_normal_var(n_str=ref.n_str_normal,t_str=ref.t_str_normal,t_sp=ref.t_sp_normal,
-                             t_sk=t_sk,h_str=ref.h_str_normal,w_str=ref.w_str_normal,w_sk_c=ref.w_sk_c_normal)
+                             t_sk=t_sk,h_str=ref.h_str_normal,w_str=ref.w_str_normal)
     MOI.compute_inertia(x=x)
 
     ws = stresses(Ixx=ref.Ixx_shear, Iyy=ref.Iyy_shear, Ixx_str=MOI.Ixx_normal, Iyy_str=MOI.Iyy_normal,
-                  h=ref.h_sp_c_normal * ref.c, L=ref.w_sk_c_normal * ref.c, t_upper=t_sk,
+                  h=ref.h_sp_c_normal * ref.c, L=ref.w_sk_normal, t_upper=t_sk,
                   t_spar1=ref.t_sp_normal, t_spar2=ref.t_sp_normal, t_lower=t_sk)
     ws.bending_loads(Mx=ref.Mx, My=ref.My)
     ws.shear_loads(Vx=ref.Vx, Vy=ref.Vy, T=ref.T)
@@ -219,11 +229,11 @@ for i,p in enumerate(percentages):
 for i,p in enumerate(percentages):
     h_str = (1+p)*ref.h_str_normal
     MOI = Inertia_normal_var(n_str=ref.n_str_normal,t_str=ref.t_str_normal,t_sp=ref.t_sp_normal,
-                             t_sk=ref.t_sk_normal,h_str=h_str,w_str=ref.w_str_normal,w_sk_c=ref.w_sk_c_normal)
+                             t_sk=ref.t_sk_normal,h_str=h_str,w_str=ref.w_str_normal)
     MOI.compute_inertia(x=x)
 
     ws = stresses(Ixx=ref.Ixx_shear, Iyy=ref.Iyy_shear, Ixx_str=MOI.Ixx_normal, Iyy_str=MOI.Iyy_normal,
-                  h=ref.h_sp_c_normal * ref.c, L=ref.w_sk_c_normal * ref.c, t_upper=ref.t_sk_normal,
+                  h=ref.h_sp_c_normal * ref.c, L=ref.w_sk_normal, t_upper=ref.t_sk_normal,
                   t_spar1=ref.t_sp_normal, t_spar2=ref.t_sp_normal, t_lower=ref.t_sk_normal)
     ws.bending_loads(Mx=ref.Mx, My=ref.My)
     ws.shear_loads(Vx=ref.Vx, Vy=ref.Vy, T=ref.T)
@@ -246,9 +256,12 @@ sensi_shear_t_sk = np.zeros(len(percentages))
 
 ###Changing the Vx load
 for i,p in enumerate(percentages):
-    Vx = (1+p) * ref.Vx
+    if ref.Vx > 0:
+        Vx = (1+p) * ref.Vx
+    else:
+        Vx = (1 - p) * ref.Vx
     ws = stresses(Ixx=ref.Ixx_shear, Iyy=ref.Iyy_shear, Ixx_str=ref.Ixx_normal, Iyy_str=ref.Iyy_normal,
-                h=ref.h_sp_c_shear*ref.c, L=ref.w_sk_c_shear * ref.c, t_upper=ref.t_sk_shear,
+                h=ref.h_sp_c_shear*ref.c, L=ref.w_sk_shear , t_upper=ref.t_sk_shear,
                 t_spar1=ref.t_sp_shear, t_spar2=ref.t_sp_shear, t_lower=ref.t_sk_shear)
 
     ws.bending_loads(Mx = ref.Mx,My = ref.My)
@@ -256,13 +269,20 @@ for i,p in enumerate(percentages):
     ws.compute_stresses()
     ws.shear_flow_plotter(show=False,type="total")
 
-    sensi_shear_Vx[i] = ws.shear_stress_max
+    if type_s == "Max":
+        sensi_shear_Vx[i] = ws.shear_stress_max
+    if type_s == "Point":
+        sensi_shear_Vx[i]= ws.q1_tot(s1)/ref.t_sk_shear
 
 ###Changing the Vy load
 for i,p in enumerate(percentages):
-    Vy = (1+p) * ref.Vy
+    if ref.Vy > 0:
+        Vy = (1+p) * ref.Vy
+    else:
+        Vy = (1-p) * ref.Vy
+
     ws = stresses(Ixx=ref.Ixx_shear, Iyy=ref.Iyy_shear, Ixx_str=ref.Ixx_normal, Iyy_str=ref.Iyy_normal,
-                h=ref.h_sp_c_shear*ref.c, L=ref.w_sk_c_shear * ref.c, t_upper=ref.t_sk_shear,
+                h=ref.h_sp_c_shear*ref.c, L=ref.w_sk_shear, t_upper=ref.t_sk_shear,
                 t_spar1=ref.t_sp_shear, t_spar2=ref.t_sp_shear, t_lower=ref.t_sk_shear)
 
     ws.bending_loads(Mx = ref.Mx,My = ref.My)
@@ -270,13 +290,19 @@ for i,p in enumerate(percentages):
     ws.compute_stresses()
     ws.shear_flow_plotter(show=False,type="total")
 
-    sensi_shear_Vy[i] = ws.shear_stress_max
+    if type_s == "Max":
+        sensi_shear_Vy[i] = ws.shear_stress_max
+    if type_s == "Point":
+        sensi_shear_Vy[i]= ws.q1_tot(s1)/ref.t_sk_shear
 
 ###Changing the T load
 for i,p in enumerate(percentages):
-    T = (1+p) * ref.T
+    if ref.T>0:
+        T = (1 + p) * ref.T
+    else:
+        T = (1 - p) * ref.T
     ws = stresses(Ixx=ref.Ixx_shear, Iyy=ref.Iyy_shear, Ixx_str=ref.Ixx_normal, Iyy_str=ref.Iyy_normal,
-                h=ref.h_sp_c_shear*ref.c, L=ref.w_sk_c_shear * ref.c, t_upper=ref.t_sk_shear,
+                h=ref.h_sp_c_shear*ref.c, L=ref.w_sk_shear, t_upper=ref.t_sk_shear,
                 t_spar1=ref.t_sp_shear, t_spar2=ref.t_sp_shear, t_lower=ref.t_sk_shear)
 
     ws.bending_loads(Mx = ref.Mx,My = ref.My)
@@ -284,16 +310,19 @@ for i,p in enumerate(percentages):
     ws.compute_stresses()
     ws.shear_flow_plotter(show=False,type="total")
 
-    sensi_shear_T[i] = ws.shear_stress_max
+    if type_s == "Max":
+        sensi_shear_T[i] = ws.shear_stress_max
+    if type_s == "Point":
+        sensi_shear_T[i] = ws.q1_tot(s1)/ref.t_sk_shear
 
 ###Changing the thickness of the spar
 for i,p in enumerate(percentages):
     t_sp = (1+p) * ref.t_sp_shear
 
-    MOI = Inertia_shear_var(t_sp=t_sp,t_sk=ref.t_sk_shear,w_sk_c=ref.w_sk_c_shear,n_str=ref.n_str_normal)
+    MOI = Inertia_shear_var(t_sp=t_sp,t_sk=ref.t_sk_shear,n_str=ref.n_str_normal)
     MOI.compute_inertia(x=x)
     ws = stresses(Ixx=MOI.Ixx_shear, Iyy=MOI.Iyy_shear, Ixx_str=ref.Ixx_normal, Iyy_str=ref.Iyy_normal,
-                h=ref.h_sp_c_shear*ref.c, L=ref.w_sk_c_shear * ref.c, t_upper=ref.t_sk_shear,
+                h=ref.h_sp_c_shear*ref.c, L=ref.w_sk_shear, t_upper=ref.t_sk_shear,
                 t_spar1=t_sp, t_spar2=t_sp, t_lower=ref.t_sk_shear)
 
     ws.bending_loads(Mx = ref.Mx,My = ref.My)
@@ -301,16 +330,19 @@ for i,p in enumerate(percentages):
     ws.compute_stresses()
     ws.shear_flow_plotter(show=False,type="total")
 
-    sensi_shear_t_sp[i] = ws.shear_stress_max
+    if type_s == "Max":
+        sensi_shear_t_sp[i] = ws.shear_stress_max
+    if type_s == "Point":
+        sensi_shear_t_sp[i] = ws.q1_tot(s1)/ref.t_sk_shear
 
 ###Changing the thickness of the skin
 for i, p in enumerate(percentages):
     t_sk = (1 + p) * ref.t_sk_shear
 
-    MOI = Inertia_shear_var(t_sp=ref.t_sp_shear, t_sk=t_sk, w_sk_c=ref.w_sk_c_shear, n_str=ref.n_str_normal)
+    MOI = Inertia_shear_var(t_sp=ref.t_sp_shear, t_sk=t_sk, n_str=ref.n_str_normal)
     MOI.compute_inertia(x=x)
     ws = stresses(Ixx=MOI.Ixx_shear, Iyy=MOI.Iyy_shear, Ixx_str=ref.Ixx_normal, Iyy_str=ref.Iyy_normal,
-                  h=ref.h_sp_c_shear * ref.c, L=ref.w_sk_c_shear * ref.c, t_upper=t_sk,
+                  h=ref.h_sp_c_shear * ref.c, L=ref.w_sk_shear, t_upper=t_sk,
                   t_spar1=ref.t_sp_shear, t_spar2=ref.t_sp_shear, t_lower=t_sk)
 
     ws.bending_loads(Mx=ref.Mx, My=ref.My)
@@ -318,7 +350,14 @@ for i, p in enumerate(percentages):
     ws.compute_stresses()
     ws.shear_flow_plotter(show=False, type="total")
 
-    sensi_shear_t_sk[i] = ws.shear_stress_max
+    if type_s == "Max":
+        sensi_shear_t_sk[i] = ws.shear_stress_max
+    if type_s == "Point":
+        sensi_shear_t_sk[i] = ws.q1_tot(s1)/t_sk
+
+    print("Skin thickness",t_sk)
+    print("Ixx shear",MOI.Ixx_shear)
+    print("Iyy shear", MOI.Iyy_shear)
 
 ###Plotting
 def bending_sensitivity_plot(Mx,My,t_str,t_sp,t_sk,h_str,imposed):
@@ -428,7 +467,9 @@ def shear_sensitivity_plot(Vx,Vy,T,t_sp,t_sk,imposed):
     plt.show()
 
 #bending_sensitivity_plot(Mx=False,My=False,t_str=False,t_sp = False,t_sk=False,h_str=True,imposed=True)
-shear_sensitivity_plot(Vx=True,Vy = True,T=True,t_sp=True,t_sk=True,imposed=False)
+#bending_sensitivity_plot(Mx=True,My=True,t_str=True,t_sp = True,t_sk=True,h_str=True,imposed=True)
+
+shear_sensitivity_plot(Vx=True,Vy = True,T=True,t_sp=True,t_sk=True,imposed=True)
 
 
 

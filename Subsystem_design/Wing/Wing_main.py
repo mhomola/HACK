@@ -58,7 +58,7 @@ for i, x in enumerate(x_arr):
 
     ### NORMAL STRESSES
     wing_stress = stresses(Ixx=MOI_shear.Ixx_shear, Iyy=MOI_shear.Iyy_shear, Ixx_str=MOI_normal.Ixx_normal, Iyy_str=MOI_normal.Iyy_normal,
-                           h=MOI_normal.h_sp_c*c, L=MOI_normal.w_sk_c*c, t_upper=MOI_normal.t_sk, t_spar1=MOI_normal.t_sp, t_spar2=MOI_normal.t_sp, t_lower=MOI_normal.t_sk)
+                           h=MOI_normal.h_sp_c*MOI_normal.chord_inertia(x=x), L=MOI_normal.w_sk, t_upper=MOI_normal.t_sk, t_spar1=MOI_normal.t_sp, t_spar2=MOI_normal.t_sp, t_lower=MOI_normal.t_sk)
 
     wing_stress.shear_loads(Vx=Sx_arr[i],Vy=Sy_arr[i],T=T_arr[i])
     wing_stress.bending_loads(Mx=Mx_arr[i],My=My_arr[i])
@@ -73,7 +73,7 @@ for i, x in enumerate(x_arr):
 
     ###SHEAR STRESSES
     wing_stress = stresses(Ixx=MOI_shear.Ixx_shear, Iyy=MOI_shear.Iyy_shear, Ixx_str=MOI_normal.Ixx_normal, Iyy_str=MOI_normal.Iyy_normal,
-                           h=MOI_shear.h_sp_c * c, L=MOI_shear.w_sk_c * c, t_upper=MOI_shear.t_sk, t_spar1=MOI_shear.t_sp, t_spar2=MOI_shear.t_sp, t_lower=MOI_shear.t_sk)
+                           h=MOI_shear.h_sp_c * MOI_shear.chord_inertia(x=x), L=MOI_shear.w_sk, t_upper=MOI_shear.t_sk, t_spar1=MOI_shear.t_sp, t_spar2=MOI_shear.t_sp, t_lower=MOI_shear.t_sk)
 
     wing_stress.shear_loads(Vx=Sx_arr[i], Vy=Sy_arr[i], T=T_arr[i])
     wing_stress.bending_loads(Mx=Mx_arr[i], My=My_arr[i])
@@ -84,40 +84,46 @@ for i, x in enumerate(x_arr):
 
 
 
-#lw.plot_loads()
-#plt.figure()
+def stresses_plotting(mises,compression,tension,shear_flow,shear_stress):
 
-###VON MISES STRESS PLOT
-# plt.plot(x_arr,vm_arr/10**6)
-# plt.xlabel("Span location[m]")
-# plt.ylabel("Von Mises Stress [MPa]")
-# plt.figure()
+    if mises == True:
+        ###VON MISES STRESS PLOT
+        plt.plot(x_arr,vm_arr/10**6)
+        plt.xlabel("Span location[m]")
+        plt.ylabel("Von Mises Stress [MPa]")
+        plt.figure()
 
-##COMPRESSION STRESS PLOT
-print("Compression stress",min(compression_arr)/10**6)
-plt.plot(x_arr,compression_arr/10**6)
-plt.xlabel("Span location[m]")
-plt.ylabel("Compression Stress [MPa]")
-plt.figure()
+    if compression == True:
+        ##COMPRESSION STRESS PLOT
+        print("Compression stress",min(compression_arr)/10**6)
+        plt.plot(x_arr,compression_arr/10**6)
+        plt.xlabel("Span location[m]")
+        plt.ylabel("Compression Stress [MPa]")
+        plt.figure()
 
-###TENSION STRESS PLOT
-# plt.plot(x_arr,tension_arr/10**6)
-# plt.xlabel("Span location[m]")
-# plt.ylabel("Tension Stress [MPa]")
-# plt.figure()
+    if tension == True:
+        ###TENSION STRESS PLOT
+        plt.plot(x_arr,tension_arr/10**6)
+        plt.xlabel("Span location[m]")
+        plt.ylabel("Tension Stress [MPa]")
+        plt.figure()
 
-###SHEAR FLOWS PLOT
-# plt.plot(x_arr,q_arr/10**6)
-# plt.xlabel("Span location[m]")
-# plt.ylabel("Shear flows [MPa/m]")
+    if shear_flow == True:
+        ###SHEAR FLOWS PLOT
+        plt.plot(x_arr,q_arr/10**6)
+        plt.xlabel("Span location[m]")
+        plt.ylabel("Shear flows [MPa/m]")
+        plt.figure()
 
-###SHEAR STRESS PLOT
-print("Max shear stress",max(shear_stress_arr)/10**6)
-plt.plot(x_arr,shear_stress_arr/10**6)
-plt.xlabel("Span location[m]")
-plt.ylabel("Shear Stress [MPa]")
-plt.show()
+    if shear_stress == True:
+        ###SHEAR STRESS PLOT
+        print("Max shear stress",max(shear_stress_arr)/10**6)
+        plt.plot(x_arr,shear_stress_arr/10**6)
+        plt.xlabel("Span location[m]")
+        plt.ylabel("Shear Stress [MPa]")
+    #plt.show()
 
+stresses_plotting(mises=False,compression=True,tension=False,shear_flow=False,shear_stress=True)
 ###MOI Graphs
 # plt.plot(x_arr,Ixx_arr,"blue")
 # plt.plot(x_arr,Iyy_arr,"red")
