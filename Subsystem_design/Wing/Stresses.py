@@ -623,6 +623,12 @@ class stresses():
         self.sigma_total()
         self.von_Misses()
 
+    def torsional_constant(self):
+        line_int = self.s1 / self.t_upper + self.s2 / self.t_spar1 + self.s3 / self.t_lower + self.s4/self.t_spar2 + \
+                    + self.s5/self.t_spar2 + self.s6/self.t_upper
+        Ao = self.h * self.L
+        self.J = 4*pow(Ao,2)/line_int
+
 
 
 def colorline(x, y, z= None, cmap=plt.get_cmap('copper'),

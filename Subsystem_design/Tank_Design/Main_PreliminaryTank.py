@@ -23,7 +23,7 @@ class spacial_constraints():
 total_vol = V_H2 / 1000 #[m^3]
 pod_H2_vol = total_vol/2  # [m^3] the volume of LH2 in each pod
 
-pod = spacial_constraints(volume=pod_H2_vol, width=2.2, height=2.2)
+pod = spacial_constraints(volume=pod_H2_vol, width=2.1, height=2.1)
 pod_tank = Mechanical_Design.OnlyPods(constraints=pod, dp=Mechanical_Design.dp, s_a=Mechanical_Design.s_a,
                                       e_w=Mechanical_Design.e_w, material_insulation=Materials.MLI
                                       , material_inner=Materials.Al_2090_T81, material_outer=Materials.Al_2090_T81,
