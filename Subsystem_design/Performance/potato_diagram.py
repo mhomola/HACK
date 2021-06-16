@@ -11,15 +11,15 @@ import matplotlib.pyplot as plt
 class potato_diagram(Constants):
     def __init__(self):
         super().__init__()
-        self.Cargo_fd = 3402            # [kg]
-        self.Cargo_af = 3402+1497            # [kg]
-        self.FuelW_ker = 10000        # [kg]
+        self.Cargo_fd = 6120/2            # [kg]
+        self.Cargo_af = 6120/2            # [kg]
+        self.FuelW_ker = 6010        # [kg]
         self.FuelW_H2 = 2690           # [kg]
 
     def oew_cg_hack(self):
         ### --- NEO --- ##
         OEW_neo = self.OEW_320neo                           # [kg]
-        cg_OEW_neo = 0.25* self.mac + self.x_LEMAC           # from nose [m]
+        cg_OEW_neo = 0.3* self.mac + self.x_LEMAC           # from nose [m]
         weight_APU = 145 # [kg] later put in self.weight_APU
         cg_APU = 34.63                                      # from nose [m]
         ### --- HACK --- ##
@@ -40,7 +40,7 @@ class potato_diagram(Constants):
               '\n oew cg of hack (% of MAC) = ', cg_OEW_HACK_MAC,
               '\n oew cg of hack (from nose) = ', cg_OEW_HACK,
               '\n oew cg of neo (from nose) = ', cg_OEW_neo,
-              '\n weight of the central tank = ', self.center_tank_mass, 'weight of pod tank = ', self.pod_tank_mass)
+              '\n weight of pod tank = ', self.pod_tank_mass)
         self.cg_LH2_tanks = cg_LH2_tanks
         self.OEW_HACK = OEW_HACK
         self.cg_OEW_HACK_MAC = cg_OEW_HACK_MAC
@@ -243,11 +243,16 @@ class potato_diagram(Constants):
         x_min = np.min([min(x1_list), min(x2_list_f),min(x3_list_f),min(x4_list_f),min(x5_list),min(x6_list)])
         x_max = np.max([max(x1_list), max(x2_list_a),max(x3_list_a),max(x4_list_a),max(x5_list),max(x6_list)])
 
+        self.x_min = x_min
+        self.x_max = x_max
+
         label_sm = str(str(SafeMargin*100)+ ' % Safety margin' )
         plt.axvline(x = x_min, color = 'black', linewidth = 1, linestyle = '--',label = label_sm)
         plt.axvline(x = x_max, color = 'black', linewidth = 1, linestyle = '--')
         plt.axvline(x = x_min-SafeMargin, color = 'black', linewidth = 1, linestyle = '--')
         plt.axvline(x = x_max+SafeMargin, color = 'black', linewidth = 1, linestyle = '--')
+        plt.axhline(y = self.MZFW_320neo+2000, color = 'red', linewidth = 1, linestyle = '--', label = 'MZFW')
+        plt.axhline(y=self.MTOW_320hack, color='blue', linewidth=1, linestyle='--', label='MTOW')
 
         #plt.xlim([,]) # eventually set x axis limits
         plt.grid(axis='y')
@@ -263,8 +268,21 @@ class potato_diagram(Constants):
 
         print('Original design OEW cg:',xcg0)
 
+    def mac_maingear(self, weight, cg_mac):
+            d_cg_nose = 15.1+ cg_mac* 4.312
+            r_nose_main = (12.64+5.07-d_cg_nose)/(d_cg_nose-5.07)
+            loadfrac_nose = 1/(1+1/r_nose_main)
+            loadfrac_main = 1/(1+r_nose_main)
+            self.loadfrac_nose = loadfrac_main
+            self.loadfrac_main = loadfrac_main
+
 
 if __name__ == '__main__':
+    c = Constants()
     p = potato_diagram()
     p.oew_cg_hack()
     p.load_diagram()
+    p.mac_maingear(weight= c.MZFW_320neo+2000, cg_mac=p.x_min)
+    print('\n Min main gear load (% of weight) = ', p.loadfrac_main*100)
+    p.mac_maingear(weight= c.MZFW_320neo + 2000, cg_mac=p.x_max)
+    print('\n Max main gear load (% of weight) = ', p.loadfrac_main*100)

@@ -101,47 +101,47 @@ class Engine_Cool(Engine_Cycle):
     # def SZ_air(self, Tpz, mf_hot, mf_h2, mf_ker, T03, T04):
     def SZ_air(self, a, p, Tpz):
 
-        cycle.cycle_analysis(a, p)
+        self.cycle_analysis(a, p)
         # Contribution of air that enters the Primary Zone
-        self.integral(self.N2_cp_data, cycle.T04, Tpz)
-        self.A = self.cp_integral * cycle.mf_hot
+        self.integral(self.N2_cp_data, self.T04, Tpz)
+        self.A = self.cp_integral * self.mf_hot
         # self.A = self.cp_gas * mf_hot * (T04 - Tpz)
 
         # Contribution of hydrogen
-        self.integral(self.h2_cp_data, cycle.T04, Tpz)
-        self.B = self.cp_integral * cycle.mf_h2
+        self.integral(self.h2_cp_data, self.T04, Tpz)
+        self.B = self.cp_integral * self.mf_h2
         # self.B = self.cp_gas * mf_h2 * (T04 - Tpz)
 
         # Contribution of kerosene
-        self.integral(self.C12H26_cp_data, cycle.T04, Tpz)
-        self.C = self.cp_integral * cycle.mf_ker
+        self.integral(self.C12H26_cp_data, self.T04, Tpz)
+        self.C = self.cp_integral * self.mf_ker
         # self.C = self.cp_gas * mf_ker * (T04 - Tpz)
         #
         # (Partial) contribution of air that enters the Secondary Zone
-        self.integral(self.N2_cp_data, cycle.T03, cycle.T04)
-        self.D = self.cp_integral * cycle.mf_hot
+        self.integral(self.N2_cp_data, self.T03, self.T04)
+        self.D = self.cp_integral * self.mf_hot
         # self.D = self.cp_air * mf_hot * (T04 - T03)
 
         self.mr_SZair = (self.A + self.B + self.C) / (self.A + self.D)
         # self.err = (self.mr_SZair - self.mr_SZair_simpl) / self.mr_SZair_simpl * 100
 
         ''' USE THIS TO GET UPDATED TPZ FROM IVAN'S CODE ''' # eqr at PZ
-        self.eqr = (cycle.mf_fuel / (cycle.mf_hot * (1-self.mr_SZair))) / cycle.stoichiometric_ratio
+        self.eqr = (self.mf_fuel / (self.mf_hot * (1-self.mr_SZair))) / self.stoichiometric_ratio
 
 
 
 
-def get_TPZ(a, p, p03, T03, eqr):
+def get_TPZ(a, p, p03, T03, eqr,n_h2,n_ker,n_O2,n_N2):
     ''' GET TPZ - RIGHT NOW WITH A MISTAKE THOUGH, WILL FIX THIS (Sara) '''  # Inputs are ( aircraft/phase, P03, T03, phi_PZ )
     if a == 'neo':
-        TPZ, MF, MF_names = eng.reactor1('neo', float(p03), float(T03), float(eqr), nargout=3)
+        TPZ, MF, MF_names = eng.reactor1('neo', float(p03), float(T03), float(eqr),float(n_h2),float(n_ker),float(n_O2),float(n_N2),nargout=3)
     elif a == 'hack':
         if p in ['idle', 'taxi_out', 'taxi_in']:
-            TPZ, MF, MF_names = eng.reactor1('hack_h2', float(p03), float(T03), float(eqr), nargout=3)
+            TPZ, MF, MF_names = eng.reactor1('hack_h2', float(p03), float(T03), float(eqr),float(n_h2),float(n_ker),float(n_O2),float(n_N2), nargout=3)
         else:
-            TPZ, MF, MF_names = eng.reactor1('hack_mix', float(p03), float(T03), float(eqr), nargout=3)
+            TPZ, MF, MF_names = eng.reactor1('hack_mix', float(p03), float(T03), float(eqr),float(n_h2),float(n_ker),float(n_O2),float(n_N2), nargout=3)
 
-    return TPZ
+    return TPZ, MF
 
 
 if __name__ == "__main__":
@@ -158,33 +158,44 @@ if __name__ == "__main__":
         for p in phases:
             print("\n", p)
             cycle.cycle_analysis(a, p)
-            eqr_old = cycle.equivalence_ratio
 
-            TPZ = get_TPZ(a, p, cycle.p03, cycle.T03, cycle.equivalence_ratio)
-            print('1st TPZ from Matlab:', TPZ)
+            '''Getting moles/second of H2 and kerosene'''
+            n_h2, n_ker, n_O2, n_N2 = cycle.n_h2, cycle.n_ker, cycle.n_O2, cycle.n_N2           # Number of moles/sec for a
+                                                                                                # stoichiometric reaction
+
+            cool.SZ_air(a, p, cycle.TPZ)
+            # eqr_old = cool.eqr
+            print('Initial TPZ [K]:', cycle.TPZ, ' Initial mr_cool', cool.mr_SZair, ' Initial eqr', cool.eqr)
+
+            ''' LOOP FOR CONVERGENCE OF EQUIVALENCE RATIO
+                USE EQR FROM CoolEngine.py ON THE FIRST ITERATION OF IVAN'S CODE '''
+
+            # INITIALIZE WHILE LOOP
+            # eqr_old = cool.eqr.copy()
+            eqr_old = 0.7 # initial value
+            TPZ, MF = get_TPZ(a, p, cycle.p03, cycle.T03, 0.7, n_h2, n_ker, n_O2, n_N2)
             cool.SZ_air(a, p, TPZ)
-            print('1st MR from engine cycle:', cycle.mr_SZair_simpl1, 'MR with this new TPZ:', cool.mr_SZair)
-            print('1st eqr from engine cycle:', cycle.equivalence_ratio, 'eqr with this new TPZ:', cool.eqr)
+            print('Initial TPZ [K]:', round(TPZ, 3),'Initial mr_cool:', round(cool.mr_SZair, 3))
+            print(' Initial eqr:', 0.7, ' Updated eqr:', round(cool.eqr, 3))
 
-            ''' LOOP FOR CONVERGENCE OF EQUIVALENCE RATIO '''
-            eqr_new = cool.eqr
-            err = abs(eqr_new-eqr_old)/eqr_new
-            print('Initial error between eqr from Engine_Cycle and Cool_Engine:', err*100, '[%]')
-            eqr_old = eqr_new # to start while loop
-
+            err = 1
             while err > 0.02: # error larger than 2%
-                print('Error at each iteration:', err*100, '[%]')
-                TPZ = get_TPZ(a, p, cycle.p03, cycle.T03, cool.eqr)
+                TPZ,_ = get_TPZ(a, p, cycle.p03, cycle.T03, cool.eqr, n_h2, n_ker, n_O2, n_N2)
                 cool.SZ_air(a, p, TPZ)
                 err = abs(cool.eqr - eqr_old) / cool.eqr
-                eqr_old = cool.eqr
-                print('Updated TPZ:', TPZ, ' Updated MR:', cool.mr_SZair, 'Updated eqr:', cool.eqr)
+                eqr_old = cool.eqr.copy()
+                print('Error at each iteration:', round(err * 100, 3), '[%]')
+                print('Updated TPZ:', round(TPZ, 3), ' Updated MR:', round(cool.mr_SZair, 3), 'Updated eqr:', round(cool.eqr, 3))
 
             save_data.append([1-cool.mr_SZair])
             # print('mf hot = ', cycle.mf_hot, 'mf h2 = ', cycle.mf_h2, 'mf ker = ', cycle.mf_ker, 'T03 = ', cycle.T03, 'T04 = ', cycle.T04)
             # print('P03', cycle.p03)
-            print('\nFINAL\nMass ratio of air injected on DZ:', round(cool.mr_SZair,3))
-            print('TPZ = ', round(TPZ,3))
+            print('\nFINAL\nMass ratio of air injected on DZ:', round(cool.mr_SZair, 3))
+            print('TPZ = ', round(TPZ, 3), 'Eqr:', round(cool.eqr, 3))
+
+            file = open(a+'_'+p+'.txt', 'a')
+            file.write('\nEqr\t'+str(round(cool.eqr, 3))+'\t-')
+            file.close()
 
         if a == 'neo':
             np.savetxt('mr_cc_neo.dat', np.array(save_data))

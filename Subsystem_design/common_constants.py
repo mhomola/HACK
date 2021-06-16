@@ -3,7 +3,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from math import pi
 from Subsystem_design.fuel_required import V_H2, V_k
-from Subsystem_design.Tank_Design.Main_PreliminaryTank import mass_pod, volume_pod
+from Subsystem_design.Tank_Design.Main_PreliminaryTank import mass_pod, volume_pod, l_wing_pod, d_wing_pod
 from Subsystem_design.Engine.EnergySplit import LHV_hack, ER_h2, ER_ker, MR_h2, MR_ker
 
 
@@ -111,6 +111,7 @@ class Constants():
         self.l_tail = self.l_f - self.l_cabin - self.l_cockpit      # Length of the tail                            [m]
         self.S_b_fus = np.pi * 0.3/2 * 0.45/2                       # Base surface area                            [m^2]
         self.sweep_LE = 27                                          # Wing sweep                                   [deg]
+        self.dihedral = 6                                           # Wing dihedral                                [deg]
         self.X_root_wing = 11.88                                    # Distance from nose to root of wing            [m]
         self.X_root_vtail = 30.11                                   # Distance from nose to root of vertical tail   [m]
         self.X_root_htail = 31.60                                   # Distance from nose to root of horizontal tail [m]
@@ -155,8 +156,13 @@ class Constants():
         self.pod_V_H2 = volume_pod * 0.885                    # Volume of H2 in each wing pod                    [m^3]
         self.pod_tank_mass = mass_pod                         # Mass of each pod tank (we have 2 tank)           [kg]
         self.pod_H2_mass = self.pod_V_H2 * 71.1               # Mass of H2 in each pod tank (we have 2 tank)     [kg]
-        self.x_cg_pod = 18.23                                 # From the nose                                    [m]
-        self.y_cg_pod = 0.55*self.b/2                         # Y location of the pods on the wing                [m]
+
+        self.pod_length = l_wing_pod
+        self.pod_diameter = d_wing_pod
+
+        self.x_cg_pod = 15.6 + self.pod_length/2               # From the nose                                    [m]
+        self.y_cg_pod = 0.55 * self.b/2                         # Y location of the pods on the wing              [m]
+        self.dummy = 1
 
         """Weights of HACK"""
         self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                       [kg]
@@ -207,14 +213,15 @@ class Constants():
 
         # self.h2_cp_data = np.array(np.genfromtxt('h2_cp.dat'))      # cp vs. T data for h2          T[K]; cp[kJ/(kg*K)]
         self.molarmass_h2 = 2.01588                                 # Molar mass of h2                          [g/mol]
+        self.molarmass_C = 12.01
 
         # self.C12H26_cp_data = np.array(np.genfromtxt('C12H26_cp.dat'))  # cp vs. T data for dodecane                T[K]; cp[J/(mol*K)]
         self.h0_C12H26 = -290.90                                        # Zero enthalpy of dodecane                 [kJ/mol]         # https://www.chemeo.com/cid/34-125-5/n-Dodecane
         self.molarmass_C12H26 = 170.3348                                # Molar mass of dodecane                    [g/mol]
-
+        self.molar_mass_kerosene = 137.238                              #                                           [g/mol]
 
         self.stoich_ratio_ker = 1/14.79 #1/15.66 #FAR
-        self.stoich_ratio_h2 = 1/34.3 #FAR
+        self.stoich_ratio_h2 = 1/33.99#1/34.3 #FAR
         self.stoich_ratio_ker_h2 = 1/15.07
 
         # """" Altitude and speed --- USE DATAFRAME """
@@ -503,3 +510,4 @@ if __name__ == '__main__':
     print('\n T = ', c.T, ' K',
           '\n P = ', c.p, ' Pa',
           '\n rho = ', c.rho, ' kg/m^3')
+    print(c.pod_length, c.pod_diameter)

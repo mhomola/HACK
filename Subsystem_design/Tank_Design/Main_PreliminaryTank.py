@@ -20,10 +20,10 @@ class spacial_constraints():
 
 
 """ ------ Pod Tank Design ------- """
-total_vol = V_H2 / 1000 #[m^3]
+total_vol = V_H2 / 1000  # [m^3]
 pod_H2_vol = total_vol/2  # [m^3] the volume of LH2 in each pod
 
-pod = spacial_constraints(volume=pod_H2_vol, width=2.2, height=2.2)
+pod = spacial_constraints(volume=pod_H2_vol, width=2.1, height=2.1)
 pod_tank = Mechanical_Design.OnlyPods(constraints=pod, dp=Mechanical_Design.dp, s_a=Mechanical_Design.s_a,
                                       e_w=Mechanical_Design.e_w, material_insulation=Materials.MLI
                                       , material_inner=Materials.Al_2090_T81, material_outer=Materials.Al_2090_T81,
@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
     print("#######PODDED TANKS#######")
     print("Mass of one tank", mass_pod, "[kg]")
-    print("Insulation of the tank thickness", pod_tank.t_insulation * 100, "[cm]")
+    print("Insulation of the tank thickness", pod_tank.t_insulation * 1000, "[mm]")
     print("Thickness inner wall", pod_tank.t_wall_inner * 1000, "[mm]")
     print("Thickness outer wall", pod_tank.t_wall_outer * 1000, "[mm]")
     print("H2 volume that is stored per tank", volume_pod, "[m^3]")
@@ -55,5 +55,3 @@ if __name__ == '__main__':
     print("#######OVERALL#######")
     print("Added Weight = ", weight_addition, "[kg]")
     print("Volume of all Tanks = ", volume_all, "[m^3]", "complying with the required ", V_H2/1000, "[m^3]")
-
-

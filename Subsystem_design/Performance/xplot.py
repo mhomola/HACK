@@ -1,5 +1,6 @@
 from Subsystem_design.common_constants import Constants
 #from Subsystem_design.aerodynamic_subsys import AerodynamicCharacteristics
+from Subsystem_design.Performance.potato_diagram import potato_diagram
 
 
 from math import *
@@ -49,6 +50,7 @@ class xplot(Constants):
         g = 9.8065  # [m/s^2]
         rho = 1.225  # see level density [kg/m^3]
         rho_cruise = self.rho_c
+        Vh_V = 0.85
 
         ln_in = 3.29  #nacelle length [m]
         ln_out = 0      # no outer engine
@@ -108,12 +110,12 @@ class xplot(Constants):
 
         # For plotting
         def stability(Xcg):
-            denominator = (CLah(beta) * (1 - e_grad) * lh * 1) / (CLaAh(beta) * MAC)
+            denominator = (CLah(beta) * (1 - e_grad) * lh * Vh_V) / (CLaAh(beta) * MAC)
             return Xcg / denominator - (Xac_stab - 0.05) / denominator, Xcg / denominator - (Xac_stab) / denominator
 
 
         def controllability(Xcg):
-            denominator = (CLh * lh * 1) / (CLAh * MAC)
+            denominator = (CLh * lh * Vh_V) / (CLAh * MAC)
             return Xcg / denominator + ((Cmac / CLAh) - Xac_contr) / denominator
 
 
@@ -141,7 +143,8 @@ class xplot(Constants):
         #         max_cg = (lemac - lemac2_max_b) / lemac2_max_m
         #
         #     return max_cg
-
+        pd = potato_diagram()
+        pd.load_diagram()
 
         """ FIND Cmac """
         # Aerodynamic center of wing + fuselage
@@ -187,7 +190,13 @@ class xplot(Constants):
         delta_aoa_0l = -15 * pi / 180  # [rad]
         aoa_0Lf = -7.5 * pi / 180 + delta_aoa_0l * Swf / S * cos(sweep(0.7, tail=False))  # [rad]
         CLaf = CLaw(beta_low) * S_land / S
-        CL0f = -aoa_0Lf * CLaf
+        #CL0f = -aoa_0Lf * CLaf
+
+        CL_land = (self.MZFW_320neo + 2000)*9.81 / (0.5 * 1.225 * Vland**2 * 122)
+        print(CL_land)
+        CL0f = CL_land - CLaw(beta)*(12 * pi/180)
+        print('CL0f=',CL0f)
+        
         deltaCm_fuselage = -1.8 * (1 - 2.5 * bf / lf) * (pi * bf * hf * lf * CL0f) / (4 * S * MAC * CLaAh(beta_low))
         print('deltaCm_fuselage', deltaCm_fuselage)
 
@@ -202,7 +211,7 @@ class xplot(Constants):
         CL_cruise = MTOW * g / (0.5 * rho_cruise * S * (420 * .51444) ** 2)
 
         """ other variables needed for controllability line """
-        CLh = -0.35 * (Ah ** (1 / 3))
+        CLh = -0.85
         CLAh = CL_max_land
 
         """ NEEDED FOR PLOTTING """
@@ -299,9 +308,11 @@ class xplot(Constants):
             ax1.set_ylabel('${S_h}/{S}$', color='tab:red', fontsize=20)
             ax1.plot(Xcg, stab_m * Xcg + stab_b, color='tab:red', label='Stability line', marker='8', markevery=70)
             ax1.plot(Xcg, stability(Xcg)[1], linestyle='--', color='tab:red', label='Neutral line', marker='x', markevery=70)
-            ax1.plot(Xcg, contr_m * Xcg + contr_b, color='blue', label='Controllability line', marker='*', markevery=70)
-            ax1.vlines(x=0.211, ymin=-0.5, ymax=0.5)
-            ax1.vlines(x=0.529, ymin=-0.5, ymax=0.5)
+            ax1.plot(Xcg-0.05, contr_m * Xcg + contr_b, color='blue', label='Controllability line', marker='*', markevery=70)
+            ax1.vlines(x= pd.x_min-0.02, ymin=-0.5, ymax=0.5, label = 'Critical forward cg location')
+            ax1.vlines(x= pd.x_max+0.02, ymin=-0.5, ymax=0.5, label= 'Critical aft cg location')
+
+            ax1.hlines(y=0.25, xmin=-0.2, xmax=1.0)
             if len(ShS_opt) != 0:
                 ax1.axhline(y=ShS_des, linestyle='--', color='k')
             # ax1.set_ylim(( ax1.get_ylim()[0]-ShS_des, ax1.get_ylim()[1]-ShS_des ))
