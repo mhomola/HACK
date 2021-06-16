@@ -190,7 +190,13 @@ class xplot(Constants):
         delta_aoa_0l = -15 * pi / 180  # [rad]
         aoa_0Lf = -7.5 * pi / 180 + delta_aoa_0l * Swf / S * cos(sweep(0.7, tail=False))  # [rad]
         CLaf = CLaw(beta_low) * S_land / S
-        CL0f = -aoa_0Lf * CLaf
+        #CL0f = -aoa_0Lf * CLaf
+
+        CL_land = (self.MZFW_320neo + 2000)*9.81 / (0.5 * 1.225 * Vland**2 * 122)
+        print(CL_land)
+        CL0f = CL_land - CLaw(beta)*(12 * pi/180)
+        print('CL0f=',CL0f)
+        
         deltaCm_fuselage = -1.8 * (1 - 2.5 * bf / lf) * (pi * bf * hf * lf * CL0f) / (4 * S * MAC * CLaAh(beta_low))
         print('deltaCm_fuselage', deltaCm_fuselage)
 
