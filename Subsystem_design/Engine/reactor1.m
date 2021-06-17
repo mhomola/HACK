@@ -35,7 +35,7 @@ function [TPZ, MF_emis, name_emis, COf, NOxf] = reactor1(g, P_input, T_input, eq
     end
     
     function [rest, tim1, tim2] = residence_time(T,time,rlimit)
-        rlim1 = 0.08;
+        rlim1 = 0.04;
         rlim2 = rlimit;
         T1 = T(1)+rlim1*(T(end)-T(1));
         idx1 = find(T >= T1);
@@ -63,10 +63,10 @@ eqr = eqr_input; %0.3;
 
 %------------------
 
-dt = 1e-6; %time step; -4 originally
-TotalTime = 0.8; % in seconds - includes autoignition phase
+dt = 1e-7; %time step; -4 originally
+TotalTime = 0.1; % in seconds - includes autoignition phase
 nSteps = ceil(TotalTime/dt); %number of steps. Total time = nSteps*dt
-rlim = 0.995;
+rlim = 0.99;
 
 if strcmp(g,'neo') %   compare string
    gas = Solution('kerosene.yaml', 'gas');
