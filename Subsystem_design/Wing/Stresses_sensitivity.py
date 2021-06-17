@@ -355,9 +355,6 @@ for i, p in enumerate(percentages):
     if type_s == "Point":
         sensi_shear_t_sk[i] = ws.q1_tot(s1)/t_sk
 
-    print("Skin thickness",t_sk)
-    print("Ixx shear",MOI.Ixx_shear)
-    print("Iyy shear", MOI.Iyy_shear)
 
 ###Plotting
 def bending_sensitivity_plot(Mx,My,t_str,t_sp,t_sk,h_str,imposed):
