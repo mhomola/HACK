@@ -29,6 +29,18 @@ function [TPZ, MF_emis, name_emis] = reactor1(g, P_input, T_input, eqr_input,n_h
             time_idx2 = j;
     end
 
+    function [rest, tim1, tim2] = residence_time(T,time,rlimit)
+        rlim1 = 0.04;
+        rlim2 = rlimit;
+        T1 = T(1)+rlim1*(T(end)-T(1));
+        idx1 = find(T >= T1);
+        tim1 = time(idx1(1));
+        T2 = T(1)+rlim2*(T(end)-T(1));
+        idx2 =find(T >= T2);
+        tim2 = time(idx2(1));
+        rest = 1000*(tim2 - tim1);
+    end
+
 % help reactor1
 
 %-----------------
@@ -46,10 +58,10 @@ eqr = eqr_input; %0.3;
 
 %------------------
 
-dt = 1e-1; %time step; -4 originally
-TotalTime = 20; % in seconds - includes autoignition phase
-
+dt = 1e-7; %time step; -4 originally
+TotalTime = 0.1; % in seconds - includes autoignition phase
 nSteps = ceil(TotalTime/dt); %number of steps. Total time = nSteps*dt
+rlim = 0.99;
 
 if strcmp(g,'neo') %   compare string
    gas = Solution('kerosene.yaml', 'gas');
@@ -157,20 +169,28 @@ name_emis = ['CH4, ','CO, ','CO2',', H2O',', NO',', NO2',', H2']
 MF_emis =  x(nSteps,1:7)
 disp(['CPU time = ' num2str(cputime - t0)]);
 
-p = 0.005;
-[t_five_i, t_com_i] = time_res(temp,dt,p);
-t_five = tim(t_five_i) + dt/2;
-t_com = tim(t_com_i);
+%p = 0.005;
+%[t_five_i, t_com_i] = time_res(temp,dt,p);
+%t_five = tim(t_five_i) + dt/2;
+%t_com = tim(t_com_i);
 
-t_res = (t_com - t_five)*1000
+[rt, tim1, tim2] = residence_time(temp,tim,rlim);
+res_time = rt
+
+%t_res = (t_com - t_five)*1000;
 % disp(['Residence time = ', t_res, ' ms']);
+
+T_tot = temp(length(temp));
+
+idx = find(temp >= rlim*max(temp));
+i = idx(1);
 
 clf; %  clear figure
 subplot(2,2,1);
 hold on;
 plot(tim,temp,'r','LineWidth',2)%,
-plot([t_five t_five],[0 3000],'k-');
-plot([t_com t_com],[0 3000],'k-');
+plot([tim1 tim1],[0 3000],'k-');
+plot([tim2 tim2],[0 3000],'k-');
 hold off;
 xlabel('Time (s)');
 ylabel('Temperature (K)');
@@ -187,12 +207,15 @@ xlabel('Time (s)');
 ylabel('CO Mass Fraction');
 
 subplot(2,2,4)
+hold on;
 plot(tim,(x(:,5)+x(:,6))*1e6);
+plot([tim(i) tim(i)],[0 max((x(:,5)+x(:,6))*1e6)],'k-');
+hold off;
 xlabel('Time (s)');
 ylabel('NOX Mass Fraction (ppm)');
 
-COf = x(end-1,2);
-NOxf =(x(end-1,5)+x(end-1,6))*1e6;
+COf = (x(end-1,2));
+NOxf =(x(i,5)+x(i,6))*1e6;
 % disp(['CO fraction = ', x(nSteps,2)]);
 % disp(['NOx fraction = ', (x(nSteps,5)+x(nSteps,6))*1e6]);
 
