@@ -19,6 +19,7 @@ import numpy as np
 from DataEngine import DataFrame
 from Subsystem_design.common_constants import Constants
 import matlab.engine
+import math as m
 
 class Engine_Cycle(Constants):
     def __init__(self):
@@ -59,10 +60,16 @@ class Engine_Cycle(Constants):
         self.LHV_f = float(data[27])
 
         # percentage of core air that is used in combustion
-        # if aircraft == 'neo':
-        #     self.mr_air_cc = np.array(np.genfromtxt('mr_cc_neo.dat'))[i]
-        # elif aircraft == 'hack':
-        #     self.mr_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))[i]
+        if aircraft == 'neo':
+            # self.mr_air_cc = np.array(np.genfromtxt('mr_cc_neo.dat'))[i]
+            self.FAR_st = self.stoich_ratio_ker
+        elif aircraft == 'hack':
+            # self.mr_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))[i]
+            if phase in ['taxi_out', 'taxi_in', 'idle']:
+                self.FAR_st = self.stoich_ratio_h2
+            else:
+                self.FAR_st = self.stoich_ratio_ker_h2
+
 
     def get_dataframe(self, aircraft, phs):
         if aircraft == 'neo':
@@ -117,21 +124,42 @@ class Engine_Cycle(Constants):
         self.p016 = self.p021 * self.PR_noz_fan
 
         # Exit of LPC - Entrance of HPC
-        self.T025 = self.T021 + ( self.T021/self.eta_LPC ) * ( self.PR_LPC ** ( (self.k_air-1)/self.k_air ) - 1 )
+        self.T025 = self.T021 + (self.T021/self.eta_LPC) * (self.PR_LPC ** ((self.k_air-1)/self.k_air) - 1)
         self.p025 = self.p021 * self.PR_LPC
 
         # Exit of HPC - Entrance of cc
-        self.T03 = self.T025 + ( self.T025/self.eta_HPC ) * ( self.PR_HPC ** ( (self.k_air-1)/self.k_air ) - 1 )
+        self.T03 = self.T025 + (self.T025/self.eta_HPC) * (self.PR_HPC ** ((self.k_air-1)/self.k_air) - 1)
         self.p03 = self.p025 * self.PR_HPC
         self.OPR = self.p03 / self.p02         # Overall Pressure Ratio
 
+        ''' FIND NECESSARY FUEL FLOW '''
         # Exit of cc - Entrance of HPT
-        self.mf_fuel = (self.mf_hot * self.cp_gas * (self.T04-self.T03)) / (self.LHV_f*10**6 * self.eta_cc)
-        self.mf_airfuel = self.mf_hot + self.mf_fuel # at the end of the cc
-        self.mf_h2 = self.mf_fuel * self.ER_h2
-        self.mf_ker = self.mf_fuel * self.ER_ker
+        self.mf_fuel = (self.mf_hot * self.cp_gas * (self.T04 - self.T03)) / (self.LHV_f * 10**6 * self.eta_cc -
+                                                                              self.cp_gas * self.T04)
+        # initiate loop
+        # T_total = 2 * self.Thrust
+        i = 0
+        print('Initial fuel flow:', self.mf_fuel, 'T04:', self.T04, 'T03:', self.T03)
+        # while round(T_total/1000, 0) != round(self.Thrust/1000, 0) or self.T04 < self.T03:
 
-        # T04 = 1500 [K], is given
+            # if i == 0:
+            #     self.mf_fuel = mf_fuel
+            # elif T_total < self.Thrust:
+            #     self.mf_fuel = self.mf_fuel * 1.01
+            #     self.T04 = ((self.mf_fuel * self.eta_cc * self.LHV_f * 10**6) / self.cp_gas + self.mf_hot * self.T03) / \
+            #                (self.mf_hot + self.mf_fuel)
+            # elif T_total > self.Thrust or m.isnan(T_total):
+            #     self.mf_fuel = self.mf_fuel * 0.99
+            #     self.T04 = ((self.mf_fuel * self.eta_cc * self.LHV_f * 10**6) / self.cp_gas + self.mf_hot * self.T03) / \
+            #                (self.mf_hot + self.mf_fuel)
+
+            # print('Fuel flow [kg/s]:', self.mf_fuel)
+            # print('T04', self.T04)
+        self.mf_airfuel = self.mf_hot + self.mf_fuel  # at the end of the cc
+        self.mf_h2 = self.mf_fuel * self.mr_h2
+        self.mf_ker = self.mf_fuel * self.mr_ker
+
+        # T04 is given
         self.p04 = self.p03 * self.PR_cc
 
         # Power to drive fan, LPC, HPC, HPT, LPT [W]
@@ -142,67 +170,101 @@ class Engine_Cycle(Constants):
         self.W_LPT = (self.W_fan + self.W_LPC) / self.eta_mech
 
         # Exit of HPT - Entrance of LPT
-        self.T045 = self.T04 - self.W_HPT / ( self.mf_airfuel * self.cp_gas )
-        self.p045 = self.p04 * ( 1 - ( 1 - self.T045/self.T04 ) / self.eta_HPT ) ** ( self.k_gas / (self.k_gas-1) )
+        self.T045 = self.T04 - self.W_HPT / (self.mf_airfuel * self.cp_gas)
+        self.p045 = self.p04 * (1 - (1 - self.T045/self.T04) / self.eta_HPT) ** (self.k_gas / (self.k_gas-1))
 
         # Exit of LPT - Entrance of nozzle
         self.T05 = self.T045 - self.W_LPT / (self.mf_airfuel * self.cp_gas)
-        self.p05 = self.p045 * ( 1 - ( 1 - self.T05/self.T045 ) / self.eta_LPT ) ** ( self.k_gas / (self.k_gas-1) )
+        self.p05 = self.p045 * (1 - (1 - self.T05/self.T045) / self.eta_LPT) ** (self.k_gas / (self.k_gas-1))
 
         # Nozzle
         self.T07 = self.T05
         self.p07 = self.p05 * self.PR_noz_core
 
         # Is the nozzle chocked?
-        self.PR_cr_noz_core = 1 / ( ( 1 - (self.k_gas-1)/(self.k_gas+1)/self.eta_nozzle) ** (self.k_gas / (self.k_gas-1)) )
+        self.PR_cr_noz_core = 1 / ((1 - (self.k_gas-1)/(self.k_gas+1)/self.eta_nozzle) ** (self.k_gas /
+                                                                                           (self.k_gas - 1)))
+
+        self.TR_cr_noz_core = (self.k_gas + 1) / 2
+        self.T8 = self.T07 / self.TR_cr_noz_core
+        self.p8 = self.p07 / self.PR_cr_noz_core
+        self.v8 = np.sqrt(self.k_gas * self.R * self.T8)
+        self.A8 = (self.mf_airfuel * self.R * self.T8) / (self.p8 * self.v8)
+        self.T_core = self.mf_airfuel * (self.v8 - self.v0) + self.A8 * (self.p8 - self.p0)  # [N]
 
         # Exit of the nozzle
-        if self.p07/self.p0 > self.PR_cr_noz_core:
-            print('The nozzle is chocked')
-            self.TR_cr_noz_core = (self.k_gas + 1) / 2
-            self.T8 = self.T07 / self.TR_cr_noz_core
-            self.p8 = self.p07 / self.PR_cr_noz_core
-            self.v8 = np.sqrt(self.k_gas * self.R * self.T8)
-            self.A8 = (self.mf_airfuel * self.R * self.T8) / (self.p8 * self.v8)
-            self.T_core = self.mf_airfuel * (self.v8 - self.v0) + self.A8 * (self.p8 - self.p0)  # [N]
-
-        elif self.p07/self.p0 <= self.PR_cr_noz_core:
-            print('The nozzle is NOT chocked')
-            self.p8 = self.p0
-            self.T8 = self.T07 * ( 1 - self.eta_nozzle * ( 1 - (self.p8/self.p07) ** ( (self.k_gas-1)/self.k_gas ) ) )
-            self.v8 = np.sqrt( 2 * self.cp_gas * (self.T07 - self.T8) )
-            self.T_core = self.mf_airfuel * ( self.v8 - self.v0 )  # [N]
+        # if self.p07/self.p0 > self.PR_cr_noz_core:
+        #     flag_noz = 'yes'
+        #     # print('The nozzle is chocked')
+        #     self.TR_cr_noz_core = (self.k_gas + 1) / 2
+        #     self.T8 = self.T07 / self.TR_cr_noz_core
+        #     self.p8 = self.p07 / self.PR_cr_noz_core
+        #     self.v8 = np.sqrt(self.k_gas * self.R * self.T8)
+        #     self.A8 = (self.mf_airfuel * self.R * self.T8) / (self.p8 * self.v8)
+        #     self.T_core = self.mf_airfuel * (self.v8 - self.v0) + self.A8 * (self.p8 - self.p0)  # [N]
+        #
+        # elif self.p07/self.p0 <= self.PR_cr_noz_core:
+        #     flag_noz = 'no'
+        #     # print('The nozzle is NOT chocked')
+        #     self.p8 = self.p0
+        #     self.T8 = self.T07 * (1 - self.eta_nozzle * (1 - (self.p8/self.p07) ** ((self.k_gas-1)/self.k_gas)))
+        #     self.v8 = np.sqrt(2 * self.cp_gas * (self.T07 - self.T8))
+        #     self.T_core = self.mf_airfuel * (self.v8 - self.v0)  # [N]
 
         # Is the fan chocked?
-        self.PR_cr_fan = 1 / ( ( 1 - (self.k_air-1)/(self.eta_nozzle*(self.k_air+1)) ) ** (self.k_air / (self.k_air-1)) )
+        self.PR_cr_fan = 1 / ((1 - (self.k_air-1)/(self.eta_nozzle*(self.k_air+1))) ** (self.k_air / (self.k_air-1)))
 
-        # Exit of bypassed air
-        if self.p016/self.p0 > self.PR_cr_fan:
-            print('The fan is chocked')
-            self.TR_cr_bypassed = (self.k_air + 1) / 2
-            self.T18 = self.T016 / self.TR_cr_bypassed
-            self.p18 = self.p016 / self.PR_cr_fan
-            self.v18 = np.sqrt(self.k_air * self.R * self.T18)
-            self.A18 = (self.mf_cold * self.R * self.T18) / (self.p18 * self.v18)
-            self.T_fan = self.mf_cold * (self.v18 - self.v0) + self.A18 * (self.p18 - self.p0)  # [N]
+        self.TR_cr_bypassed = (self.k_air + 1) / 2
+        self.T18 = self.T016 / self.TR_cr_bypassed
+        self.p18 = self.p016 / self.PR_cr_fan
+        self.v18 = np.sqrt(self.k_air * self.R * self.T18)
+        self.A18 = (self.mf_cold * self.R * self.T18) / (self.p18 * self.v18)
+        self.T_fan = self.mf_cold * (self.v18 - self.v0) + self.A18 * (self.p18 - self.p0)  # [N]
 
-        elif self.p016/self.p0 <= self.PR_cr_fan:
-            print('The fan is NOT chocked')
-            self.p18 = self.p0
-            self.T18 = self.T016 - self.T016 * self.eta_fan * ( 1 - (self.p18/self.p016) ** ( (self.k_air-1)/self.k_air ) )
-            self.v18 = np.sqrt( 2 * self.cp_air * (self.T016 - self.T18) )
-            self.T_fan = self.mf_cold * ( self.v18 - self.v0 ) # [N]
+        # # Exit of bypassed air
+        # if self.p016/self.p0 > self.PR_cr_fan:
+        #     flag_fan = 'yes'
+        #     # print('The fan is chocked')
+        #     self.TR_cr_bypassed = (self.k_air + 1) / 2
+        #     self.T18 = self.T016 / self.TR_cr_bypassed
+        #     self.p18 = self.p016 / self.PR_cr_fan
+        #     self.v18 = np.sqrt(self.k_air * self.R * self.T18)
+        #     self.A18 = (self.mf_cold * self.R * self.T18) / (self.p18 * self.v18)
+        #     self.T_fan = self.mf_cold * (self.v18 - self.v0) + self.A18 * (self.p18 - self.p0)  # [N]
+        #
+        # elif self.p016/self.p0 <= self.PR_cr_fan:
+        #     flag_fan = 'no'
+        #     # print('The fan is NOT chocked')
+        #     self.p18 = self.p0
+        #     self.T18 = self.T016 - self.T016 * self.eta_fan * (1 - (self.p18/self.p016) ** ((self.k_air-1)/self.k_air))
+        #     self.v18 = np.sqrt(2 * self.cp_air * (self.T016 - self.T18))
+        #     self.T_fan = self.mf_cold * (self.v18 - self.v0) # [N]
 
 
         self.T_total = self.T_fan + self.T_core # [N]
-        self.TSFC = self.mf_fuel / (self.T_total*10**(-3)) # [g/kN/s]
+        # i += 1
+        print('[kN] Required Thrust:', self.Thrust / 1000, 'Actual Thrust:', self.T_total / 1000)
+
+        # self.T_total = T_total
+        self.TSFC_m = self.mf_fuel / (self.T_total*10**(-3))        # [g/kN/s]
+        self.TSFC_e = self.mf_fuel * self.LHV_f / (self.T_total * 10 ** (-3))    # [MJ/kN/s]
+
+        # if flag_noz == 'yes':
+        #     print('Core is chocked')
+        # elif flag_noz == 'no':
+        #     print('Core is NOT chocked')
+        # elif flag_fan == 'yes':
+        #     print('Fan is chocked')
+        # elif flag_fan == 'no':
+        #     print('Fan is NOT chocked')
 
         ''' USE EQR FROM CoolEngine.py ON THE FIRST ITERATION OF IVAN'S CODE '''
-        self.stoichiometric_ratio = self.stoich_ratio_ker_h2
+        # self.stoichiometric_ratio = self.stoich_ratio_ker_h2
         #self.stoichiometric_ratio = self.mr_h2 * self.stoich_ratio_h2 + self.mr_ker * self.stoich_ratio_ker # UPDATE THIS, SOFIA
         #self.mf_air_combustion = self.mf_hot * self.mr_air_cc
         #self.equivalence_ratio = (self.mf_fuel / (self.mf_air_combustion)) / \
                                   #self.stoichiometric_ratio
+
 
         self.air_cool()
         self.mole_rate()
@@ -210,13 +272,25 @@ class Engine_Cycle(Constants):
 
 
     def air_cool(self):
+        mr_c = 0.4
+        mr_cool = 1-mr_c
+        self.eqr_PZ = (self.mf_fuel / (mr_c * self.mf_hot)) / self.FAR_st
+        self.eqr_overall = (self.mf_fuel / self.mf_hot) / self.FAR_st
 
-        self.mr_SZair_simpl1 = (self.mf_airfuel*self.cp_gas*(self.T04-self.T03) - self.mf_fuel*self.eta_cc*self.LHV_f*10**6) /\
-                               (self.mf_hot * (self.T04-self.T03)*(self.cp_gas-self.cp_air))
-        self.TPZ = self.T03 + ( self.mf_fuel*self.eta_cc*self.LHV_f*10**6 ) / (self.cp_gas*( (1-self.mr_SZair_simpl1)*self.mf_hot+self.mf_fuel ))
+        # self.mr_SZair_simpl1 = (self.mf_airfuel*self.cp_gas*(self.T04-self.T03) - self.mf_fuel*self.eta_cc*self.LHV_f*10**6) /\
+        #                        (self.mf_hot * (self.T04-self.T03)*(self.cp_gas-self.cp_air))
+        # self.TPZ = self.T03 + ( self.mf_fuel*self.eta_cc*self.LHV_f*10**6 ) / (self.cp_gas*( (1-self.mr_SZair_simpl1)*self.mf_hot+self.mf_fuel ))
+        #
+        # self.mr_SZair_simpl = (self.mf_airfuel * self.cp_gas * (self.TPZ - self.T04)) / (
+        #             self.mf_hot * (self.cp_air * (self.T04 - self.T03) + self.cp_gas * (self.TPZ - self.T04))) # just to check but should be the same as simpl1
 
-        self.mr_SZair_simpl = (self.mf_airfuel * self.cp_gas * (self.TPZ - self.T04)) / (
-                    self.mf_hot * (self.cp_air * (self.T04 - self.T03) + self.cp_gas * (self.TPZ - self.T04))) # just to check but should be the same as simpl1
+        TPZ1 = self.T04 - (mr_cool * self.mf_hot * self.cp_air * (self.T03 - self.T04)) / ((mr_c * self.mf_hot +
+                                                                                           self.mf_fuel) * self.cp_gas)
+        TPZ2 = self.T03 + (self.mf_fuel * self.eta_cc * self.LHV_f * 10**6) / (self.cp_gas * (mr_c * self.mf_hot +
+                                                                                              self.mf_fuel))
+
+        self.TPZ = (TPZ1 + TPZ2) / 2            # Total temperature at the end of the PZ [K]
+
 
     def mole_rate(self):
         #Gives me mole rate
@@ -264,8 +338,8 @@ if __name__ == '__main__':
             print('Mass flow of air: Total = ', round(ec.mf_air_init,3), '[kg/s]; Core = ', round(ec.mf_hot,3), '[kg/s]; Bypassed = ', round(ec.mf_cold,3),'[kg/s]')
             print('Entrance of HPC: T025 = ', round(ec.T025,3), '[K]; p025 = ', round(ec.p025,3), '[Pa]')
             print('Entrance of CC: T03 = ', round(ec.T03,3), '[K]; p03 = ', round(ec.p03,3), '[Pa]; OPR = ', round(ec.OPR,3))
-            print('Mass flow CC: Fuel = ', round(ec.mf_fuel,3), '[kg/s]; air CC = ', round(ec.mf_hot,3), '[kg/s]; Total end of CC = ', round(ec.mf_airfuel,3),'[kg/s]')
-            print('LHV fuel = ',round(ec.LHV_f,3),'m air to cool / m air core', round(ec.mr_SZair_simpl,4), round(ec.mr_SZair_simpl1, 4) )
+            print('Mass flow CC: Fuel = ', round(ec.mf_fuel,3), '[kg/s]; air CC = ', round(ec.mf_h2,3), '[kg/s]; Total end of CC = ', round(ec.mf_ker,3),'[kg/s]')
+            print('LHV fuel = ',round(ec.LHV_f,3)) #,'m air to cool / m air core', round(ec.mr_SZair_simpl,4), round(ec.mr_SZair_simpl1, 4) )
             print('Initial estimate TPZ = ', round(ec.TPZ,3))
             print('Power: Fan = ', round(ec.W_fan,3), '[W]; LPC = ', round(ec.W_LPC,3), '[W]; HPC = ', round(ec.W_HPC,3), '[W]')
             print('LPT = ', round(ec.W_LPT,3), '[W]; HPT = ', round(ec.W_HPT,3), '[W]')
@@ -277,7 +351,8 @@ if __name__ == '__main__':
             print('Exit of fan: T016 = ', round(ec.T016,3), '[K]; p016 = ', round(ec.p016,3), '[Pa]; PR_cr_fan = ', ec.PR_cr_fan)
             print('Exit of fan: T18 = ', round(ec.T18,3), '[K]; p18 = ', round(ec.p18,3), '[Pa]; v18 = ', round(ec.v18,3), '[m/s]')
             print('Provided Thrust: Fan = ', round(ec.T_fan,3), '[N]; Core = ', round(ec.T_core,3), '[N]; Total = ', round(ec.T_total,3), '[N]')
-            print('Thrust SFC = ', round(ec.TSFC,5), '[g/kN/s]; Equivalence ratio = ', round(ec.equivalence_ratio,4))
+            print('Thrust SFC = ', round(ec.TSFC_m,5), '[g/kN/s];', round(ec.TSFC_e,5), '[MJ/kN/s]')
+            print('\nEqr PZ:', round(ec.eqr_PZ,3), 'Eqr Overall:', round(ec.eqr_overall,3))
 
             amb = [['T0', round(ec.T0,3), 'K'], ['p0', round(ec.p0,3), 'Pa'], ['v0', round(ec.v0,3), 'm/s']]
             air = [['m_intake', round(ec.mf_air_init,3), 'kg/s'], ['m_hot', round(ec.mf_hot,3), 'kg/s'], ['m_cold', round(ec.mf_cold,3), 'kg/s']]
@@ -295,7 +370,8 @@ if __name__ == '__main__':
             st8 = [['T8', round(ec.T8,3), 'K'], ['p8', round(ec.p8,3), 'Pa'], ['v8', round(ec.v8,3), 'm/s']]
             st16 = [['T016', round(ec.T016,3), 'K'], ['p016', round(ec.p016,3), 'Pa']]
             st18 = [['T18', round(ec.T18,3), 'K'], ['p18', round(ec.p18,3), 'Pa'], ['v18', round(ec.v18,3), 'm/s']]
-            Thr = [['T_fan', round(ec.T_fan,3), 'N'], ['T_core', round(ec.T_core,3), 'N'], ['T_tot', round(ec.T_total,3), 'N'], ['TSCF', round(ec.TSFC,5), 'g/kN/s']]
+            Thr = [['T_fan', round(ec.T_fan,3), 'N'], ['T_core', round(ec.T_core,3), 'N'],
+                   ['T_tot', round(ec.T_total,3), 'N'], ['TSCF', round(ec.TSFC_m,5), 'g/kN/s'], ['TSCF', round(ec.TSFC_e,5), 'MJ/kN/s']]
             OPR = ['OPR',round(ec.OPR,3), '-']
 
             save_txt = amb + air + st0 + st2 + [BPR] + st21 + st25 + st3 + st4 + fuel + st45 + st5 + st7 + st8 + st16 + st18 + Thr + [OPR]

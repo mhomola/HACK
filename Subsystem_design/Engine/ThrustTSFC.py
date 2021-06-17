@@ -14,24 +14,26 @@ class TSFC_PR(Constants):
 
         PR_HPC_OG, T04_OG = self.get_data(ph)
         self.PR_HPC_OG, self.PR_LPC_OG, self.T04_OG = PR_HPC_OG, self.PR_LPC, T04_OG
-        print('LEAP-1A values\nHPC PR:',PR_HPC_OG,'; TP4:', T04_OG)
+        # print('LEAP-1A values\nHPC PR:', PR_HPC_OG, '; TP4:', T04_OG)
         self.cycle(PR_HPC_OG, T04_OG)
         self.T_core_OG, self.TSFC_OG = self.T_core.copy()/1000, self.TSFC.copy()
+        print(self.T_total/1000, self.TSFC)
 
-        # plt.figure()
-        # plt.plot( self.T_core/1000, self.TSFC, 'go')
+        plt.figure()
+        plt.plot(self.T_total/1000, self.TSFC_OG, 'bo')
+        plt.plot(22219.934/1000, 0.01419, 'go')
 
 
         ''' PLOT PR LINES '''
         if ph == 'taxi_out' or ph == 'taxi_in' or ph == 'take_off':
-            self.new_PR = np.arange(8, 21.1, 0.005)
-            self.new_T = np.arange(1600, 1731, 1)
+            self.new_PR = np.arange(8, 21.1, 0.005) # 1)
+            self.new_T = np.arange(1600, 1731, 1) # 50)
         elif ph == 'climb' or ph == 'approach':
-            self.new_PR = np.arange(7, 20.1, 0.005)
-            self.new_T = np.arange(1500, 1701, 1)
-        elif ph == 'cruise':
-            self.new_PR = np.arange(6, 20.1, 0.005)
-            self.new_T = np.arange(1400, 1651, 1)
+            self.new_PR = np.arange(7, 21.1, 0.005) # 1)
+            self.new_T = np.arange(1500, 1701, 1) # 50)
+        else: # ph == 'cruise':
+            self.new_PR = np.arange(6, 20.1, 1)# 0.005) # 1)
+            self.new_T = np.arange(1400, 1651, 50)#1) # 50)
 
 
         self.save_TSFC_PR, self.save_T4_PR, self.save_thrust_PR, self.save_var_PR = list(), list(), list(), list()
@@ -48,7 +50,7 @@ class TSFC_PR(Constants):
                 if not m.isnan(self.TSFC) and self.p07 / self.p0 > self.PR_cr_noz_core:
                     # TO PLOT
                     self.save_TSFC = np.append(self.save_TSFC, self.TSFC)
-                    self.save_thrust = np.append(self.save_thrust, self.T_core/1000) # [kN]
+                    self.save_thrust = np.append(self.save_thrust, self.T_total/1000) # [kN]
                     # TO FIND OPTIMAL VALUE
                     a.append(self.TSFC)
                     b.append(self.T_core/1000) # [kN]
@@ -58,35 +60,35 @@ class TSFC_PR(Constants):
             self.save_thrust_PR.append(list(b))
             self.save_T4_PR.append(list(c))
             # plt.plot(self.save_thrust, self.save_TSFC, color='black')
-            # plt.xlabel('Net thrust from core [kN]', fontsize=16)
-            # plt.ylabel('Thrust Specific Fuel Consumption [g/kN/s]', fontsize=16)
+            plt.xlabel('Net thrust [kN]', fontsize=16)
+            plt.ylabel('TSFC [MJ/kN/s]', fontsize=16)
 
-        # # PLOT T04 LINES
-        # self.save_TSFC_T4, self.save_PR_T4, self.save_thrust_T4, self.save_var_T4 = list(), list(), list(), list()
-        # for T_new in self.new_T:  # increase one variable at a time, the remaining stay the original value
-        #     T04 = T_new
-        #     self.save_TSFC, self.save_thrust, a, b, c = np.array([]), np.array([]), list(), list(), list()
-        #     self.save_var_T4.append(T04)
-        #
-        #     for PR_new in self.new_PR:  # increase each time by 1%, 2%, etc
-        #         PR_HPC = PR_new
-        #
-        #         self.cycle(PR_HPC, T04)
-        #         if not m.isnan(self.TSFC):
-        #             # TO PLOT
-        #             self.save_TSFC = np.append(self.save_TSFC, self.TSFC)
-        #             self.save_thrust = np.append(self.save_thrust, self.T_core / 1000)  # [kN]
-        #             # TO FIND OPTIMAL VALUE
-        #             a.append(self.TSFC)
-        #             b.append(self.T_core / 1000)  # [kN]
-        #             c.append(PR_HPC)
-        #
-        #     self.save_TSFC_T4.append(list(a))
-        #     self.save_thrust_T4.append(list(b))  # [kN]
-        #     self.save_PR_T4.append(list(c))
+        # PLOT T04 LINES
+        self.save_TSFC_T4, self.save_PR_T4, self.save_thrust_T4, self.save_var_T4 = list(), list(), list(), list()
+        for T_new in self.new_T:  # increase one variable at a time, the remaining stay the original value
+            T04 = T_new
+            self.save_TSFC, self.save_thrust, a, b, c = np.array([]), np.array([]), list(), list(), list()
+            self.save_var_T4.append(T04)
+
+            for PR_new in self.new_PR:  # increase each time by 1%, 2%, etc
+                PR_HPC = PR_new
+
+                self.cycle(PR_HPC, T04)
+                if not m.isnan(self.TSFC):
+                    # TO PLOT
+                    self.save_TSFC = np.append(self.save_TSFC, self.TSFC)
+                    self.save_thrust = np.append(self.save_thrust, self.T_total / 1000)  # [kN]
+                    # TO FIND OPTIMAL VALUE
+                    a.append(self.TSFC)
+                    b.append(self.T_core / 1000)  # [kN]
+                    c.append(PR_HPC)
+
+            self.save_TSFC_T4.append(list(a))
+            self.save_thrust_T4.append(list(b))  # [kN]
+            self.save_PR_T4.append(list(c))
             # plt.plot(self.save_thrust, self.save_TSFC, color='red')
 
-        # plt.show()
+        plt.show()
 
 
     def get_data(self, ph):
@@ -98,7 +100,7 @@ class TSFC_PR(Constants):
         elif ph == 'climb':
             data = np.array(DataFrame().neo.climb)
         elif ph == 'cruise':
-            data = np.array(DataFrame().neo.cruise)
+            data = np.array(DataFrame().hack.cruise)
         elif ph == 'approach':
             data = np.array(DataFrame().neo.approach)
         else: # ph == 'taxi_in'
@@ -114,7 +116,7 @@ class TSFC_PR(Constants):
         self.T0, self.p0, self.rho0, self.a0 = self.T, self.p, self.rho, self.a
         self.v0 = self.M0 * np.sqrt(self.cp_air * self.R * self.T0)
         self.Thrust = float(data[2])
-        self.A_eff = float(data[3])*self.A_fan
+        self.A_eff = float(data[3]) * np.pi * (float(data[28]) * 0.0254)**2 / 4
 
         self.eta_inlet = float(data[4])
         self.PR_fan = float(data[5])
@@ -134,7 +136,7 @@ class TSFC_PR(Constants):
         self.PR_noz_core = float(data[21])
         self.PR_noz_fan = float(data[22])
         self.mr_h2 = float(data[23])
-        self.m_ker = float(data[24])
+        self.mr_ker = float(data[24])
         self.ER_h2 = float(data[25])
         self.ER_ker = float(data[26])
         self.LHV_f = float(data[27])
@@ -207,10 +209,11 @@ class TSFC_PR(Constants):
         self.OPR = self.p03 / self.p02  # Overall Pressure Ratio
 
         # Exit of cc - Entrance of HPT
-        self.mf_fuel = (self.mf_hot * self.cp_gas * (T04 - self.T03)) / (self.LHV_f * 10 ** 6 * self.eta_cc)
+        self.mf_fuel = (self.mf_hot * self.cp_gas * (T04 - self.T03)) / (self.LHV_f * 10 ** 6 * self.eta_cc -
+                                                                              self.cp_gas * T04)
         self.mf_airfuel = self.mf_hot + self.mf_fuel  # at the end of the cc
-        self.mf_h2 = self.mf_fuel * self.ER_h2
-        self.mf_ker = self.mf_fuel * self.ER_ker
+        self.mf_h2 = self.mf_fuel * self.mr_h2
+        self.mf_ker = self.mf_fuel * self.mr_ker
 
         # T04 = 1500 [K], is given
         self.p04 = self.p03 * self.PR_cc
@@ -274,13 +277,14 @@ class TSFC_PR(Constants):
             self.T_fan = self.mf_cold * (self.v18 - self.v0)  # [N]
 
         self.T_total = self.T_fan + self.T_core  # [N]
-        self.TSFC = self.mf_fuel / (self.T_total * 10 ** (-3))  # [g/kN/s]
+        # self.TSFC = self.mf_fuel / (self.T_total * 10 ** (-3))  # [g/kN/s]
+        self.TSFC = self.mf_fuel * self.LHV_f / (self.T_total * 10 ** (-3))  # [MJ/kN/s]
 
 
 if __name__=='__main__':
     c = Constants()
     # phase = ['taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in']
-    phase = ['approach']
+    phase = ['cruise']
 
     for ph in phase:
         print('\nPhase:', ph)
@@ -292,7 +296,7 @@ if __name__=='__main__':
             OPR = 44.69790405
         elif ph == 'climb' or ph == 'approach':
             T4_2030 = [1586, 1545+5*9-1, 1545+5*9, 1545+5*9+1, 1593]
-            PR_low, PR_high = 7, 20
+            PR_low, PR_high = 7, 21
             OPR = 47.73806804
         else:  # ph == 'cruise'
             T4_2030 = [1460+5*9-1, 1460+5*9, 1460+5*9+1]
@@ -336,5 +340,5 @@ if __name__=='__main__':
                 print('New parameters:\nThrust [kN] = ', thrust_new, '\nT04 [K] = ', T, '\nPR LPC = ',
                       s_L[np.where(s_T4 == T)[0][0]], '\nPR HPC = ', s_H[np.where(s_T4 == T)[0][0]],
                       '\nTSFC = ', s_TSFC[np.where(s_T4 == T)[0][0]])
-            # else:
-            #     print('s_T4', s_T4, '\nT4_2030', T4_2030)
+            else:
+                print('s_T4', s_T4, '\nT4_2030', T4_2030)
