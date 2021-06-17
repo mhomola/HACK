@@ -11,15 +11,16 @@ import matplotlib.pyplot as plt
 class potato_diagram(Constants):
     def __init__(self):
         super().__init__()
-        self.Cargo_fd = 6120/2            # [kg]
-        self.Cargo_af = 6120/2            # [kg]
+        self.Cargo_fd = 3402            # [kg]
+        self.Cargo_af = 4536+1497            # [kg]
         self.FuelW_ker = 6010        # [kg]
         self.FuelW_H2 = 2690           # [kg]
+        print(self.pod_tank_mass)
 
     def oew_cg_hack(self):
         ### --- NEO --- ##
         OEW_neo = self.OEW_320neo                           # [kg]
-        cg_OEW_neo = 0.25* self.mac + self.x_LEMAC           # from nose [m]
+        cg_OEW_neo = 0.3* self.mac + self.x_LEMAC           # from nose [m]
         weight_APU = 145 # [kg] later put in self.weight_APU
         cg_APU = 34.63                                      # from nose [m]
         ### --- HACK --- ##
@@ -30,6 +31,7 @@ class potato_diagram(Constants):
         cg_LH2_tanks = self.x_cg_pod # From the nose [m]
         # Calculate A320-HAC.K cg @ OEW
         OEW_HACK = OEW_neo - weight_APU + weight_LH2_tanks + weight_DPU
+        print(OEW_HACK,'oew hack')
         cg_OEW_HACK = (self.OEW_320neo*cg_OEW_neo - weight_APU*cg_APU +
                        weight_LH2_tanks*cg_LH2_tanks +
                        weight_DPU*cg_DPU) / (OEW_neo -
@@ -40,7 +42,7 @@ class potato_diagram(Constants):
               '\n oew cg of hack (% of MAC) = ', cg_OEW_HACK_MAC,
               '\n oew cg of hack (from nose) = ', cg_OEW_HACK,
               '\n oew cg of neo (from nose) = ', cg_OEW_neo,
-              '\n weight of the central tank = ', self.center_tank_mass, 'weight of pod tank = ', self.pod_tank_mass)
+              '\n weight of pod tank = ', self.pod_tank_mass)
         self.cg_LH2_tanks = cg_LH2_tanks
         self.OEW_HACK = OEW_HACK
         self.cg_OEW_HACK_MAC = cg_OEW_HACK_MAC
@@ -67,7 +69,7 @@ class potato_diagram(Constants):
         SafeMargin  = 0.02              # [MAC]
 
         # Interior configuration
-        Num_row = 30                    # number of rows [-]
+        Num_row = 21                    # number of rows [-]
         seatpitch = 28 * 0.0254         # [m]
         x_firstrow = 6.3                #[m]
 
@@ -206,7 +208,7 @@ class potato_diagram(Constants):
         plt.scatter(x2_list_a,W2_list_a,color = 'tab:blue', marker = 'x')
         plt.plot(x2_list_a,W2_list_a,color = 'tab:blue',linewidth = '1')
 
-        #Step 3 plot - pax aisle seats
+        #Step 3 plot - pax middle seats
         x3_list_f = (np.array(xcg_ais_f) - x_LEMAC ) /MAC
         W3_list_f = np.array(W3_ais_f)
         plt.scatter(x3_list_f,W3_list_f,color = 'tab:green', marker = 'x')
@@ -217,7 +219,7 @@ class potato_diagram(Constants):
         plt.scatter(x3_list_a,W3_list_a,color = 'tab:green', marker = 'x')
         plt.plot(x3_list_a,W3_list_a,color = 'tab:green',linewidth = '1')
 
-        #Step 4 plot - pax middle seats
+        #Step 4 plot - pax aisle seats
         x4_list_f = (np.array(xcg_mid_f) - x_LEMAC ) /MAC
         W4_list_f = np.array(W4_mid_f)
         plt.scatter(x4_list_f,W4_list_f,color = 'tab:orange', marker = 'x')
@@ -263,18 +265,49 @@ class potato_diagram(Constants):
         print('Most fd cg:',x_min*100,'% MAC')
         print('Most af cg:',x_max*100,'% MAC')
         print('(Excluding the safety margin.)')
-        plt.legend()
+        plt.legend(loc= 'upper right')
         plt.show()
 
         print('Original design OEW cg:',xcg0)
 
     def mac_maingear(self, weight, cg_mac):
-            d_cg_nose = 15.1+ cg_mac* 4.312
-            r_nose_main = (12.64+5.07-d_cg_nose)/(d_cg_nose-5.07)
+            shift_lg = 0.2
+            d_cg_nose = 15.1+ (cg_mac)* 4.312       #distance between nose and the critical cg location
+            critccg_main = 12.64+5.07+(shift_lg*self.mac)-d_cg_nose   #distance b/w main gear and critical cg
+            critccg_nose = d_cg_nose - 5.07       #distance b/w nose gear and crictical cg
+            r_nose_main = critccg_main / critccg_nose
             loadfrac_nose = 1/(1+1/r_nose_main)
             loadfrac_main = 1/(1+r_nose_main)
-            self.loadfrac_nose = loadfrac_main
+            self.loadfrac_nose = loadfrac_nose
             self.loadfrac_main = loadfrac_main
+
+    def verify_cglimits(self):
+        fwd_cg_limit = 0.17
+        aft_cg_limit = 0.42
+        weight_APU = 145  # [kg] later put in self.weight_APU
+        cg_APU = 34.63  # from nose [m]
+        ### --- HACK --- ##
+        weight_DPU = 781  # [kg] later put in self.weight_DPU
+        cg_DPU = 32.5  # from nose [m] later put in self.cg_DPU
+        ### -- LH2 tanks --- ##
+        weight_LH2_tanks = 2 * self.pod_tank_mass  # [kg]
+        cg_LH2_tanks = self.x_cg_pod  # From the nose [m]
+        self.ver_min_cg = (self.MTOW_320hack*(15.10+(fwd_cg_limit*self.mac)) - weight_APU*cg_APU +
+                       weight_LH2_tanks*cg_LH2_tanks +
+                       weight_DPU*cg_DPU - 16.1452*2000) / (self.MTOW_320hack) # from nose [m]
+
+        self.ver_max_cg = (self.MTOW_320hack * (15.10+(aft_cg_limit * self.mac)) - weight_APU * cg_APU +
+                        weight_LH2_tanks * cg_LH2_tanks +
+                        weight_DPU * cg_DPU - 16.1452 * 2000) / (self.MTOW_320hack)  # from nose
+
+        print((self.ver_min_cg-15.1)/self.mac,(self.ver_max_cg-15.1)/self.mac, '--verification')
+
+    def pitchback_angle(self):
+        p = potato_diagram()
+        p.load_diagram()
+        p.mac_maingear()
+        np.arctan(p.x_min/1)
+
 
 
 if __name__ == '__main__':
@@ -282,7 +315,8 @@ if __name__ == '__main__':
     p = potato_diagram()
     p.oew_cg_hack()
     p.load_diagram()
-    p.mac_maingear(weight= c.MZFW_320neo+2000, cg_mac=p.x_min)
+    p.mac_maingear(weight= c.MZFW_320neo+2000, cg_mac=p.x_min-0.02)
     print('\n Min main gear load (% of weight) = ', p.loadfrac_main*100)
-    p.mac_maingear(weight= c.MZFW_320neo + 2000, cg_mac=p.x_max)
+    p.mac_maingear(weight= c.MZFW_320neo + 2000, cg_mac=p.x_max+0.2)
     print('\n Max main gear load (% of weight) = ', p.loadfrac_main*100)
+    p.verify_cglimits()
