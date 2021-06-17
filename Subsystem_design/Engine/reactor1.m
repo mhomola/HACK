@@ -63,7 +63,7 @@ eqr = eqr_input; %0.3;
 
 %------------------
 
-dt = 1e-8; %time step; -4 originally
+dt = 1e-6; %time step; -4 originally
 TotalTime = 0.8; % in seconds - includes autoignition phase
 nSteps = ceil(TotalTime/dt); %number of steps. Total time = nSteps*dt
 rlim = 0.995;

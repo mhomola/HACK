@@ -212,17 +212,17 @@ if __name__ == '__main__':
     SAvolume = []
     SAcost = []
 
-    for i in SensA:
+    # for i in SensA:
+    #
+    #     FC_power_sa = SF*0.001*BS.final_bat_size(i*BS.Req_power(0)[0])[0]
+    #     print(i*BS.Req_power(0)[0], ' this')
+    #     SAmass.append(total_system(FC_power_sa, BS.final_bat_size(i*BS.Req_power(0)[0])[0], BS.final_bat_size(i*BS.Req_power(0)[0])[2], BS.final_bat_size(i*BS.Req_power(0)[0])[1])[2])
+    #
+    #     # SAvolume.append(total_system(FC_power_sa)[1])
+    #     # SAcost.append(total_system(FC_power_sa)[0])
 
-        FC_power_sa = SF*0.001*BS.final_bat_size(i*BS.Req_power(0)[0])[0]
-        print(i*BS.Req_power(0)[0], ' this')
-        SAmass.append(total_system(FC_power_sa, BS.final_bat_size(i*BS.Req_power(0)[0])[0], BS.final_bat_size(i*BS.Req_power(0)[0])[2], BS.final_bat_size(i*BS.Req_power(0)[0])[1])[2])
-
-        # SAvolume.append(total_system(FC_power_sa)[1])
-        # SAcost.append(total_system(FC_power_sa)[0])
-
-    plt.plot(SensA,SAmass)
-    plt.show()
+    # plt.plot(SensA,SAmass)
+    # plt.show()
 
 
 
