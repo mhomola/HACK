@@ -58,7 +58,7 @@ for b in phases:
     print("\n", b)
     '''Run cycle analysis, to get TSFC, T_tot'''
     ec.cycle_analysis(aircraft[0],b)
-    print(Emissions_array_neo[phases==b])
+
     if printing== True:
         print('\nInlet: T0 = ', round(ec.T0, 3), '[K]; p0 = ', round(ec.p0, 3), '[Pa]; v0 = ', round(ec.v0, 3), '[m/s]')
         print('T00 = ', round(ec.T00, 3), '[K]; p00 = ', round(ec.p00, 3), '[Pa]')
@@ -96,23 +96,29 @@ for b in phases:
     n_h2,n_ker,n_O2,n_N2 = ec.n_h2,ec.n_ker,ec.n_O2,ec.n_N2                     # Number of moles/sec for a
                                                                                 # stoichiometric reaction
     cool.SZ_air(aircraft[0], b, ec.TPZ)
-    eqr_old = cool.eqr
+    #eqr_old = cool.eqr
     print('Initial TPZ [K]:', ec.TPZ, ' Initial mr_cool', cool.mr_SZair, ' Initial eqr', cool.eqr)
 
     ''' LOOP FOR CONVERGENCE OF EQUIVALENCE RATIO '''
-    eqr_old = cool.eqr.copy()
+
+    eqr_old = 0.5350926260993377#0.7  # initial value
+    TPZ, MF = get_TPZ(aircraft[0], b, ec.p03, ec.T03, 0.7, n_h2, n_ker, n_O2, n_N2)
+    cool.SZ_air(aircraft[0], b, TPZ)
+    print('Initial TPZ [K]:', round(TPZ, 3), 'Initial mr_cool:', round(cool.mr_SZair, 3))
+    print(' Initial eqr:', 0.7, ' Updated eqr:', round(cool.eqr, 3))
     err = 1
 
     while err > 0.02:  # error larger than 2%
 
         TPZ, Emissions = get_TPZ(aircraft[0], b, ec.p03, ec.T03, cool.eqr,n_h2,n_ker,n_O2,n_N2)
-        cool.SZ_air(aircraft[0], b, TPZ)
 
+        cool.SZ_air(aircraft[0], b, TPZ)
         err = abs(cool.eqr - eqr_old) / cool.eqr
         eqr_old = cool.eqr.copy()
 
         print('Error at each iteration:', err * 100, '[%]')
         print('Updated TPZ:', TPZ, ' Updated MR:', cool.mr_SZair, 'Updated eqr:', cool.eqr)
+
 
     data_list.append([1 - cool.mr_SZair])
 
@@ -125,14 +131,18 @@ for b in phases:
     '''ASSESSING THE EMISSIONS OF NEO'''
     #Getting time of phase
     time = T_required.durations[phases==b]
-    #Getting total emissions in that phase
-    mf_reactants = ec.mf_fuel + ec.mf_air_combustion
 
-    for i in Emissions_array_neo[phases==b]:
-        for j in range(len(Emissions)):
-            i[j] = Emissions[j] * mf_reactants * time
+    #Getting total emissions in that phase
+    mf_reactants = ec.mf_fuel + ec.mf_hot
+    Emissions = np.array(Emissions)
+
+    Emissions_array_neo[phases == b] = Emissions * mf_reactants * time
+
+
     print(np.array(['CH4', 'CO', 'CO2', 'H2O', 'NO', 'NO2', 'H2']))
     print('Emissions array:',Emissions_array_neo)
+
+
 
 '''ASSESSING THE CLIMATE IMPACT OF NEO'''
 #For the LTO cycle [taxi-out,take-off,clim-out(until 900m),descend(after 900m),landing,taxi-in]
@@ -157,6 +167,11 @@ h = 11600
 ATR_cruise_neo = climate.ATR(h=h, e_CO2=eCO2, e_H2O=eH2O, e_NOx=eNOx, e_soot=esoot, e_sulfate=eSO4, U=U_ker, plot=True)
 print('The average temperature response, A_100, for the cruise of the HACK is:', ATR_cruise_neo, '[K]')
 
+'''Storing Neo emissions'''
+
+file = open('Emissions_neo', 'w')
+file.write(str(Emissions_array_neo) + 'ATR during LTO' + str(ATR_LTO_neo)+ 'ATR during cruise' + str(ATR_cruise_neo))
+file.close()
 
 
 '''--------------------------------HACK--------------------------------------------'''
@@ -223,11 +238,15 @@ while Emissions_requirement != True:
             n_h2, n_ker, n_O2, n_N2 = ec.n_h2, ec.n_ker, ec.n_O2, ec.n_N2                   # Number of moles/sec for a
                                                                                             # stoichiometric reaction
             cool.SZ_air(aircraft[1], b, ec.TPZ)
-            eqr_old = cool.eqr
+            #eqr_old = cool.eqr
             print('Initial TPZ [K]:', ec.TPZ, ' Initial mr_cool', cool.mr_SZair, ' Initial eqr', cool.eqr)
 
             ''' LOOP FOR CONVERGENCE OF EQUIVALENCE RATIO '''
-            eqr_old = cool.eqr.copy()
+            eqr_old = 0.7
+            TPZ, Emissions = get_TPZ(aircraft[1], b, ec.p03, ec.T03, 0.7, n_h2, n_ker, n_O2, n_N2)
+            cool.SZ_air(aircraft[1], b, TPZ)
+            print('Initial TPZ [K]:', round(TPZ, 3), 'Initial mr_cool:', round(cool.mr_SZair, 3))
+            print(' Initial eqr:', 0.7, ' Updated eqr:', round(cool.eqr, 3))
             err = 1
 
             while err > 0.02:  # error larger than 2%
@@ -253,7 +272,7 @@ while Emissions_requirement != True:
             time = T_required.durations[phases == b]
 
             # Getting total emissions in that phase
-            mf_reactants = ec.mf_fuel + ec.mf_air_combustion
+            mf_reactants = ec.mf_fuel + ec.mf_hot
 
             for i in Emissions_array_HACK[phases == b]:
                 for j in range(len(Emissions)):

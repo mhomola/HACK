@@ -59,10 +59,10 @@ class Engine_Cycle(Constants):
         self.LHV_f = float(data[27])
 
         # percentage of core air that is used in combustion
-        if aircraft == 'neo':
-            self.mr_air_cc = np.array(np.genfromtxt('mr_cc_neo.dat'))[i]
-        elif aircraft == 'hack':
-            self.mr_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))[i]
+        # if aircraft == 'neo':
+        #     self.mr_air_cc = np.array(np.genfromtxt('mr_cc_neo.dat'))[i]
+        # elif aircraft == 'hack':
+        #     self.mr_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))[i]
 
     def get_dataframe(self, aircraft, phs):
         if aircraft == 'neo':

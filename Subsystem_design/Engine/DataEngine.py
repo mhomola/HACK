@@ -4,11 +4,16 @@ from EnergySplit import LHV_hack, MR_h2, MR_ker, ER_h2, ER_ker
 
 class DataFrame:
     def __init__(self):
+        # self.common_data= pd.DataFrame(data=np.array([['M0', 0.038, 0.12, 0.497, 0.78, 0.47, 0.038, 0],
+        #                                               ['h', 0, 0, 5800, 11600, 5800, 0, 0],
+        #                                               ['A_eff/fan', 4.2, 3.5, 1, 0.8, 1.05, 4.2, 4.4]]),# M2 = 0.5, new Mach
+        #                                       columns=['parameter', 'taxi_out', take_off1','take_off2', 'climb1','climb2','climb3', 'cruise1', 'cruise2','Descend','approach1','approach2', 'taxi_in', 'idle'])
+
         self.neo =\
             pd.DataFrame(data=np.array([['M0', 0.038, 0.12, 0.497, 0.78, 0.47, 0.038, 0],
                                         ['h', 0, 0, 5800, 11600, 5800, 0, 0],
                                         ['Thrust', 1, 1, 1, 1, 1, 1, 1],
-                                        ['A_eff/fan', 4.2, 3.5, 1, 0.8, 1.05, 4.2, 4.4], # M2 = 0.5, new Mach
+                                        ['A_eff/fan', 4.2, 3.5, 1, 0.8, 1.05, 4.2, 4.4],
                                         # ['A_eff/fan', 3.5, 3, 0.85, 0.7, 0.85, 3.5, 3.65],  # M2 = 0.4, new Mach
                                         ['eta_inlet', 0.99, 0.99, 0.99, 0.99, 0.99, 0.99, 0.99],
                                         ['PR_fan', 1.4, 1.4, 1.403, 1.4206, 1.403, 1.4, 1.4],
@@ -40,10 +45,7 @@ class DataFrame:
 
 
         self.hack = \
-            pd.DataFrame(data=np.array([['M0', 0.038, 0.12, 0.497, 0.78, 0.47, 0.038, 0],
-                                        ['h', 0, 0, 5800, 11600, 5800, 0, 0],
-                                        ['Thrust', 1, 1, 1, 1, 1, 1, 1],
-                                        ['A_eff/fan', 4.2, 3.5, 1, 0.8, 1.05, 4.2, 4.4], # M2 = 0.5, new Mach
+            pd.DataFrame(data=np.array([['Thrust', 1, 1, 1, 1, 1, 1, 1],
                                         ['eta_inlet', 0.995, 0.995, 0.995, 0.995, 0.995, 0.995, 0.995],
                                         ['PR_fan', 1.4, 1.4, 1.403, 1.4206, 1.403, 1.4, 1.4],
                                         ['eta_fan', 0.950452034, 0.950452034, 0.939948517, 0.929445, 0.939948517, 0.950452034, 0.950452034],
