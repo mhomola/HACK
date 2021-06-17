@@ -24,19 +24,24 @@ class Energy_Split():
         self.V_h2 = self.energy_h2 / self.LHV_h2 / self.rho_h2 # [L]
         self.V_ker = self.energy_ker / self.LHV_ker / self.rho_ker # [L]
 
-        self.m_h2 = self.energy_h2 / self.LHV_h2 # [kg]
-        self.m_ker = self.energy_ker / self.LHV_ker # [kg]
+        self.m_h2 = self.energy_h2 / self.LHV_h2                # [kg]
+        self.m_ker = self.energy_ker / self.LHV_ker             # [kg]
 
 
-        self.m_h2_DPU = 250 # [kg]
-        self.energy_h2_DPU = self.LHV_h2 * self.m_h2_DPU # [MJ]
+        self.m_h2_DPU = 140.7                                   # [kg]
+        self.energy_h2_DPU = self.LHV_h2 * self.m_h2_DPU        # [MJ]
         self.V_h2_DPU = self.m_h2_DPU / self.rho_h2
 
         # self.idle = 1229 # [s]
-        self.t_taxi_out = 7.5 * 60 # [s]
-        self.t_taxi_in = 8 * 60 # [s]
-        self.fuelflow_neo_to = 0.373 # 0.250196 # [kg/s]
-        self.fuelflow_neo_ti = 0.373 # 0.137205 # [kg/s]
+        self.t_idle = 5 * 60                    # 5 min [s]
+        self.fuelflow_neo_idle = 0.234 * 0.4    # [kg/s] Assumed to be 1/2 of taxi out value
+        self.energy_h2_idle = self.LHV_h2 * self.fuelflow_neo_idle * self.t_idle  # [MJ]
+        self.m_h2_idle = self.energy_h2_idle / self.LHV_h2  # [kg]
+
+        self.t_taxi_out = 7.5 * 60              # [s]
+        self.t_taxi_in = 8 * 60                 # [s]
+        self.fuelflow_neo_to = 0.234            # 0.250196 # [kg/s]
+        self.fuelflow_neo_ti = 0.234            # 0.137205 # [kg/s]
         self.energy_h2_to = self.LHV_h2 * self.fuelflow_neo_to * self.t_taxi_out # [MJ]
         self.energy_h2_ti = self.LHV_h2 * self.fuelflow_neo_ti * self.t_taxi_in  # [MJ]
         self.m_h2_to = self.energy_h2_to / self.LHV_h2 # [kg]
@@ -44,7 +49,7 @@ class Energy_Split():
 
 
         # ======= ENERGY RATIO ======= #
-        self.energy_h2_flight = self.energy_h2 - self.energy_h2_DPU - self.energy_h2_to - self.energy_h2_ti
+        self.energy_h2_flight = self.energy_h2 - self.energy_h2_DPU - self.energy_h2_to - self.energy_h2_ti - self.energy_h2_idle
         self.energy_ker_flight = self.energy_ker
 
         self.ER_h2_flight = self.energy_h2_flight / ( self.energy_h2_flight + self.energy_ker_flight )
@@ -58,7 +63,7 @@ class Energy_Split():
 
 
         # ======= MASS RATIO ======= #
-        self.m_h2_flight = self.m_h2 - self.m_h2_DPU - self.m_h2_to - self.m_h2_ti
+        self.m_h2_flight = self.m_h2 - self.m_h2_DPU - self.m_h2_to - self.m_h2_ti - self.m_h2_idle
         self.m_ker_flight = self.m_ker
         self.MR_h2_flight = self.m_h2_flight / ( self.m_h2_flight + self.m_ker_flight )
         self.MR_ker_flight = self.m_ker_flight / ( self.m_h2_flight + self.m_ker_flight )
