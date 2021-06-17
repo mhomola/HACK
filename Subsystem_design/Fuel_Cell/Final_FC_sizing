@@ -34,15 +34,18 @@ def calc_current(V):
 def calc_cur_density(Vc):
     return PCM.inverse(Vc)
 
-def FC_sizing():
+def FC_sizing(FC_power = SF*0.001*BS.final_bat_size()[0]):
 
     V = 1200 #V
     n_series = round(V/Vc)
     I = calc_current(V)
     iden = calc_cur_density(Vc)
 
-    n_cells = round(FC_power/PtoN)
-    n_paral = round(n_cells/n_series)
+    # n_cells = round(FC_power/PtoN)
+    # n_paral = round(n_cells/n_series)
+    n_cells = (FC_power / PtoN)
+    n_paral = (n_cells / n_series)
+
     n_cells = n_paral*n_series
 
     V_stack = n_cells*VpCell
@@ -57,7 +60,7 @@ def FC_sizing():
 
     return [n_series, n_paral, n_cells, I, iden, V_stack, m_stack, A/0.0001, l, l_cell,d_current]
 
-def total_system():
+def total_system(FC_power = FC_power, B_cost = B_cost, B_volume = B_volume, B_mass = B_mass):
 
     cost = B_cost + FC_power*sp_C
     volume = B_volume + FC_power/sp_V
@@ -84,15 +87,12 @@ def total_tank_cooling(T1,T2):
     tot_den = r*h2oden+(1-r)*rden
     tot_cp = r*h2ocp+(1-r)*rcp
 
-    print(tot_den)
 
     m1 = (n*LHV*mh2)/(tot_cp*T1)
     m2 = (n*LHV*mh2)/(tot_cp*T2)
 
     v1 = m1*10**3/tot_den
     v2 = m2*10**3/tot_den
-
-    print(v1,v2)
 
     t = VFC/v1
     V_tank = t*(v2-v1)
@@ -139,7 +139,7 @@ def cooling_liquid(Tg):
     n = 0.4
     LHV = 120*10**6
     VFC = 30
-    r = 0.5
+    r = 0.8
 
     # Water
     h2oden = 998.21
@@ -153,6 +153,25 @@ def cooling_liquid(Tg):
     tot_cp = r*h2ocp+(1-r)*rcp
 
     return (n * LHV * mh2) / (tot_cp * (FC_T - Tg))
+
+def cooling_liquid_II(Tg):
+
+    FC_T = 90
+    r = 0.8
+
+    # Water
+    h2oden = 998.21
+    h2ocp = 4180
+
+    # Refrigerant
+    rden = 1225.5
+    rcp = 1415.03
+
+    tot_den = r*h2oden+(1-r)*rden
+    tot_cp = r*h2ocp+(1-r)*rcp
+    print(tot_den)
+
+    return 2600 / (tot_cp * (FC_T - Tg))
 
 
 if __name__ == '__main__':
@@ -177,11 +196,36 @@ if __name__ == '__main__':
     print('Total FC system volume: ',round(total_system()[1]), ' l')
     print('Total FC system cost: ',round(total_system()[0]),' EUR')
     print('Only FC volume: ',round(FC_power/sp_V),' l')
-    print()
+    print('Hydrogen needed: ')
+    # print()
     print('Cooling FC: ', cooling_liquid(40), ' kg/s')
+    print('Cooling bat:',cooling_liquid_II(40),' kg/s')
 
     print(total_tank_bat_cooling(40,10), ' l')
     print(total_tank_cooling(80,50), ' l')
+
+    print(total_system()[2])
+
+    SensA = np.linspace(0.5, 1.5, 70)
+
+    SAmass = []
+    SAvolume = []
+    SAcost = []
+
+    # for i in SensA:
+    #
+    #     FC_power_sa = SF*0.001*BS.final_bat_size(i*BS.Req_power(0)[0])[0]
+    #     print(i*BS.Req_power(0)[0], ' this')
+    #     SAmass.append(total_system(FC_power_sa, BS.final_bat_size(i*BS.Req_power(0)[0])[0], BS.final_bat_size(i*BS.Req_power(0)[0])[2], BS.final_bat_size(i*BS.Req_power(0)[0])[1])[2])
+    #
+    #     # SAvolume.append(total_system(FC_power_sa)[1])
+    #     # SAcost.append(total_system(FC_power_sa)[0])
+
+    # plt.plot(SensA,SAmass)
+    # plt.show()
+
+
+
 
 
 

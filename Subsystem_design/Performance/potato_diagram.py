@@ -271,11 +271,14 @@ class potato_diagram(Constants):
         print('Original design OEW cg:',xcg0)
 
     def mac_maingear(self, weight, cg_mac):
-            d_cg_nose = 15.1+ cg_mac* 4.312
-            r_nose_main = (12.64+5.07-d_cg_nose)/(d_cg_nose-5.07)
+            shift_lg = 0.2
+            d_cg_nose = 15.1+ (cg_mac)* 4.312       #distance between nose and the critical cg location
+            critccg_main = 12.64+5.07+(shift_lg*self.mac)-d_cg_nose   #distance b/w main gear and critical cg
+            critccg_nose = d_cg_nose - 5.07       #distance b/w nose gear and crictical cg
+            r_nose_main = critccg_main / critccg_nose
             loadfrac_nose = 1/(1+1/r_nose_main)
             loadfrac_main = 1/(1+r_nose_main)
-            self.loadfrac_nose = loadfrac_main
+            self.loadfrac_nose = loadfrac_nose
             self.loadfrac_main = loadfrac_main
 
     def verify_cglimits(self):
@@ -299,6 +302,12 @@ class potato_diagram(Constants):
 
         print((self.ver_min_cg-15.1)/self.mac,(self.ver_max_cg-15.1)/self.mac, '--verification')
 
+    def pitchback_angle(self):
+        p = potato_diagram()
+        p.load_diagram()
+        p.mac_maingear()
+        np.arctan(p.x_min/1)
+
 
 
 if __name__ == '__main__':
@@ -306,8 +315,8 @@ if __name__ == '__main__':
     p = potato_diagram()
     p.oew_cg_hack()
     p.load_diagram()
-    p.mac_maingear(weight= c.MZFW_320neo+2000, cg_mac=p.x_min)
+    p.mac_maingear(weight= c.MZFW_320neo+2000, cg_mac=p.x_min-0.02)
     print('\n Min main gear load (% of weight) = ', p.loadfrac_main*100)
-    p.mac_maingear(weight= c.MZFW_320neo + 2000, cg_mac=p.x_max)
+    p.mac_maingear(weight= c.MZFW_320neo + 2000, cg_mac=p.x_max+0.2)
     print('\n Max main gear load (% of weight) = ', p.loadfrac_main*100)
     p.verify_cglimits()
