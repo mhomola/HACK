@@ -129,7 +129,7 @@ class Constants():
         """Fuel constant A320-HACK"""
 
         self.V_H2 = V_H2/1000 * 0.885                                 # Volume required of hydrogen                [m^3]
-        self.V_k = V_k/1000                                           # Volume required of kerosene                [m^3]
+        self.V_k = V_k                                                # Volume required of kerosene                [l]
 
         self.W1_Wto = 0.990
         self.W2_W1 = 0.990
@@ -170,6 +170,8 @@ class Constants():
         self.MRW_320HACK = 73900
         self.OEW_320hack = 41755
         self.payload_320hack = 13257
+        self.W_kerosene = self.V_k * self.rho_ker
+
 
         """Weights of A320neo"""
         self.MTOW_320neo = 73500                                    # Maximum Take-Off weight of A320neo            [kg]
