@@ -181,11 +181,11 @@ class Constants():
         #                 (self.x_cg_320neo_mtow -self.x_cg_320neo_zf)*self.Max_fuel_mass_capacity_320neo
 
         """Weights of HACK"""
-        self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                       [kg]
+        self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off(This is outdated)                       [kg]
         self.MTOW_320hack = 73500
         self.MRW_320HACK = 73900
-        self.OEW_320hack = 41755
-        self.payload_320hack = 13257
+        self.OEW_320hack = 45297.94
+        self.payload_320hack = self.MPLW_320neo#13257
         self.W_kerosene = self.V_k * self.rho_ker
         self.Wing_Weight_320HACK = 0.9 * self.Wing_Weight_320neo
 
