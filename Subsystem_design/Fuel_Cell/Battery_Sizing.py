@@ -173,26 +173,26 @@ def toWh(val):
 
 #if __name__ == '__main__':
 
-def final_bat_size():
+def final_bat_size(FC_power_new = Req_power(0)[0]):
 
     FC_power = 0
-    FC_power_new, bat_E, time_tot1, power_tot1 = Req_power(0)
+    bat_E, time_tot1, power_tot1 = Req_power(0)[1:4]
 
     mair = mfoAir(FC_power_new)
     mh2 = mfoH2(FC_power_new)
 
-    print('Original estimate without compressor')
-    print('Air mass flow: ',round(mair*1000,2),' kg/s')
-    print('Hydrogen mass flow: ', round(mh2*1000,2), ' kg/s')
-    print(FC_power_new / 1000, " kW")
-    print(bat_E / 1000000, " MJ")
-    bat_orig = toWh(bat_E)
-    print('Battery cost: ', round(0.001*bat_orig*cost), " EUR")
-    print('Battery mass: ', round(bat_orig/spec_m), " kg")
-    print('Battery volume: ', round(bat_orig/spec_V), " l")
-    print()
+    # print('Original estimate without compressor')
+    print('Air mass flow: ',round(mair*1000,2),' g/s')
+    print('Hydrogen mass flow: ', round(mh2*1000,2), ' g/s')
+    # print(FC_power_new / 1000, " kW")
+    # print(bat_E / 1000000, " MJ")
+    # bat_orig = toWh(bat_E)
+    # print('Battery cost: ', round(0.001*bat_orig*cost), " EUR")
+    # print('Battery mass: ', round(bat_orig/spec_m), " kg")
+    # print('Battery volume: ', round(bat_orig/spec_V), " l")
+    # print()
 
-    while(abs(FC_power-FC_power_new)/FC_power_new >= 0.05):
+    while(abs(FC_power-FC_power_new)/FC_power_new >= 0.02):
         FC_power = FC_power_new
         mAir = mfoAir(FC_power)
         FC_power_new, bat_E, time_tot2, power_tot2 = Req_power(mAir)
@@ -210,29 +210,30 @@ def final_bat_size():
     b_cells_par = m.ceil(b_Ah/Ahbcell)
     b_tot = b_cells_s*b_cells_par
 
-    print('New estimate with compressor')
-    print('Air mass flow: ', round(mair*1000,2), ' g/s')
-    print('Hydrogen mass flow: ', round(mh2*1000,2), ' g/s')
-    print(FC_power_new/1000, " kW")
-    print(bat_E/1000000, " MJ")
-    print()
-    print('Battery cells in series: ',b_cells_s)
-    print('Battery cells in parallel: ',b_cells_par)
-    print('Battery cells - total: ',b_tot)
-    print('Battery cost: ', round(0.001 * bat_orig * cost), " EUR")
-    print('Battery mass: ', round(bat_orig / spec_m), " kg")
-    print('Battery volume: ', round(bat_orig / spec_V), " l")
-    print()
+    # print('New estimate with compressor')
+    # print('Air mass flow: ', round(mair*1000,2), ' g/s')
+    # print('Hydrogen mass flow: ', round(mh2*1000,2), ' g/s')
+    # print(FC_power_new/1000, " kW")
+    # print(bat_E/1000000, " MJ")
+    # print()
+    # print('Battery cells in series: ',b_cells_s)
+    # print('Battery cells in parallel: ',b_cells_par)
+    # print('Battery cells - total: ',b_tot)
+    # print('Battery cost: ', round(0.001 * bat_orig * cost), " EUR")
+    # print('Battery mass: ', round(bat_orig / spec_m), " kg")
+    # print('Battery volume: ', round(bat_orig / spec_V), " l")
+    # print()
 
-    plt.plot(time_tot1, power_tot1, label = 'No compressor')
-    #plt.plot(time_tot2, power_tot2, 'k', label = 'Compressor')
-    # plt.plot(time_tot, avg_arr)
-    plt.legend()
-    plt.ylabel('Energy stored in battery [kJ]')
-    plt.xlabel('Time [min]')
-    plt.show()
+    # plt.plot(time_tot1, power_tot1, label = 'No compressor')
+    # #plt.plot(time_tot2, power_tot2, 'k', label = 'Compressor')
+    # # plt.plot(time_tot, avg_arr)
+    # plt.legend()
+    # plt.ylabel('Energy stored in battery [kJ]')
+    # plt.xlabel('Time [min]')
+    # plt.show()
 
     return FC_power_new, round(0.001 * bat_orig * cost), round(bat_orig / spec_m), round(bat_orig / spec_V), mh2
+    #return FC_power_new, (0.001 * bat_orig * cost), (bat_orig / spec_m), (bat_orig / spec_V), mh2
 
 
 def compressor_plotter():

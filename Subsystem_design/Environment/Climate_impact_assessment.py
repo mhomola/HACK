@@ -28,7 +28,9 @@ class Climate_assess():
         self.flights_EU_2024 = 11411000                                # Number of flights in 2024 post corona, best scenario
         self.narrow_body_2025 = 0.64                                   # Percentage of flights narrow-body pass A/C take over in 2025
         self.narrow_body_2040 = 0.63                                   # Percentage of flights narrow-body pass A/C take over in 2040
-
+        self.single_aisle_share = np.array([0.43,0.184,0.203,0.079,0.08,0.018]) #Assumed to stay constant over the years
+        self.growth_rates = np.array([0.045,0.017,0.02,0.029,0.036,0.036,0.032])
+        self.world_flights_2019 = 38.6 *10**6
 
         'Efficacies'
         self.Eff_CO2 = 1                                               # Efficacy of CO2                        [-]
@@ -117,31 +119,108 @@ class Climate_assess():
         H2_perce = interp1d(time,percentages, kind='cubic')
         H2_flights_perc_year = np.ones(len(self.t_prime))
         H2_flights_perc_year[self.t_prime<=self.t_0 + self.H] = H2_perce(self.t_prime[self.t_prime<=self.t_0 + self.H])
-        H2_flights_perc_year[self.t_prime > self.t_0 + self.H] = 0.0
+        H2_flights_perc_year[self.t_prime > self.t_0 + self.H] = 0.
 
         return H2_flights_perc_year
 
-    def number_aircraft_kerosene(self):
-        tot_flights_2035 = self.flights_EU_2024 * (1 + self.growth_rate) ** 11
-        tot_flights = np.linspace(tot_flights_2035, tot_flights_2035 * (1 + self.growth_rate) ** len(self.t_prime),
-                                  len(self.t_prime))
-        narrow_body_percent = self.narrow_body_percentage()
-        narrow_body_flights = tot_flights * narrow_body_percent(self.t_prime)
+    def market_share_per_region(self):
+        #Regions:
+        # Asia/Pacific, North America, Europe, Latin America, Middle East, Africa
+        share_2021 = np.array([0.3864,0.2272,0.2362,0.0571,0.0741,0.019])
+        share_2016 = np.array([0.35,0.24,0.26,0.07,0.05,0.02])
+        shares = np.vstack((share_2016,share_2021))
+        time = np.array([2016,2021])
+        share_func_Asia = interp1d(time,shares[:,0])
+        share_func_NAmerica = interp1d(time, shares[:, 1])
+        share_func_Europe = interp1d(time, shares[:, 2])
+        share_func_Latin = interp1d(time, shares[:, 3])
+        share_func_MiddleE = interp1d(time, shares[:, 4])
+        share_func_Africa = interp1d(time, shares[:, 5])
 
-        return narrow_body_flights
+        return share_func_Asia,share_func_NAmerica,share_func_Europe,share_func_Latin,share_func_MiddleE,share_func_Africa
+
+
+
+    def total_flights_per_region_2035(self):
+        # Get narrow_body flights in the world in 2019
+        share_func_Asia, share_func_NAmerica, share_func_Europe, share_func_Latin, share_func_MiddleE, share_func_Africa = self.market_share_per_region()
+        #Asia
+        Asia_flights_2023 = share_func_Asia(2019) * self.world_flights_2019
+        Asia_flights_2035 = Asia_flights_2023 * (1+self.growth_rates[0])**12
+        #North America
+        NA_flights_2023 = share_func_NAmerica(2019) * self.world_flights_2019
+        NA_flights_2035 = NA_flights_2023 * (1 + self.growth_rates[1])**12
+        #Europe
+        Europe_flights_2024 = share_func_Europe(2019) * self.world_flights_2019
+        Europe_flights_2035 = Europe_flights_2024 * (1 + self.growth_rates[2])**11
+        #Latin America
+        Latin_flights_2023 = share_func_Latin(2019) * self.world_flights_2019
+        Latin_flights_2035 = Latin_flights_2023 * (1 + self.growth_rates[3])**12
+        #Middle East
+        MiddleE_flights_2024 = share_func_MiddleE(2019) * self.world_flights_2019
+        MiddleE_flights_2035 = MiddleE_flights_2024 * (1 + self.growth_rates[4])**11
+        #Africa
+        Africa_flights_2024 = share_func_Africa(2019) * self.world_flights_2019
+        Africa_flights_2035 = Africa_flights_2024 * (1 + self.growth_rates[5])**11
+        #World
+        World_flights_2035 = np.sum([Asia_flights_2035,NA_flights_2035,Europe_flights_2035,Latin_flights_2035,MiddleE_flights_2035,Africa_flights_2035])
+
+        return Asia_flights_2035,NA_flights_2035,Europe_flights_2035,Latin_flights_2035,MiddleE_flights_2035,Africa_flights_2035, World_flights_2035
+
+    def narrow_body_flights_per_region(self):
+        _,_, share_func_Europe,_, _,_ = self.market_share_per_region()
+        Asia_flights_2035, NA_flights_2035, Europe_flights_2035, Latin_flights_2035, MiddleE_flights_2035, Africa_flights_2035, World_flights_2035 = self.total_flights_per_region_2035()
+
+        #Asia
+        Asia_tot_flights = np.linspace(Asia_flights_2035,Asia_flights_2035 * (1 + self.growth_rates[0]) ** len(self.t_prime),len(self.t_prime))
+        #North America
+        NA_tot_flights = np.linspace(NA_flights_2035,NA_flights_2035 * (1 + self.growth_rates[1]) ** len(self.t_prime),len(self.t_prime))
+        #Europe
+        Europe_tot_flights = np.linspace(Europe_flights_2035, Europe_flights_2035 * (1 + self.growth_rates[2]) ** len(self.t_prime),
+                                     len(self.t_prime))
+        #Latin
+        Latin_tot_flights = np.linspace(Latin_flights_2035, Latin_flights_2035 * (1 + self.growth_rates[3]) ** len(self.t_prime),
+                                     len(self.t_prime))
+        #Middle East
+        MiddleE_tot_flights = np.linspace(MiddleE_flights_2035, MiddleE_flights_2035 * (1 + self.growth_rates[4]) ** len(self.t_prime),
+                                     len(self.t_prime))
+        #Africa
+        Africa_tot_flights = np.linspace(Africa_flights_2035, Africa_flights_2035 * (1 + self.growth_rates[5]) ** len(self.t_prime),
+                                     len(self.t_prime))
+        #World
+        World_tot_flights = np.sum(np.vstack((Asia_tot_flights,NA_tot_flights,Europe_tot_flights,Latin_tot_flights,MiddleE_tot_flights,Africa_tot_flights)),axis=0)
+        print(World_tot_flights)
+        #Narrow_body_flights
+        Narrow_body_flights_percent = (self.narrow_body_percentage()(2019) / self.single_aisle_share[2]) * share_func_Europe(2019)
+        World_Narrow_body_flights = Narrow_body_flights_percent * World_tot_flights
+        print(World_Narrow_body_flights)
+        #Asia
+        self.Asia_Narrow_body_flights = World_Narrow_body_flights * self.single_aisle_share[0]
+        #North America
+        self.NA_Narrow_body_flights = World_Narrow_body_flights * self.single_aisle_share[1]
+        #Europe
+        self.Europe_Narrow_body_flights = World_Narrow_body_flights * self.single_aisle_share[2]
+        #Latin
+        self.Latin_Narrow_body_flights = World_Narrow_body_flights * self.single_aisle_share[3]
+        #Middle East
+        self.MiddleE_Narrow_body_flights = World_Narrow_body_flights * self.single_aisle_share[4]
+        #Africa
+        self.Africa_Narrow_body_flights = World_Narrow_body_flights * self.single_aisle_share[5]
+
+        return World_Narrow_body_flights
+
 
     def number_aircraft_H2(self):
 
-        tot_flights_2035 = self.flights_EU_2024 * (1+self.growth_rate)**11
-        tot_flights = np.linspace(tot_flights_2035,tot_flights_2035*(1+self.growth_rate)**len(self.t_prime),len(self.t_prime))
-
-        narrow_body_percent = self.narrow_body_percentage()
-        narrow_body_flights = tot_flights * narrow_body_percent(self.t_prime)
+        # tot_flights_2035 = self.flights_EU_2024 * (1+self.growth_rate)**11
+        # tot_flights = np.linspace(tot_flights_2035,tot_flights_2035*(1+self.growth_rate)**len(self.t_prime),len(self.t_prime))
+        #
+        # narrow_body_percent = self.narrow_body_percentage()
+        # narrow_body_flights = tot_flights * narrow_body_percent(self.t_prime)
 
         H2_percentage = self.H2_percentage_trend()
-        N_aircraft_H2 = narrow_body_flights * H2_percentage
+        N_aircraft_H2 = self.narrow_body_flights_per_region() * H2_percentage
 
-        print('Here',tot_flights_2035)
         return N_aircraft_H2
 
 
@@ -502,24 +581,24 @@ if __name__ == '__main__':
     climate.s(compound='O3S')
     e_CO2, e_SO4, e_H2O, e_soot, e_NOx = climate.emissions(13300)
     #
-    #U_H2 = climate.number_aircraft_H2()                 # Number of flights in a year
-    U_ker = climate.number_aircraft_kerosene()
+    U_H2 = climate.number_aircraft_H2()                 # Number of flights in a year
+    #U_ker = climate.number_aircraft_kerosene()
     #E_H2 = climate.E(e=e_CO2 ,U=U_H2,time=climate.t_prime)
-    E_ker = climate.E(e=e_CO2, U=U_ker, time=climate.t_prime)
+    #E_ker = climate.E(e=e_CO2, U=U_ker, time=climate.t_prime)
     #percentages= climate.H2_percentage_trend()
     # plt.subplot(131)
     # plt.plot(climate.t_prime,percentages,label='Percentage of H2 flights')
     # plt.legend()
     # plt.subplot(132)
-    # plt.plot(climate.t_prime,U_H2,label='Utilization rate')
-    # plt.xlabel('years')
-    # plt.ylabel('Number of missions per year')
-    # plt.legend()
+    plt.plot(climate.t_prime,U_H2,label='Utilization rate')
+    plt.xlabel('years')
+    plt.ylabel('Number of missions per year')
+    plt.legend()
 
     # plt.subplot(133)
     # plt.plot(climate.t_prime, E_H2,label='Emissions per year')
     # plt.legend()
-    #plt.show()
+    plt.show()
     # print('Start analysis for LTO')
     # 'To plot the change in CO2 concentration in ppmv per year'
 
@@ -527,5 +606,5 @@ if __name__ == '__main__':
     # print(clim)
     #
     #
-    ATR = climate.ATR(h=11000,e_CO2= e_CO2, e_H2O= e_H2O, e_NOx=e_NOx,e_soot= e_soot,e_sulfate=e_SO4,U=U_ker,plot = True)
-    print('The average temperature response, A_100, for the LTO of the HACK is:',ATR,'[K]')
+    # ATR = climate.ATR(h=11000,e_CO2= e_CO2, e_H2O= e_H2O, e_NOx=e_NOx,e_soot= e_soot,e_sulfate=e_SO4,U=U_ker,plot = True)
+    # print('The average temperature response, A_100, for the LTO of the HACK is:',ATR,'[K]')

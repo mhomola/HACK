@@ -126,7 +126,8 @@ class Engine_Cool(Engine_Cycle):
         # self.err = (self.mr_SZair - self.mr_SZair_simpl) / self.mr_SZair_simpl * 100
 
         ''' USE THIS TO GET UPDATED TPZ FROM IVAN'S CODE ''' # eqr at PZ
-        self.eqr = (self.mf_fuel / (self.mf_hot * (1-self.mr_SZair))) / self.stoichiometric_ratio
+        self.mf_hot = self.mf_hot * (1-self.mr_SZair)
+        self.eqr = (self.mf_fuel / (self.mf_hot)) / self.stoichiometric_ratio
 
 
 

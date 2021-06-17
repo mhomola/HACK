@@ -129,7 +129,7 @@ class Constants():
         """Fuel constant A320-HACK"""
 
         self.V_H2 = V_H2/1000 * 0.885                                 # Volume required of hydrogen                [m^3]
-        self.V_k = V_k/1000                                           # Volume required of kerosene                [m^3]
+        self.V_k = V_k                                                # Volume required of kerosene                [l]
 
         self.W1_Wto = 0.990
         self.W2_W1 = 0.990
@@ -147,7 +147,7 @@ class Constants():
 
         """ STRUCTURES"""
         self.pylon_height = 0.38     # height of the pylon of the tank [m]
-        self.pylon_weight = 19.126   # weight of each pylon            [kg]
+        self.pylon_weight = 22.69   # weight of each pylon            [kg]
         self.x_cg_pylon = 17.14      # From nose                       [m]
 
         """Tank design constants"""
@@ -164,13 +164,6 @@ class Constants():
         self.y_cg_pod = 0.55 * self.b/2                         # Y location of the pods on the wing              [m]
         self.dummy = 1
 
-        """Weights of HACK"""
-        self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                       [kg]
-        self.MTOW_320hack = 73500
-        self.MRW_320HACK = 73900
-        self.OEW_320hack = 41755
-        self.payload_320hack = 13257
-
         """Weights of A320neo"""
         self.MTOW_320neo = 73500                                    # Maximum Take-Off weight of A320neo            [kg]
         self.MLW_320neo = 66300                                     # Maximum Landing weight of A320neo             [kg]
@@ -186,6 +179,15 @@ class Constants():
         self.x_cg_320neo_mtow = 0.275
         # self.x_cg_hack = self.x_cg_320neo_zf * self.MZFW_320neo + \
         #                 (self.x_cg_320neo_mtow -self.x_cg_320neo_zf)*self.Max_fuel_mass_capacity_320neo
+
+        """ Weights of HACK """
+        self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                       [kg]
+        self.MTOW_320hack = 73500
+        self.MRW_320HACK = 73900
+        self.OEW_320hack = 41755
+        self.payload_320hack = 13257
+        self.W_kerosene = self.V_k * self.rho_ker
+        self.Wing_Weight_320HACK = 0.9 * self.Wing_Weight_320neo
 
         """Weights of A321neo"""
         self.MTOW_321neo = 89000                                    # Maximum Take-Off weight of A321neo            [kg]
