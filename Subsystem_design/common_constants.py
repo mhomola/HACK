@@ -147,7 +147,7 @@ class Constants():
 
         """ STRUCTURES"""
         self.pylon_height = 0.38     # height of the pylon of the tank [m]
-        self.pylon_weight = 19.126   # weight of each pylon            [kg]
+        self.pylon_weight = 22.69   # weight of each pylon            [kg]
         self.x_cg_pylon = 17.14      # From nose                       [m]
 
         """Tank design constants"""
