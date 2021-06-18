@@ -319,7 +319,7 @@ class Engine_Cycle(Constants):
         plt.plot(s[0:5], T[0:5], 'go', alpha=alp)
         plt.plot(s[-5:], T[-5:], 'go', alpha=alp)
         plt.plot(s4, T4, 'r-o', alpha=alp)
-        plt.xlabel('Enthalpy [J/kg/K]', fontsize=15)
+        plt.xlabel('Entropy [J/kg/K]', fontsize=15)
         plt.ylabel('Temperature [K]', fontsize=15)
         plt.xticks(fontsize=14)
         plt.yticks(fontsize=14)
