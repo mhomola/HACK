@@ -41,6 +41,8 @@ def FC_sizing(FC_power = SF*0.001*BS.final_bat_size()[0]):
     I = calc_current(V)
     iden = calc_cur_density(Vc)
 
+    print('iden is:', iden)
+
     # n_cells = round(FC_power/PtoN)
     # n_paral = round(n_cells/n_series)
     n_cells = (FC_power / PtoN)

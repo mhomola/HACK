@@ -1,7 +1,7 @@
 function a = plotter()
 
     a = 1;
-    eqr = linspace(0.75,0.95,20);
+    eqr = linspace(0.5,0.,20);
     NOx = [];
     CO = [];
     
@@ -28,18 +28,18 @@ function a = plotter()
     
     clf; %  clear figure
     
-    COdif = (CO - ICAO_CO)./((ICAO_CO+CO)./2);
+    COdif = (ICAO_CO)./(ICAO_CO);
     COmax = max(COdif);
     
-    NOxdif = (NOx - ICAO_NOx)./((ICAO_NOx+NOx)./2);
+    NOxdif = (NOx - ICAO_NOx)./(ICAO_NOx);
     NOxmax = max(NOxdif);
     
     subplot(3,1,1);
     hold on;
     plot(eqr,ICAO_CO,'b','LineWidth',1.5)
-    plot(eqr,CO,'g','LineWidth',1.5)
+    plot(eqr,CO,'r','LineWidth',1.5)
     %plot(eqr,COdif,'r','LineWidth',1.5)
-    %legend('ICAO','Cantera')
+    legend('ICAO','Cantera')
     hold off;
     xlabel('Equivalence ratio (-)');
     ylabel('CO')
@@ -48,9 +48,9 @@ function a = plotter()
     hold on;
     %plot(eqr,ICAO_CO,'b','LineWidth',1.5)
     %plot(eqr,NOxdif,'r','LineWidth',1.5)
-    %legend('ICAO','Cantera')
     plot(eqr,ICAO_NOx,'b','LineWidth',1.5)
     plot(eqr,NOx,'r','LineWidth',1.5)
+    legend('ICAO','Cantera')
     hold off;
     xlabel('Equivalence ratio (-)');
     ylabel('NOx')
