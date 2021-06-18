@@ -45,7 +45,7 @@ class Climate_assess():
         'Constants for RF of CO2'
         self.EI_CO2 = 3.16                                             # Emissions index of CO2                 [kg/kgkerosene]
         self.E_CO2 = 0                                                 # Absolute CO2 emissions                 [kg]
-        self.X_CO2_0 = 311                                             # Background concentration of CO2        [ppmv]
+        self.X_CO2_0 = 380                                             # Background concentration of CO2        [ppmv]
         self.alpha_1 = 0.067/10**12#0.067                               #                                        [ppmv/kg]
         self.alpha_2 = 0.1135/10**12#0.1135                             #                                        [ppmv/kg]
         self.alpha_3 = 0.152/10**12#0.152                               #                                        [ppmv/kg]
@@ -346,6 +346,7 @@ class Climate_assess():
                              26420.091,27505.983,28509.118,29562.49,31242.0659,33433.873,
                              34645.2834,35564.9354,36792.6272,37579.1538,39084.3820,41220.932])
             s = interp1d(altitude,forcing_fact,kind='cubic')
+
         if compound == 'O3S':
             forcing_fact = np.array([0.475,0.476,0.545,0.5764,0.6149,0.666,0.7119,0.7029,
                                      0.7104,0.7681,0.8217,0.8794,0.9579,0.9979,1.060,
@@ -612,15 +613,27 @@ if __name__ == '__main__':
     # plt.ylabel('Percentage [%]')
     # plt.legend()
     # plt.subplot(122)
-    plt.plot(climate.t_prime,U_H2,label='Utilization rate',color='tab:red')
-    plt.xlabel('years')
-    plt.ylabel('Number of missions per year')
-    plt.xlim(2035,2085)
-    plt.legend()
+    # plt.plot(climate.t_prime,U_H2,label='Utilization rate',color='tab:red')
+    # plt.xlabel('years')
+    # plt.ylabel('Number of missions per year')
+    # plt.xlim(2035,2085)
+    # plt.legend()
 
     # plt.subplot(133)
     # plt.plot(climate.t_prime, E_H2,label='Emissions per year')
     # plt.legend()
+    altitude_CH4 = 0.3048 * np.array([0.0,17582.52,19617.886,21263.886,23302.9859,24712.7742,25293.3739,
+                             26420.091,27505.983,28509.118,29562.49,31242.0659,33433.873,
+                             34645.2834,35564.9354,36792.6272,37579.1538,39084.3820,41220.932])
+    altitude_O3S =  0.3048 * np.array([0.0,17734.057,19270.4087,20162.2675,21487.656,22736.4962,
+                                 23452.5,24338.567,25615.992,26827.0408,27833.806,28856.331,30201.358,31624.234,
+                                 32571.11,33550.85,34199.759,34816.349,35466.1077,36338.689,37290.789,38163.418,
+                                 39184.116,40136.381,41251.765])
+    plt.plot(altitude_CH4,climate.s('CH4')(altitude_CH4),marker = '*',label= 'CH_4 & O_3L',color= 'navy')
+    plt.plot(altitude_O3S,climate.s('O3S')(altitude_O3S),marker= 'o',label= 'O_3S', color= 'tab:red')
+    plt.xlabel('Altitude [m]',fontsize= 15)
+    plt.ylabel('Forcing factor, s [-]',fontsize= 15)
+    plt.legend(fontsize= 15)
     plt.show()
     # print('Start analysis for LTO')
     # 'To plot the change in CO2 concentration in ppmv per year'
