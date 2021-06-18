@@ -31,14 +31,17 @@ def trend(x,y,degr,string):
     print('R2: ', r2)
 
     plt.figure()
-    plt.scatter(x, y, s=10)
-    plt.xlabel('Year', fontsize = 30)
-    plt.ylabel(string, fontsize = 30)
+    plt.xlabel('Year', fontsize=17)
+    plt.ylabel(string, fontsize=17)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
     # sort the values of x before line plot
     sort_axis = operator.itemgetter(0)
-    sorted_zip = sorted(zip(x,y_poly_pred), key=sort_axis)
+    sorted_zip = sorted(zip(x, y_poly_pred), key=sort_axis)
     x, y_poly_pred = zip(*sorted_zip)
-    plt.plot(x, y_poly_pred, color='m')
+    plt.errorbar(x, y_poly_pred, yerr=y_poly_pred - y, fmt='.r', capsize=5)
+    plt.plot(x, y_poly_pred, color='k')
+    plt.scatter(x, y, s=30)
     plt.show()
 
 
@@ -58,4 +61,8 @@ trend(x_eta_HPC, y_eta_HPC, 2, 'eta_HPC')
 x_eta_HPT = np.array([1984, 1992, 1993, 1995, 1996, 2013, 2016])
 y_eta_HPT = np.array([0.884, 0.905, 0.9, 0.9125, 0.91, 0.9328, 0.92])
 trend(x_eta_HPT, y_eta_HPT, 2, 'eta_HPT')
+
+
+x = np.array([6, 15, 24, 33, 41, 52, 59, 66, 73, 81])
+y = np.array([5, 10, 15, 20, 25, 30, 35, 40, 45, 50])
 
