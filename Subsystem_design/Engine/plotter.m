@@ -1,7 +1,7 @@
 function a = plotter()
-
+    b = 2
     a = 1;
-    eqr = linspace(0.75,0.95,20);
+    eqr = linspace(0.65,0.90,30);
     NOx = [];
     CO = [];
     
@@ -17,7 +17,7 @@ function a = plotter()
     ICAO_NOx = [];
     
     for i = 1:length(eqr)        
-        [~,~,~,COf, NOxf] = reactor1('neo',3283120,1.1*805,eqr(i));
+        [~,~,~,COf, NOxf] = reactor1('neo',3283120,1.1*805,eqr(i),0,1,14.76,55.45);
         CO(i) = COf;
         NOx(i) = NOxf;
         
@@ -28,10 +28,10 @@ function a = plotter()
     
     clf; %  clear figure
     
-    COdif = (CO - ICAO_CO)./((ICAO_CO+CO)./2);
+    COdif = (CO - ICAO_CO)./(ICAO_CO);
     COmax = max(COdif);
     
-    NOxdif = (NOx - ICAO_NOx)./((ICAO_NOx+NOx)./2);
+    NOxdif = (NOx - ICAO_NOx)./(ICAO_NOx);
     NOxmax = max(NOxdif);
     
     subplot(3,1,1);

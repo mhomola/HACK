@@ -1,4 +1,4 @@
-function [TPZ, MF_emis, name_emis] = reactor1(g, P_input, T_input, eqr_input,n_h2,n_ker,n_O2,n_N2)
+function [TPZ, MF_emis, name_emis,COf, NOxf] = reactor1(g, P_input, T_input, eqr_input,n_h2,n_ker,n_O2,n_N2)
 
 %    REACTOR1 Zero-dimensional kinetics: adiabatic, constant pressure.
 %
