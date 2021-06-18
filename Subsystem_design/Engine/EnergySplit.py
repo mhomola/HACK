@@ -32,18 +32,18 @@ class Energy_Split():
 
         # self.idle = 1229 # [s]
         self.t_idle = 5 * 60                    # 5 min [s]
-        self.fuelflow_neo_idle = 0.073 * 0.4    # [kg/s] Assumed to be 1/2 of taxi out value
-        self.energy_h2_idle = self.LHV_h2 * self.fuelflow_neo_idle * self.t_idle        # [MJ]
-        self.m_h2_idle = self.energy_h2_idle / self.LHV_h2  # [kg]
+        self.fuelflow_idle = 0.019          # [kg/s] for HACK
+        self.energy_h2_idle = self.LHV_h2 * self.fuelflow_idle * self.t_idle        # [MJ]
+        self.m_h2_idle = self.fuelflow_idle * self.t_idle  # [kg]
 
         self.t_taxi_out = 7.5 * 60              # [s]
         self.t_taxi_in = 8 * 60                 # [s]
-        self.fuelflow_neo_to = 0.214            # 0.250196 # [kg/s]
-        self.fuelflow_neo_ti = 0.214            # 0.137205 # [kg/s]
-        self.energy_h2_to = self.LHV_h2 * self.fuelflow_neo_to * self.t_taxi_out        # [MJ]
-        self.energy_h2_ti = self.LHV_h2 * self.fuelflow_neo_ti * self.t_taxi_in         # [MJ]
-        self.m_h2_to = self.energy_h2_to / self.LHV_h2                                  # [kg]
-        self.m_h2_ti = self.energy_h2_ti / self.LHV_h2                                  # [kg]
+        self.fuelflow_to = 0.066            # 0.250196 # [kg/s]
+        self.fuelflow_ti = 0.066            # 0.137205 # [kg/s]
+        self.energy_h2_to = self.LHV_h2 * self.fuelflow_to * self.t_taxi_out        # [MJ]
+        self.energy_h2_ti = self.LHV_h2 * self.fuelflow_ti * self.t_taxi_in         # [MJ]
+        self.m_h2_to = self.fuelflow_to * self.t_taxi_out                                 # [kg]
+        self.m_h2_ti = self.fuelflow_ti * self.t_taxi_in                                  # [kg]
 
 
         # ======= ENERGY RATIO ======= #
