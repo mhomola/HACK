@@ -131,8 +131,8 @@ class thrust_req(Constants):
         #print(self.t_array[[(self.t_array >= self.land_time) & (self.t_array <= self.stop_time)]])
         #self.testt = self.m[(self.t_array >= self.takeoff_time) & (self.t_array<self.takeoff_time+30)]
         '''
-        plt.plot(self.t_array, self.m)
-        plt.show()
+        #plt.plot(self.t_array, self.m)
+        #plt.show()
        # return self.m
 
     def dens(self):
@@ -159,6 +159,8 @@ class thrust_req(Constants):
             self.ISA_calculator(h_input=self.alt[alt])
             self.density_array[alt] = self.rho
             self.temp_array[alt] = self.T
+        self.a = np.sqrt(1.4*287*self.temp_array)
+
         #return self.density_array, len(self.alt[np.where((self.t_array >= self.land_time) & (self.t_array <= self.stop_time))])
         #return self.alt[np.where((self.t_array >= 263.5*60))], self.temp_array[np.where((self.t_array >= 263.5*60))]
         #plt.plot(self.t_array, self.alt)
@@ -195,7 +197,7 @@ class thrust_req(Constants):
         self.Lift[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)] =self.CL[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)] * 0.5 * self.density_array[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)] \
             * self.v[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)] **2 * self.S
 
-        plt.plot(self.t_array, self.Lift)
+        #plt.plot(self.t_array, self.Lift)
         #plt.show()
 
         self.cdarray = self.cd0array + np.square(self.CL) / (np.pi * self.wingar * self.e)
@@ -242,6 +244,9 @@ class thrust_req(Constants):
         self.ThrustReq_Descent = self.thrust_required[np.where((self.t_array >= self.mid_descent_time) & (self.t_array < self.mid_descent_time+30))]
         self.ThrustReq_TaxiIn = self.thrust_required[np.where((self.t_array >= self.land_time+120)  & (self.t_array < self.land_time  + 150))]
 
+
+        self.Machs = self.v/self.a
+        self.listofMachs = self.Machs[(self.alt ==580)],self.Machs[self.alt ==290]
         #self.ThrustReq_TaxiOut = 0.07 * self.ThrustReq_TO
         #self.ThrustReq_TaxiIn = 0.07 * self.ThrustReq_TO
         #+ (self.stop_time - self.land_time) / 4)
@@ -253,10 +258,12 @@ class thrust_req(Constants):
 
         #return self.thrust_required
         #return self.T_to_overcome_drag
-
+        plt.plot(self.t_array,self.Machs)
+        plt.show()
         #return self.CL[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)]
         #return self.T_to_overcome_drag
-        return  self.Lift[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)], self.T_to_overcome_drag[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)]
+
+            #self.Lift[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)], self.T_to_overcome_drag[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)]
 
 
         #self.CD = self.CD0 + (self.CL) **2 / np.pi * self.wingar * self.e
@@ -316,7 +323,7 @@ if __name__ == '__main__':
     #t.mass()
     #print(t.mass())
 
-
+    '''
     print('\n Thrust Req TaxiOut = ', t.ThrustReq_TaxiOut/1000 , '[kN]'
           '\n Thrust Req TO = ', t.ThrustReq_TO/1000 , '[kN]'
             '\n Thrust Req Lift off= ', t.Thrust_Liftoff/1000 , '[kN]'
@@ -324,7 +331,7 @@ if __name__ == '__main__':
           '\n Thrust Req Cruise =', t.ThrustReq_Cruise/1000, '[kN]'
           '\n Thrust Req Descend =', t.ThrustReq_Descent/1000, '[kN]'
           '\n Thrust Req Taxi In =', t.ThrustReq_TaxiIn/1000, '[kN]')
-
+    '''
     #t.mass()
 
     #print(t.drag())
