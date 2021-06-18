@@ -319,10 +319,12 @@ class Engine_Cycle(Constants):
         plt.plot(s[0:5], T[0:5], 'go', alpha=alp)
         plt.plot(s[-5:], T[-5:], 'go', alpha=alp)
         plt.plot(s4, T4, 'r-o', alpha=alp)
-        plt.xlabel('Enthalpy [J/kg/K]', fontsize=12)
-        plt.ylabel('Temperature [K]', fontsize=12)
+        plt.xlabel('Enthalpy [J/kg/K]', fontsize=15)
+        plt.ylabel('Temperature [K]', fontsize=15)
+        plt.xticks(fontsize=14)
+        plt.yticks(fontsize=14)
         # plt.title(phase)
-        plt.legend()
+        plt.legend(fontsize=15)
         # plt.show()
 
 
@@ -346,7 +348,7 @@ Stations:
 if __name__ == '__main__':
     ec = Engine_Cycle()
     aircraft = ['neo', 'hack']
-    phases = ['taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in']
+    phases = ['taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in', 'idle']
     # aircraft = ['neo']
     # phases = ['cruise']
 
@@ -413,9 +415,10 @@ if __name__ == '__main__':
                    ['T_tot', round(ec.T_total, 3), 'N'], ['TSCF', round(ec.TSFC_m, 5), 'g/kN/s'],
                    ['TSCF', round(ec.TSFC_e, 5), 'MJ/kN/s']]
             OPR = ['OPR', round(ec.OPR, 3), '-']
+            eqr = [['PZ eqr', round(ec.eqr_PZ, 3), 'K'], ['Overall eqr', round(ec.eqr_overall, 3), 'Pa']]
 
             save_txt = amb + air + st0 + st2 + [BPR] + st21 + st25 + st3 + st4 + fuel + st45 + st5 + st7 + st8 + \
-                       st16 + st18 + Thr + [OPR]
+                       st16 + st18 + Thr + [OPR] + eqr
             name = a+'_'+p+'.txt'
 
             F = open(name, 'w')
@@ -428,15 +431,19 @@ if __name__ == '__main__':
 
     def plot_m(mark, l, T, SFC):
         plt.plot(T, SFC, mark, label=l)
-        plt.xlabel('Net Thrust [kN]', fontsize=12)
-        plt.ylabel('TSFC [kg/kN/s]', fontsize=12)
-        plt.legend()
+        plt.xlabel('Net Thrust [kN]', fontsize=15)
+        plt.ylabel('TSFC [kg/kN/s]', fontsize=15)
+        plt.xticks(fontsize=14)
+        plt.yticks(fontsize=14)
+        plt.legend(fontsize=15)
 
     def plot_e(mark, l, T, SFC):
         plt.plot(T, SFC, mark, label=l)
-        plt.xlabel('Net Thrust [kN]', fontsize=12)
-        plt.ylabel('TSFC [MJ/kN/s]', fontsize=12)
-        plt.legend()
+        plt.xlabel('Net Thrust [kN]', fontsize=15)
+        plt.ylabel('TSFC [MJ/kN/s]', fontsize=15)
+        plt.xticks(fontsize=14)
+        plt.yticks(fontsize=14)
+        plt.legend(fontsize=15)
 
 
     ec.cycle_analysis('neo', 'take_off')
