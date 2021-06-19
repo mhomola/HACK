@@ -323,7 +323,7 @@ if __name__ == '__main__':
     #t.mass()
     #print(t.mass())
 
-    '''
+
     print('\n Thrust Req TaxiOut = ', t.ThrustReq_TaxiOut/1000 , '[kN]'
           '\n Thrust Req TO = ', t.ThrustReq_TO/1000 , '[kN]'
             '\n Thrust Req Lift off= ', t.Thrust_Liftoff/1000 , '[kN]'
@@ -331,7 +331,7 @@ if __name__ == '__main__':
           '\n Thrust Req Cruise =', t.ThrustReq_Cruise/1000, '[kN]'
           '\n Thrust Req Descend =', t.ThrustReq_Descent/1000, '[kN]'
           '\n Thrust Req Taxi In =', t.ThrustReq_TaxiIn/1000, '[kN]')
-    '''
+
     #t.mass()
 
     #print(t.drag())
