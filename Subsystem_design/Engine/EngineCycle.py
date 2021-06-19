@@ -20,6 +20,7 @@ from DataEngine import DataFrame
 from Subsystem_design.common_constants import Constants
 import matlab.engine
 import math as m
+import matplotlib.pyplot as plt
 
 class Engine_Cycle(Constants):
     def __init__(self):
