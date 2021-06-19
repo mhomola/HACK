@@ -3,6 +3,9 @@ import matplotlib.pyplot as plt
 from Subsystem_design.aerodynamic_subsys import AerodynamicCharacteristics
 import numpy as np
 from math import log
+from Subsystem_design.Engine.Thrust_Required import thrust_req
+from Subsystem_design.aerodynamic_subsys import cd0clean, wingar
+from Subsystem_design.Engine.EnergySplit import Energy_Split
 
 class Compute_weight(Constants):
     def __init__(self):
@@ -48,48 +51,140 @@ class performance(Compute_weight):
 
         R = (self.V_cruise/(SFC*self.g_0)) * (L_D_ratio) *log(1/cruise_f_ratio)
         return R
-    def payload_range_dia_HACK(self,L_over_D,SFC):
+    def payload_range_diagram(self,L_over_D,SFC,mission,phase_durations):
 
         # Function to plot the payload-range diagram
-        #Payload as a funstion of range
-        #Get Range equation, get Wf and Wi from fuel fractions
-        # R = V/cp * L/D * Wi/Wf
-        # Running compute_weight class to get variables inside functions
-        self.weight_break_down_HACK()
-
+        if mission == 'hack':
+            self.weight_break_down_HACK()
+            MTOW = self.MTOW_HACK
+            MPLW = self.MPLW_HACK
+            Max_fuel_MPLW = self.Max_fuel_at_max_PL_HACK
+            Max_fuel_capacity = self.Max_fuel_mass_capacity_HACK
+            OEW = self.OEW_HACK
+        if mission == 'neo':
+            MTOW = self.MTOW_320neo
+            MPLW = self.MPLW_320neo
+            Max_fuel_MPLW = self.MTOW_320neo - self.MPLW_320neo - self.OEW_320neo
+            Max_fuel_capacity = self.Max_fuel_mass_capacity_320neo
+            OEW = self.OEW_320neo
 
         #Point A: R = 0 and W_Pl = MPLW
         R_A = 0
-        W_Pl_A = self.MPLW_HACK                                               # Payload mass at point A             [kg]
+        W_Pl_A = MPLW                                               # Payload mass at point A             [kg]
 
         #Point B: R = ?? and W_Pl = MPLW
-        Mto = self.MTOW_HACK
-        W_Pl_B = self.MPLW_HACK                                               # Payload mass at point B             [kg]
-        Mf = self.Max_fuel_at_max_PL_HACK                                     # Maximum fuel at maximum payload    [kg]
+        Mto = MTOW
+        W_Pl_B = MPLW                                               # Payload mass at point B             [kg]
+        Mf = Max_fuel_MPLW                                          # Maximum fuel at maximum payload    [kg]
         W5W4_B = self.flight_profile_weights(Mf,Mto)                          # Fuel ratio during cruise for point B [-]
         R_B = self.Range(L_over_D,W5W4_B,SFC)                                     # Range at point B                     [m]
 
 
         # Point C: R = ?? and Wf = MFW, Wpl = MTOW - OEM - Maxfuel
-        Mf = self.Max_fuel_mass_capacity_HACK - self.Fuel_idel_taxi_take_off_HACK  # Maximum fuel capacity of HACK      [kg]
-        W_Pl_C = Mto - Mf - self.OEW_HACK                                     #Payload mass at point C             [kg]
-        W5W4_C = self.flight_profile_weights(Mf, Mto)                         # Fuel ratio during cruise for point C [-]
-        R_C = self.Range(L_over_D, W5W4_C,SFC)                                    # Range at point C                     [m]
+        if mission == 'hack':
+            self.Energy_split(Max_fuel_capacity)                                          # Maximum fuel capacity of HACK      [kg]
+            massH2, massker = self.get_fuel_before_take_off(self.mass_h2,self.mass_k,phase_durations,mission,True)
+            Mf = massH2 + massker
+        else:
+            massH2, massker = self.get_fuel_before_take_off(0.,Max_fuel_capacity, phase_durations, mission, True)
+            Mf = massH2 + massker
+
+        W_Pl_C = Mto - Mf - OEW                                           #Payload mass at point C             [kg]
+        W5W4_C = self.flight_profile_weights(Mf, Mto)                               # Fuel ratio during cruise for point C [-]
+        R_C = self.Range(L_over_D, W5W4_C,SFC)                                      # Range at point C                     [m]
 
 
         # Point D: R = ?? and W_Pl = 0--> W_fuel = Maxfuel
-        Mf = self.Max_fuel_mass_capacity_HACK - self.Fuel_idel_taxi_take_off_HACK  # Maximum fuel capacity of HACK      [kg]
-        W_PL_D = 0                                                            # Payload mass at point D            [kg]
-        Mto = self.OEW_HACK + Mf + W_PL_D                                     # Take off weight at point D         [kg]
-        W5W4_D = self.flight_profile_weights(Mf, Mto)                         # Fuel ratio during cruise for point D [-]
-        R_D = self.Range(L_over_D, W5W4_D,SFC)                                    # Range at point D                     [m]
+        W_PL_D = 0                                                                  # Payload mass at point D            [kg]
+        Mto = OEW + Mf + W_PL_D                                           # Take off weight at point D         [kg]
+        W5W4_D = self.flight_profile_weights(Mf, Mto)                               # Fuel ratio during cruise for point D [-]
+        R_D = self.Range(L_over_D, W5W4_D,SFC)                                      # Range at point D                     [m]
 
-        Range_array = np.array([R_A*0.001,R_B*0.001,R_C*0.001,R_D*0.001])
-        Payload_array = np.array([W_Pl_A,W_Pl_B,W_Pl_C,W_PL_D])
-        plt.plot(Range_array,Payload_array,marker = '*',color = 'tab:red')
-        plt.xlabel('Range [km]')
-        plt.ylabel('Payload Mass [kg]')
-        plt.show()
+        self.Range_array = np.array([R_A*0.001,R_B*0.001,R_C*0.001,R_D*0.001])
+        self.Payload_array = np.array([W_Pl_A,W_Pl_B,W_Pl_C,W_PL_D])
+
+    def read_files(self,name_of_file):
+        main_file = 'C:\\Users\\daf6111\\Documents\\universidade\\Third year\\DSE\\HACK\\Subsystem_design\\Engine'
+        file = open(main_file + '\\' + name_of_file,'r')
+        file_data = file.readlines()
+        mf_h2 = float(file_data[20].split('\t')[1])
+        mf_ker = float(file_data[21].split('\t')[1])
+        return mf_h2,mf_ker
+
+    def Energy_split(self,m_tot):
+        E_k = (m_tot * self.LHV_ker * self.LHV_h2)/(self.LHV_h2+self.LHV_ker)
+        E_h2 = 0.5 * E_k
+        self.mass_k = E_k / self.LHV_ker
+        self.mass_h2 = E_h2/ self.LHV_h2
+
+    def get_fuel_before_take_off(self,m_h2,m_k,time_phases,mission,take_off):
+        # Note: must read taxi-out and take-off files to get mass of fuel at beggining of mission.
+        mf_h2_taxiout, mf_k_taxiout = self.read_files(mission + '_taxi_out.txt')
+        mf_h2_takeoff, mf_k_takeoff = self.read_files(mission + '_take_off.txt')
+        if take_off == True:
+            m_h2 = m_h2 - mf_h2_taxiout * time_phases[0] - mf_h2_takeoff * time_phases[1]
+            m_k = m_k - mf_k_taxiout * time_phases[0] - mf_k_takeoff * time_phases[1]
+        else:
+            m_h2 = m_h2 + mf_h2_taxiout * time_phases[0] + mf_h2_takeoff * time_phases[1]
+            m_k = m_k + mf_k_taxiout * time_phases[0] + mf_k_takeoff * time_phases[1]
+
+        return m_h2,m_k
+
+    def mission_profile(self,phase_durations,mission):
+
+        if mission ==  'hack':
+            # m_f is the fuel weigth available at Take-off
+            self.weight_break_down_HACK()
+            m_f = self.Max_fuel_at_max_PL_HACK
+            self.Energy_split(m_tot=m_f)
+            m_h2 = self.mass_h2
+            m_k = self.mass_k
+
+        if mission == 'neo':
+            # m_f is the fuel weigth available at Take-off
+            m_f = self.MTOW_320neo - self.MPLW_320neo - self.OEW_320neo
+            m_h2 = 0
+            m_k = m_f
+
+        time_phases = phase_durations
+        m_h2, m_k = self.get_fuel_before_take_off(m_h2,m_k,time_phases,mission,take_off = False)
+
+        if mission == 'hack':
+            m_f = m_h2 + m_k
+            self.Energy_split(m_tot=m_f)
+            m_h2 = self.mass_h2
+            m_k = self.mass_k
+
+        'Taxi-out'
+        mf_h2_taxiout, mf_k_taxiout = self.read_files(mission + '_taxi_out.txt')
+        fs_h2_taxi_out = np.linspace(m_h2, m_h2 - mf_h2_taxiout * time_phases[0], 50)
+        fs_k_taxi_out = np.linspace(m_k, m_k - mf_k_taxiout * time_phases[0], 50)
+        'Take-off'
+        mf_h2_takeoff, mf_k_takeoff = self.read_files(mission + '_take_off.txt')
+        fs_h2_take_off = np.linspace(fs_h2_taxi_out[-1], fs_h2_taxi_out[-1] - mf_h2_takeoff * time_phases[1], 50)
+        fs_k_take_off = np.linspace(fs_k_taxi_out[-1], fs_k_taxi_out[-1] - mf_k_takeoff * time_phases[1], 50)
+        'Climb'
+        mf_h2_climb, mf_k_climb = self.read_files(mission +'_climb.txt')
+        fs_h2_climb = np.linspace(fs_h2_take_off[-1], fs_h2_take_off[-1] - mf_h2_climb * time_phases[2], 100)
+        fs_k_climb = np.linspace(fs_k_take_off[-1], fs_k_take_off[-1] - mf_k_climb * time_phases[2], 100)
+        'Cruise'
+        mf_h2_cruise, mf_k_cruise = self.read_files(mission +'_cruise.txt')
+        fs_h2_cruise = np.linspace(fs_h2_climb[-1], fs_h2_climb[-1] - mf_h2_cruise * time_phases[3],200)
+        fs_k_cruise = np.linspace(fs_k_climb[-1], fs_k_climb[-1] - mf_k_cruise * time_phases[3], 200)
+        'Approach'
+        mf_h2_approach, mf_k_approach = self.read_files(mission +'_approach.txt')
+        fs_h2_approach = np.linspace(fs_h2_cruise[-1], fs_h2_cruise[-1] - mf_h2_approach * time_phases[4], 50)
+        fs_k_approach = np.linspace(fs_k_cruise[-1], fs_k_cruise[-1] - mf_k_approach * time_phases[4], 50)
+        'Taxi-in'
+        mf_h2_taxiin, mf_k_taxiin = self.read_files(mission +'_taxi_in.txt')
+        fs_h2_taxi_in = np.linspace(fs_h2_approach[-1], fs_h2_approach[-1] - mf_h2_taxiin * time_phases[5], 50)
+        fs_k_taxi_in = np.linspace(fs_k_approach[-1], fs_k_approach[-1] - mf_k_taxiin * time_phases[5], 50)
+
+        fs_h2_total = np.hstack((fs_h2_taxi_out,fs_h2_take_off,fs_h2_climb,fs_h2_cruise,fs_h2_approach,fs_h2_taxi_in))
+        fs_k_total = np.hstack((fs_k_taxi_out,fs_k_take_off,fs_k_climb,fs_k_cruise,fs_k_approach,fs_k_taxi_in))
+
+        return fs_h2_total,fs_k_total
+
 
 if __name__ == '__main__':
     const = Constants()
@@ -97,13 +192,54 @@ if __name__ == '__main__':
 
     AC_weights = Compute_weight()                                               # Initiallize class of weight estimation
     AC_weights.weight_break_down_HACK()
+
     Aerodynamic_charac = AerodynamicCharacteristics()
     Aerodynamic_charac.L_over_D_cruise()
 
     Performance = performance()
-    Performance.payload_range_dia_HACK(L_over_D=Aerodynamic_charac.L_D_ratio_HACK,SFC= const.c_j_k_H2_cruise)
-    #Performance.payload_range_dia_320neo(L_over_D=Aerodynamic_charac.L_D_ratio_HACK,SFC = const.c_j_kerosene)
-    #W4_W5 = (3200*10**3)/(((const.M * Aerodynamic_charac.a)/(const.c_j_k_H2_cruise*const.g_0)) * Aerodynamic_charac.L_D_ratio_HACK)
+
+    T = thrust_req(cd0clean, wingar)
+
+    '''Plotting fuel consumption during flight'''
+    fs_h2_total_hack,fs_k_total_hack = Performance.mission_profile(phase_durations= T.durations, mission='hack')
+    fs_h2_total_neo, fs_k_total_neo = Performance.mission_profile(phase_durations= T.durations, mission='neo')
+    time = np.linspace(0,np.sum(T.durations),500)
+    plt.plot(time,fs_h2_total_hack,label= 'Hydrogen')
+    plt.plot(time, fs_k_total_hack, label='Kerosene')
+    plt.plot(time, fs_h2_total_hack+fs_k_total_hack, label='Total')
+    plt.ylabel('Mass of fuel on board [kg]',fontsize = 15)
+    plt.xlabel('Time [s]',fontsize = 15)
+    plt.legend(fontsize = 15)
+    plt.show()
+
+    '''Plotting payload range diagrams'''
+    #HACK
+    main_file = 'C:\\Users\\daf6111\\Documents\\universidade\\Third year\\DSE\\HACK\\Subsystem_design\\Engine'
+    file1 = open(main_file + '\\' + 'hack_cruise.txt', 'r')
+    file_data1 = file1.readlines()
+    TSFC_cruise1 = float(file_data1[39].split('\t')[1])
+
+    #NEO
+    file2 = open(main_file + '\\' + 'neo_cruise.txt', 'r')
+    file_data2 = file2.readlines()
+    TSFC_cruise2 = float(file_data2[39].split('\t')[1])
+
+    Performance.payload_range_diagram(L_over_D=Aerodynamic_charac.L_D_ratio_HACK,SFC= TSFC_cruise1*10**-6,mission='hack',phase_durations=T.durations)
+    Range_HACK = Performance.Range_array
+    Payload_HACK = Performance.Payload_array
+
+    Performance.payload_range_diagram(L_over_D=Aerodynamic_charac.L_D_ratio_neo,SFC = TSFC_cruise2*10**-6,mission='neo',phase_durations=T.durations)
+    Range_neo = Performance.Range_array
+    Payload_neo = Performance.Payload_array
+
+    plt.plot(Range_HACK, Payload_HACK, marker='*', color='tab:red',label='A320-HACK')
+    plt.plot(Range_neo,Payload_neo,marker='o',color='navy',label='A320neo')
+    plt.xlabel('Range [km]')
+    plt.ylabel('Payload Mass [kg]')
+    plt.legend()
+    plt.show()
+
+
 
     print('The OEW of the A320HACK is:',AC_weights.OEW_HACK)
     print('The MPLW of the A320HACK is:', AC_weights.MPLW_HACK)

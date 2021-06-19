@@ -230,7 +230,7 @@ class Engine_Cycle(Constants):
         print('[kN] Required Thrust:', self.Thrust / 1000, 'Actual Thrust:', self.T_total / 1000)
 
         # self.T_total = T_total
-        self.TSFC_m = self.mf_fuel / (self.T_total*10**(-3))        # [g/kN/s]
+        self.TSFC_m = (self.mf_fuel*10**3) / (self.T_total*10**(-3))        # [g/kN/s]
         self.TSFC_e = self.mf_fuel * self.LHV_f / (self.T_total * 10 ** (-3))    # [MJ/kN/s]
 
 
