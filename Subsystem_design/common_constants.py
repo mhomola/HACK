@@ -180,7 +180,7 @@ class Constants():
         # self.x_cg_hack = self.x_cg_320neo_zf * self.MZFW_320neo + \
         #                 (self.x_cg_320neo_mtow -self.x_cg_320neo_zf)*self.Max_fuel_mass_capacity_320neo
 
-        """ Weights of HACK """
+        """Weights of HACK"""
         self.Fuel_idel_taxi_take_off_HACK = 262.88                # Fuel for before take -off                       [kg]
         self.MTOW_320hack = 73500
         self.MRW_320HACK = 73900

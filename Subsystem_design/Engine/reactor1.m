@@ -1,6 +1,11 @@
-function [TPZ, MF_emis, name_emis] = reactor1(g, P_input, T_input, eqr_input,n_h2,n_ker,n_O2,n_N2)
+function [TPZ, MF_emis, name_emis,COf, NOxf] = reactor1(g, P_input, T_input, eqr_input,n_h2,n_ker,n_O2,n_N2)
 
-% Running MATLAB script
+%    REACTOR1 Zero-dimensional kinetics: adiabatic, constant pressure.
+%
+%    This example illustrates how to use class 'Reactor' for
+%    zero-dimensional kinetics simulations. Here the parameters are
+%    set so that the reactor is adiabatic and very close to constant
+%    pressure.
 
     function [time_idx1, time_idx2] = time_res(t,dt,p)
 
@@ -230,11 +235,5 @@ TPZ = temp(length(temp))
 % clear all
 % cleanup
 % Add a calculation of 5% steep angle
-
-%    REACTOR1 Zero-dimensional kinetics: adiabatic, constant pressure.
-%
-%    This example illustrates how to use class 'Reactor' for
-%    zero-dimensional kinetics simulations. Here the parameters are
-%    set so that the reactor is adiabatic and very close to constant
-%    pressure.
 end
+

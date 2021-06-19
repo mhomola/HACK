@@ -12,6 +12,7 @@ class Climate_assess():
 
     def __init__(self,t):
         self.H = 40                                                # Span of years considered(larger than 30 years)
+        self.H_int = 100
         self.RF_2CO2 = 3.7                                             # Radiative forcing corresponding to   [W/m^2]
                                                                        # a doubling of the concentration
         self.t_0 = 2035#1940
@@ -31,6 +32,7 @@ class Climate_assess():
         self.single_aisle_share = np.array([0.43,0.184,0.203,0.079,0.08,0.018]) #Assumed to stay constant over the years
         self.growth_rates = np.array([0.045,0.017,0.02,0.029,0.036,0.036,0.032])
         self.world_flights_2019 = 38.6 *10**6
+        self.Narrow_body_flights_percent = 0.56
 
         'Efficacies'
         self.Eff_CO2 = 1                                               # Efficacy of CO2                        [-]
@@ -43,7 +45,7 @@ class Climate_assess():
         'Constants for RF of CO2'
         self.EI_CO2 = 3.16                                             # Emissions index of CO2                 [kg/kgkerosene]
         self.E_CO2 = 0                                                 # Absolute CO2 emissions                 [kg]
-        self.X_CO2_0 = 311                                             # Background concentration of CO2        [ppmv]
+        self.X_CO2_0 = 380                                             # Background concentration of CO2        [ppmv]
         self.alpha_1 = 0.067/10**12#0.067                               #                                        [ppmv/kg]
         self.alpha_2 = 0.1135/10**12#0.1135                             #                                        [ppmv/kg]
         self.alpha_3 = 0.152/10**12#0.152                               #                                        [ppmv/kg]
@@ -115,12 +117,13 @@ class Climate_assess():
     def H2_percentage_trend(self):
 
         percentages= np.array([self.H2_flights_2035,0.1,0.18,self.H2_flights_2050,0.42,0.41,0.30,0.])
+        hack_percentages = np.linspace(1.0, 0.0, len(self.t_prime[self.t_prime<=self.t_0 + self.H]))
         time = np.array([2035,2040,2045,2050,2055,2060,2065,self.t_0 + self.H])
-        H2_perce = interp1d(time,percentages, kind='cubic')
+        H2_perce = interp1d(time,percentages)
         H2_flights_perc_year = np.ones(len(self.t_prime))
-        H2_flights_perc_year[self.t_prime<=self.t_0 + self.H] = H2_perce(self.t_prime[self.t_prime<=self.t_0 + self.H])
+        H2_flights_perc_year[self.t_prime<=self.t_0 + self.H] = H2_perce(self.t_prime[self.t_prime<=self.t_0 + self.H])* hack_percentages
         H2_flights_perc_year[self.t_prime > self.t_0 + self.H] = 0.
-
+        #H2_flights_perc_year = H2_flights_perc_year * hack_percentages
         return H2_flights_perc_year
 
     def market_share_per_region(self):
@@ -137,6 +140,7 @@ class Climate_assess():
         share_func_MiddleE = interp1d(time, shares[:, 4])
         share_func_Africa = interp1d(time, shares[:, 5])
 
+
         return share_func_Asia,share_func_NAmerica,share_func_Europe,share_func_Latin,share_func_MiddleE,share_func_Africa
 
 
@@ -147,21 +151,27 @@ class Climate_assess():
         #Asia
         Asia_flights_2023 = share_func_Asia(2019) * self.world_flights_2019
         Asia_flights_2035 = Asia_flights_2023 * (1+self.growth_rates[0])**12
+
         #North America
         NA_flights_2023 = share_func_NAmerica(2019) * self.world_flights_2019
         NA_flights_2035 = NA_flights_2023 * (1 + self.growth_rates[1])**12
+
         #Europe
         Europe_flights_2024 = share_func_Europe(2019) * self.world_flights_2019
         Europe_flights_2035 = Europe_flights_2024 * (1 + self.growth_rates[2])**11
+
         #Latin America
         Latin_flights_2023 = share_func_Latin(2019) * self.world_flights_2019
         Latin_flights_2035 = Latin_flights_2023 * (1 + self.growth_rates[3])**12
+
         #Middle East
         MiddleE_flights_2024 = share_func_MiddleE(2019) * self.world_flights_2019
         MiddleE_flights_2035 = MiddleE_flights_2024 * (1 + self.growth_rates[4])**11
+
         #Africa
         Africa_flights_2024 = share_func_Africa(2019) * self.world_flights_2019
         Africa_flights_2035 = Africa_flights_2024 * (1 + self.growth_rates[5])**11
+
         #World
         World_flights_2035 = np.sum([Asia_flights_2035,NA_flights_2035,Europe_flights_2035,Latin_flights_2035,MiddleE_flights_2035,Africa_flights_2035])
 
@@ -189,11 +199,11 @@ class Climate_assess():
                                      len(self.t_prime))
         #World
         World_tot_flights = np.sum(np.vstack((Asia_tot_flights,NA_tot_flights,Europe_tot_flights,Latin_tot_flights,MiddleE_tot_flights,Africa_tot_flights)),axis=0)
-        print(World_tot_flights)
+        print('World_tot_flights',World_tot_flights)
         #Narrow_body_flights
-        Narrow_body_flights_percent = (self.narrow_body_percentage()(2019) / self.single_aisle_share[2]) * share_func_Europe(2019)
-        World_Narrow_body_flights = Narrow_body_flights_percent * World_tot_flights
-        print(World_Narrow_body_flights)
+        #Narrow_body_flights_percent = (self.narrow_body_percentage()(2019) / self.single_aisle_share[2]) * share_func_Europe(2019)
+        World_Narrow_body_flights = self.Narrow_body_flights_percent * World_tot_flights
+        print('World_Narrow_body_flights',World_Narrow_body_flights)
         #Asia
         self.Asia_Narrow_body_flights = World_Narrow_body_flights * self.single_aisle_share[0]
         #North America
@@ -336,6 +346,7 @@ class Climate_assess():
                              26420.091,27505.983,28509.118,29562.49,31242.0659,33433.873,
                              34645.2834,35564.9354,36792.6272,37579.1538,39084.3820,41220.932])
             s = interp1d(altitude,forcing_fact,kind='cubic')
+
         if compound == 'O3S':
             forcing_fact = np.array([0.475,0.476,0.545,0.5764,0.6149,0.666,0.7119,0.7029,
                                      0.7104,0.7681,0.8217,0.8794,0.9579,0.9979,1.060,
@@ -569,7 +580,7 @@ class Climate_assess():
         :return: Average temperature response for a certain flight phase [K]
         '''
 
-        ATR = (1/self.H) * integrate.simps(self.delta_T(h,e_CO2, e_H2O, e_NOx, e_soot, e_sulfate,U,plot),self.t_prime-self.t_0)
+        ATR = (1/self.H_int) * integrate.simps(self.delta_T(h,e_CO2, e_H2O, e_NOx, e_soot, e_sulfate,U,plot),self.t_prime-self.t_0)
 
         return ATR
 
@@ -580,24 +591,49 @@ if __name__ == '__main__':
     climate = Climate_assess(t = 2135) #1995
     climate.s(compound='O3S')
     e_CO2, e_SO4, e_H2O, e_soot, e_NOx = climate.emissions(13300)
-    #
+    climate.narrow_body_flights_per_region()
+    # print('Asia_Narrow_body_flights',climate.Asia_Narrow_body_flights)
+    # print('NA_Narrow_body_flights',climate.NA_Narrow_body_flights)
+    # print('Europe_Narrow_body_flights',climate.Europe_Narrow_body_flights)
+    # print('Latin_Narrow_body_flights',climate.Latin_Narrow_body_flights)
+    # print('MiddleE_Narrow_body_flights',climate.MiddleE_Narrow_body_flights)
+    # print('Africa_Narrow_body_flights',climate.Africa_Narrow_body_flights)
+    H2_flights = climate.H2_percentage_trend()
     U_H2 = climate.number_aircraft_H2()                 # Number of flights in a year
-    #U_ker = climate.number_aircraft_kerosene()
+    U_ker = U_H2
     #E_H2 = climate.E(e=e_CO2 ,U=U_H2,time=climate.t_prime)
     #E_ker = climate.E(e=e_CO2, U=U_ker, time=climate.t_prime)
     #percentages= climate.H2_percentage_trend()
     # plt.subplot(131)
     # plt.plot(climate.t_prime,percentages,label='Percentage of H2 flights')
     # plt.legend()
-    # plt.subplot(132)
-    plt.plot(climate.t_prime,U_H2,label='Utilization rate')
-    plt.xlabel('years')
-    plt.ylabel('Number of missions per year')
-    plt.legend()
+    # plt.subplot(121)
+    # plt.plot(climate.t_prime,H2_flights, label='Percentage of H2 flights')
+    # plt.xlabel('years')
+    # plt.ylabel('Percentage [%]')
+    # plt.legend()
+    # plt.subplot(122)
+    # plt.plot(climate.t_prime,U_H2,label='Utilization rate',color='tab:red')
+    # plt.xlabel('years')
+    # plt.ylabel('Number of missions per year')
+    # plt.xlim(2035,2085)
+    # plt.legend()
 
     # plt.subplot(133)
     # plt.plot(climate.t_prime, E_H2,label='Emissions per year')
     # plt.legend()
+    altitude_CH4 = 0.3048 * np.array([0.0,17582.52,19617.886,21263.886,23302.9859,24712.7742,25293.3739,
+                             26420.091,27505.983,28509.118,29562.49,31242.0659,33433.873,
+                             34645.2834,35564.9354,36792.6272,37579.1538,39084.3820,41220.932])
+    altitude_O3S =  0.3048 * np.array([0.0,17734.057,19270.4087,20162.2675,21487.656,22736.4962,
+                                 23452.5,24338.567,25615.992,26827.0408,27833.806,28856.331,30201.358,31624.234,
+                                 32571.11,33550.85,34199.759,34816.349,35466.1077,36338.689,37290.789,38163.418,
+                                 39184.116,40136.381,41251.765])
+    plt.plot(altitude_CH4,climate.s('CH4')(altitude_CH4),marker = '*',label= 'CH_4 & O_3L',color= 'navy')
+    plt.plot(altitude_O3S,climate.s('O3S')(altitude_O3S),marker= 'o',label= 'O_3S', color= 'tab:red')
+    plt.xlabel('Altitude [m]',fontsize= 15)
+    plt.ylabel('Forcing factor, s [-]',fontsize= 15)
+    plt.legend(fontsize= 15)
     plt.show()
     # print('Start analysis for LTO')
     # 'To plot the change in CO2 concentration in ppmv per year'

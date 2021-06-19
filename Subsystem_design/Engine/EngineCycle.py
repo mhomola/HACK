@@ -20,7 +20,6 @@ from DataEngine import DataFrame
 from Subsystem_design.common_constants import Constants
 import matlab.engine
 import math as m
-import matplotlib.pyplot as plt
 
 class Engine_Cycle(Constants):
     def __init__(self):
@@ -231,7 +230,7 @@ class Engine_Cycle(Constants):
         print('[kN] Required Thrust:', self.Thrust / 1000, 'Actual Thrust:', self.T_total / 1000)
 
         # self.T_total = T_total
-        self.TSFC_m = self.mf_fuel / (self.T_total*10**(-3))        # [g/kN/s]
+        self.TSFC_m = (self.mf_fuel*10**3) / (self.T_total*10**(-3))        # [g/kN/s]
         self.TSFC_e = self.mf_fuel * self.LHV_f / (self.T_total * 10 ** (-3))    # [MJ/kN/s]
 
 
@@ -279,6 +278,8 @@ class Engine_Cycle(Constants):
         self.n_N2 = self.n_h2 * 1.88 + self.n_ker * 55.45
         self.m_O2 = self.n_O2* 32 *10**-3
         self.m_N2 = self.n_N2 * self.molarmass_N2 *10**-3
+        self.stoichiometric_ratio = (self.mf_h2 + self.mf_ker) / (self.m_O2 + self.m_N2)
+
 
     def plot_TS(self, aircraft, phase, alp):
 
@@ -326,7 +327,6 @@ class Engine_Cycle(Constants):
         # plt.title(phase)
         plt.legend(fontsize=15)
         # plt.show()
-
 
 ''' FORMULAE
 
