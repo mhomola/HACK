@@ -73,6 +73,25 @@ def P_com(h,p2,m):
     
     return cp*(T1/nc)*((p2/p1)**((gamma-1)/gamma)-1)*m, p1
 
+
+def P_com(h, p2, m):
+
+    T1 = ISA_t(h)
+
+    nc = 0.7
+    gamma = 1.4
+    g = 9.81
+    R = 287.05
+
+    if h <= 1800:
+        p1 = ISA_p(T1)
+    else:
+        p11 = ISA_p(ISA_t(1800))
+       # p1 = p11 * np.exp(-g / (R * ISA_t(11000)) * (h - 11000))
+        p1 = ISA_p(ISA_t(1800))
+
+    return cp * ((20+273.15) / nc) * ((p2 / p1) ** ((gamma - 1) / gamma) - 1) * m, p1
+
 def inverse(Vsearch):
 
     i = np.arange(0, 1.6, 0.01)
@@ -136,22 +155,22 @@ plt.ylabel('Power density [W/cm2]')
 plt.xlabel('Current density [A/cm2]')
 plt.show()
 
-h = np.arange(0,13001)
+h = np.arange(0,11001)
 # P_comp_req1 = P_com(h,200000,0.05)
 # P_comp_req2 = P_com(h,200000,0.1)
 # P_comp_req3 = P_com(h,200000,0.15)
 # P_comp_req4 = P_com(h,200000,0.2)
 
-P_comp_req1 = np.array([P_com(i,200000,0.05)[0] for i in h])
-P_comp_req2 = np.array([P_com(i,200000,0.1)[0] for i in h])
-P_comp_req3 = np.array([P_com(i,200000,0.15)[0] for i in h])
-P_comp_req4 = np.array([P_com(i,200000,0.2)[0] for i in h])
+P_comp_req1 = np.array([P_com(i,101300,0.28)[0] for i in h])
+P_comp_req2 = np.array([P_com(i,202600,0.28)[0] for i in h])
+P_comp_req3 = np.array([P_com(i,303900,0.28)[0] for i in h])
+P_comp_req4 = np.array([P_com(i,405200,0.28)[0] for i in h])
 p_check = np.array([P_com(i,200000,0.2)[1] for i in h])
 
-plt.plot(h/1000,P_comp_req1/1000,'#6f83e3', label = 'm = 0.05')
-plt.plot(h/1000,P_comp_req2/1000,'#3c4a8c', label = 'm = 0.1')
-plt.plot(h/1000,P_comp_req3/1000,'#1d2759', label = 'm = 0.15')
-plt.plot(h/1000,P_comp_req4/1000,'#060b24', label = 'm = 0.2')
+plt.plot(h/1000,P_comp_req1/1000,'#060b24', label = 'p2 = 1 atm')
+# plt.plot(h/1000,P_comp_req2/1000,'#3c4a8c', label = 'p2 = 2 atm')
+# plt.plot(h/1000,P_comp_req3/1000,'#1d2759', label = 'p2 = 3 atm')
+# plt.plot(h/1000,P_comp_req4/1000,'#060b24', label = 'p2 = 4 atm')
 plt.legend()
 plt.title('Compressor power as a function of altitude, nc = 0.7')
 plt.ylabel('Compressor power [kW]')

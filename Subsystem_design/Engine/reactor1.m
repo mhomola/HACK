@@ -7,6 +7,8 @@ function [TPZ, MF_emis, name_emis, COf, NOxf] = reactor1(g, P_input, T_input, eq
 %    set so that the reactor is adiabatic and very close to constant
 %    pressure.
 
+    rtf = 1.1;
+
     function [time_idx1, time_idx2] = time_res(t,dt,p)
 
             slope = (t(2:end) - t(1:end-1))/dt;
@@ -35,15 +37,31 @@ function [TPZ, MF_emis, name_emis, COf, NOxf] = reactor1(g, P_input, T_input, eq
     end
     
     function [rest, tim1, tim2] = residence_time(T,time,rlimit)
-        rlim1 = 0.04;
+        
+        rlim1 = 0.05
         rlim2 = rlimit;
         T1 = T(1)+rlim1*(T(end)-T(1));
         idx1 = find(T >= T1);
         tim1 = time(idx1(1));
         T2 = T(1)+rlim2*(T(end)-T(1));
         idx2 =find(T >= T2);
-        tim2 = time(idx2(1));
+        tim2 = time(round(idx2(1)*rtf));
         rest = 1000*(tim2 - tim1);
+       
+    end
+
+    function H2OTIM = H2O_time(T,time)
+        
+        rlim1 = 0.15;
+        rlim2 = 0.9999;
+        T1 = T(1)+rlim1*(T(end)-T(1));
+        idx1 = find(T >= T1);
+        tim1 = time(idx1(1));
+        T2 = T(1)+rlim2*(T(end)-T(1));
+        idx2 =find(T >= T2);
+        tim2 = time(idx2(1));
+        H2OTIM = 1000*(tim2 - tim1);
+        
     end
 
 % help reactor1
@@ -63,10 +81,10 @@ eqr = eqr_input; %0.3;
 
 %------------------
 
-dt = 1e-7; %time step; -4 originally
-TotalTime = 0.1; % in seconds - includes autoignition phase
+dt = 1e-6; %time step; -4 originally
+TotalTime = 0.4; % in seconds - includes autoignition phase
 nSteps = ceil(TotalTime/dt); %number of steps. Total time = nSteps*dt
-rlim = 0.99;
+rlim = 0.9999;
 
 if strcmp(g,'neo') %   compare string
    gas = Solution('kerosene.yaml', 'gas');
@@ -75,18 +93,39 @@ if strcmp(g,'neo') %   compare string
    p_o2_new = p_o2/eqr;
    p_n2_new = p_n2/eqr;
    
-   str_ker = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,O2:',string(p_o2_new),',N2:',string(p_n2_new)],"")); % only kerosene
+   str_ker = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,O2:',...
+       string(p_o2_new),',N2:',string(p_n2_new)],"")); % only kerosene
    set(gas,'T',T,'P',P,'X',str_ker) % only kerosene
+   %set(gas,'T',T,'P',P,'X','H2:1,O2:0.5,N2:1.88'); 
    %gas = Solution('nDodecane_Reitz.yaml','nDodecane_IG');
 
+t_res_combo = 0;
+   
 elseif strcmp(g,'hack_mix')
    gas = Solution('kerosene.yaml', 'gas');
-   p_o2 = 15.26;%44.76;
-   p_n2 = 57.38;%168.3;
+   p_o2 = 44.76; %44.76;
+   p_n2 = 168.3; %168.3;
    p_o2_new = p_o2/eqr;
    p_n2_new = p_n2/eqr;
-   str_ker_h2 = convertStringsToChars(join(['NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:1,O2:',string(p_o2_new),',N2:',string(p_n2_new)],"")); % kerosene and H2, 50% in volume
+  
+   
+   mh2 = 0.152;
+   mker = 0.359;
+   r = mh2/(mh2+mker);
+   
+   h2_num = r*60/0.5;
+   
+   NC10H22num = (1-r)*0.74/0.5;
+   PHC3H7num = (1-r)*0.15/0.5;
+   CYC9H18num = (1-r)*0.11/0.5;
+   str_ker_h2 = convertStringsToChars(join(['NC10H22:',string(NC10H22num),',PHC3H7:',string(PHC3H7num),...
+       ',CYC9H18:',string(CYC9H18num),',H2:',string(h2_num),',O2:',string(p_o2_new),',N2:',string(p_n2_new)],""));...
+       % kerosene and H2, 50% in mass
    set(gas,'T',T,'P',P,'X',str_ker_h2) % 50% H2 in volume - change this (automatically based on mass ratio)
+   
+   t_res_combo = 23.337*(r*5.721/21.223+(1-r))*0.001;
+   t_res_combo2 = t_res_combo*1000
+   
     
 elseif strcmp(g,'hack_h2')
    gas = GRI30('None');
@@ -120,8 +159,8 @@ end
 
 %set(gas,'T',T,'P',P,'X','NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,O2:14.76,N2:55.45')% kerosene, stoich
 
-%set(gas,'T',T,'P',P,'X','NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:1,O2:15.26,N2:57.38') % 50% H2 in volume
-%set(gas,'T',T,'P',P,'X','NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:60,O2:44.76,N2:168.3') % 50% H2 in volume
+%set(gas,'T',T,'P',P,'X','NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:1,O2:15.26,N2:57.38') % 50% H2 in volume 
+%set(gas,'T',T,'P',P,'X','NC10H22:0.74,PHC3H7:0.15,CYC9H18:0.11,H2:60,O2:46.76,N2:168.3') % 50% H2 in mass 
 %set(gas,'T',T,'P',P,'X','c12h26:1,O2:18.5,N2:69.56'); %For soot
 
 
@@ -177,6 +216,8 @@ disp(['CPU time = ' num2str(cputime - t0)]);
 [rt, tim1, tim2] = residence_time(temp,tim,rlim);
 res_time = rt
 
+timMix = tim1 + t_res_combo;
+
 %t_res = (t_com - t_five)*1000;
 % disp(['Residence time = ', t_res, ' ms']);
 
@@ -189,37 +230,50 @@ clf; %  clear figure
 subplot(2,2,1);
 hold on;
 plot(tim,temp,'r','LineWidth',2)%,
-plot([tim1 tim1],[0 3000],'k-');
-plot([tim2 tim2],[0 3000],'k-');
+%plot([tim1 tim1],[0 3000],'k-');
+%plot([tim2 tim2],[0 3000],'k-');
+plot([timMix,timMix],[0 3000],'k-');
 hold off;
 xlabel('Time (s)');
 ylabel('Temperature (K)');
 
 subplot(2,2,2)
+hold on;
 plot(tim,sum(kero,2),'k',tim,x(:,3),'r',tim,x(:,4),'b',tim,x(:,end),'g');
+%plot([tim(i) tim(i)],[0 max(x(:,3))],'k-');
+plot([timMix,timMix],[0 max(x(:,4))],'k-');
+hold off;
 xlabel('Time (s)');
 ylabel('Mass fraction');
 legend('Kerosene','CO2','H2O','H2');
 
 subplot(2,2,3)
+hold on
 plot(tim,x(:,2));
+plot([timMix,timMix],[0 max(x(:,3))],'k-');
+%plot([tim(i) tim(i)],[0 max(x(:,2))],'k-'); %kerosene only
+hold off
 xlabel('Time (s)');
 ylabel('CO Mass Fraction');
 
 subplot(2,2,4)
 hold on;
 plot(tim,(x(:,5)+x(:,6))*1e6);
-plot([tim(i) tim(i)],[0 max((x(:,5)+x(:,6))*1e6)],'k-');
+%plot([tim(i) tim(i)],[0 max((x(:,5)+x(:,6))*1e6)],'k-');
+plot([timMix,timMix],[0 max((x(:,5)+x(:,6))*1e6)],'k-');
 hold off;
 xlabel('Time (s)');
 ylabel('NOX Mass Fraction (ppm)');
 
-COf = (x(end-1,2));
-NOxf =(x(i,5)+x(i,6))*1e6;
+COf = (x(round(i*rtf),2));
+NOxf =(x(round(i*rtf),5)+x(round(i*rtf),6))*1e6;
+
 % disp(['CO fraction = ', x(nSteps,2)]);
 % disp(['NOx fraction = ', (x(nSteps,5)+x(nSteps,6))*1e6]);
 
 TPZ = temp(length(temp));
+
+TH2O = H2O_time(temp,tim);
 
 % clear all
 % cleanup
