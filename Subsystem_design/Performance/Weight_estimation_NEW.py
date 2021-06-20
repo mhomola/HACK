@@ -121,6 +121,7 @@ class performance(Compute_weight):
         # Note: must read taxi-out and take-off files to get mass of fuel at beggining of mission.
         mf_h2_taxiout, mf_k_taxiout = self.read_files(mission + '_taxi_out.txt')
         mf_h2_takeoff, mf_k_takeoff = self.read_files(mission + '_take_off.txt')
+
         if take_off == True:
             m_h2 = m_h2 - mf_h2_taxiout * time_phases[0] - mf_h2_takeoff * time_phases[1]
             m_k = m_k - mf_k_taxiout * time_phases[0] - mf_k_takeoff * time_phases[1]
