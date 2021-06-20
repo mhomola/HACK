@@ -42,11 +42,12 @@ ae = AerodynamicCharacteristics()
 ae.aero_functions(AoA_cruise=2)
 
 aircraft = ['neo', 'hack']
-#phases = np.array(['taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in'])
-phases = np.array(['taxi_out', 'take_off1', 'take_off2', 'climb1', 'climb2', 'cruise1', 'cruise2', 'approach1',
-          'approach2', 'taxi_in', 'idle'])
-Time_phases = 60* np.array([8.,0.5,1.,1.,18,217,16.5,0.5,1.,8.])
-Time_CA_analysis = 60*np.array([3.75,8.,8.5,9.5,10.5,28.5,245.5,262,262.5,263.5,264.5])
+phases = np.array(['taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in'])
+#phases = np.array(['taxi_out', 'take_off1', 'take_off2', 'climb1', 'climb2', 'cruise1', 'cruise2', 'approach1',
+          #'approach2', 'taxi_in', 'idle'])
+#Time_phases = 60* np.array([8.,0.5,1.,1.,18,217,16.5,0.5,1.,8.])
+#Time_CA_analysis = 60*np.array([3.75,8.,8.5,9.5,10.5,28.5,245.5,262,262.5,263.5,264.5])
+Time_phases = T.durations
 printing = False                #Change to True for printing stuff
 
 #Emission indexes of soot and UHC
@@ -113,6 +114,7 @@ for b in phases:
     #Getting total emissions in that phase
     mf_reactants = ec.mf_fuel + ec.mf_hot
     Emissions = np.array(Emissions)
+    E_soot =
 
     Emissions_array_neo[phases == b] = Emissions * mf_reactants * time
 

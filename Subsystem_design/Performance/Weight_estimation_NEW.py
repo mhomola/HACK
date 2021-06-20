@@ -120,14 +120,14 @@ class performance(Compute_weight):
     def get_fuel_before_take_off(self,m_h2,m_k,time_phases,mission,take_off):
         # Note: must read taxi-out and take-off files to get mass of fuel at beggining of mission.
         mf_h2_taxiout, mf_k_taxiout = self.read_files(mission + '_taxi_out.txt')
-        mf_h2_takeoff1, mf_k_takeoff1 = self.read_files(mission + '_take_off1.txt')
-        mf_h2_takeoff2, mf_k_takeoff2 = self.read_files(mission + '_take_off2.txt')
+        mf_h2_takeoff, mf_k_takeoff = self.read_files(mission + '_take_off.txt')
+
         if take_off == True:
-            m_h2 = m_h2 - mf_h2_taxiout * time_phases[0] - mf_h2_takeoff1 * time_phases[1]- mf_h2_takeoff2 * time_phases[2]
-            m_k = m_k - mf_k_taxiout * time_phases[0] - mf_k_takeoff1 * time_phases[1] - mf_k_takeoff2 * time_phases[2]
+            m_h2 = m_h2 - mf_h2_taxiout * time_phases[0] - mf_h2_takeoff * time_phases[1]
+            m_k = m_k - mf_k_taxiout * time_phases[0] - mf_k_takeoff * time_phases[1]
         else:
-            m_h2 = m_h2 + mf_h2_taxiout * time_phases[0] + mf_h2_takeoff1 * time_phases[1] + mf_h2_takeoff2 * time_phases[2]
-            m_k = m_k + mf_k_taxiout * time_phases[0] + mf_k_takeoff1 * time_phases[1] + mf_k_takeoff2 * time_phases[2]
+            m_h2 = m_h2 + mf_h2_taxiout * time_phases[0] + mf_h2_takeoff * time_phases[1]
+            m_k = m_k + mf_k_taxiout * time_phases[0] + mf_k_takeoff * time_phases[1]
 
         return m_h2,m_k
 
@@ -160,49 +160,33 @@ class performance(Compute_weight):
         mf_h2_taxiout, mf_k_taxiout = self.read_files(mission + '_taxi_out.txt')
         fs_h2_taxi_out = np.linspace(m_h2, m_h2 - mf_h2_taxiout * time_phases[0], 50)
         fs_k_taxi_out = np.linspace(m_k, m_k - mf_k_taxiout * time_phases[0], 50)
-        'Take-off1'
-        mf_h2_takeoff1, mf_k_takeoff1 = self.read_files(mission + '_take_off1.txt')
-        fs_h2_take_off1 = np.linspace(fs_h2_taxi_out[-1], fs_h2_taxi_out[-1] - mf_h2_takeoff1 * time_phases[1], 50)
-        fs_k_take_off1 = np.linspace(fs_k_taxi_out[-1], fs_k_taxi_out[-1] - mf_k_takeoff1 * time_phases[1], 50)
-        'Take-off2'
-        mf_h2_takeoff2, mf_k_takeoff2 = self.read_files(mission + '_take_off2.txt')
-        fs_h2_take_off2 = np.linspace(fs_h2_take_off1[-1], fs_h2_take_off1[-1] - mf_h2_takeoff2 * time_phases[2], 50)
-        fs_k_take_off2 = np.linspace(fs_k_take_off1[-1], fs_k_take_off1[-1] - mf_k_takeoff2 * time_phases[2], 50)
-        'Take-off3'
-        mf_h2_takeoff3, mf_k_takeoff3 = self.read_files(mission + '_take_off3.txt')
-        fs_h2_take_off3 = np.linspace(fs_h2_take_off2[-1], fs_h2_take_off2[-1] - mf_h2_takeoff3 * time_phases[3], 50)
-        fs_k_take_off3 = np.linspace(fs_k_take_off2[-1], fs_k_take_off2[-1] - mf_k_takeoff3 * time_phases[3], 50)
+        'Take-off'
+        mf_h2_takeoff, mf_k_takeoff = self.read_files(mission + '_take_off.txt')
+        fs_h2_take_off = np.linspace(fs_h2_taxi_out[-1], fs_h2_taxi_out[-1] -  mf_h2_takeoff * time_phases[1], 50)
+        fs_k_take_off = np.linspace(fs_k_taxi_out[-1], fs_k_taxi_out[-1] - mf_k_takeoff * time_phases[1], 50)
+
         'Climb1'
-        mf_h2_climb1, mf_k_climb1 = self.read_files(mission +'_climb1.txt')
-        fs_h2_climb1 = np.linspace(fs_h2_take_off3[-1], fs_h2_take_off3[-1] - mf_h2_climb1 * time_phases[4], 100)
-        fs_k_climb1 = np.linspace(fs_k_take_off3[-1], fs_k_take_off3[-1] - mf_k_climb1 * time_phases[4], 100)
-        'Climb2'
-        mf_h2_climb2, mf_k_climb2 = self.read_files(mission + '_climb2.txt')
-        fs_h2_climb2 = np.linspace(fs_h2_climb1[-1], fs_h2_climb1[-1] - mf_h2_climb2 * time_phases[5], 100)
-        fs_k_climb2 = np.linspace(fs_k_climb1[-1], fs_k_climb1[-1] - mf_k_climb2 * time_phases[5], 100)
+        mf_h2_climb, mf_k_climb = self.read_files(mission +'_climb.txt')
+        fs_h2_climb = np.linspace(fs_h2_take_off[-1], fs_h2_take_off[-1] - mf_h2_climb * time_phases[2], 100)
+        fs_k_climb = np.linspace(fs_k_take_off[-1], fs_k_take_off[-1] - mf_k_climb* time_phases[2], 100)
+
         'Cruise1'
-        mf_h2_cruise1, mf_k_cruise1 = self.read_files(mission +'_cruise1.txt')
-        fs_h2_cruise1 = np.linspace(fs_h2_climb2[-1], fs_h2_climb2[-1] - mf_h2_cruise1 * time_phases[6],200)
-        fs_k_cruise1 = np.linspace(fs_k_climb2[-1], fs_k_climb2[-1] - mf_k_cruise1 * time_phases[6], 200)
-        'Cruise2'
-        mf_h2_cruise2, mf_k_cruise2 = self.read_files(mission + '_cruise1.txt')
-        fs_h2_cruise2 = np.linspace(fs_h2_cruise1[-1], fs_h2_cruise1[-1] - mf_h2_cruise2 * time_phases[7], 50)
-        fs_k_cruise2 = np.linspace(fs_k_cruise1[-1], fs_k_cruise1[-1] - mf_k_cruise2 * time_phases[7], 50)
-        'Approach1'
-        mf_h2_approach1, mf_k_approach1 = self.read_files(mission +'_approach1.txt')
-        fs_h2_approach1 = np.linspace(fs_h2_cruise2[-1], fs_h2_cruise2[-1] - mf_h2_approach1 * time_phases[8], 50)
-        fs_k_approach1 = np.linspace(fs_k_cruise2[-1], fs_k_cruise2[-1] - mf_k_approach1 * time_phases[8], 50)
-        'Approach2'
-        mf_h2_approach2, mf_k_approach2 = self.read_files(mission + '_approach2.txt')
-        fs_h2_approach2 = np.linspace(fs_h2_approach1[-1], fs_h2_approach1[-1] - mf_h2_approach2 * time_phases[9], 50)
-        fs_k_approach2 = np.linspace(fs_k_approach1[-1], fs_k_approach1[-1] - mf_k_approach2 * time_phases[9], 50)
+        mf_h2_cruise, mf_k_cruise = self.read_files(mission +'_cruise.txt')
+        fs_h2_cruise = np.linspace(fs_h2_climb[-1], fs_h2_climb[-1] - mf_h2_cruise * time_phases[3],200)
+        fs_k_cruise = np.linspace(fs_k_climb[-1], fs_k_climb[-1] - mf_k_cruise * time_phases[3], 200)
+
+        'Approach'
+        mf_h2_approach, mf_k_approach = self.read_files(mission +'_approach.txt')
+        fs_h2_approach = np.linspace(fs_h2_cruise[-1], fs_h2_cruise[-1] - mf_h2_approach * time_phases[4], 50)
+        fs_k_approach = np.linspace(fs_k_cruise[-1], fs_k_cruise[-1] - mf_k_approach * time_phases[4], 50)
+
         'Taxi-in'
         mf_h2_taxiin, mf_k_taxiin = self.read_files(mission +'_taxi_in.txt')
-        fs_h2_taxi_in = np.linspace(fs_h2_approach2[-1], fs_h2_approach2[-1] - mf_h2_taxiin * time_phases[10], 50)
-        fs_k_taxi_in = np.linspace(fs_k_approach2[-1], fs_k_approach2[-1] - mf_k_taxiin * time_phases[10], 50)
+        fs_h2_taxi_in = np.linspace(fs_h2_approach[-1], fs_h2_approach[-1] - mf_h2_taxiin * time_phases[5], 50)
+        fs_k_taxi_in = np.linspace(fs_k_approach[-1], fs_k_approach[-1] - mf_k_taxiin * time_phases[5], 50)
 
-        fs_h2_total = np.hstack((fs_h2_taxi_out,fs_h2_take_off1,fs_h2_take_off2,fs_h2_take_off3,fs_h2_climb1,fs_h2_climb2,fs_h2_cruise1,fs_h2_cruise2,fs_h2_approach1,fs_h2_approach2,fs_h2_taxi_in))
-        fs_k_total = np.hstack((fs_k_taxi_out,fs_k_take_off1,fs_k_take_off2,fs_k_take_off3,fs_k_climb1,fs_k_climb2,fs_k_cruise1,fs_k_cruise2,fs_k_approach1,fs_k_approach2,fs_k_taxi_in))
+        fs_h2_total = np.hstack((fs_h2_taxi_out,fs_h2_take_off,fs_h2_climb,fs_h2_cruise,fs_h2_approach,fs_h2_taxi_in))
+        fs_k_total = np.hstack((fs_k_taxi_out,fs_k_take_off,fs_k_climb,fs_k_cruise,fs_k_approach,fs_k_taxi_in))
 
         return fs_h2_total,fs_k_total
 
@@ -224,7 +208,7 @@ if __name__ == '__main__':
     '''Plotting fuel consumption during flight'''
     fs_h2_total_hack,fs_k_total_hack = Performance.mission_profile(phase_durations= T.durations, mission='hack')
     fs_h2_total_neo, fs_k_total_neo = Performance.mission_profile(phase_durations= T.durations, mission='neo')
-    time = np.linspace(0,np.sum(T.durations),800)
+    time = np.linspace(0,np.sum(T.durations),500)
     plt.plot(time,fs_h2_total_hack,label= 'Hydrogen')
     plt.plot(time, fs_k_total_hack, label='Kerosene')
     plt.plot(time, fs_h2_total_hack+fs_k_total_hack, label='Total')
