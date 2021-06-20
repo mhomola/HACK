@@ -37,7 +37,7 @@ v18	224.911	m/s
 T_fan	100701.858	N	
 T_core	18154.381	N	
 T_tot	118856.239	N	
-TSCF	0.00423	g/kN/s	
+TSCF	4.22612	g/kN/s	
 TSCF	0.28348	MJ/kN/s	
 OPR	43.102	-	
 PZ eqr	0.397	-	

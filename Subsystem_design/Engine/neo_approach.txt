@@ -40,5 +40,5 @@ T_tot	33607.126	N
 TSCF	11.05564	g/kN/s	
 TSCF	0.47539	MJ/kN/s	
 OPR	35.676	-	
-PZ eqr	0.369	K	
-Overall eqr	0.205	Pa	
+PZ eqr	0.369	-	
+Overall eqr	0.205	-	
