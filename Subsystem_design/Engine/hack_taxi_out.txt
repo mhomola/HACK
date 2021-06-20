@@ -21,11 +21,11 @@ m_fuel	0.066	kg/s
 m_h2	0.066	kg/s	
 m_ker	0.0	kg/s	
 T045	1049.052	K	
-p045	1007262.97	Pa	
+p045	1007262.987	Pa	
 T05	609.174	K	
-p05	103780.106	Pa	
+p05	103780.112	Pa	
 T07	609.174	K	
-p07	103217.418	Pa	
+p07	103217.424	Pa	
 T8	606.353	K	
 p8	101325.0	Pa	
 v8	80.556	m/s	
@@ -35,10 +35,10 @@ T18	290.864	K
 p18	101325.0	Pa	
 v18	221.448	m/s	
 T_fan	36122.459	N	
-T_core	755.202	N	
-T_tot	36877.66	N	
-TSCF	1.79622	g/kN/s	
+T_core	755.203	N	
+T_tot	36877.662	N	
+TSCF	0.0018	g/kN/s	
 TSCF	0.21555	MJ/kN/s	
 OPR	43.102	-	
-PZ eqr	0.271	K	
-Overall eqr	0.203	Pa	
+PZ eqr	0.271	-	
+Overall eqr	0.203	-	

@@ -68,18 +68,6 @@ class Engine_Cycle(Constants):
         self.ER_ker = float(data[26])
         self.LHV_f = float(data[27])
 
-        # percentage of core air that is used in combustion
-        # if aircraft == 'neo':
-        #     # self.mr_air_cc = np.array(np.genfromtxt('mr_cc_neo.dat'))[i]
-        #     self.FAR_st = self.stoich_ratio_ker
-        # elif aircraft == 'hack':
-        #     # self.mr_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))[i]
-        #     if phase in ['taxi_out', 'taxi_in', 'idle']:
-        #         self.FAR_st = self.stoich_ratio_h2
-        #     else:
-        #
-        #         self.FAR_st = self.stoich_ratio_ker_h2
-
 
     def get_dataframe(self, aircraft, phs):
         c = DataFrame().common_data
@@ -165,16 +153,21 @@ class Engine_Cycle(Constants):
 
         ''' FIND NECESSARY FUEL FLOW '''
         # Exit of cc - Entrance of HPT
-        if 'taxi' in phase:
-            self.mf_fuel = (self.mf_hot * self.cp_gas * (self.T04 - self.T03)) / (self.LHV_f * 10**6 * self.eta_cc -
-                                                                              self.cp_gas * self.T04) + 0.03
-        else:
-            self.mf_fuel = (self.mf_hot * self.cp_gas * (self.T04 - self.T03)) / (self.LHV_f * 10 ** 6 * self.eta_cc -
-                                                                                  self.cp_gas * self.T04)
+        # if 'taxi' in phase:
+        #     self.mf_fuel = (self.mf_hot * self.cp_gas * (self.T04 - self.T03)) / (self.LHV_f * 10**6 * self.eta_cc -
+        #                                                                       self.cp_gas * self.T04) + 0.03
+        # else:
+        #     self.mf_fuel = (self.mf_hot * self.cp_gas * (self.T04 - self.T03)) / (self.LHV_f * 10 ** 6 * self.eta_cc -
+        #                                                                           self.cp_gas * self.T04)
+        #
+        # self.T04 = ((self.mf_fuel * self.eta_cc * self.LHV_f * 10 ** 6) / self.cp_gas + self.mf_hot * self.T03) / \
+        #                    (self.mf_hot + self.mf_fuel)
 
+
+        self.mf_fuel = (self.mf_hot * self.cp_gas * (self.T04 - self.T03)) / (self.LHV_f * 10 ** 6 * self.eta_cc -
+                                                                              self.cp_gas * self.T04)
         self.T04 = ((self.mf_fuel * self.eta_cc * self.LHV_f * 10 ** 6) / self.cp_gas + self.mf_hot * self.T03) / \
-                           (self.mf_hot + self.mf_fuel)
-
+                                (self.mf_hot + self.mf_fuel)
 
         self.mf_airfuel = self.mf_hot + self.mf_fuel  # at the end of the cc
         self.mf_h2 = self.mf_fuel * self.ER_h2
@@ -292,7 +285,6 @@ class Engine_Cycle(Constants):
         self.eqr_PZ = (self.mf_fuel / (mr_c * self.mf_hot)) / self.stoichiometric_ratio
         self.eqr_overall = (self.mf_fuel / self.mf_hot) / self.stoichiometric_ratio
 
-
         TPZ1 = self.T04 - (mr_cool * self.mf_hot * self.cp_air * (self.T03 - self.T04)) / ((mr_c * self.mf_hot +
                                                                                            self.mf_fuel) * self.cp_gas)
         TPZ2 = self.T03 + (self.mf_fuel * self.eta_cc * self.LHV_f * 10**6) / (self.cp_gas * (mr_c * self.mf_hot +
@@ -304,11 +296,11 @@ class Engine_Cycle(Constants):
     def mole_rate(self):
         #Gives me mole rate
         self.n_h2 = self.mf_h2/(self.molarmass_h2 * 10**-3)
-        self.n_ker = self.mf_ker/(self.molar_mass_kerosene*10**-3)
+        self.n_ker = self.mf_ker/(self.molar_mass_kerosene * 10**-3)
         self.n_O2 = self.n_h2 * 0.5 + self.n_ker * 14.76
         self.n_N2 = self.n_h2 * 1.88 + self.n_ker * 55.45
-        self.m_O2 = self.n_O2* 32 *10**-3
-        self.m_N2 = self.n_N2 * self.molarmass_N2 *10**-3
+        self.m_O2 = self.n_O2 * 32 * 10**-3
+        self.m_N2 = self.n_N2 * self.molarmass_N2 * 10**-3
         self.stoichiometric_ratio = (self.mf_h2 + self.mf_ker) / (self.m_O2 + self.m_N2)
 
 
@@ -423,7 +415,7 @@ if __name__ == '__main__':
             print('Provided Thrust: Fan = ', round(ec.T_fan, 3), '[N]; Core = ', round(ec.T_core, 3), '[N]; Total = ',
                   round(ec.T_total, 3), '[N]')
             print('Thrust SFC = ', round(ec.TSFC_m, 5), '[g/kN/s];', round(ec.TSFC_e, 5), '[MJ/kN/s]')
-            print('\nEqr PZ:', round(ec.eqr_PZ, 3), 'Eqr Overall:', round(ec.eqr_overall, 3))
+            print('Eqr PZ:', round(ec.eqr_PZ, 3), 'Eqr Overall:', round(ec.eqr_overall, 3))
 
             amb = [['T0', round(ec.T0, 3), 'K'], ['p0', round(ec.p0, 3), 'Pa'], ['v0', round(ec.v0, 3), 'm/s']]
             air = [['m_intake', round(ec.mf_air_init, 3), 'kg/s'], ['m_hot', round(ec.mf_hot, 3), 'kg/s'],
@@ -447,7 +439,7 @@ if __name__ == '__main__':
                    ['T_tot', round(ec.T_total, 3), 'N'], ['TSCF', round(ec.TSFC_m, 5), 'g/kN/s'],
                    ['TSCF', round(ec.TSFC_e, 5), 'MJ/kN/s']]
             OPR = ['OPR', round(ec.OPR, 3), '-']
-            eqr = [['PZ eqr', round(ec.eqr_PZ, 3), 'K'], ['Overall eqr', round(ec.eqr_overall, 3), 'Pa']]
+            eqr = [['PZ eqr', round(ec.eqr_PZ, 3), '-'], ['Overall eqr', round(ec.eqr_overall, 3), '-']]
 
             save_txt = amb + air + st0 + st2 + [BPR] + st21 + st25 + st3 + st4 + fuel + st45 + st5 + st7 + st8 + \
                        st16 + st18 + Thr + [OPR] + eqr
