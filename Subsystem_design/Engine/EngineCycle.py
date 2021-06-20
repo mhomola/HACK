@@ -27,19 +27,11 @@ class Engine_Cycle(Constants):
         super().__init__()
 
     def data(self, aircraft, phase):
-        data, common_data, i = self.get_dataframe(aircraft, phase)
-        # if less_phases == True:
-        #     self.M0 = float(data[0])
-        #     self.h = float(data[1])
-        #     self.A_eff = float(data[3]) * np.pi * (float(data[28]) * 0.0254) ** 2 / 4
-        # else:
-        #     self.M0 = float(common_data[0])
-        #     self.h = float(common_data[1])
-        #     self.A_eff = float(common_data[2]) * np.pi * (float(data[28]) * 0.0254) ** 2 / 4
+        data, i = self.get_dataframe(aircraft, phase)
 
-        self.M0 = float(common_data[0])
-        self.h = float(common_data[1])
-        self.A_eff = float(common_data[2]) * np.pi * (float(data[28]) * 0.0254) ** 2 / 4
+        self.M0 = float(data[0])
+        self.h = float(data[1])
+        self.A_eff = float(data[3]) * np.pi * (float(data[28]) * 0.0254) ** 2 / 4
 
         self.ISA_calculator(h_input=self.h) # gives self.T0, self.p0, self.rho0, self.a0
         self.T0, self.p0, self.rho0, self.a0 = self.T, self.p, self.rho, self.a
@@ -73,7 +65,7 @@ class Engine_Cycle(Constants):
 
 
     def get_dataframe(self, aircraft, phs):
-        c = DataFrame().common_data
+
         if aircraft == 'neo':
             d = DataFrame().neo
 
@@ -83,54 +75,28 @@ class Engine_Cycle(Constants):
         ###################################
         if phs == 'taxi_out':
             data, i = d.taxi_out, 0
-            common = c.taxi_out
+
         elif phs == 'take_off':
             data, i = d.take_off, 1
-            common = c.take_off
-        # elif phs == 'take_off1' or phs == 'take_off':
-        #     data, i = d.take_off, 1
-        #     common = c.take_off1
-        # elif phs == 'take_off2':
-        #     data, i = d.take_off, 1
-        #     common = c.take_off2
-        # elif phs == 'take_off3':
-        #     data, i = d.take_off, 1
-        #     common = c.take_off3
+
+
         elif phs == 'climb':
             data, i = d.climb, 2
-            common = c.climb
-        # elif phs == 'climb1' or phs == 'climb':
-        #     data, i = d.climb, 2
-        #     common = c.climb1
-        # elif phs == 'climb2':
-        #     data, i = d.climb, 2
-        #     common = c.climb2
+
         elif phs == 'cruise':
             data, i = d.cruise, 3
-            common = c.cruise
-        # elif phs == 'cruise1' or phs == 'cruise':
-        #     data, i = d.cruise, 3
-        #     common = c.cruise1
-        # elif phs == 'cruise2':
-        #     data, i = d.cruise, 3
-        #     common = c.cruise2
+
         elif phs == 'approach':
             data, i = d.approach, 4
-            common = c.approach
-        # elif phs == 'approach1' or phs == 'approach':
-        #     data, i = d.approach, 4
-        #     common = c.approach1
-        # elif phs == 'approach2':
-        #     data, i = d.approach, 4
-        #     common = c.approach2
+
         elif phs == 'taxi_in':
             data, i = d.taxi_in, 5
-            common = c.taxi_in
+
         elif phs == 'idle':
             data, i = d.idle, 6
-            common = c.idle
 
-        return data, common, i
+
+        return data, i
 
 
     def cycle_analysis(self, aircraft, phase): # i = phase
@@ -420,8 +386,8 @@ Stations:
 if __name__ == '__main__':
     ec = Engine_Cycle()
     aircraft = ['neo', 'hack']
-    # phases = ['taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in', 'idle']
-    phases = ['taxi_out', 'take_off1', 'take_off2', 'climb1', 'climb2', 'cruise1', 'cruise2', 'approach1', 'approach2', 'taxi_in', 'idle']
+    phases = ['taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in', 'idle']
+    #phases = ['taxi_out', 'take_off1', 'take_off2', 'climb1', 'climb2', 'cruise1', 'cruise2', 'approach1', 'approach2', 'taxi_in', 'idle']
     # aircraft = ['neo']
     # phases = ['cruise']
 
@@ -456,8 +422,8 @@ if __name__ == '__main__':
             # print('Entrance of nozzle: T05 = ', round(ec.T05, 3), '[K]; p05 = ', round(ec.p05, 3), '[Pa]')
             # print('Exit of nozzle: T07 = ', round(ec.T07, 3), '[K]; p07 = ', round(ec.p07, 3), '[Pa]; PR_cr_noz = ',
             #       round(ec.PR_cr_noz_core, 3))
-            # print('Exit of nozzle: T8 = ', round(ec.T8, 3), '[K]; p8 = ', round(ec.p8, 3), '[Pa]; v8 = ',
-            #       round(ec.v8, 3), '[m/s]')
+            #print('Exit of nozzle: T8 = ', round(ec.T8, 3), '[K]; p8 = ', round(ec.p8, 3), '[Pa]; v8 = ',
+                  round(ec.v8, 3), '[m/s]')
             # print('Exit of fan: T016 = ', round(ec.T016, 3), '[K]; p016 = ', round(ec.p016, 3), '[Pa]; PR_cr_fan = ',
             #       round(ec.PR_cr_fan, 3))
             # print('Exit of fan: T18 = ', round(ec.T18, 3), '[K]; p18 = ', round(ec.p18, 3), '[Pa]; v18 = ',

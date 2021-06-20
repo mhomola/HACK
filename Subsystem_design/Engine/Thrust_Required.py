@@ -322,6 +322,16 @@ if __name__ == '__main__':
     #print(t.drag())
     #t.mass()
     #print(t.mass())
+    print(t.T_to_overcome_drag[np.where((t.t_array == t.taxiout_time))])
+    print(t.T_to_overcome_drag[np.where(t.t_array == t.takeoff_time)])
+
+
+    print(t.T_to_overcome_drag[np.where((t.t_array >=30 ) & (t.t_array <=60 ))])
+
+    print(t.T_to_overcome_drag[np.where((t.t_array >= t.mid_climb_time) & (t.t_array < t.mid_climb_time+30))])
+    print(t.T_to_overcome_drag[np.where((t.t_array >= t.cruise_start_time) & (t.t_array < t.cruise_start_time+30))])
+    print(t.T_to_overcome_drag[np.where((t.t_array >= t.mid_descent_time) & (t.t_array < t.mid_descent_time+30))])
+    print(t.T_to_overcome_drag[np.where((t.t_array >= t.land_time+120)  & (t.t_array < t.land_time  + 150))])
 
 
     print('\n Thrust Req TaxiOut = ', t.ThrustReq_TaxiOut/1000 , '[kN]'
