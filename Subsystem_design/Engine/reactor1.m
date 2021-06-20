@@ -1,6 +1,11 @@
-function [TPZ, MF_emis, name_emis] = reactor1(g, P_input, T_input, eqr_input,n_h2,n_ker,n_O2,n_N2)
+function [TPZ, MF_emis, name_emis,COf, NOxf] = reactor1(g, P_input, T_input, eqr_input,n_h2,n_ker,n_O2,n_N2)
 
-% Running MATLAB script
+%    REACTOR1 Zero-dimensional kinetics: adiabatic, constant pressure.
+%
+%    This example illustrates how to use class 'Reactor' for
+%    zero-dimensional kinetics simulations. Here the parameters are
+%    set so that the reactor is adiabatic and very close to constant
+%    pressure.
 
     function [time_idx1, time_idx2] = time_res(t,dt,p)
 
@@ -28,9 +33,9 @@ function [TPZ, MF_emis, name_emis] = reactor1(g, P_input, T_input, eqr_input,n_h
             time_idx1 = i;
             time_idx2 = j;
     end
-
+    
     function [rest, tim1, tim2] = residence_time(T,time,rlimit)
-        rlim1 = 0.04;
+        rlim1 = 0.08;
         rlim2 = rlimit;
         T1 = T(1)+rlim1*(T(end)-T(1));
         idx1 = find(T >= T1);
@@ -58,10 +63,16 @@ eqr = eqr_input; %0.3;
 
 %------------------
 
-dt = 1e-7; %time step; -4 originally
-TotalTime = 0.1; % in seconds - includes autoignition phase
+<<<<<<<<< Temporary merge branch 1
+dt = 1e-1; %time step; -4 originally
+TotalTime = 20; % in seconds - includes autoignition phase
+
+=========
+dt = 1e-6; %time step; -4 originally
+TotalTime = 0.8; % in seconds - includes autoignition phase
+>>>>>>>>> Temporary merge branch 2
 nSteps = ceil(TotalTime/dt); %number of steps. Total time = nSteps*dt
-rlim = 0.99;
+rlim = 0.995;
 
 if strcmp(g,'neo') %   compare string
    gas = Solution('kerosene.yaml', 'gas');
@@ -224,11 +235,5 @@ TPZ = temp(length(temp))
 % clear all
 % cleanup
 % Add a calculation of 5% steep angle
-
-%    REACTOR1 Zero-dimensional kinetics: adiabatic, constant pressure.
-%
-%    This example illustrates how to use class 'Reactor' for
-%    zero-dimensional kinetics simulations. Here the parameters are
-%    set so that the reactor is adiabatic and very close to constant
-%    pressure.
 end
+

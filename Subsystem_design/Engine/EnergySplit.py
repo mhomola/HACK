@@ -73,7 +73,15 @@ es = Energy_Split()
 LHV_hack = es.LHV_hack
 ER_h2, MR_h2 = es.ER_h2, es.MR_h2
 ER_ker, MR_ker = es.ER_ker, es.MR_ker
-
+# print(es.m_fuel_neo)
+# print(es.m_h2)
+# print(es.m_ker)
+# print(es.m_h2_ti)
+# print(es.m_h2_to)
+# print(es.m_h2_idle)
+# print(es.m_h2_flight)
+# print(es.m_ker_flight)
+# print(es.m_h2_DPU)
 
 if __name__ == '__main__':
     print('Phases: ', np.array(['taxi out', 'takeoff', 'climb', 'cruise', 'approach', 'taxi in', 'idle']))
