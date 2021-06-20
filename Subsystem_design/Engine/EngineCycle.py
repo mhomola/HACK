@@ -306,7 +306,16 @@ class Engine_Cycle(Constants):
         #     self.v18 = np.sqrt(2 * self.cp_air * (self.T016 - self.T18))
         #     self.T_fan = self.mf_cold * (self.v18 - self.v0)        # [N]
 
-        self.T_total = self.T_fan + self.T_core                     # [N]
+        self.T_total = self.T_core + self.T_fan             # [N]
+
+        ''' USE EQR FROM CoolEngine.py ON THE FIRST ITERATION OF IVAN'S CODE '''
+        self.mole_rate()
+        self.air_cool(aircraft)
+
+
+        # if phase in ['take_off', 'cruise']:
+        #     plt.figure()
+        #     self.plot_TS(aircraft, phase)
 
 
 
@@ -324,6 +333,7 @@ class Engine_Cycle(Constants):
                                                                                            self.mf_fuel) * self.cp_gas)
         TPZ2 = self.T03 + (self.mf_fuel * self.eta_cc * self.LHV_f * 10**6) / (self.cp_gas * (mr_c * self.mf_hot +
                                                                                               self.mf_fuel))
+
         self.TPZ = (TPZ1 + TPZ2) / 2            # Total temperature at the end of the PZ [K]
 
 
@@ -336,6 +346,7 @@ class Engine_Cycle(Constants):
         self.m_O2 = self.n_O2 * 32 * 10**-3
         self.m_N2 = self.n_N2 * self.molarmass_N2 * 10**-3
         self.stoichiometric_ratio = (self.mf_h2 + self.mf_ker) / (self.m_O2 + self.m_N2)
+
 
     def plot_TS(self, aircraft, phase, alp):
 
