@@ -40,5 +40,5 @@ T_tot	nan	N
 TSCF	nan	g/kN/s	
 TSCF	nan	MJ/kN/s	
 OPR	35.676	-	
-PZ eqr	0.313	K	
-Overall eqr	0.174	Pa	
+PZ eqr	0.312	-	
+Overall eqr	0.173	-	
