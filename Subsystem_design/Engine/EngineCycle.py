@@ -384,37 +384,38 @@ if __name__ == '__main__':
 
 
 
-            print('\nInlet: T0 = ', round(ec.T0, 3), '[K]; p0 = ', round(ec.p0, 3), '[Pa]; v0 = ', round(ec.v0, 3),
-                  '[m/s]')
-            print('T00 = ', round(ec.T00, 3), '[K]; p00 = ', round(ec.p00, 3), '[Pa]')
-            print('Entrance of fan: T02 = ', round(ec.T02, 3), '[K]; p02 = ', round(ec.p02,3), '[Pa]')
-            print('Entrance of LPC: T021 = ', round(ec.T021, 3), '[K]; p021 = ', round(ec.p021,3), '[Pa]')
+            # print('\nInlet: T0 = ', round(ec.T0, 3), '[K]; p0 = ', round(ec.p0, 3), '[Pa]; v0 = ', round(ec.v0, 3),
+            #       '[m/s]')
+            # print('T00 = ', round(ec.T00, 3), '[K]; p00 = ', round(ec.p00, 3), '[Pa]')
+            # print('Entrance of fan: T02 = ', round(ec.T02, 3), '[K]; p02 = ', round(ec.p02,3), '[Pa]')
+            # print('Entrance of LPC: T021 = ', round(ec.T021, 3), '[K]; p021 = ', round(ec.p021,3), '[Pa]')
             print('Mass flow of air: Total = ', round(ec.mf_air_init, 3), '[kg/s]; Core = ', round(ec.mf_hot, 3),
                   '[kg/s]; Bypassed = ', round(ec.mf_cold, 3), '[kg/s]')
-            print('Entrance of HPC: T025 = ', round(ec.T025, 3), '[K]; p025 = ', round(ec.p025, 3), '[Pa]')
+            # print('Entrance of HPC: T025 = ', round(ec.T025, 3), '[K]; p025 = ', round(ec.p025, 3), '[Pa]')
             print('Entrance of CC: T03 = ', round(ec.T03, 3), '[K]; p03 = ', round(ec.p03,3), '[Pa]; OPR = ',
-                  round(ec.OPR, 3))
+                   round(ec.OPR, 3))
             print('Mass flow CC: Fuel = ', round(ec.mf_fuel, 3), '[kg/s]; mf_h2 = ', round(ec.mf_h2,3),
                   '[kg/s]; mf_ker = ', round(ec.mf_ker, 3), '[kg/s]')
-            print('LHV fuel = ', round(ec.LHV_f, 3))
+            print('Moles reacting per second of kerosene:',ec.n_ker,'of H2:',ec.n_h2,'of O2:',ec.n_O2,'of N2:',ec.n_N2)
+            # print('LHV fuel = ', round(ec.LHV_f, 3))
             print('Initial estimate TPZ = ', round(ec.TPZ, 3))
-            print('Power: Fan = ', round(ec.W_fan, 3), '[W]; LPC = ', round(ec.W_LPC, 3), '[W]; HPC = ',
-                  round(ec.W_HPC, 3), '[W]')
-            print('LPT = ', round(ec.W_LPT, 3), '[W]; HPT = ', round(ec.W_HPT, 3), '[W]')
-            print('Entrance of HPT: T04 = ', round(ec.T04, 3), '[K]; p04 = ', round(ec.p04, 3), '[Pa]')
-            print('Entrance of LPT: T045 = ', round(ec.T045, 3), '[K]; p045 = ', round(ec.p045, 3), '[Pa]')
-            print('Entrance of nozzle: T05 = ', round(ec.T05, 3), '[K]; p05 = ', round(ec.p05, 3), '[Pa]')
-            print('Exit of nozzle: T07 = ', round(ec.T07, 3), '[K]; p07 = ', round(ec.p07, 3), '[Pa]; PR_cr_noz = ',
-                  round(ec.PR_cr_noz_core, 3))
-            print('Exit of nozzle: T8 = ', round(ec.T8, 3), '[K]; p8 = ', round(ec.p8, 3), '[Pa]; v8 = ',
-                  round(ec.v8, 3), '[m/s]')
-            print('Exit of fan: T016 = ', round(ec.T016, 3), '[K]; p016 = ', round(ec.p016, 3), '[Pa]; PR_cr_fan = ',
-                  round(ec.PR_cr_fan, 3))
-            print('Exit of fan: T18 = ', round(ec.T18, 3), '[K]; p18 = ', round(ec.p18, 3), '[Pa]; v18 = ',
-                  round(ec.v18,3), '[m/s]')
-            print('Provided Thrust: Fan = ', round(ec.T_fan, 3), '[N]; Core = ', round(ec.T_core, 3), '[N]; Total = ',
-                  round(ec.T_total, 3), '[N]')
-            print('Thrust SFC = ', round(ec.TSFC_m, 5), '[g/kN/s];', round(ec.TSFC_e, 5), '[MJ/kN/s]')
+            # print('Power: Fan = ', round(ec.W_fan, 3), '[W]; LPC = ', round(ec.W_LPC, 3), '[W]; HPC = ',
+            #       round(ec.W_HPC, 3), '[W]')
+            # print('LPT = ', round(ec.W_LPT, 3), '[W]; HPT = ', round(ec.W_HPT, 3), '[W]')
+            # print('Entrance of HPT: T04 = ', round(ec.T04, 3), '[K]; p04 = ', round(ec.p04, 3), '[Pa]')
+            # print('Entrance of LPT: T045 = ', round(ec.T045, 3), '[K]; p045 = ', round(ec.p045, 3), '[Pa]')
+            # print('Entrance of nozzle: T05 = ', round(ec.T05, 3), '[K]; p05 = ', round(ec.p05, 3), '[Pa]')
+            # print('Exit of nozzle: T07 = ', round(ec.T07, 3), '[K]; p07 = ', round(ec.p07, 3), '[Pa]; PR_cr_noz = ',
+            #       round(ec.PR_cr_noz_core, 3))
+            # print('Exit of nozzle: T8 = ', round(ec.T8, 3), '[K]; p8 = ', round(ec.p8, 3), '[Pa]; v8 = ',
+            #       round(ec.v8, 3), '[m/s]')
+            # print('Exit of fan: T016 = ', round(ec.T016, 3), '[K]; p016 = ', round(ec.p016, 3), '[Pa]; PR_cr_fan = ',
+            #       round(ec.PR_cr_fan, 3))
+            # print('Exit of fan: T18 = ', round(ec.T18, 3), '[K]; p18 = ', round(ec.p18, 3), '[Pa]; v18 = ',
+            #       round(ec.v18,3), '[m/s]')
+            # print('Provided Thrust: Fan = ', round(ec.T_fan, 3), '[N]; Core = ', round(ec.T_core, 3), '[N]; Total = ',
+            #       round(ec.T_total, 3), '[N]')
+            # print('Thrust SFC = ', round(ec.TSFC_m, 5), '[g/kN/s];', round(ec.TSFC_e, 5), '[MJ/kN/s]')
             print('Eqr PZ:', round(ec.eqr_PZ, 3), 'Eqr Overall:', round(ec.eqr_overall, 3))
 
             amb = [['T0', round(ec.T0, 3), 'K'], ['p0', round(ec.p0, 3), 'Pa'], ['v0', round(ec.v0, 3), 'm/s']]
