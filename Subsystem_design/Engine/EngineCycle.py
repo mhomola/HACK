@@ -26,15 +26,23 @@ class Engine_Cycle(Constants):
     def __init__(self):
         super().__init__()
 
-    def data(self, aircraft, phase):
-        data, i = self.get_dataframe(aircraft, phase)
-        self.M0 = float(data[0])
-        self.h = float(data[1])
+    def data(self, aircraft, phase,less_phases):
+        data, common_data, i = self.get_dataframe(aircraft, phase)
+        if less_phases == True:
+            self.M0 = float(data[0])
+            self.h = float(data[1])
+            self.Thrust = float(data[2])
+            self.A_eff = float(data[3]) * np.pi * (float(data[28]) * 0.0254) ** 2 / 4
+        else:
+            self.M0 = float(common_data[0])
+            self.h = float(common_data[1])
+            self.Thrust = float(common_data[2])
+            self.A_eff = float(common_data[3]) * np.pi * (float(data[28]) * 0.0254) ** 2 / 4
+
         self.ISA_calculator(h_input=self.h) # gives self.T0, self.p0, self.rho0, self.a0
         self.T0, self.p0, self.rho0, self.a0 = self.T, self.p, self.rho, self.a
         self.v0 = self.M0 * np.sqrt(self.cp_air * self.R * self.T0)
-        self.Thrust = float(data[2])
-        self.A_eff = float(data[3]) * np.pi * (float(data[28]) * 0.0254)**2 / 4
+
         self.eta_inlet = float(data[4])
         self.PR_fan = float(data[5])
         self.eta_fan = float(data[6])
@@ -73,31 +81,55 @@ class Engine_Cycle(Constants):
 
 
     def get_dataframe(self, aircraft, phs):
+        c = DataFrame().common_data
         if aircraft == 'neo':
             d = DataFrame().neo
+
         elif aircraft == 'hack':
             d = DataFrame().hack
+
         ###################################
         if phs == 'taxi_out':
             data, i = d.taxi_out, 0
-        elif phs == 'take_off':
+            common = c.taxi_out
+        elif phs == 'take_off1' or phs == 'take_off':
             data, i = d.take_off, 1
-        elif phs == 'climb':
+            common = c.take_off1
+        elif phs == 'take_off2':
+            data, i = d.take_off, 1
+            common = c.take_off2
+        elif phs == 'take_off3':
+            data, i = d.take_off, 1
+            common = c.take_off3
+        elif phs == 'climb1' or phs == 'climb':
             data, i = d.climb, 2
-        elif phs == 'cruise':
+            common = c.climb1
+        elif phs == 'climb2':
+            data, i = d.climb, 2
+            common = c.climb2
+        elif phs == 'cruise1' or phs == 'cruise':
             data, i = d.cruise, 3
-        elif phs == 'approach':
+            common = c.cruise1
+        elif phs == 'cruise2':
+            data, i = d.cruise, 3
+            common = c.cruise2
+        elif phs == 'approach1' or phs == 'approach':
             data, i = d.approach, 4
+            common = c.approach1
+        elif phs == 'approach2':
+            data, i = d.approach, 4
+            common = c.approach2
         elif phs == 'taxi_in':
             data, i = d.taxi_in, 5
+            common = c.taxi_in
         elif phs == 'idle':
             data, i = d.idle, 6
+            common = c.idle
+        return data, common, i
 
-        return data, i
 
-
-    def cycle_analysis(self, aircraft, phase): # i = phase
-        self.data(aircraft, phase)
+    def cycle_analysis(self, aircraft, phase,less_phases): # i = phase
+        self.data(aircraft, phase,less_phases)
 
         self.v0 = self.M0 * np.sqrt(self.k_air * self.R * self.T0)
         self.rho0 = self.p0 / (self.R*self.T0)
@@ -349,7 +381,8 @@ Stations:
 if __name__ == '__main__':
     ec = Engine_Cycle()
     aircraft = ['neo', 'hack']
-    phases = ['taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in', 'idle']
+    #phases = ['taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in', 'idle']
+    phases =  ['taxi_out', 'take_off1','take_off2','take_off3', 'climb1','climb2', 'cruise1','cruise2', 'approach1','approach2', 'taxi_in', 'idle']
     # aircraft = ['neo']
     # phases = ['cruise']
 
@@ -357,7 +390,7 @@ if __name__ == '__main__':
         print("\n= = = = Analysis for A320", a, "= = = =")
         for p in phases:
             print("\n", p)
-            ec.cycle_analysis(a, p)
+            ec.cycle_analysis(a, p,False)
 
 
 
@@ -447,13 +480,13 @@ if __name__ == '__main__':
         plt.legend(fontsize=15)
 
 
-    ec.cycle_analysis('neo', 'take_off')
+    ec.cycle_analysis('neo', 'take_off',True)
     Th_nto, SFC_m_nto, SFC_e_nto = ec.T_total/1000, ec.TSFC_m, ec.TSFC_e
-    ec.cycle_analysis('hack', 'take_off')
+    ec.cycle_analysis('hack', 'take_off',True)
     Th_hto, SFC_m_hto, SFC_e_hto = ec.T_total / 1000, ec.TSFC_m, ec.TSFC_e
-    ec.cycle_analysis('neo', 'cruise')
+    ec.cycle_analysis('neo', 'cruise',True)
     Th_nc, SFC_m_nc, SFC_e_nc = ec.T_total / 1000, ec.TSFC_m, ec.TSFC_e
-    ec.cycle_analysis('hack', 'cruise')
+    ec.cycle_analysis('hack', 'cruise',True)
     Th_hc, SFC_m_hc, SFC_e_hc = ec.T_total / 1000, ec.TSFC_m, ec.TSFC_e
 
 
@@ -473,15 +506,15 @@ if __name__ == '__main__':
     plt.show()
 
     plt.figure()
-    ec.cycle_analysis('neo', 'take_off')
+    ec.cycle_analysis('neo', 'take_off',True)
     ec.plot_TS('neo', 'take_off', 0.2)
-    ec.cycle_analysis('hack', 'take_off')
+    ec.cycle_analysis('hack', 'take_off',True)
     ec.plot_TS('hack', 'take_off', 1)
     plt.show()
 
     plt.figure()
-    ec.cycle_analysis('neo', 'cruise')
+    ec.cycle_analysis('neo', 'cruise',True)
     ec.plot_TS('neo', 'cruise', 0.2)
-    ec.cycle_analysis('hack', 'cruise')
+    ec.cycle_analysis('hack', 'cruise',True)
     ec.plot_TS('hack', 'cruise', 1)
     plt.show()
