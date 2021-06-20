@@ -117,8 +117,8 @@ class Constants():
         self.X_root_htail = 31.60                                   # Distance from nose to root of horizontal tail [m]
         self.D_fan = 78 * 0.0254                                    # Fan diameter, 78 [in]                         [m]
         self.A_fan = np.pi * self.D_fan**2 / 4                      # Area of the fan                               [m2]
-        # self.D_fan_eff = 1.787                                      # Effective fan diameter for air intake in cruise [m]
-        # self.A_fan_eff = np.pi * self.D_fan_eff**2 / 4              # Effective fan area for air intake in cruise   [m2]
+        # self.D_fan_eff = 1.787                                    # Effective fan diameter for air intake in cruise [m]
+        # self.A_fan_eff = np.pi * self.D_fan_eff**2 / 4            # Effective fan area for air intake in cruise   [m2]
         self.D_h = 2.3                                              # Diameter of cowling inlet                     [m]
         self.D_n = 2.5                                              # Diameter of the cowling                       [m]
         self.D_e = 2.2                                              # Diameter of the cowling exit                  [m]
@@ -155,6 +155,7 @@ class Constants():
         self.pod_volume = volume_pod                        # Volume of each wing pod                          [m^3]
         self.pod_V_H2 = volume_pod * 0.885                    # Volume of H2 in each wing pod                    [m^3]
         self.pod_tank_mass = mass_pod                         # Mass of each pod tank (we have 2 tank)           [kg]
+        self.pod_pylon_mass = 22.69                             # Mass of the pylon that supports the pods          [kg]
         self.pod_H2_mass = self.pod_V_H2 * 71.1               # Mass of H2 in each pod tank (we have 2 tank)     [kg]
 
         self.pod_length = l_wing_pod
