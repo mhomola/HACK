@@ -123,7 +123,7 @@ def Req_power(mair,f = 1):
     avg_arr = average*np.ones(len(power+1))
     difference = avg_arr - power
 
-    print('Difference: ',difference)
+    print(difference)
 
     time_all = np.concatenate(([0],time))
     power_all = np.concatenate(([0],difference*time))
@@ -141,10 +141,12 @@ def Req_power(mair,f = 1):
         power_tot_upd.append(power_tot[i]-min(power_tot))
         power_bat.append(average-power_all[i])
 
-    # #plt.plot(time_tot, power_tot)
-    # plt.plot(time_tot, power_tot_upd)
+    #plt.plot(time_tot, power_tot)
+    # plt.plot(time_tot, np.array(power_tot_upd)/(10**6),'k', label = 'Energy stored in the battery')
+    # plt.plot([time_tot[0],time_tot[-1]],[max(power_tot_upd)/(10**6),max(power_tot_upd)/(10**6)],':', label = 'Required storage capacity')
     # #plt.plot(time_tot, avg_arr)
-    # plt.ylabel('Energy stored in battery [kJ]')
+    # plt.legend()
+    # plt.ylabel('Energy stored in battery [MJ]')
     # plt.xlabel('Time [min]')
     # plt.show()
 
@@ -214,7 +216,7 @@ def final_bat_size(FC_power_new = Req_power(0)[0],f = 1):
     bat_orig = toWh(bat_E)
 
     Vbcell = 3.7 # V
-    Ahbcell = 2
+    Ahbcell = 2.55
     b_voltage = fc.FCV
     b_cells_s = m.ceil(b_voltage/Vbcell)
     b_Ah = bat_orig/b_voltage
