@@ -14,10 +14,11 @@ class DataFrame:
         #                  columns=['parameter', 'taxi_out', 'take_off1', 'take_off2',  'climb1', 'climb2', 'cruise1', 'cruise2', 'approach1', 'approach2', 'taxi_in', 'idle'])
 
         self.common_data = \
-            pd.DataFrame(data=np.array([['M0', 0.038, 0.1439, 0.2495, 0.267, 0.2864, 0.78, 0.78, 0.24, 0.22, 0.17, 0.01],
-                                        ['h', 0, 0, 0, 450, 900, 11600, 11600, 900, 450, 0, 0],
-                                        ['A_eff/fan', 3.5, 3.5, 1.8, 1.7, 1.6, 0.8, 0.8, 1.85, 2., 2.6, 3.65]]),
-                         columns=['parameter', 'taxi_out', 'take_off1', 'take_off2', 'climb1', 'climb2', 'cruise1', 'cruise2', 'approach1', 'approach2', 'taxi_in', 'idle'])
+            pd.DataFrame(
+                data=np.array([['M0', 0.038, 0.1439, 0.497, 0.78, 0.24, 0.17, 0.01],
+                               ['h', 0, 0, 5800, 11600, 900, 0, 0],
+                               ['A_eff/fan', 3.5, 2.9, 1, 0.8, 1.85, 2.15, 3.65]]),
+                columns=['parameter', 'taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in', 'idle'])
 
         self.neo =\
             pd.DataFrame(data=np.array([['M0', 0.038, 0.12, 0.497, 0.78, 0.47, 0.038, 0.01],
