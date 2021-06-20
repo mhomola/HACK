@@ -258,7 +258,7 @@ class thrust_req(Constants):
 
         #return self.thrust_required
         #return self.T_to_overcome_drag
-        plt.plot(self.t_array,self.thrust_required)
+        plt.plot(self.t_array,self.Machs)
         plt.show()
         #return self.CL[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)]
         #return self.T_to_overcome_drag
@@ -311,35 +311,17 @@ if __name__ == '__main__':
     con = Constants()
     #print(t.w6)
     t.drag()
-    #print(t.drag())
+    print(t.drag())
 
     #t.velocity()
     #print(t.velocity())
     #print(t.drag())
-    t.dens()
+    #t.dens()
     #print(t.dens())
     #print(t.t_array)
     #print(t.drag())
     #t.mass()
     #print(t.mass())
-
-    phases = np.array(
-        ['taxi_out', 'take_off1', 'take_off2', 'climb1', 'climb2', 'cruise1', 'cruise2', 'approach1',
-         'approach2', 'taxi_in', 'idle'])
-    Time_phases = 60 * np.array([8., 0.5, 1.0, 1., 18., 217, 16.5, 0.5, 1., 8.])
-    Time_CA_analysis = 60 * np.array([3.75, 8., 8.5, 9.5, 10.5, 28.5, 245.5, 262, 262.5, 263.5, 264.5])
-    print(t.alt[t.t_array<15500])
-    for i in phases:
-        print(i)
-        print(t.thrust_required[t.t_array<Time_CA_analysis[phases == i]][-1])
-        print(t.T_to_overcome_drag[t.t_array<Time_CA_analysis[phases == i]][-1])
-        print(t.thrust_required[t.t_array<Time_CA_analysis[phases == i]][-1] - 0.07 *  t.T_to_overcome_drag[t.t_array<Time_CA_analysis[phases == i]][-1])
-        print()
-    print(t.T_to_Acc[t.t_array<Time_CA_analysis[phases == 'approach1']][-1])
-    print(t.T_to_overcome_drag[t.t_array < Time_CA_analysis[phases == 'approach1']][-1])
-    print(t.T_to_climb_and_descend[t.t_array < Time_CA_analysis[phases == 'approach1']][-1])
-    print(t.T_to_overcome_friction[t.t_array < Time_CA_analysis[phases == 'approach1']][-1])
-    print(t.T_Static[t.t_array < Time_CA_analysis[phases == 'approach1']][-1])
 
 
     print('\n Thrust Req TaxiOut = ', t.ThrustReq_TaxiOut/1000 , '[kN]'

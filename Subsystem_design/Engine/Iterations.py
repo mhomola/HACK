@@ -161,6 +161,9 @@ T_HACK = []
 TSFC_HACK = []
 data_list = []
 
+#Thrust required at each phase of the flight
+T_req = np.array([T_required.ThrustReq_TaxiOut,T_required.ThrustReq_TO,T_required.ThrustReq_Climb,
+                       T_required.ThrustReq_Cruise,T_required.ThrustReq_Descent,T_required.ThrustReq_TaxiIn])
 
 Range_requirement = False
 Thrust_requirement = False
@@ -242,7 +245,7 @@ while Emissions_requirement != True:
         '''ASSESSING RANGE OF HACK'''
         m_5 = T_required.m[T_required.t_array<=T_required.cruise_end_time][-1]
         m_4 = T_required.m[T_required.t_array<=T_required.cruise_start_time][-1]
-        Range_HACK = performance().Range(ae.L_D_ratio_HACK,m_5/m_4,TSFC_HACK[phases=='cruise1']*10**-6)
+        Range_HACK = performance().Range(ae.L_D_ratio_HACK,m_5/m_4,TSFC_HACK[phases=='cruise']*10**-6)
 
         if Range_HACK< 3200*10**3:
 

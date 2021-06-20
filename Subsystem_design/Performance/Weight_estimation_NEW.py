@@ -162,24 +162,20 @@ class performance(Compute_weight):
         fs_k_taxi_out = np.linspace(m_k, m_k - mf_k_taxiout * time_phases[0], 50)
         'Take-off'
         mf_h2_takeoff, mf_k_takeoff = self.read_files(mission + '_take_off.txt')
-        fs_h2_take_off = np.linspace(fs_h2_taxi_out[-1], fs_h2_taxi_out[-1] -  mf_h2_takeoff * time_phases[1], 50)
+        fs_h2_take_off = np.linspace(fs_h2_taxi_out[-1], fs_h2_taxi_out[-1] - mf_h2_takeoff * time_phases[1], 50)
         fs_k_take_off = np.linspace(fs_k_taxi_out[-1], fs_k_taxi_out[-1] - mf_k_takeoff * time_phases[1], 50)
-
-        'Climb1'
+        'Climb'
         mf_h2_climb, mf_k_climb = self.read_files(mission +'_climb.txt')
         fs_h2_climb = np.linspace(fs_h2_take_off[-1], fs_h2_take_off[-1] - mf_h2_climb * time_phases[2], 100)
-        fs_k_climb = np.linspace(fs_k_take_off[-1], fs_k_take_off[-1] - mf_k_climb* time_phases[2], 100)
-
-        'Cruise1'
+        fs_k_climb = np.linspace(fs_k_take_off[-1], fs_k_take_off[-1] - mf_k_climb * time_phases[2], 100)
+        'Cruise'
         mf_h2_cruise, mf_k_cruise = self.read_files(mission +'_cruise.txt')
         fs_h2_cruise = np.linspace(fs_h2_climb[-1], fs_h2_climb[-1] - mf_h2_cruise * time_phases[3],200)
         fs_k_cruise = np.linspace(fs_k_climb[-1], fs_k_climb[-1] - mf_k_cruise * time_phases[3], 200)
-
         'Approach'
         mf_h2_approach, mf_k_approach = self.read_files(mission +'_approach.txt')
         fs_h2_approach = np.linspace(fs_h2_cruise[-1], fs_h2_cruise[-1] - mf_h2_approach * time_phases[4], 50)
         fs_k_approach = np.linspace(fs_k_cruise[-1], fs_k_cruise[-1] - mf_k_approach * time_phases[4], 50)
-
         'Taxi-in'
         mf_h2_taxiin, mf_k_taxiin = self.read_files(mission +'_taxi_in.txt')
         fs_h2_taxi_in = np.linspace(fs_h2_approach[-1], fs_h2_approach[-1] - mf_h2_taxiin * time_phases[5], 50)
