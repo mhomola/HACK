@@ -36,21 +36,29 @@ eng = matlab.engine.start_matlab()
 ec = Engine_Cycle()
 const = Constants()
 cool = Engine_Cool()
-T_required = thrust_req(cd0clean,wingar)
-T_required.mass()
+T = thrust_req(cd0clean,wingar)
+T.drag()
 ae = AerodynamicCharacteristics()
 ae.aero_functions(AoA_cruise=2)
 
 aircraft = ['neo', 'hack']
-phases = np.array(['taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in'])
-printing = False                                                            #Change to True for printing stuff
+#phases = np.array(['taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in'])
+phases = np.array(['taxi_out', 'take_off1', 'take_off2', 'climb1', 'climb2', 'cruise1', 'cruise2', 'approach1',
+          'approach2', 'taxi_in', 'idle'])
+Time_phases = 60* np.array([8.,0.5,1.,1.,18,217,16.5,0.5,1.,8.])
+Time_CA_analysis = 60*np.array([3.75,8.,8.5,9.5,10.5,28.5,245.5,262,262.5,263.5,264.5])
+printing = False                #Change to True for printing stuff
 
+#Emission indexes of soot and UHC
+'Take-off,Climb-out,Approach,Taxi/idle'
+EI_soot = np.array([])
+EI_UHC = np.array([0.02*10**-3,0.02*10**-3,0.04*10**-3,0.28*10**-3])
 #First run it for neo, store the ATR value to later compare with HACK
 '-------------------------NEO----------------------------------'
 print("\n= = = = Analysis for A320", aircraft[0], "= = = =")
 
-'CH4, CO, CO2, H2O, NO, NO2, H2'
-Emissions_array_neo = np.zeros((len(phases),7))
+'CH4, CO, CO2, H2O, NO, NO2, H2','soot','UHC'
+Emissions_array_neo = np.zeros((len(phases),9))
 
 data_list = []
 
@@ -95,42 +103,12 @@ for b in phases:
     '''Getting moles/second of H2 and kerosene'''
     n_h2,n_ker,n_O2,n_N2 = ec.n_h2,ec.n_ker,ec.n_O2,ec.n_N2                     # Number of moles/sec for a
                                                                                 # stoichiometric reaction
-    cool.SZ_air(aircraft[0], b, ec.TPZ)
-    #eqr_old = cool.eqr
-    print('Initial TPZ [K]:', ec.TPZ, ' Initial mr_cool', cool.mr_SZair, ' Initial eqr', cool.eqr)
-
-    ''' LOOP FOR CONVERGENCE OF EQUIVALENCE RATIO '''
-
-    eqr_old = 0.5350926260993377#0.7  # initial value
-    TPZ, MF = get_TPZ(aircraft[0], b, ec.p03, ec.T03, 0.7, n_h2, n_ker, n_O2, n_N2)
-    cool.SZ_air(aircraft[0], b, TPZ)
-    print('Initial TPZ [K]:', round(TPZ, 3), 'Initial mr_cool:', round(cool.mr_SZair, 3))
-    print(' Initial eqr:', 0.7, ' Updated eqr:', round(cool.eqr, 3))
-    err = 1
-
-    while err > 0.02:  # error larger than 2%
-
-        TPZ, Emissions = get_TPZ(aircraft[0], b, ec.p03, ec.T03, cool.eqr,n_h2,n_ker,n_O2,n_N2)
-
-        cool.SZ_air(aircraft[0], b, TPZ)
-        err = abs(cool.eqr - eqr_old) / cool.eqr
-        eqr_old = cool.eqr.copy()
-
-        print('Error at each iteration:', err * 100, '[%]')
-        print('Updated TPZ:', TPZ, ' Updated MR:', cool.mr_SZair, 'Updated eqr:', cool.eqr)
-
-
-    data_list.append([1 - cool.mr_SZair])
-
-    print('\nFINAL\nMass ratio of air injected on DZ:', round(cool.mr_SZair, 3))
-    print('TPZ = ', round(TPZ, 3))
-
-    np.savetxt('mr_cc_neo.dat', np.array(data_list))
-
+    TPZ, Emissions, _, _, _ = get_TPZ(aircraft[0], b, ec.p03, ec.T03, cool.eqr, n_h2, n_ker, n_O2, n_N2)
+    print('TPZ is:', TPZ)
 
     '''ASSESSING THE EMISSIONS OF NEO'''
     #Getting time of phase
-    time = T_required.durations[phases==b]
+    time = Time_phases[phases==b]
 
     #Getting total emissions in that phase
     mf_reactants = ec.mf_fuel + ec.mf_hot
@@ -139,7 +117,7 @@ for b in phases:
     Emissions_array_neo[phases == b] = Emissions * mf_reactants * time
 
 
-    print(np.array(['CH4', 'CO', 'CO2', 'H2O', 'NO', 'NO2', 'H2']))
+    print(np.array(['CH4', 'CO', 'CO2', 'H2O', 'NO', 'NO2', 'H2','soot','UHC']))
     print('Emissions array:',Emissions_array_neo)
 
 
@@ -151,7 +129,7 @@ eH2O = np.sum(Emissions_array_neo[:,3])-Emissions_array_neo[3,3]
 eNOx = np.sum(Emissions_array_neo[:,4])-Emissions_array_neo[3,4] + np.sum(Emissions_array_neo[:,5])-Emissions_array_neo[3,5]
 esoot = 0
 eSO4 = 0
-U_ker = climate.number_aircraft_kerosene()
+U_ker = climate.number_aircraft_H2()
 h = 450
 ATR_LTO_neo = climate.ATR(h=h, e_CO2=eCO2, e_H2O=eH2O, e_NOx=eNOx, e_soot=esoot, e_sulfate=eSO4, U=U_ker, plot=True)
 print('The average temperature response, A_100, for the LTO of the HACK is:', ATR_LTO_neo, '[K]')
@@ -162,7 +140,7 @@ eH2O = Emissions_array_neo[3,3]
 eNOx = Emissions_array_neo[3,4] + Emissions_array_neo[3,5]
 esoot = 0
 eSO4 = 0
-U_ker = climate.number_aircraft_kerosene()
+
 h = 11600
 ATR_cruise_neo = climate.ATR(h=h, e_CO2=eCO2, e_H2O=eH2O, e_NOx=eNOx, e_soot=esoot, e_sulfate=eSO4, U=U_ker, plot=True)
 print('The average temperature response, A_100, for the cruise of the HACK is:', ATR_cruise_neo, '[K]')
@@ -181,9 +159,6 @@ T_HACK = []
 TSFC_HACK = []
 data_list = []
 
-#Thrust required at each phase of the flight
-T_req = np.array([T_required.ThrustReq_TaxiOut,T_required.ThrustReq_TO,T_required.ThrustReq_Climb,
-                       T_required.ThrustReq_Cruise,T_required.ThrustReq_Descent,T_required.ThrustReq_TaxiIn])
 
 Range_requirement = False
 Thrust_requirement = False
@@ -237,63 +212,35 @@ while Emissions_requirement != True:
             '''Getting moles/second of H2 and kerosene'''
             n_h2, n_ker, n_O2, n_N2 = ec.n_h2, ec.n_ker, ec.n_O2, ec.n_N2                   # Number of moles/sec for a
                                                                                             # stoichiometric reaction
-            cool.SZ_air(aircraft[1], b, ec.TPZ)
-            #eqr_old = cool.eqr
-            print('Initial TPZ [K]:', ec.TPZ, ' Initial mr_cool', cool.mr_SZair, ' Initial eqr', cool.eqr)
-
-            ''' LOOP FOR CONVERGENCE OF EQUIVALENCE RATIO '''
-            eqr_old = 0.7
-            TPZ, Emissions = get_TPZ(aircraft[1], b, ec.p03, ec.T03, 0.7, n_h2, n_ker, n_O2, n_N2)
-            cool.SZ_air(aircraft[1], b, TPZ)
-            print('Initial TPZ [K]:', round(TPZ, 3), 'Initial mr_cool:', round(cool.mr_SZair, 3))
-            print(' Initial eqr:', 0.7, ' Updated eqr:', round(cool.eqr, 3))
-            err = 1
-
-            while err > 0.02:  # error larger than 2%
-
-                TPZ, Emissions = get_TPZ(aircraft[1], b, ec.p03, ec.T03, cool.eqr, n_h2, n_ker, n_O2, n_N2)
-                cool.SZ_air(aircraft[1], b, TPZ)
-
-                err = abs(cool.eqr - eqr_old) / cool.eqr
-                eqr_old = cool.eqr.copy()
-
-                print('Error at each iteration:', err * 100, '[%]')
-                print('Updated TPZ:', TPZ, ' Updated MR:', cool.mr_SZair, 'Updated eqr:', cool.eqr)
-
-            data_list.append([1 - cool.mr_SZair])
-
-            print('\nFINAL\nMass ratio of air injected on DZ:', round(cool.mr_SZair, 3))
-            print('TPZ = ', round(TPZ, 3))
-
-            np.savetxt('mr_cc_hack.dat', np.array(data_list))
+            TPZ, Emissions,_,_,_ = get_TPZ(aircraft[1], b, ec.p03, ec.T03, cool.eqr, n_h2, n_ker, n_O2, n_N2)
+            print('TPZ is:',TPZ)
 
             '''ASSESSING THE EMISSIONS OF NEO'''
             # Getting time of phase
-            time = T_required.durations[phases == b]
+            time = Time_phases[phases == b]
 
             # Getting total emissions in that phase
             mf_reactants = ec.mf_fuel + ec.mf_hot
 
-            for i in Emissions_array_HACK[phases == b]:
-                for j in range(len(Emissions)):
-                    i[j] = Emissions[j] * mf_reactants * time
+            Emissions_array_neo[phases == b] = Emissions * mf_reactants * time
+
             print(np.array(['CH4', 'CO', 'CO2', 'H2O', 'NO', 'NO2', 'H2']))
             print('Emissions array:', Emissions_array_HACK)
 
             #Compare Thrust from cycle analysis to Thrust required
-            if ec.T_total< T_req[phases==b]:
+            if ec.T_total< T.thrust_required[T.t_array<=Time_CA_analysis[phases==b]][-1]:
                 print('Thrust available for '+b+ ' is too little, change energy split')
             else:
                 print('Thrust available for '+b+ 'is enough:',ec.T_total)
                 Thrust_requirement = True
 
             T_HACK.append(ec.T_total)
-            TSFC_HACK.append(ec.TSFC)
+            TSFC_HACK.append(ec.TSFC_m)
 
         '''ASSESSING RANGE OF HACK'''
         m_5 = T_required.m[T_required.t_array<=T_required.cruise_end_time][-1]
         m_4 = T_required.m[T_required.t_array<=T_required.cruise_start_time][-1]
-        Range_HACK = performance().Range(ae.L_D_ratio_HACK,m_5/m_4,TSFC_HACK[phases=='cruise']*10**-6)
+        Range_HACK = performance().Range(ae.L_D_ratio_HACK,m_5/m_4,TSFC_HACK[phases=='cruise1']*10**-6)
 
         if Range_HACK< 3200*10**3:
 
@@ -332,4 +279,37 @@ while Emissions_requirement != True:
         print('Emissions requirement is not met. Change Energy split')
 
 
+#--------------OLD CODE--------------------------------NEO-------------------------------
+# #cool.SZ_air(aircraft[0], b, ec.TPZ)
+#     #eqr_old = cool.eqr
+#     #print('Initial TPZ [K]:', ec.TPZ, ' Initial mr_cool', cool.mr_SZair, ' Initial eqr', cool.eqr)
+#
+#     ''' LOOP FOR CONVERGENCE OF EQUIVALENCE RATIO '''
+#
+#     #eqr_old = 0.5350926260993377#0.7  # initial value
+#     TPZ, MF = get_TPZ(aircraft[0], b, ec.p03, ec.T03, 0.7, n_h2, n_ker, n_O2, n_N2)
+#     cool.SZ_air(aircraft[0], b, TPZ)
+#     print('Initial TPZ [K]:', round(TPZ, 3), 'Initial mr_cool:', round(cool.mr_SZair, 3))
+#     print(' Initial eqr:', 0.7, ' Updated eqr:', round(cool.eqr, 3))
+#     err = 1
+#
+#     while err > 0.02:  # error larger than 2%
+#
+#         TPZ, Emissions = get_TPZ(aircraft[0], b, ec.p03, ec.T03, cool.eqr,n_h2,n_ker,n_O2,n_N2)
+#
+#         cool.SZ_air(aircraft[0], b, TPZ)
+#         err = abs(cool.eqr - eqr_old) / cool.eqr
+#         eqr_old = cool.eqr.copy()
+#
+#         print('Error at each iteration:', err * 100, '[%]')
+#         print('Updated TPZ:', TPZ, ' Updated MR:', cool.mr_SZair, 'Updated eqr:', cool.eqr)
+#
+#
+#     data_list.append([1 - cool.mr_SZair])
+#
+#     print('\nFINAL\nMass ratio of air injected on DZ:', round(cool.mr_SZair, 3))
+#     print('TPZ = ', round(TPZ, 3))
+#
+#     np.savetxt('mr_cc_neo.dat', np.array(data_list))
 
+#--------------OLD CODE--------------------------------HACK-------------------------------

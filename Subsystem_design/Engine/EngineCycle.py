@@ -69,15 +69,16 @@ class Engine_Cycle(Constants):
         self.LHV_f = float(data[27])
 
         # percentage of core air that is used in combustion
-        if aircraft == 'neo':
-            # self.mr_air_cc = np.array(np.genfromtxt('mr_cc_neo.dat'))[i]
-            self.FAR_st = self.stoich_ratio_ker
-        elif aircraft == 'hack':
-            # self.mr_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))[i]
-            if phase in ['taxi_out', 'taxi_in', 'idle']:
-                self.FAR_st = self.stoich_ratio_h2
-            else:
-                self.FAR_st = self.stoich_ratio_ker_h2
+        # if aircraft == 'neo':
+        #     # self.mr_air_cc = np.array(np.genfromtxt('mr_cc_neo.dat'))[i]
+        #     self.FAR_st = self.stoich_ratio_ker
+        # elif aircraft == 'hack':
+        #     # self.mr_air_cc = np.array(np.genfromtxt('mr_cc_hack.dat'))[i]
+        #     if phase in ['taxi_out', 'taxi_in', 'idle']:
+        #         self.FAR_st = self.stoich_ratio_h2
+        #     else:
+        #
+        #         self.FAR_st = self.stoich_ratio_ker_h2
 
 
     def get_dataframe(self, aircraft, phs):
@@ -98,9 +99,6 @@ class Engine_Cycle(Constants):
         elif phs == 'take_off2':
             data, i = d.take_off, 1
             common = c.take_off2
-        elif phs == 'take_off3':
-            data, i = d.take_off, 1
-            common = c.take_off3
         elif phs == 'climb1' or phs == 'climb':
             data, i = d.climb, 2
             common = c.climb1
@@ -274,9 +272,9 @@ class Engine_Cycle(Constants):
         #self.equivalence_ratio = (self.mf_fuel / (self.mf_air_combustion)) / \
                                   #self.stoichiometric_ratio
 
-
-        self.air_cool(aircraft)
         self.mole_rate()
+        self.air_cool(aircraft)
+
 
         # if phase in ['take_off', 'cruise']:
         #     plt.figure()
@@ -291,8 +289,8 @@ class Engine_Cycle(Constants):
             mr_c = 0.75
 
         mr_cool = 1-mr_c
-        self.eqr_PZ = (self.mf_fuel / (mr_c * self.mf_hot)) / self.FAR_st
-        self.eqr_overall = (self.mf_fuel / self.mf_hot) / self.FAR_st
+        self.eqr_PZ = (self.mf_fuel / (mr_c * self.mf_hot)) / self.stoichiometric_ratio
+        self.eqr_overall = (self.mf_fuel / self.mf_hot) / self.stoichiometric_ratio
 
 
         TPZ1 = self.T04 - (mr_cool * self.mf_hot * self.cp_air * (self.T03 - self.T04)) / ((mr_c * self.mf_hot +
@@ -381,8 +379,8 @@ Stations:
 if __name__ == '__main__':
     ec = Engine_Cycle()
     aircraft = ['neo', 'hack']
-    #phases = ['taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in', 'idle']
-    phases =  ['taxi_out', 'take_off1','take_off2','take_off3', 'climb1','climb2', 'cruise1','cruise2', 'approach1','approach2', 'taxi_in', 'idle']
+    phases = ['taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in', 'idle']
+    #phases =  ['taxi_out', 'take_off1','take_off2', 'climb1','climb2', 'cruise1','cruise2', 'approach1','approach2', 'taxi_in', 'idle']
     # aircraft = ['neo']
     # phases = ['cruise']
 
@@ -390,7 +388,7 @@ if __name__ == '__main__':
         print("\n= = = = Analysis for A320", a, "= = = =")
         for p in phases:
             print("\n", p)
-            ec.cycle_analysis(a, p,False)
+            ec.cycle_analysis(a, p,True)
 
 
 
