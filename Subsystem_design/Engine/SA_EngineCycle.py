@@ -15,40 +15,41 @@ class SA_Engine_Cycle(Constants):
         # self.var_name = np.array(['PR_fan', 'BPR', 'PR_LPC', 'PR_HPC', 'PR_LPT', 'PR_HPT'])
         # self.up_bound = np.array([ 2, 15.808, 7, 15, 0.3, 0.7 ])
         self.get_data()
+        e_index = [10, 15, 16]
+        mk = 0
 
-        for k in range(len(self.var_OG)): # increase one variable at a time, the remaining stay the original value
+        for k in e_index:               # increase one variable at a time, the remaining stay the original value
             var_loop = self.var_OG.copy()
             # print('\nvar:', self.var_name[k])
             # self.get_vals(self.var_OG[k], self.up_bound[k])
             save_TSFC, save_var = np.array([]), np.array([])
-            save_T45, save_T5 = np.array([]), np.array([])
-            save_thrust = np.array([])
+            # save_T45, save_T5 = np.array([]), np.array([])
+            # save_thrust = np.array([])
 
+            self.deltas = (np.linspace(0.8, 1, 1000) - self.var_OG[k]) / self.var_OG[k]
+            #
+            # if 'eta' in self.names[k] or 'PR_noz' in self.names[k] or 'PR_cc' in self.names[k]:
+            #     self.deltas = (np.linspace(0.9, 1, 1000) - self.var_OG[k]) / self.var_OG[k]
+            # else:
+            #     self.deltas = np.arange(0.8, 1.05, 0.05)
 
-            if 'eta' in self.names[k+4] or 'PR_noz' in self.names[k+4] or 'PR_cc' in self.names[k+4]:
-                self.deltas = (np.linspace(0.9*self.var_OG[k], 1, 1000) - self.var_OG[k]) / self.var_OG[k]
-            else:
-                self.deltas = np.arange(-0.2, 1.05, 0.05)
-
-            for d in self.deltas: # increase each time by 1%, 2%, etc
+            for d in self.deltas:                                       # increase each time by 1%, 2%, etc
                 var_loop[k] = self.var_OG[k].copy() * (d + 1)
                 self.cycle(var_loop)
 
                 if not m.isnan(self.TSFC):
                     save_TSFC = np.append(save_TSFC, self.TSFC)
                     save_var = np.append(save_var, var_loop[k])
-                # else:
-                #     save_TSFC = np.append(save_TSFC, 1000) # add a dummy number that will never be the minimum of the TSFC array
-
 
             # print(save_TSFC)
-            v_opt = save_var[ np.where( save_TSFC == np.min( save_TSFC ) )[0][0] ]
-            incr = self.deltas[ np.where( save_TSFC == np.min( save_TSFC ) )[0][0] ] * 100 # [%]
-            delta_TSFC = ( np.min( save_TSFC ) - save_TSFC[0] ) / save_TSFC[0] * 100
-            self.opt_vars.append( [ self.names[k+4], round(v_opt,3), round(incr, 3), 'Delta TSFC:', round(delta_TSFC,3) ] )
-            print(self.opt_vars[k])
+            # v_opt = save_var[np.where(save_TSFC == np.min(save_TSFC))[0][0]]
+            # incr = self.deltas[np.where(save_TSFC == np.min(save_TSFC))[0][0]] * 100            # [%]
+            # delta_TSFC = (np.min(save_TSFC) - save_TSFC[0]) / save_TSFC[0] * 100
+            # self.opt_vars.append([self.names[k+4], round(v_opt,3), round(incr, 3), 'Delta TSFC:', round(delta_TSFC,3)])
+            # print(self.opt_vars[k])
 
-            self.plot(save_var, save_TSFC, k, flag=False)
+            self.plot(save_var, save_TSFC, k, mk)
+            mk += 1
             # if self.names[k + 4] == 'eta_HPC':
             #     self.plot(save_var, save_T45, k, flag='p045')
             #     self.plot(save_var, save_thrust, k, flag='Thrust core')
@@ -57,9 +58,9 @@ class SA_Engine_Cycle(Constants):
 
     def get_data(self):
         data = np.array(DataFrame().neo.cruise)
-        self.names = np.array(DataFrame().neo.parameter)
-        self.names = np.delete(self.names, np.where(self.names == 'PR_LPT')[0][0])
-        self.names = np.delete(self.names, np.where(self.names == 'PR_HPT')[0][0])
+        # self.names = np.array(DataFrame().neo.parameter)
+        # self.names = np.delete(self.names, np.where(self.names == 'PR_LPT')[0][0])
+        # self.names = np.delete(self.names, np.where(self.names == 'PR_HPT')[0][0])
 
         self.M0 = float(data[0])
         self.h = float(data[1])
@@ -96,6 +97,10 @@ class SA_Engine_Cycle(Constants):
          eta_LPC_OG, eta_HPC_OG, PR_LPC_OG, PR_HPC_OG, eta_mech_OG, eta_cc_OG,
          PR_cc_OG, T04_OG, eta_LPT_OG, eta_HPT_OG,
          eta_nozzle_OG, PR_noz_core_OG, PR_noz_fan_OG])
+        self.names = np.array(['Inlet', 'Fan', 'Fan', 'BPR',
+         'LPC', 'HPC', 'LPC', 'HPC', 'Mechanical', 'cc',
+         'cc', '$T04$', 'LPT', 'HPT',
+         'Nozzle', 'Core nozzle', 'Duct nozzle'])
         self.data = data
 
 
@@ -195,62 +200,66 @@ class SA_Engine_Cycle(Constants):
                     (1 - (self.k_gas - 1) / (self.k_gas + 1) / var_loop[14]) ** (self.k_gas / (self.k_gas - 1)))
 
         # Exit of the nozzle
-        if self.p07 / self.p0 > self.PR_cr_noz_core:
-            self.TR_cr_noz_core = (self.k_gas + 1) / 2
-            self.T8 = self.T07 / self.TR_cr_noz_core
-            self.p8 = self.p07 / self.PR_cr_noz_core
-            self.v8 = np.sqrt(self.k_gas * self.R * self.T8)
-            self.A8 = (self.mf_airfuel * self.R * self.T8) / (self.p8 * self.v8)
-            self.T_core = self.mf_airfuel * (self.v8 - self.v0) + self.A8 * (self.p8 - self.p0)  # [N]
+        # if self.p07 / self.p0 >= self.PR_cr_noz_core:
+        self.TR_cr_noz_core = (self.k_gas + 1) / 2
+        self.T8 = self.T07 / self.TR_cr_noz_core
+        self.p8 = self.p07 / self.PR_cr_noz_core
+        self.v8 = np.sqrt(self.k_gas * self.R * self.T8)
+        self.A8 = (self.mf_airfuel * self.R * self.T8) / (self.p8 * self.v8)
+        self.T_core = self.mf_airfuel * (self.v8 - self.v0) + self.A8 * (self.p8 - self.p0)  # [N]
 
-        elif self.p07 / self.p0 <= self.PR_cr_noz_core:
-            self.p8 = self.p0
-            self.T8 = self.T07 * (1 - var_loop[14] * (1 - (self.p8 / self.p07) ** ((self.k_gas - 1) / self.k_gas)))
-            self.v8 = np.sqrt(2 * self.cp_gas * (self.T07 - self.T8))
-            self.T_core = self.mf_airfuel * (self.v8 - self.v0)  # [N]
+        # elif self.p07 / self.p0 < self.PR_cr_noz_core:
+        #     self.p8 = self.p0
+        #     self.T8 = self.T07 * (1 - var_loop[14] * (1 - (self.p8 / self.p07) ** ((self.k_gas - 1) / self.k_gas)))
+        #     self.v8 = np.sqrt(2 * self.cp_gas * (self.T07 - self.T8))
+        #     self.T_core = self.mf_airfuel * (self.v8 - self.v0)  # [N]
 
         # Is the fan chocked?
         self.PR_cr_fan = 1 / (
                     (1 - (self.k_air - 1) / (var_loop[14] * (self.k_air + 1))) ** (self.k_air / (self.k_air - 1)))
 
         # Exit of bypassed air
-        if self.p016 / self.p0 > self.PR_cr_fan:
-            self.TR_cr_bypassed = (self.k_air + 1) / 2
-            self.T18 = self.T016 / self.TR_cr_bypassed
-            self.p18 = self.p016 / self.PR_cr_fan
-            self.v18 = np.sqrt(self.k_air * self.R * self.T18)
-            self.A18 = (self.mf_cold * self.R * self.T18) / (self.p18 * self.v18)
-            self.T_fan = self.mf_cold * (self.v18 - self.v0) + self.A18 * (self.p18 - self.p0)  # [N]
-
-        elif self.p016 / self.p0 <= self.PR_cr_fan:
-            self.p18 = self.p0
-            self.T18 = self.T016 - self.T016 * var_loop[14] * (
-                        1 - (self.p18 / self.p016) ** ((self.k_air - 1) / self.k_air))
-            self.v18 = np.sqrt(2 * self.cp_air * (self.T016 - self.T18))
-            self.T_fan = self.mf_cold * (self.v18 - self.v0)  # [N]
+        # if self.p016 / self.p0 > self.PR_cr_fan:
+        self.TR_cr_bypassed = (self.k_air + 1) / 2
+        self.T18 = self.T016 / self.TR_cr_bypassed
+        self.p18 = self.p016 / self.PR_cr_fan
+        self.v18 = np.sqrt(self.k_air * self.R * self.T18)
+        self.A18 = (self.mf_cold * self.R * self.T18) / (self.p18 * self.v18)
+        self.T_fan = self.mf_cold * (self.v18 - self.v0) + self.A18 * (self.p18 - self.p0)  # [N]
+        #
+        # elif self.p016 / self.p0 <= self.PR_cr_fan:
+        #     self.p18 = self.p0
+        #     self.T18 = self.T016 - self.T016 * var_loop[14] * (
+        #                 1 - (self.p18 / self.p016) ** ((self.k_air - 1) / self.k_air))
+        #     self.v18 = np.sqrt(2 * self.cp_air * (self.T016 - self.T18))
+        #     self.T_fan = self.mf_cold * (self.v18 - self.v0)  # [N]
 
         self.T_total = self.T_fan + self.T_core  # [N]
         self.TSFC = self.mf_fuel / (self.T_total * 10 ** (-3))  # [g/kN/s]
 
 
-    def plot(self, save_var, save_TSFC, k, flag):
+    def plot(self, save_var, save_TSFC, k, mk):
+        mark = ['*', 'o', 's', 'v', 'h', '1', '+', 'x', 'd']
+
         i = np.where(save_TSFC == 1000)
         if len(i[0]) != 0:
             save_var = np.delete(save_var, i)
             save_TSFC = np.delete(save_TSFC, i)
 
-        plt.figure()
-        plt.gcf().canvas.set_window_title(self.names[k+4])
-        plt.plot(save_var, save_TSFC)
-        plt.xlabel(self.names[k + 4], fontsize=20)
-        plt.ylabel('TSFC [g/kN/s]', fontsize=20)
+        plt.gcf().canvas.set_window_title('TSFC Vs. Pressure Ratio')
+        plt.plot(save_var, save_TSFC, marker=mark[mk], markevery=100, label=self.names[k])
+        plt.xlabel('Pressure ratio', fontsize=15)
+        plt.ylabel('TSFC [g/kN/s]', fontsize=15)
+        plt.xticks(np.array([0.8, 0.85, 0.9, 0.95, 1]), fontsize=14)
+        plt.yticks(fontsize=14)
+        plt.legend(fontsize=15)
 
         # if flag == False:
         #     plt.ylabel('TSFC [g/kN/s]', fontsize=20)
         # else:
         #     plt.ylabel(flag+'[K]', fontsize=20)
 
-        plt.savefig('C:\\Users\\sarar\\OneDrive\\Ambiente de Trabalho\\Folders\\DELFT\\3rd year\\DSE\\HACK\\Subsystem_design\\Engine\\Parameters\\'+self.names[k + 4])
+        # plt.savefig('C:\\Users\\sarar\\OneDrive\\Ambiente de Trabalho\\Folders\\DELFT\\3rd year\\DSE\\HACK\\Subsystem_design\\Engine\\Parameters\\'+'Efficiency')
         plt.show()
 
 if __name__=='__main__':
