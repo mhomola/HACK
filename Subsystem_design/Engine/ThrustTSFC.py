@@ -17,11 +17,11 @@ class TSFC_PR(Constants):
         # print('LEAP-1A values\nHPC PR:', PR_HPC_OG, '; TP4:', T04_OG)
         self.cycle(PR_HPC_OG, T04_OG)
         self.T_core_OG, self.TSFC_OG = self.T_core.copy()/1000, self.TSFC.copy()
-        print(self.T_total/1000, self.TSFC)
+        print(self.T_core/1000, self.TSFC)
 
         plt.figure()
-        plt.plot(self.T_total/1000, self.TSFC_OG, 'bo')
-        plt.plot(22219.934/1000, 0.01419, 'go')
+        # plt.plot(self.T_core_OG/1000, self.TSFC_OG, 'bo')      # hack
+        plt.plot(3720.575/1000, 0.01277, 'go')              # neo
 
 
         ''' PLOT PR LINES '''
@@ -32,16 +32,17 @@ class TSFC_PR(Constants):
             self.new_PR = np.arange(7, 21.1, 0.005) # 1)
             self.new_T = np.arange(1500, 1701, 1) # 50)
         else: # ph == 'cruise':
-            self.new_PR = np.arange(6, 20.1, 1)# 0.005) # 1)
-            self.new_T = np.arange(1400, 1651, 50)#1) # 50)
+            self.new_PR = np.arange(9, 20.1, 0.005)# 0.005) # 1)
+            self.new_T = np.arange(1300, 1551, 1)#1) # 50)
 
 
         self.save_TSFC_PR, self.save_T4_PR, self.save_thrust_PR, self.save_var_PR = list(), list(), list(), list()
-
+        self.new_PR = np.arange(9, 17.1, 1)
+        self.new_T = np.arange(1300, 1551, 1)
         for PR_new in self.new_PR: # increase one variable at a time, the remaining stay the original value
             PR_HPC = PR_new
             self.save_TSFC, self.save_thrust, a, b, c = np.array([]), np.array([]), list(), list(), list()
-            self.save_var_PR.append(np.round(PR_HPC,1))
+            self.save_var_PR.append(np.round(PR_HPC, 1))
 
             for T_new in self.new_T: # increase each time by 1%, 2%, etc
                 T04 = T_new
@@ -50,7 +51,7 @@ class TSFC_PR(Constants):
                 if not m.isnan(self.TSFC) and self.p07 / self.p0 > self.PR_cr_noz_core:
                     # TO PLOT
                     self.save_TSFC = np.append(self.save_TSFC, self.TSFC)
-                    self.save_thrust = np.append(self.save_thrust, self.T_total/1000) # [kN]
+                    self.save_thrust = np.append(self.save_thrust, self.T_core/1000)        # [kN]
                     # TO FIND OPTIMAL VALUE
                     a.append(self.TSFC)
                     b.append(self.T_core/1000) # [kN]
@@ -59,12 +60,16 @@ class TSFC_PR(Constants):
             self.save_TSFC_PR.append(list(a))
             self.save_thrust_PR.append(list(b))
             self.save_T4_PR.append(list(c))
-            # plt.plot(self.save_thrust, self.save_TSFC, color='black')
-            plt.xlabel('Net thrust [kN]', fontsize=16)
-            plt.ylabel('TSFC [MJ/kN/s]', fontsize=16)
+            plt.plot(self.save_thrust, self.save_TSFC, color='black')
+            plt.xlabel('Net thrust [kN]', fontsize=15)
+            plt.ylabel('TSFC [g/kN/s]', fontsize=15)
+            plt.xticks(fontsize=14)
+            plt.yticks(fontsize=14)
 
         # PLOT T04 LINES
         self.save_TSFC_T4, self.save_PR_T4, self.save_thrust_T4, self.save_var_T4 = list(), list(), list(), list()
+        self.new_PR = np.arange(9, 17.1, 0.05)  # 0.005) # 1)
+        self.new_T = np.arange(1300, 1551, 50)  # 1) # 50)
         for T_new in self.new_T:  # increase one variable at a time, the remaining stay the original value
             T04 = T_new
             self.save_TSFC, self.save_thrust, a, b, c = np.array([]), np.array([]), list(), list(), list()
@@ -77,7 +82,7 @@ class TSFC_PR(Constants):
                 if not m.isnan(self.TSFC):
                     # TO PLOT
                     self.save_TSFC = np.append(self.save_TSFC, self.TSFC)
-                    self.save_thrust = np.append(self.save_thrust, self.T_total / 1000)  # [kN]
+                    self.save_thrust = np.append(self.save_thrust, self.T_core / 1000)  # [kN]
                     # TO FIND OPTIMAL VALUE
                     a.append(self.TSFC)
                     b.append(self.T_core / 1000)  # [kN]
@@ -86,7 +91,7 @@ class TSFC_PR(Constants):
             self.save_TSFC_T4.append(list(a))
             self.save_thrust_T4.append(list(b))  # [kN]
             self.save_PR_T4.append(list(c))
-            # plt.plot(self.save_thrust, self.save_TSFC, color='red')
+            plt.plot(self.save_thrust, self.save_TSFC, color='red')
 
         plt.show()
 
@@ -100,7 +105,7 @@ class TSFC_PR(Constants):
         elif ph == 'climb':
             data = np.array(DataFrame().neo.climb)
         elif ph == 'cruise':
-            data = np.array(DataFrame().hack.cruise)
+            data = np.array(DataFrame().neo.cruise)
         elif ph == 'approach':
             data = np.array(DataFrame().neo.approach)
         else: # ph == 'taxi_in'
@@ -242,19 +247,19 @@ class TSFC_PR(Constants):
                     (1 - (self.k_gas - 1) / (self.k_gas + 1) / self.eta_nozzle) ** (self.k_gas / (self.k_gas - 1)))
 
         # Exit of the nozzle
-        if self.p07 / self.p0 > self.PR_cr_noz_core:
-            self.TR_cr_noz_core = (self.k_gas + 1) / 2
-            self.T8 = self.T07 / self.TR_cr_noz_core
-            self.p8 = self.p07 / self.PR_cr_noz_core
-            self.v8 = np.sqrt(self.k_gas * self.R * self.T8)
-            self.A8 = (self.mf_airfuel * self.R * self.T8) / (self.p8 * self.v8)
-            self.T_core = self.mf_airfuel * (self.v8 - self.v0) + self.A8 * (self.p8 - self.p0)  # [N]
+        # if self.p07 / self.p0 > self.PR_cr_noz_core:
+        self.TR_cr_noz_core = (self.k_gas + 1) / 2
+        self.T8 = self.T07 / self.TR_cr_noz_core
+        self.p8 = self.p07 / self.PR_cr_noz_core
+        self.v8 = np.sqrt(self.k_gas * self.R * self.T8)
+        self.A8 = (self.mf_airfuel * self.R * self.T8) / (self.p8 * self.v8)
+        self.T_core = self.mf_airfuel * (self.v8 - self.v0) + self.A8 * (self.p8 - self.p0)  # [N]
 
-        elif self.p07 / self.p0 <= self.PR_cr_noz_core:
-            self.p8 = self.p0
-            self.T8 = self.T07 * (1 - self.eta_nozzle * (1 - (self.p8 / self.p07) ** ((self.k_gas - 1) / self.k_gas)))
-            self.v8 = np.sqrt(2 * self.cp_gas * (self.T07 - self.T8))
-            self.T_core = self.mf_airfuel * (self.v8 - self.v0)  # [N]
+        # elif self.p07 / self.p0 <= self.PR_cr_noz_core:
+        #     self.p8 = self.p0
+        #     self.T8 = self.T07 * (1 - self.eta_nozzle * (1 - (self.p8 / self.p07) ** ((self.k_gas - 1) / self.k_gas)))
+        #     self.v8 = np.sqrt(2 * self.cp_gas * (self.T07 - self.T8))
+        #     self.T_core = self.mf_airfuel * (self.v8 - self.v0)  # [N]
 
         # Is the fan chocked?
         self.PR_cr_fan = 1 / (
@@ -277,8 +282,8 @@ class TSFC_PR(Constants):
             self.T_fan = self.mf_cold * (self.v18 - self.v0)  # [N]
 
         self.T_total = self.T_fan + self.T_core  # [N]
-        # self.TSFC = self.mf_fuel / (self.T_total * 10 ** (-3))  # [g/kN/s]
-        self.TSFC = self.mf_fuel * self.LHV_f / (self.T_total * 10 ** (-3))  # [MJ/kN/s]
+        self.TSFC = self.mf_fuel / (self.T_total * 10 ** (-3))  # [g/kN/s]
+        # self.TSFC = self.mf_fuel * self.LHV_f / (self.T_total * 10 ** (-3))  # [MJ/kN/s]
 
 
 if __name__=='__main__':
@@ -299,28 +304,29 @@ if __name__=='__main__':
             PR_low, PR_high = 7, 21
             OPR = 47.73806804
         else:  # ph == 'cruise'
-            T4_2030 = [1460+5*9-1, 1460+5*9, 1460+5*9+1]
-            PR_low, PR_high = 6, 20
+            T4_2030 = [1475+5*9-1, 1475+5*9, 1475+5*9+1]  # 1460+5*9-1, 1460+5*9, 1460+5*9+1
+            PR_low, PR_high = 9, 17
             OPR = 49.870583691692445
 
-        thrust_new = t.T_core_OG
+        thrust_new = t.T_core_OG*1.1
         PR_LPC_arr = np.arange(t.PR_LPC_OG*0.1, 7.1, 0.1)
         s_L, s_H, s_Th, s_TSFC, s_T4 = list(), list(), list(), list(), list()
 
         for PR_L in PR_LPC_arr:
             p025_new = t.p021 * PR_L
-            PR_H = ( OPR * t.p02 ) / p025_new
+            PR_H = (OPR * t.p02) / p025_new
+            print(PR_L, PR_H)
 
             if PR_H >= PR_low and PR_H <= PR_high:
                 # get index where PR = PR_H
-                i = np.where( t.save_var_PR == round(PR_H,1) )[0][0]
+                i = np.where(t.save_var_PR == round(PR_H, 1))[0][0]
                 thrust_arr = t.save_thrust_PR[i]
                 TSFC_arr = t.save_TSFC_PR[i]
                 T4_arr = t.save_T4_PR[i]
 
                 # get index where Thrust = Thrust_new
-                j = np.where(np.round(thrust_arr,1) == round(thrust_new, 1))[0][0]
-                TSFC_new  = TSFC_arr[j]
+                j = np.where(np.round(thrust_arr, 1) == round(thrust_new, 1))[0][0]
+                TSFC_new = TSFC_arr[j]
                 T4_new = T4_arr[j]
 
                 s_L.append(PR_L)
