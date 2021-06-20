@@ -76,8 +76,7 @@ class Engine_Cycle(Constants):
         c = DataFrame().common_data
         if aircraft == 'neo':
             d = DataFrame().neo
-
-        elif aircraft == 'hack':
+        else:
             d = DataFrame().hack
 
         ###################################
@@ -420,8 +419,8 @@ Stations:
 if __name__ == '__main__':
     ec = Engine_Cycle()
     aircraft = ['neo', 'hack']
-    # phases = ['taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in', 'idle']
-    phases = ['taxi_out', 'take_off1', 'take_off2', 'climb1', 'climb2', 'cruise1', 'cruise2', 'approach1', 'approach2', 'taxi_in', 'idle']
+    phases = ['taxi_out', 'take_off', 'climb', 'cruise', 'approach', 'taxi_in', 'idle']
+    # phases = ['taxi_out', 'take_off1', 'take_off2', 'climb1', 'climb2', 'cruise1', 'cruise2', 'approach1', 'approach2', 'taxi_in', 'idle']
     # aircraft = ['neo']
     # phases = ['cruise']
 
