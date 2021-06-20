@@ -137,6 +137,9 @@ class Engine_Cycle(Constants):
 
         self.mf_fuel = (self.mf_hot * self.cp_gas * (self.T04 - self.T03)) / (self.LHV_f * 10 ** 6 * self.eta_cc -
                                                                               self.cp_gas * self.T04)
+        self.T04 = ((self.mf_fuel * self.eta_cc * self.LHV_f * 10 ** 6) / self.cp_gas + self.mf_hot * self.T03) / \
+                                (self.mf_hot + self.mf_fuel)
+
         self.mf_airfuel = self.mf_hot + self.mf_fuel  # at the end of the cc
         self.mf_h2 = self.mf_fuel * self.ER_h2
         self.mf_ker = self.mf_fuel * self.ER_ker
