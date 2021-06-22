@@ -1,23 +1,22 @@
 function a = plotter()
 
     a = 1;
-    eqr = linspace(0.75,0.95,20);
+    eqr = linspace(0.5,0.6,20);
     NOx = [];
     CO = [];
     
-    valCO = 0.3*0.001; % kg/kg
-    valNOx = 17.59*0.001; % kg/kg
+    valCO = 3*0.5*0.001; % kg/kg
+    valNOx = 17.4*0.001; % kg/kg
     
     fuel = 0.855; % kg/s
     air = 34.06198; % kg/s     
     
     AFstoich = 14.79; % from Sofia
-    
     ICAO_CO = [];
     ICAO_NOx = [];
     
     for i = 1:length(eqr)        
-        [~,~,~,COf, NOxf] = reactor1('neo',3283120,1.1*805,eqr(i),0,1,14.76,55.45);
+        [~,~,~,COf, NOxf] = reactor1('neo',3283120,1.05*805,eqr(i));
         CO(i) = COf;
         NOx(i) = NOxf;
         
