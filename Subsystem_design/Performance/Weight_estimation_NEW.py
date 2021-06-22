@@ -14,19 +14,25 @@ class Compute_weight(Constants):
 
     def Tank_mass(self):
         self.tank_mass = 2*self.pod_tank_mass
+
     def Feeding_sys_m(self):
-        self.Feeding_mass = 22                          # Feeding system from tanks to engine + tank to tank
+        self.Feeding_mass = 22.71                          # Feeding system from tanks to engine + tank to tank
     def Struc_m(self):
-        self.struc_mass = self.Wing_Weight_320HACK-self.Wing_Weight_320neo + self.pylon_weight
+        self.struc_mass = self.Wing_Weight_320HACK-self.Wing_Weight_320neo + 2*self.pylon_weight
+
     def Fuel_cell_m(self):
-        self.FC_m = 781                                 # Entire system [kg]
+        self.FC_m = 781 -145                                # Entire system [kg]
+    def Engine_weight_difference(self):
+        self.Eng_diff_m = 2*self.W_engine-2*self.W_engine_HACK
+
     def weight_break_down_HACK(self):
         self.Tank_mass()
         self.Feeding_sys_m()
         self.Struc_m()
         self.Fuel_cell_m()
+        self.Engine_weight_difference()
 
-        self.OEW_HACK = self.OEW_320neo +self.struc_mass +self.Feeding_mass + self.FC_m + self.tank_mass
+        self.OEW_HACK = self.OEW_320neo +self.struc_mass +self.Feeding_mass + self.FC_m + self.tank_mass - self.Eng_diff_m
 
         self.Max_fuel_mass_capacity_HACK = self.W_kerosene + 2* self.pod_H2_mass
 
@@ -166,23 +172,23 @@ class performance(Compute_weight):
         fs_k_take_off = np.linspace(fs_k_taxi_out[-1], fs_k_taxi_out[-1] - mf_k_takeoff * time_phases[1], 50)
         'Climb'
         mf_h2_climb, mf_k_climb = self.read_files(mission +'_climb.txt')
-        fs_h2_climb = np.linspace(fs_h2_take_off[-1], fs_h2_take_off[-1] - mf_h2_climb * time_phases[2], 100)
-        fs_k_climb = np.linspace(fs_k_take_off[-1], fs_k_take_off[-1] - mf_k_climb * time_phases[2], 100)
+        self.fs_h2_climb = np.linspace(fs_h2_take_off[-1], fs_h2_take_off[-1] - mf_h2_climb * time_phases[2], 100)
+        self.fs_k_climb = np.linspace(fs_k_take_off[-1], fs_k_take_off[-1] - mf_k_climb * time_phases[2], 100)
         'Cruise'
         mf_h2_cruise, mf_k_cruise = self.read_files(mission +'_cruise.txt')
-        fs_h2_cruise = np.linspace(fs_h2_climb[-1], fs_h2_climb[-1] - mf_h2_cruise * time_phases[3],200)
-        fs_k_cruise = np.linspace(fs_k_climb[-1], fs_k_climb[-1] - mf_k_cruise * time_phases[3], 200)
+        self.fs_h2_cruise = np.linspace(self.fs_h2_climb[-1], self.fs_h2_climb[-1] - mf_h2_cruise * time_phases[3],200)
+        self.fs_k_cruise = np.linspace(self.fs_k_climb[-1], self.fs_k_climb[-1] - mf_k_cruise * time_phases[3], 200)
         'Approach'
         mf_h2_approach, mf_k_approach = self.read_files(mission +'_approach.txt')
-        fs_h2_approach = np.linspace(fs_h2_cruise[-1], fs_h2_cruise[-1] - mf_h2_approach * time_phases[4], 50)
-        fs_k_approach = np.linspace(fs_k_cruise[-1], fs_k_cruise[-1] - mf_k_approach * time_phases[4], 50)
+        fs_h2_approach = np.linspace(self.fs_h2_cruise[-1], self.fs_h2_cruise[-1] - mf_h2_approach * time_phases[4], 50)
+        fs_k_approach = np.linspace(self.fs_k_cruise[-1], self.fs_k_cruise[-1] - mf_k_approach * time_phases[4], 50)
         'Taxi-in'
         mf_h2_taxiin, mf_k_taxiin = self.read_files(mission +'_taxi_in.txt')
         fs_h2_taxi_in = np.linspace(fs_h2_approach[-1], fs_h2_approach[-1] - mf_h2_taxiin * time_phases[5], 50)
         fs_k_taxi_in = np.linspace(fs_k_approach[-1], fs_k_approach[-1] - mf_k_taxiin * time_phases[5], 50)
 
-        fs_h2_total = np.hstack((fs_h2_taxi_out,fs_h2_take_off,fs_h2_climb,fs_h2_cruise,fs_h2_approach,fs_h2_taxi_in))
-        fs_k_total = np.hstack((fs_k_taxi_out,fs_k_take_off,fs_k_climb,fs_k_cruise,fs_k_approach,fs_k_taxi_in))
+        fs_h2_total = np.hstack((fs_h2_taxi_out,fs_h2_take_off,self.fs_h2_climb,self.fs_h2_cruise,fs_h2_approach,fs_h2_taxi_in))
+        fs_k_total = np.hstack((fs_k_taxi_out,fs_k_take_off,self.fs_k_climb,self.fs_k_cruise,fs_k_approach,fs_k_taxi_in))
 
         return fs_h2_total,fs_k_total
 
@@ -200,6 +206,9 @@ if __name__ == '__main__':
     Performance = performance()
 
     T = thrust_req(cd0clean, wingar)
+
+    Performance.mission_profile(phase_durations=T.durations, mission='hack')
+    print('hello',Performance.fs_h2_cruise)
 
     '''Plotting fuel consumption during flight'''
     fs_h2_total_hack,fs_k_total_hack = Performance.mission_profile(phase_durations= T.durations, mission='hack')
@@ -229,11 +238,13 @@ if __name__ == '__main__':
     Range_HACK = Performance.Range_array
     Payload_HACK = Performance.Payload_array
 
-    Performance.payload_range_diagram(L_over_D=Aerodynamic_charac.L_D_ratio_neo,SFC = TSFC_cruise2*10**-6,mission='neo',phase_durations=T.durations)
+    #Performance.payload_range_diagram(L_over_D=Aerodynamic_charac.L_D_ratio_neo,SFC = TSFC_cruise2*10**-6,mission='neo',phase_durations=T.durations)
+    Performance.payload_range_diagram(L_over_D=Aerodynamic_charac.L_D_ratio_neo, SFC= const.c_j_kerosene,
+                                     mission='neo', phase_durations=T.durations)
     Range_neo = Performance.Range_array
     Payload_neo = Performance.Payload_array
-
-    plt.plot(Range_HACK, Payload_HACK, marker='*', color='tab:red',label='A320-HACK')
+    print(Range_neo)
+    #plt.plot(Range_HACK, Payload_HACK, marker='*', color='tab:red',label='A320-HACK')
     plt.plot(Range_neo,Payload_neo,marker='o',color='navy',label='A320neo')
     plt.xlabel('Range [km]')
     plt.ylabel('Payload Mass [kg]')

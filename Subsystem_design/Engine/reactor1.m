@@ -63,14 +63,10 @@ eqr = eqr_input; %0.3;
 
 %------------------
 
-<<<<<<<<< Temporary merge branch 1
-dt = 1e-1; %time step; -4 originally
-TotalTime = 20; % in seconds - includes autoignition phase
 
-=========
-dt = 1e-6; %time step; -4 originally
-TotalTime = 0.8; % in seconds - includes autoignition phase
->>>>>>>>> Temporary merge branch 2
+dt = 1e-5; %time step; -4 originally
+TotalTime = 12; % in seconds - includes autoignition phase
+
 nSteps = ceil(TotalTime/dt); %number of steps. Total time = nSteps*dt
 rlim = 0.995;
 
