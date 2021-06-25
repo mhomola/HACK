@@ -35,7 +35,7 @@ class Compute_weight(Constants):
         self.OEW_HACK = self.OEW_320neo +self.struc_mass +self.Feeding_mass + self.FC_m + self.tank_mass - self.Eng_diff_m
 
         self.Max_fuel_mass_capacity_HACK = self.W_kerosene + 2* self.pod_H2_mass
-
+        print(2* self.pod_H2_mass)
         self.MPLW_HACK = self.MPLW_320neo                           # Maximum Payload weight of HACK                  [kg]
         self.MZFW_HACK = self.MPLW_HACK + self.OEW_HACK             # Maximum zero fuel weight of HACK                [kg]
         self.MTOW_HACK = self.MTOW_320neo                           # Maximum take-off weight of Hack                 [kg]
@@ -65,6 +65,7 @@ class performance(Compute_weight):
             MTOW = self.MTOW_HACK
             MPLW = self.MPLW_HACK
             Max_fuel_MPLW = self.Max_fuel_at_max_PL_HACK
+
             Max_fuel_capacity = self.Max_fuel_mass_capacity_HACK
             OEW = self.OEW_HACK
         if mission == 'neo':
@@ -100,7 +101,7 @@ class performance(Compute_weight):
         R_C = self.Range(L_over_D, W5W4_C,SFC)                                      # Range at point C                     [m]
 
 
-        # Point D: R = ?? and W_Pl = 0--> W_fuel = Maxfuel
+        #Point D: R = ?? and W_Pl = 0--> W_fuel = Maxfuel
         W_PL_D = 0                                                                  # Payload mass at point D            [kg]
         Mto = OEW + Mf + W_PL_D                                           # Take off weight at point D         [kg]
         W5W4_D = self.flight_profile_weights(Mf, Mto)                               # Fuel ratio during cruise for point D [-]
@@ -108,6 +109,7 @@ class performance(Compute_weight):
 
         self.Range_array = np.array([R_A*0.001,R_B*0.001,R_C*0.001,R_D*0.001])
         self.Payload_array = np.array([W_Pl_A,W_Pl_B,W_Pl_C,W_PL_D])
+
 
     def read_files(self,name_of_file):
         main_file = 'C:\\Users\\daf6111\\Documents\\universidade\\Third year\\DSE\\HACK\\Subsystem_design\\Engine'
@@ -145,7 +147,7 @@ class performance(Compute_weight):
             m_f = self.Max_fuel_at_max_PL_HACK
             self.Energy_split(m_tot=m_f)
             m_h2 = self.mass_h2
-            m_k = self.mass_k
+            m_k =self.mass_k
 
         if mission == 'neo':
             # m_f is the fuel weigth available at Take-off
@@ -208,7 +210,7 @@ if __name__ == '__main__':
     T = thrust_req(cd0clean, wingar)
 
     Performance.mission_profile(phase_durations=T.durations, mission='hack')
-    print('hello',Performance.fs_h2_cruise)
+
 
     '''Plotting fuel consumption during flight'''
     fs_h2_total_hack,fs_k_total_hack = Performance.mission_profile(phase_durations= T.durations, mission='hack')
@@ -236,19 +238,21 @@ if __name__ == '__main__':
 
     Performance.payload_range_diagram(L_over_D=Aerodynamic_charac.L_D_ratio_HACK,SFC= TSFC_cruise1*10**-6,mission='hack',phase_durations=T.durations)
     Range_HACK = Performance.Range_array
+    print(Range_HACK)
     Payload_HACK = Performance.Payload_array
 
-    #Performance.payload_range_diagram(L_over_D=Aerodynamic_charac.L_D_ratio_neo,SFC = TSFC_cruise2*10**-6,mission='neo',phase_durations=T.durations)
-    Performance.payload_range_diagram(L_over_D=Aerodynamic_charac.L_D_ratio_neo, SFC= const.c_j_kerosene,
-                                     mission='neo', phase_durations=T.durations)
+    Performance.payload_range_diagram(L_over_D=Aerodynamic_charac.L_D_ratio_neo,SFC = TSFC_cruise2*10**-6,mission='neo',phase_durations=T.durations)
+    #Performance.payload_range_diagram(L_over_D=Aerodynamic_charac.L_D_ratio_neo, SFC= const.c_j_kerosene,
+                                     #mission='neo', phase_durations=T.durations)
     Range_neo = Performance.Range_array
     Payload_neo = Performance.Payload_array
     print(Range_neo)
-    #plt.plot(Range_HACK, Payload_HACK, marker='*', color='tab:red',label='A320-HACK')
+    plt.plot(Range_HACK, Payload_HACK, marker='*', color='tab:red',label='A320-HACK')
+    #plt.plot(np.array([1238,1714]), np.array([18240,0]), marker='*', color='tab:red', label='A320-HACK with only hydrogen')
     plt.plot(Range_neo,Payload_neo,marker='o',color='navy',label='A320neo')
-    plt.xlabel('Range [km]')
-    plt.ylabel('Payload Mass [kg]')
-    plt.legend()
+    plt.xlabel('Range [km]',fontsize = 15)
+    plt.ylabel('Payload Mass [kg]',fontsize = 15)
+    plt.legend(fontsize = 15)
     plt.show()
 
 

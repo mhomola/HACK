@@ -146,7 +146,7 @@ class Engine_Cycle(Constants):
         elif self.mr_ker == 0:                                              # only H2
             self.mf_fuel = (1 / 33.99) * 0.25 * self.mf_hot * self.mr_cc
         else:                                                               # H2 + ker
-            self.mf_fuel = 0.048086 * 0.35 * self.mf_hot * self.mr_cc
+            self.mf_fuel = 0.048086 * 0.45 * self.mf_hot * self.mr_cc
 
         self.T04 = (self.mf_hot * self.cp_gas * self.T03 + self.mf_fuel * self.LHV_f * 10 ** 6 * self.eta_cc) / (
                     self.cp_gas * (self.mf_fuel + self.mf_hot))

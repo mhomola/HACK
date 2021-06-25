@@ -173,7 +173,7 @@ class Constants():
         self.MPLW_320neo = 18240                                    # Maximum Payload weight of A320neo             [kg]
         self.OEW_320neo = 44560                                     # Operational Empty weight of A320neo           [kg]
         self.Wing_Weight_320neo = 9150                              # Wing weight DOI:10.5139/IJASS.2014.15.4.38    [kg]
-        self.W_engine = 3071.5                                        # Weight of one engine                          [kg]
+        self.W_engine = 2780#3071.5                                        # Weight of one engine                          [kg]
         self.Fuel_idel_taxi_take_off_320neo = 400                   # Fuel for before take -off                     [kg]
         self.Max_fuel_mass_capacity_320neo = self.fuel_capacity_320neo * self.k_d # Maximum kerosene mass of A320neo[kg]
         self.x_cg_320neo_zf = 0.29
@@ -189,7 +189,7 @@ class Constants():
         self.payload_320hack = 18240
         self.W_kerosene = self.V_k * self.rho_ker
         self.Wing_Weight_320HACK = 0.9 * self.Wing_Weight_320neo
-        self.W_engine_HACK = 3003.352                               #                                               [kg]
+        self.W_engine_HACK = 3318.27#3003.352                               #                                               [kg]
 
         """Weights of A321neo"""
         self.MTOW_321neo = 89000                                    # Maximum Take-Off weight of A321neo            [kg]

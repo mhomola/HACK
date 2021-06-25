@@ -45,7 +45,7 @@ class Climate_assess():
         'Constants for RF of CO2'
         self.EI_CO2 = 3.16                                             # Emissions index of CO2                 [kg/kgkerosene]
         self.E_CO2 = 0                                                 # Absolute CO2 emissions                 [kg]
-        self.X_CO2_0 = 311#380                                             # Background concentration of CO2        [ppmv]
+        self.X_CO2_0 = 380                                             # Background concentration of CO2        [ppmv]
         self.alpha_1 = 0.067/10**12#0.067                               #                                        [ppmv/kg]
         self.alpha_2 = 0.1135/10**12#0.1135                             #                                        [ppmv/kg]
         self.alpha_3 = 0.152/10**12#0.152                               #                                        [ppmv/kg]
@@ -77,8 +77,8 @@ class Climate_assess():
         self.EI_NOx = 0.014                                            # Emission index of NOx                 [kgH2O/kgkerosene]
         'Constants for RF of Water,soot and sulfate'
         self.EI_H2O = 1.26                                             # Emission index of H2O                 [kgH2O/kgkerosene]
-        self.EI_soot = 2.0 * 10**-4                                    # Emission index of soot                {kgsoot/kgkerosene]
-        self.EI_SO4 = 4.0 * 10**-5                                     # Emission index of SO4                 [kgSO4/kgkerosene]
+        self.EI_soot = 4.0* 10**-5                                    # Emission index of soot                {kgsoot/kgkerosene]
+        self.EI_SO4 = 2.0 * 10**-4                                     # Emission index of SO4                 [kgSO4/kgkerosene]
         self.RF_E_ref_H2O = 7.43 * 10**(-15)                             # Radiative forcing due to H2O          [(W/m^2)/kgNOx]
                                                                   # per unit of H2O
         self.RF_E_ref_SO4 = -1.0 * 10**(-10)                             # Radiative forcing due to SO4          [(W/m^2)/kgNOx]
@@ -463,10 +463,11 @@ class Climate_assess():
             # plt.show()
         if compound == 'soot':
             RF = self.RF_E_ref_soot * self.E(e,U,self.t_prime)
+
             #print('The RF of soot is:', RF)
-            # plt.plot(self.t_prime, RF, label='Radiative forcing of' + str(compound))
-            # plt.legend()
-            # plt.show()
+            plt.plot(self.t_prime, RF, label='Radiative forcing of' + str(compound))
+            plt.legend()
+            plt.show()
         if compound == 'sulfate':
             RF = self.RF_E_ref_SO4 * self.E(e,U,self.t_prime)
             #print('The RF of SO4 is:', RF)
@@ -536,24 +537,24 @@ class Climate_assess():
         :return: Change in temperature over the span of years selected [K]
         '''
 
-        self.emissions_level(e_CO2, e_H2O, e_NOx, e_soot, e_sulfate)
+        #self.emissions_level(e_CO2, e_H2O, e_NOx, e_soot, e_sulfate)
 
-        delta_T_O3S = np.convolve(self.RF_(h, self.eNOx, U, compound='O3S'),self.G_T(self.t_prime - self.t_0),'full')
+        delta_T_O3S = np.convolve(self.RF_(h, e_NOx, U, compound='O3S'),self.G_T(self.t_prime - self.t_0),'full')
         delta_T_O3S = (self.Eff_O3/self.RF_2CO2)*delta_T_O3S[:self.t_prime.size]
 
-        delta_T_H2O = np.convolve(self.RF_(h, self.eH2O, U, compound='H2O'),self.G_T(self.t_prime - self.t_0),'full')
+        delta_T_H2O = np.convolve(self.RF_(h, e_H2O, U, compound='H2O'),self.G_T(self.t_prime - self.t_0),'full')
         delta_T_H2O = (self.Eff_H2O/self.RF_2CO2)*delta_T_H2O[:self.t_prime.size]
 
-        delta_T_soot = np.convolve(self.RF_(h, self.esoot, U, compound='soot'),self.G_T(self.t_prime - self.t_0),'full')
+        delta_T_soot = np.convolve(self.RF_(h, e_soot, U, compound='soot'),self.G_T(self.t_prime - self.t_0),'full')
         delta_T_soot =(self.Eff_soot/self.RF_2CO2)*delta_T_soot[:self.t_prime.size]
 
-        delta_T_CO2 = np.convolve(self.RF_(h, self.eCO2, U, compound='CO2'),self.G_T(self.t_prime - self.t_0),'full')
+        delta_T_CO2 = np.convolve(self.RF_(h, e_CO2, U, compound='CO2'),self.G_T(self.t_prime - self.t_0),'full')
         delta_T_CO2 = delta_T_CO2[:self.t_prime.size]
 
-        delta_T_CH4 = np.convolve(self.RF_(h, self.eNOx, U, compound='CH4'),self.G_T(self.t_prime - self.t_0),'full')
+        delta_T_CH4 = np.convolve(self.RF_(h, e_NOx, U, compound='CH4'),self.G_T(self.t_prime - self.t_0),'full')
         delta_T_CH4 = (self.Eff_CH_4/self.RF_2CO2)*delta_T_CH4[:self.t_prime.size]
 
-        delta_T_O3L = np.convolve(self.RF_(h, self.eNOx, U, compound='O3L'),self.G_T(self.t_prime - self.t_0),'full')
+        delta_T_O3L = np.convolve(self.RF_(h, e_NOx, U, compound='O3L'),self.G_T(self.t_prime - self.t_0),'full')
         delta_T_O3L = (self.Eff_O3/self.RF_2CO2)* delta_T_O3L[:self.t_prime.size]
 
         delta_T_tot = delta_T_CO2 + delta_T_CH4+ delta_T_H2O  + delta_T_O3L  + delta_T_O3S  + delta_T_soot
@@ -604,11 +605,11 @@ class Climate_assess():
             plt.plot(self.t_prime, delta_T_CH4, color='black', label='CH4')
             plt.plot(self.t_prime, delta_T_O3L, color='grey', label='O3L')
             plt.plot(self.t_prime,delta_T_tot,color = 'yellow',label= 'Change in temperature per year')
-            plt.xlabel('years')
-            plt.ylabel('$\Delta_T$ [K]')
+            plt.xlabel('years',fontsize =15)
+            plt.ylabel('$\Delta_T$ [K]',fontsize =15)
             plt.legend()
-            plt.savefig('Delta_T_plots')
-            #plt.show()
+            #plt.savefig('Delta_T_plots'+str(h))
+            plt.show()
 
         #del_T = integrate.simps(self.G_T(t-t_prime) * RF_norm, t_prime)
 
