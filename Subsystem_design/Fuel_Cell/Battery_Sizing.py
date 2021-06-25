@@ -67,19 +67,18 @@ def P_com(h, p2, m):
     #     p1 = ISA_p(T1)
     if h <= 1800:
         p1 = ISA_p(T1)
-
     else:
         p1 = ISA_p(ISA_t(1800))
 
         # p11 = ISA_p(ISA_t(11000))
         # p1 = p11 * np.exp(-g / (R * ISA_t(11000)) * (h - 11000))
 
-    return cp * ((273.15+20) / nc) * ((p2 / p1) ** ((gamma - 1) / gamma) - 1) * m, p1
+    return cp * (T1 / nc) * ((p2 / p1) ** ((gamma - 1) / gamma) - 1) * m, p1
 
-def Req_power(mair,f = 1):
+def Req_power(mair):
 
     # Power in diferent mission stages
-    scale = f*180/150
+    scale = 180/150
     p_ground = 195.41*scale*1000
     p_take_off = 90.13*scale*1000
     p_climb = 223.5*scale*1000
@@ -113,7 +112,6 @@ def Req_power(mair,f = 1):
     power = np.array([p_ground+pc_ground,p_take_off+pc_ground,p_climb+pc_climb,p_cruise+pc_cruise,p_descend+pc_climb,p_landing+pc_ground])
     time = np.array([t_ground,t_take_off,t_climb,t_cruise,t_descend,t_landing])
 
-    print('Power array: ',power)
     average = sum(power*time)/sum(time)
 
     print('Avg is:', average)
@@ -122,8 +120,6 @@ def Req_power(mair,f = 1):
 
     avg_arr = average*np.ones(len(power+1))
     difference = avg_arr - power
-
-    print(difference)
 
     time_all = np.concatenate(([0],time))
     power_all = np.concatenate(([0],difference*time))
@@ -141,12 +137,10 @@ def Req_power(mair,f = 1):
         power_tot_upd.append(power_tot[i]-min(power_tot))
         power_bat.append(average-power_all[i])
 
-    #plt.plot(time_tot, power_tot)
-    # plt.plot(time_tot, np.array(power_tot_upd)/(10**6),'k', label = 'Energy stored in the battery')
-    # plt.plot([time_tot[0],time_tot[-1]],[max(power_tot_upd)/(10**6),max(power_tot_upd)/(10**6)],':', label = 'Required storage capacity')
+    # #plt.plot(time_tot, power_tot)
+    # plt.plot(time_tot, power_tot_upd)
     # #plt.plot(time_tot, avg_arr)
-    # plt.legend()
-    # plt.ylabel('Energy stored in battery [MJ]')
+    # plt.ylabel('Energy stored in battery [kJ]')
     # plt.xlabel('Time [min]')
     # plt.show()
 
@@ -179,13 +173,12 @@ def mfoH2(Pel):
 def toWh(val):
     return val*0.000277778
 
-def final_bat_size(FC_power_new = Req_power(0)[0],f = 1):
+#if __name__ == '__main__':
 
-    print('FC power new = ',FC_power_new)
+def final_bat_size(FC_power_new = Req_power(0)[0]):
 
     FC_power = 0
-    print('f = ',f)
-    bat_E, time_tot1, power_tot1 = Req_power(0,f = f)[1:4]
+    bat_E, time_tot1, power_tot1 = Req_power(0)[1:4]
 
     mair = mfoAir(FC_power_new)
     mh2 = mfoH2(FC_power_new)
@@ -201,14 +194,10 @@ def final_bat_size(FC_power_new = Req_power(0)[0],f = 1):
     # print('Battery volume: ', round(bat_orig/spec_V), " l")
     # print()
 
-
-    while(abs(FC_power-FC_power_new)/FC_power_new >= 0.001):
+    while(abs(FC_power-FC_power_new)/FC_power_new >= 0.02):
         FC_power = FC_power_new
         mAir = mfoAir(FC_power)
-        print('mair = ',mair)
-        FC_power_new, bat_E, time_tot2, power_tot2 = Req_power(mAir,f = f)
-        print('FC_power_new =', FC_power_new)
-        print('FC_power =', FC_power)
+        FC_power_new, bat_E, time_tot2, power_tot2 = Req_power(mAir)
 
     bat_E = bat_E/0.85
     mair = mfoAir(FC_power_new)
@@ -216,7 +205,7 @@ def final_bat_size(FC_power_new = Req_power(0)[0],f = 1):
     bat_orig = toWh(bat_E)
 
     Vbcell = 3.7 # V
-    Ahbcell = 2.55
+    Ahbcell = 2
     b_voltage = fc.FCV
     b_cells_s = m.ceil(b_voltage/Vbcell)
     b_Ah = bat_orig/b_voltage

@@ -19,7 +19,6 @@ sp_V = 0.8
 sp_C = 35*0.85 #All 3 of them from DOE
 
 # Mirai data
-
 PMirai = 114 # kW
 Ncells = 370
 VMirai = 37 #l
@@ -36,8 +35,6 @@ def calc_cur_density(Vc):
     return PCM.inverse(Vc)
 
 def FC_sizing(FC_power = SF*0.001*BS.final_bat_size()[0]):
-
-    print('FC power is: ',FC_power)
 
     V = 1200 #V
     n_series = round(V/Vc)
@@ -211,7 +208,7 @@ if __name__ == '__main__':
 
     print(total_system()[2])
 
-    SensA = np.linspace(0.9,1.1, 30)
+    SensA = np.linspace(0.5, 1.5, 70)
 
     SAmass = []
     SAvolume = []
@@ -219,25 +216,15 @@ if __name__ == '__main__':
 
     # for i in SensA:
     #
-    #     print('ITERATION ',i)
-    #
-    #     FC_power_sa = SF*0.001*BS.final_bat_size()[0]
-    #     SAmass.append(total_system(i*FC_power_sa, i*BS.final_bat_size()[0], i*BS.final_bat_size()[2],
-    #                                i*BS.final_bat_size()[1])[1])
+    #     FC_power_sa = SF*0.001*BS.final_bat_size(i*BS.Req_power(0)[0])[0]
+    #     print(i*BS.Req_power(0)[0], ' this')
+    #     SAmass.append(total_system(FC_power_sa, BS.final_bat_size(i*BS.Req_power(0)[0])[0], BS.final_bat_size(i*BS.Req_power(0)[0])[2], BS.final_bat_size(i*BS.Req_power(0)[0])[1])[2])
     #
     #     # SAvolume.append(total_system(FC_power_sa)[1])
     #     # SAcost.append(total_system(FC_power_sa)[0])
-    #
+
     # plt.plot(SensA,SAmass)
     # plt.show()
-    #
-    # i = 1
-    # FC_power_sa = SF * 0.001 * BS.final_bat_size(BS.Req_power(0, f=i)[0], f=i)[0]
-    # print(FC_power_sa)
-    # print(total_system(FC_power_sa, BS.final_bat_size(BS.Req_power(0, f=i)[0], f=i)[0],
-    #                            BS.final_bat_size(BS.Req_power(0, f=i)[0], f=i)[2],
-    #                            BS.final_bat_size(BS.Req_power(0, f=i)[0], f=i)[1])[2])
-
 
 
 

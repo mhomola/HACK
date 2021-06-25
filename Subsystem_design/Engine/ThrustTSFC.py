@@ -21,30 +21,30 @@ class TSFC_PR(Constants):
 
         plt.figure()
         # plt.plot(self.T_core_OG/1000, self.TSFC_OG, 'bo')      # hack
-        plt.plot(3720.575/1000, 0.01277, 'go')              # neo
+        # plt.plot(3.931, 12.76267, 'go')              # neo
 
 
         ''' PLOT PR LINES '''
         if ph == 'taxi_out' or ph == 'taxi_in' or ph == 'take_off':
-            self.new_PR = np.arange(8, 21.1, 0.005) # 1)
-            self.new_T = np.arange(1600, 1731, 1) # 50)
+            self.new_PR = np.arange(8, 21.1, 0.005)         # 1)
+            self.new_T = np.arange(1600, 1731, 1)           # 50)
         elif ph == 'climb' or ph == 'approach':
-            self.new_PR = np.arange(7, 21.1, 0.005) # 1)
-            self.new_T = np.arange(1500, 1701, 1) # 50)
-        else: # ph == 'cruise':
-            self.new_PR = np.arange(9, 20.1, 0.005)# 0.005) # 1)
-            self.new_T = np.arange(1300, 1551, 1)#1) # 50)
+            self.new_PR = np.arange(7, 21.1, 0.005)         # 1)
+            self.new_T = np.arange(1500, 1701, 1)           # 50)
+        else:                                               # ph == 'cruise':
+            self.new_PR = np.arange(9, 20.1, 0.005)         # 0.005) # 1)
+            self.new_T = np.arange(1250, 1501, 1)           #1) # 50)
 
 
         self.save_TSFC_PR, self.save_T4_PR, self.save_thrust_PR, self.save_var_PR = list(), list(), list(), list()
         self.new_PR = np.arange(9, 17.1, 1)
-        self.new_T = np.arange(1300, 1551, 1)
-        for PR_new in self.new_PR: # increase one variable at a time, the remaining stay the original value
+        self.new_T = np.arange(1250, 1501, 1)
+        for PR_new in self.new_PR:          # increase one variable at a time, the remaining stay the original value
             PR_HPC = PR_new
             self.save_TSFC, self.save_thrust, a, b, c = np.array([]), np.array([]), list(), list(), list()
             self.save_var_PR.append(np.round(PR_HPC, 1))
 
-            for T_new in self.new_T: # increase each time by 1%, 2%, etc
+            for T_new in self.new_T:                # increase each time by 1%, 2%, etc
                 T04 = T_new
 
                 self.cycle(PR_HPC, T04)
@@ -61,15 +61,16 @@ class TSFC_PR(Constants):
             self.save_thrust_PR.append(list(b))
             self.save_T4_PR.append(list(c))
             plt.plot(self.save_thrust, self.save_TSFC, color='black')
-            plt.xlabel('Net thrust [kN]', fontsize=15)
+            plt.xlabel('Core Net Thrust [kN]', fontsize=15)
             plt.ylabel('TSFC [g/kN/s]', fontsize=15)
+            plt.xlim([3, 8.5])
             plt.xticks(fontsize=14)
             plt.yticks(fontsize=14)
 
         # PLOT T04 LINES
         self.save_TSFC_T4, self.save_PR_T4, self.save_thrust_T4, self.save_var_T4 = list(), list(), list(), list()
         self.new_PR = np.arange(9, 17.1, 0.05)  # 0.005) # 1)
-        self.new_T = np.arange(1300, 1551, 50)  # 1) # 50)
+        self.new_T = np.arange(1250, 1501, 50)  # 1) # 50)
         for T_new in self.new_T:  # increase one variable at a time, the remaining stay the original value
             T04 = T_new
             self.save_TSFC, self.save_thrust, a, b, c = np.array([]), np.array([]), list(), list(), list()
@@ -91,7 +92,30 @@ class TSFC_PR(Constants):
             self.save_TSFC_T4.append(list(a))
             self.save_thrust_T4.append(list(b))  # [kN]
             self.save_PR_T4.append(list(c))
-            plt.plot(self.save_thrust, self.save_TSFC, color='red')
+            plt.plot(self.save_thrust, self.save_TSFC, color='red', zorder=10)
+
+        PR_new = 14.81599335
+        T_core_new = 3.931
+        TSFC_new = self.TSFC_OG * 0.95
+        t = np.arange(1250, 1551, 1)
+        i = 0
+        flag = "False"
+        print(T_core_new)
+
+        while flag == "False" and i < (len(t)-1):
+            self.cycle(PR_new, t[i])
+            print('T04', t[i], 'Thrust', self.T_core/1000)
+
+            if self.T_core/1000 < T_core_new + 0.5 and self.T_core/1000 > T_core_new - 0.5:
+                flag = "True"
+                T04_new = t[i]
+                print('New T04:', T04_new)
+                break
+
+            i += 1
+
+        plt.scatter(T_core_new, TSFC_new, s=50, c='dodgerblue', marker='^', zorder=5)
+        plt.scatter(3.931, 12.76267, s=50, c='limegreen', marker='o', zorder=0)              # neo
 
         plt.show()
 
@@ -282,7 +306,7 @@ class TSFC_PR(Constants):
             self.T_fan = self.mf_cold * (self.v18 - self.v0)  # [N]
 
         self.T_total = self.T_fan + self.T_core  # [N]
-        self.TSFC = self.mf_fuel / (self.T_total * 10 ** (-3))  # [g/kN/s]
+        self.TSFC = self.mf_fuel * 10 ** 3 / (self.T_total * 10 ** (-3))  # [g/kN/s]
         # self.TSFC = self.mf_fuel * self.LHV_f / (self.T_total * 10 ** (-3))  # [MJ/kN/s]
 
 
@@ -308,7 +332,7 @@ if __name__=='__main__':
             PR_low, PR_high = 9, 17
             OPR = 49.870583691692445
 
-        thrust_new = t.T_core_OG*1.1
+        thrust_new = t.T_core_OG
         PR_LPC_arr = np.arange(t.PR_LPC_OG*0.1, 7.1, 0.1)
         s_L, s_H, s_Th, s_TSFC, s_T4 = list(), list(), list(), list(), list()
 

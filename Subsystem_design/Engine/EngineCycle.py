@@ -57,6 +57,7 @@ class Engine_Cycle(Constants):
         self.PR_noz_core = float(data[21])
         self.PR_noz_fan = float(data[22])
         self.mr_h2 = float(data[23])
+        print(self.mr_h2)
         self.mr_ker = float(data[24])
         self.ER_h2 = float(data[25])
         self.ER_ker = float(data[26])
@@ -67,8 +68,10 @@ class Engine_Cycle(Constants):
         else:
             if self.mr_h2 == 0:         # When we run HACK only with kerosene - use valves
                 self.mr_cc = 0.37
-            else:
+            elif self.mr_ker == 0:      # ground phases
                 self.mr_cc = 0.73
+            else:
+                self.mr_cc = 0.5
 
     def get_dataframe(self, aircraft, phs):
 
@@ -187,7 +190,7 @@ class Engine_Cycle(Constants):
         else:
             print('The duct nozzle is NOT chocked')
 
-        print('[kN] Required Thrust:', round(self.Thrust / 1000, 3), 'Actual Thrust:', round(self.T_total / 1000, 3))
+        # print('[kN] Required Thrust:', round(self.Thrust / 1000, 3), 'Actual Thrust:', round(self.T_total / 1000, 3))
         # print('[kN] Core Thrust:', round(self.T_core / 1000, 3), 'Fan Thrust:', round(self.T_fan / 1000, 3))
         # print('T04 [K]', self.T04, 'Fuel flow [kg/s]:', round(self.mf_fuel, 3))
 
@@ -296,6 +299,7 @@ class Engine_Cycle(Constants):
                                                                                               self.mf_fuel))
 
         self.TPZ = (TPZ1 + TPZ2) / 2            # Total temperature at the end of the PZ [K]
+        # print('Error TPZ [%]:', max((TPZ1-self.TPZ)/self.TPZ*100, (TPZ2-self.TPZ)/self.TPZ*100))
 
 
     def mole_rate(self):
@@ -307,6 +311,7 @@ class Engine_Cycle(Constants):
         self.m_O2 = self.n_O2 * 32 * 10**-3
         self.m_N2 = self.n_N2 * self.molarmass_N2 * 10**-3
         self.stoichiometric_ratio = (self.mf_h2 + self.mf_ker) / (self.m_O2 + self.m_N2)
+        print('Stoic ratio:', self.stoichiometric_ratio)
 
 
 
@@ -347,9 +352,6 @@ class Engine_Cycle(Constants):
             # T_cc = self.T03 * 2 ** (i/(n+1))
             T2.append(T_cc)
 
-        print('T in cc', T2)
-        print('ds2', ds2)
-
         T = np.array(T1+T2+T3)
         plt.gcf().canvas.set_window_title(phase)
         plt.plot(s, T, 'g', label=aircraft, alpha=alp)
@@ -361,6 +363,14 @@ class Engine_Cycle(Constants):
         plt.xticks(fontsize=14)
         plt.yticks(fontsize=14)
         plt.legend(fontsize=15)
+
+        self.work = -(self.T8-self.T02)*(s[-1]-s[1])/2 + (self.T025-self.T02)*(s[3]-s[1])/2 + \
+                    (self.T03-self.T025)*(s[4]-s[1])/2 + (self.T025-self.T02)*(s[4]-s[3]) + \
+                    (self.T8-self.T02)*(s[-1]-s[4]) + (self.T03-self.T8)*(s[-5]-s[4]) + \
+                    (self.T04-self.T03)*(s[-5]-s[4])/2 + (self.T04-self.T8)*(s[-1]-s[-5])/2
+
+        self.lost_heat = (self.T8-self.T02)*(s[-1]-s[1])/2 + self.T02*(s[-1]-s[1])
+
 
 ''' FORMULAE
 
@@ -396,37 +406,39 @@ if __name__ == '__main__':
             ec.cycle_analysis(a, p, flag=False, alph=0)         # since flag = False, alph doesn't matter
 
 
-            # print('\nInlet: T0 = ', round(ec.T0, 3), '[K]; p0 = ', round(ec.p0, 3), '[Pa]; v0 = ', round(ec.v0, 3),
+            # print('\nInlet: T0 = ', round(ec.T0, 3), '[K]; rho0 = ', round(ec.rho0, 3), '[kg/m3]; v0 = ', round(ec.v0, 3),
             #       '[m/s]')
-            # print('T00 = ', round(ec.T00, 3), '[K]; p00 = ', round(ec.p00, 3), '[Pa]')
-            # print('Entrance of fan: T02 = ', round(ec.T02, 3), '[K]; p02 = ', round(ec.p02,3), '[Pa]')
-            # print('Entrance of LPC: T021 = ', round(ec.T021, 3), '[K]; p021 = ', round(ec.p021,3), '[Pa]')
-            #print('Mass flow of air: Total = ', round(ec.mf_air_init, 3), '[kg/s]; Core = ', round(ec.mf_hot, 3),
-                  #'[kg/s]; Bypassed = ', round(ec.mf_cold, 3), '[kg/s]')
-            print('Entrance of HPC: T025 = ', round(ec.T025, 3), '[K]; p025 = ', round(ec.p025, 3), '[Pa]')
-            print('Entrance of CC: T03 = ', round(ec.T03, 3), '[K]; p03 = ', round(ec.p03, 3), '[Pa]; OPR = ',
-                   round(ec.OPR, 3))
+            # print('M0 =', round(ec.M0, 3), '[-]; h =', round(ec.h, 3), '[m]')
+            print('T00 = ', round(ec.T00, 3), '[K]; p00 = ', round(ec.p00/100000, 3), '[bar]')
+            print('Entrance of fan: T02 = ', round(ec.T02, 3), '[K]; p02 = ', round(ec.p02/100000,3), '[bar]')
+            print('Entrance of LPC: T021 = ', round(ec.T021, 3), '[K]; p021 = ', round(ec.p021/100000,3), '[bar]')
+            print('Mass flow of air: Total = ', round(ec.mf_air_init, 3), '[kg/s]; Core = ', round(ec.mf_hot, 3),
+                  '[kg/s]; Bypassed = ', round(ec.mf_cold, 3), '[kg/s]')
+            print('Entrance of HPC: T025 = ', round(ec.T025, 3), '[K]; p025 = ', round(ec.p025/100000, 3), '[bar]')
+            print('Entrance of CC: T03 = ', round(ec.T03, 3), '[K]; p03 = ', round(ec.p03/100000, 3), '[bar]; OPR = ',
+                   round(ec.OPR, 4))
             print('Mass flow CC: Fuel = ', round(ec.mf_fuel, 3), '[kg/s]; mf_h2 = ', round(ec.mf_h2,3),
                   '[kg/s]; mf_ker = ', round(ec.mf_ker, 3), '[kg/s]')
-            print('Moles reacting per second of kerosene:', round(ec.n_ker, 3), 'of H2:', round(ec.n_h2, 3), 'of O2:', round(ec.n_O2, 3), 'of N2:', round(ec.n_N2, 3))
+            # print('Moles reacting per second of kerosene:', round(ec.n_ker, 3), 'of H2:', round(ec.n_h2, 3), 'of O2:', round(ec.n_O2, 3), 'of N2:', round(ec.n_N2, 3))
             # print('LHV fuel = ', round(ec.LHV_f, 3))
-            print('TPZ = ', round(ec.TPZ, 3))
-            # print('Power: Fan = ', round(ec.W_fan, 3), '[W]; LPC = ', round(ec.W_LPC, 3), '[W]; HPC = ',
-            #       round(ec.W_HPC, 3), '[W]')
-            # print('LPT = ', round(ec.W_LPT, 3), '[W]; HPT = ', round(ec.W_HPT, 3), '[W]')
-            print('Entrance of HPT: T04 = ', round(ec.T04, 3), '[K]; p04 = ', round(ec.p04, 3), '[Pa]')
-            # print('Entrance of LPT: T045 = ', round(ec.T045, 3), '[K]; p045 = ', round(ec.p045, 3), '[Pa]')
-            # print('Entrance of nozzle: T05 = ', round(ec.T05, 3), '[K]; p05 = ', round(ec.p05, 3), '[Pa]')
-            # print('Exit of nozzle: T07 = ', round(ec.T07, 3), '[K]; p07 = ', round(ec.p07, 3), '[Pa]; PR_cr_noz = ',
-            #       round(ec.PR_cr_noz_core, 3))
-            # print('Exit of nozzle: T8 = ', round(ec.T8, 3), '[K]; p8 = ', round(ec.p8, 3), '[Pa]; v8 = ',
-            #       round(ec.v8, 3), '[m/s]')
-            # print('Exit of fan: T016 = ', round(ec.T016, 3), '[K]; p016 = ', round(ec.p016, 3), '[Pa]; PR_cr_fan = ',
-            #       round(ec.PR_cr_fan, 3))
-            # print('Exit of fan: T18 = ', round(ec.T18, 3), '[K]; p18 = ', round(ec.p18, 3), '[Pa]; v18 = ',
-            #       round(ec.v18,3), '[m/s]')
-            print('Provided Thrust: Fan = ', round(ec.T_fan, 3), '[N]; Core = ', round(ec.T_core, 3), '[N]; Total = ',
-                  round(ec.T_total, 3), '[N]')
+            # print('TPZ = ', round(ec.TPZ, 3))
+            print('Power: Fan = ', round(ec.W_fan/1000, 3), '[kW]; LPC = ', round(ec.W_LPC/1000, 3), '[kW]; HPC = ',
+                  round(ec.W_HPC/1000, 3), '[kW]')
+            print('LPT = ', round(ec.W_LPT/1000, 3), '[kW]; HPT = ', round(ec.W_HPT/1000, 3), '[kW]')
+            print('Entrance of HPT: T04 = ', round(ec.T04, 3), '[K]; p04 = ', round(ec.p04/100000, 3), '[bar]')
+            print('Entrance of LPT: T045 = ', round(ec.T045, 3), '[K]; p045 = ', round(ec.p045/100000, 3), '[bar]')
+            print('Entrance of nozzle: T05 = ', round(ec.T05, 3), '[K]; p05 = ', round(ec.p05/100000, 3), '[bar]')
+            print('Exit of nozzle: T07 = ', round(ec.T07, 3), '[K]; p07 = ', round(ec.p07/100000, 3), '[bar]; PR_cr_noz = ',
+                  round(ec.PR_cr_noz_core, 3))
+            print('Exit of nozzle: T8 = ', round(ec.T8, 3), '[K]; p8 = ', round(ec.p8/100000, 3), '[bar]; v8 = ',
+                  round(ec.v8, 3), '[m/s]')
+            print('Exit of fan: T016 = ', round(ec.T016, 3), '[K]; p016 = ', round(ec.p016/100000, 3), '[bar]; PR_cr_fan = ',
+                  round(ec.PR_cr_fan, 3))
+            print('Exit of fan: T18 = ', round(ec.T18, 3), '[K]; p18 = ', round(ec.p18/100000, 3), '[bar]; v18 = ',
+                  round(ec.v18,3), '[m/s]')
+            # print('Required Thrust [kN]', round(ec.Thrust/1000))
+            print('Provided Thrust: Fan = ', round(ec.T_fan/1000, 3), '[kN]; Core = ', round(ec.T_core/1000, 3), '[kN]; Total = ',
+                  round(ec.T_total/1000, 3), '[kN]')
             # print('Thrust SFC = ', round(ec.TSFC_m, 5), '[g/kN/s];', round(ec.TSFC_e, 5), '[MJ/kN/s]')
             print('Eqr PZ:', round(ec.eqr_PZ, 3), 'Eqr Overall:', round(ec.eqr_overall, 3))
 
@@ -466,55 +478,80 @@ if __name__ == '__main__':
 
             F.close()
 
-    def plot_m(mark, l, T, SFC):
-        plt.plot(T, SFC, mark, label=l)
+    print()
+    def plot_m(c, m, l, T, SFC):
+        plt.scatter(T, SFC, s=70, color=c, marker=m, label=l)
         plt.xlabel('Net Thrust [kN]', fontsize=15)
-        plt.ylabel('TSFC [kg/kN/s]', fontsize=15)
-        plt.xticks(fontsize=14)
+        plt.ylabel('TSFC [g/kN/s]', fontsize=15)
+        plt.xticks([20.97, 20.98, 20.99], fontsize=14)
         plt.yticks(fontsize=14)
         plt.legend(fontsize=15)
 
-    def plot_e(mark, l, T, SFC):
-        plt.plot(T, SFC, mark, label=l)
+    def plot_e(c, m, l, T, SFC):
+        plt.scatter(T, SFC, s=70, color=c, marker=m, label=l)
         plt.xlabel('Net Thrust [kN]', fontsize=15)
         plt.ylabel('TSFC [MJ/kN/s]', fontsize=15)
-        plt.xticks(fontsize=14)
+        plt.xticks([20.97, 20.98, 20.99], fontsize=14)
         plt.yticks(fontsize=14)
         plt.legend(fontsize=15)
 
-    ec.cycle_analysis('neo', 'take_off', flag=False, alph=1)
-    Th_nto, SFC_m_nto, SFC_e_nto = ec.T_total/1000, ec.TSFC_m, ec.TSFC_e
-    ec.cycle_analysis('hack', 'take_off', flag=False, alph=1)
-    Th_hto, SFC_m_hto, SFC_e_hto = ec.T_total / 1000, ec.TSFC_m, ec.TSFC_e
-    ec.cycle_analysis('neo', 'cruise', flag=False, alph=1)
-    Th_nc, SFC_m_nc, SFC_e_nc = ec.T_total / 1000, ec.TSFC_m, ec.TSFC_e
-    ec.cycle_analysis('hack', 'cruise', flag=False, alph=1)
-    Th_hc, SFC_m_hc, SFC_e_hc = ec.T_total / 1000, ec.TSFC_m, ec.TSFC_e
+    # ec.cycle_analysis('neo', 'take_off', flag=False, alph=1)
+    # Th_nto, SFC_m_nto, SFC_e_nto = ec.T_total/1000, ec.TSFC_m, ec.TSFC_e
+    # ec.cycle_analysis('hack', 'take_off', flag=False, alph=1)
+    # Th_hto, SFC_m_hto, SFC_e_hto = ec.T_total / 1000, ec.TSFC_m, ec.TSFC_e
+    # ec.cycle_analysis('neo', 'cruise', flag=False, alph=1)
+    # Th_nc, SFC_m_nc, SFC_e_nc = ec.T_total / 1000, ec.TSFC_m, ec.TSFC_e
+    # ec.cycle_analysis('hack', 'cruise', flag=False, alph=1)
+    # Th_hc, SFC_m_hc, SFC_e_hc = ec.T_total / 1000, ec.TSFC_m, ec.TSFC_e
 
-    plt.figure()
-    plot_e('bx', 'A320neo - Cruise', Th_nc, SFC_e_nc)
-    plot_e('gx', 'A320-HACK - Cruise', Th_hc, SFC_e_hc)
-    plot_e('bo', 'A320neo - Take-off', Th_nto, SFC_e_nto)
-    plot_e('go', 'A320-HACK - Take-off', Th_hto, SFC_e_hto)
-    plt.show()
+    # plt.figure()
+    # plot_e('limegreen', 'x', 'A320neo', Th_nc, SFC_e_nc)
+    # plot_e('dodgerblue', 'o', 'A320-HACK', Th_hc, SFC_e_hc)
+    # plot_e('limegreen', '^', 'A320neo - Lift-off', Th_nto, SFC_e_nto)
+    # plot_e('dodgerblue', 's', 'A320-HACK - Lift-off', Th_hto, SFC_e_hto)
+    # plt.show()
+    #
+    # plt.figure()
+    # plot_m('limegreen', 'x',  'A320neo', Th_nc, SFC_m_nc)
+    # plot_m('dodgerblue', 'o', 'A320-HACK', Th_hc, SFC_m_hc)
+    # # plot_m('limegreen', '^', 'A320neo - Lift-off', Th_nto, SFC_m_nto)
+    # # plot_m('dodgerblue', 's', 'A320-HACK - Lift-off', Th_hto, SFC_m_hto)
+    # plt.show()
+    #
+    # plt.figure()
+    # ec.cycle_analysis('neo', 'cruise', flag=True, alph=0.2)
+    # work_nc, lost_nc = ec.work, ec.lost_heat
+    # ec.cycle_analysis('hack', 'cruise', flag=True, alph=1)
+    # work_hc, lost_hc = ec.work, ec.lost_heat
+    # plt.show()
+    #
+    # print('\nCruise\nWork HACK - neo:', round((work_hc - work_nc)/work_nc*100, 3))
+    # print('Heat Lost HACK - neo:', round((lost_hc - lost_nc)/lost_nc*100, 3))
+    # print('\nThermal efficiency: NEO = ', round(work_nc/(work_nc+lost_nc)*100, 3), 'HACK = ', round(work_hc/(work_hc+lost_hc)*100, 3))
+    #
+    # plt.figure()
+    # ec.cycle_analysis('neo', 'take_off', flag=True, alph=0.2)
+    # work_nTO, lost_nTO = ec.work, ec.lost_heat
+    # ec.cycle_analysis('hack', 'take_off', flag=True, alph=1)
+    # work_hTO, lost_hTO = ec.work, ec.lost_heat
+    # plt.show()
+    #
+    # print('\nTake Off\nWork HACK - neo:', round((work_hTO - work_nTO)/work_nTO*100, 3))
+    # print('Heat Lost HACK - neo:', round((lost_hTO - lost_nTO)/lost_nTO*100, 3))
+    # print('\nThermal efficiency: NEO = ', round(work_nTO / (work_nTO + lost_nTO) * 100, 3), 'HACK = ',
+    #       round(work_hTO / (work_hTO + lost_hTO) * 100, 3))
 
-    plt.figure()
-    plot_m('bx', 'A320neo - Cruise', Th_nc, SFC_m_nc)
-    plot_m('gx', 'A320-HACK - Cruise', Th_hc, SFC_m_hc)
-    plot_m('bo', 'A320neo - Take-off', Th_nto, SFC_m_nto)
-    plot_m('go', 'A320-HACK - Take-off', Th_hto, SFC_m_hto)
-    plt.show()
 
-    plt.figure()
-    print('\nNEO CRUISE - TS')
-    ec.cycle_analysis('neo', 'cruise', flag=True, alph=0.2)
-    print('\nHACK CRUISE - TS')
-    ec.cycle_analysis('hack', 'cruise', flag=True, alph=1)
-    plt.show()
+#####################################################################
+    for phase in phases:
+        ec.cycle_analysis('neo', phase, flag=True, alph=0.2)
+        work_n, lost_n = ec.work, ec.lost_heat
+        ec.cycle_analysis('hack', phase, flag=True, alph=1)
+        work_h, lost_h = ec.work, ec.lost_heat
 
-    plt.figure()
-    ec.cycle_analysis('neo', 'take_off', flag=True, alph=0.2)
-    ec.cycle_analysis('hack', 'take_off', flag=True, alph=1)
-    plt.show()
+        eta_th_n = round(work_n/(work_n+lost_n)*100, 3)
+        eta_th_h = round(work_h / (work_h + lost_h) * 100, 3)
 
-
+        print('\n', phase)
+        print('\nThermal efficiency: NEO = ', eta_th_n, 'HACK = ', eta_th_h)
+        # print('Percentage change:', round(eta_th_h - eta_th_n, 3))
