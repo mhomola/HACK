@@ -15,7 +15,8 @@ class SA_Engine_Cycle(Constants):
         # self.var_name = np.array(['PR_fan', 'BPR', 'PR_LPC', 'PR_HPC', 'PR_LPT', 'PR_HPT'])
         # self.up_bound = np.array([ 2, 15.808, 7, 15, 0.3, 0.7 ])
         self.get_data()
-        e_index = [10, 15, 16]
+        # e_index = [0, 2, 4, 5, 9, 12, 13, 15]  #, 16, 8]
+        e_index = [0]
         mk = 0
 
         for k in e_index:               # increase one variable at a time, the remaining stay the original value
@@ -26,7 +27,7 @@ class SA_Engine_Cycle(Constants):
             # save_T45, save_T5 = np.array([]), np.array([])
             # save_thrust = np.array([])
 
-            self.deltas = (np.linspace(0.8, 1, 1000) - self.var_OG[k]) / self.var_OG[k]
+            self.deltas = (np.linspace(0.9, 1, 1000) - self.var_OG[k]) / self.var_OG[k]
             #
             # if 'eta' in self.names[k] or 'PR_noz' in self.names[k] or 'PR_cc' in self.names[k]:
             #     self.deltas = (np.linspace(0.9, 1, 1000) - self.var_OG[k]) / self.var_OG[k]
@@ -64,7 +65,7 @@ class SA_Engine_Cycle(Constants):
 
         self.M0 = float(data[0])
         self.h = float(data[1])
-        self.ISA_calculator(h_input=self.h) # gives self.T0, self.p0, self.rho0, self.a0
+        self.ISA_calculator(h_input=self.h)             # gives self.T0, self.p0, self.rho0, self.a0
         self.T0, self.p0, self.rho0, self.a0 = self.T, self.p, self.rho, self.a
         self.v0 = self.M0 * np.sqrt(self.cp_air * self.R * self.T0)
         self.Thrust = float(data[2])
@@ -85,8 +86,8 @@ class SA_Engine_Cycle(Constants):
         eta_LPT_OG = float(data[16])
         eta_HPT_OG = float(data[17])
         eta_nozzle_OG = float(data[20])
-        PR_noz_core_OG = float(data[21])
-        PR_noz_fan_OG = float(data[22])
+        eta_noz_core_OG = float(data[21])
+        eta_noz_fan_OG = float(data[22])
         self.mr_h2 = float(data[23])
         self.m_ker = float(data[24])
         self.ER_h2 = float(data[25])
@@ -96,7 +97,7 @@ class SA_Engine_Cycle(Constants):
         self.var_OG = np.array([eta_inlet_OG, PR_fan_OG, eta_fan_OG, BPR_OG,
          eta_LPC_OG, eta_HPC_OG, PR_LPC_OG, PR_HPC_OG, eta_mech_OG, eta_cc_OG,
          PR_cc_OG, T04_OG, eta_LPT_OG, eta_HPT_OG,
-         eta_nozzle_OG, PR_noz_core_OG, PR_noz_fan_OG])
+         eta_nozzle_OG, eta_noz_core_OG, eta_noz_fan_OG])
         self.names = np.array(['Inlet', 'Fan', 'Fan', 'BPR',
          'LPC', 'HPC', 'LPC', 'HPC', 'Mechanical', 'cc',
          'cc', '$T04$', 'LPT', 'HPT',
@@ -235,24 +236,24 @@ class SA_Engine_Cycle(Constants):
         #     self.T_fan = self.mf_cold * (self.v18 - self.v0)  # [N]
 
         self.T_total = self.T_fan + self.T_core  # [N]
-        self.TSFC = self.mf_fuel / (self.T_total * 10 ** (-3))  # [g/kN/s]
+        self.TSFC = self.mf_fuel * 10**3 / (self.T_total * 10 ** (-3))  # [g/kN/s]
 
 
     def plot(self, save_var, save_TSFC, k, mk):
-        mark = ['*', 'o', 's', 'v', 'h', '1', '+', 'x', 'd']
+        mark = ['*', 'o', 's', 'v', 'h', '1', '+', 'x', 'd', '.']
 
         i = np.where(save_TSFC == 1000)
         if len(i[0]) != 0:
             save_var = np.delete(save_var, i)
             save_TSFC = np.delete(save_TSFC, i)
 
-        plt.gcf().canvas.set_window_title('TSFC Vs. Pressure Ratio')
+        plt.gcf().canvas.set_window_title('TSFC Vs. Efficiency')
         plt.plot(save_var, save_TSFC, marker=mark[mk], markevery=100, label=self.names[k])
-        plt.xlabel('Pressure ratio', fontsize=15)
-        plt.ylabel('TSFC [g/kN/s]', fontsize=15)
-        plt.xticks(np.array([0.8, 0.85, 0.9, 0.95, 1]), fontsize=14)
-        plt.yticks(fontsize=14)
-        plt.legend(fontsize=15)
+        plt.xlabel('Efficiency', fontsize=17)
+        plt.ylabel('TSFC [g/kN/s]', fontsize=17)
+        plt.xticks(np.array([0.9, 0.92, 0.94, 0.96, 0.98, 1]), fontsize=16)
+        plt.yticks(fontsize=16)
+        plt.legend(fontsize=17)
 
         # if flag == False:
         #     plt.ylabel('TSFC [g/kN/s]', fontsize=20)
