@@ -149,9 +149,7 @@ class Engine_Cycle(Constants):
         elif self.mr_ker == 0:                                              # only H2
             self.mf_fuel = (1 / 33.99) * 0.25 * self.mf_hot * self.mr_cc
         else:                                                               # H2 + ker
-            self.mf_fuel = 0.0480873 * 0.45 * self.mf_hot * self.mr_cc
-
-        print(self.mr_cc)
+            self.mf_fuel = 0.048086 * 0.45 * self.mf_hot * self.mr_cc
 
         self.T04 = (self.mf_hot * self.cp_gas * self.T03 + self.mf_fuel * self.LHV_f * 10 ** 6 * self.eta_cc) / (
                     self.cp_gas * (self.mf_fuel + self.mf_hot))
@@ -164,6 +162,8 @@ class Engine_Cycle(Constants):
                 self.mf_fuel = (self.mf_hot * self.cp_gas * (self.T04 - self.T03)) / (self.LHV_f * 10 ** 6 *
                                                                         self.eta_cc - self.cp_gas * self.T04)
                 self.cycle_after_cc()    # when loop ends, we have our final T04 and mf_fuel
+                print('T_total', self.T_total / 1000, 'T_core', self.T_core / 1000)
+                print('T04', self.T04, 'fuel flow', self.mf_fuel)
 
         else:
             while m.isnan(self.T_total) or self.T_total < self.Thrust or self.T_total > self.Thrust + 1000 or self.T_core < 0 or m.isnan(self.T_core):

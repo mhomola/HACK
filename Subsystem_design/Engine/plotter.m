@@ -1,39 +1,38 @@
 function a = plotter()
 
     a = 1;
-    eqr = linspace(0.75,0.95,20);
+    eqr = linspace(0.5,0.6,20);
     NOx = [];
     CO = [];
-    
+
     valCO = 0.3*0.001; % kg/kg
     valNOx = 17.59*0.001; % kg/kg
-    
+
     fuel = 0.855; % kg/s
-    air = 34.06198; % kg/s     
-    
+    air = 34.06198; % kg/s
+
     AFstoich = 14.79; % from Sofia
-    
     ICAO_CO = [];
     ICAO_NOx = [];
-    
-    for i = 1:length(eqr)        
+
+    for i = 1:length(eqr)
         [~,~,~,COf, NOxf] = reactor1('neo',3283120,1.1*805,eqr(i),0,1,14.76,55.45);
         CO(i) = COf;
         NOx(i) = NOxf;
-        
+
         Air = (AFstoich/eqr(i))*fuel;
         ICAO_CO(i) = valCO*fuel/(Air+fuel);
-        ICAO_NOx(i) = (valNOx*fuel/(Air+fuel))*1e6;      
-    end  
-    
+        ICAO_NOx(i) = (valNOx*fuel/(Air+fuel))*1e6;
+    end
+
     clf; %  clear figure
-    
+
     COdif = (CO)./(ICAO_CO);
     COmax = max(COdif);
-    
+
     NOxdif = (ICAO_NOx)./(NOx);
     NOxmax = max(NOxdif);
-    
+
     subplot(3,1,1);
     hold on;
     plot(eqr,ICAO_CO,'b','LineWidth',1.5)
@@ -43,7 +42,7 @@ function a = plotter()
     hold off;
     xlabel('Equivalence ratio (-)');
     ylabel('CO')
-    
+
     subplot(3,1,2);
     hold on;
     %plot(eqr,ICAO_CO,'b','LineWidth',1.5)
@@ -54,7 +53,7 @@ function a = plotter()
     hold off;
     xlabel('Equivalence ratio (-)');
     ylabel('NOx')
-    
+
     subplot(3,1,3);
     hold on;
     %plot(eqr,ICAO_NOx,'b','LineWidth',1.5)
@@ -66,5 +65,5 @@ function a = plotter()
     hold off;
     xlabel('Equivalence ratio (-)');
     ylabel('CO+NOx')
-    
+
 end

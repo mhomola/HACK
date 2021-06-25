@@ -321,8 +321,8 @@ if __name__ == '__main__':
           '\n The L/D ratio is = ', ae.L_D_ratio_HACK,
           '\n The C_L_alpha of the wing is = ', ae.CL_alpha_w,
           '\n The C_L_alpha of the horizontal tail is = ', ae.CL_alpha_h)
-
-
+    print(ae.L_D_ratio_neo)
+    print(ae.D_start_cruise_neo)
     print('\n rho = ', ae.rho,
           '\n V = ', ae.M * ae.a)
 

@@ -88,6 +88,16 @@ class thrust_req(Constants):
         self.v[(self.t_array >= self.taxiout_time) & (self.t_array < self.takeoff_time)] = np.arange(
             self.taxiout_velocity, self.liftoffv,
             self.takeoff_acc * 30)
+        # self.velocity = np.array([0])
+        # self.velocity = np.append(self.velocity,self.v[(self.t_array >= self.taxiout_time) & (self.t_array < self.takeoff_time)])
+        # self.x = np.array([0])
+        # for i in range(len(self.velocity)):
+        #     x = self.x[i] + self.velocity[i] * 30
+        #     self.x = np.append(self.x,x)
+        #print(self.x)
+        #print('Runway distance is:',self.x[-1])
+        #print(self.ROC)
+        #print(self.ROD)
         self.v[(self.t_array >= self.takeoff_time) & (self.t_array < self.cruise_start_time)] = np.arange(self.liftoffv,
                                                                                                           self.cruisev,
                                                                                                           self.climb_acc * 30)
@@ -98,7 +108,9 @@ class thrust_req(Constants):
         self.v[(self.t_array >= self.land_time) & (self.t_array < self.stop_time)] = np.arange(self.landv, 0,
                                                                                                self.land_decc * 30)
 
-
+        # plt.plot(self.t_array[(self.t_array >= self.taxiout_time) & (self.t_array < self.takeoff_time)],self.v[(self.t_array >= self.taxiout_time) & (self.t_array < self.takeoff_time)],label='Velocity profile',color='navy')
+        # plt.legend()
+        # plt.show()
         #return self.v[(self.t_array>=self.taxiout_time) & (self.t_array<self.taxiout_time+30)]
         #return self.v
         #[np.where(self.t_array == self.takeoff_time)]
@@ -152,6 +164,7 @@ class thrust_req(Constants):
         self.alt[np.where((self.t_array >= self.land_time) & (self.t_array <= self.stop_time))] = 0
 
 
+
         self.density_array = np.ones(len(self.alt))
         self.temp_array = np.ones(len(self.alt))
 
@@ -170,6 +183,8 @@ class thrust_req(Constants):
         self.dens()
         self.mass()
         self.velocity()
+        # print(self.t_array[self.alt > 49][0])
+        # print(self.alt[self.t_array==540])
         self.CL = np.zeros(len(self.t_array))
 
         self.CL[self.t_array < self.taxiout_time] = 0.4
@@ -258,8 +273,8 @@ class thrust_req(Constants):
 
         #return self.thrust_required
         #return self.T_to_overcome_drag
-        plt.plot(self.t_array,self.Machs)
-        plt.show()
+        #plt.plot(self.t_array,self.Machs)
+        #plt.show()
         #return self.CL[(self.t_array >= self.taxiout_time) & (self.t_array <= self.takeoff_time)]
         #return self.T_to_overcome_drag
 
@@ -311,7 +326,7 @@ if __name__ == '__main__':
     con = Constants()
     #print(t.w6)
     t.drag()
-    print(t.drag())
+    #print(t.drag())
 
     #t.velocity()
     #print(t.velocity())
@@ -322,6 +337,27 @@ if __name__ == '__main__':
     #print(t.drag())
     #t.mass()
     #print(t.mass())
+    print('velocity at end of taxi-out',t.v[np.where((t.t_array == t.taxiout_time))])
+    print('velocity at lift-of',t.v[np.where(t.t_array == t.takeoff_time)])
+
+    print('Velocity taxi-out',t.v[np.where((t.t_array >= 30) & (t.t_array <= 60))])
+
+    print('Velocity in the middle of climb',t.v[np.where((t.t_array >= t.mid_climb_time) & (t.t_array < t.mid_climb_time + 30))])
+    print('Velocity at start of cruise',t.v[np.where((t.t_array >= t.cruise_start_time) & (t.t_array < t.cruise_start_time + 30))])
+    print('Velocity in the middle of descent',t.v[np.where((t.t_array >= t.mid_descent_time) & (t.t_array < t.mid_descent_time + 30))])
+    print('Velocity 2 min after touchdown',t.v[np.where((t.t_array >= t.land_time + 120) & (t.t_array < t.land_time + 150))])
+
+
+    # print(t.T_to_overcome_drag[np.where((t.t_array == t.taxiout_time))])
+    # print(t.T_to_overcome_drag[np.where(t.t_array == t.takeoff_time)])
+    #
+    #
+    # print(t.T_to_overcome_drag[np.where((t.t_array >=30 ) & (t.t_array <=60 ))])
+    #
+    # print(t.T_to_overcome_drag[np.where((t.t_array >= t.mid_climb_time) & (t.t_array < t.mid_climb_time+30))])
+    # print(t.T_to_overcome_drag[np.where((t.t_array >= t.cruise_start_time) & (t.t_array < t.cruise_start_time+30))])
+    # print(t.T_to_overcome_drag[np.where((t.t_array >= t.mid_descent_time) & (t.t_array < t.mid_descent_time+30))])
+    # print(t.T_to_overcome_drag[np.where((t.t_array >= t.land_time+120)  & (t.t_array < t.land_time  + 150))])
 
 
     print('\n Thrust Req TaxiOut = ', t.ThrustReq_TaxiOut/1000 , '[kN]'
