@@ -8,6 +8,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import PolynomialFeatures
 
 
+
 def trend(x,y,degr,string):
     # transforming the data to include another axis
     x = x[:, np.newaxis]
@@ -25,8 +26,8 @@ def trend(x,y,degr,string):
     y_2030 = model.predict(x_poly_pred)
     print('Predicted value of ',string,' in 2030: ',y_2030[0][0])
 
-    rmse = np.sqrt(mean_squared_error(y,y_poly_pred))
-    r2 = r2_score(y,y_poly_pred)
+    rmse = np.sqrt(mean_squared_error(y, y_poly_pred))
+    r2 = r2_score(y, y_poly_pred)
     print('RMSE: ',rmse)
     print('R2: ', r2)
 
