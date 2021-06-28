@@ -57,7 +57,6 @@ class Engine_Cycle(Constants):
         self.PR_noz_core = float(data[21])
         self.PR_noz_fan = float(data[22])
         self.mr_h2 = float(data[23])
-        print(self.mr_h2)
         self.mr_ker = float(data[24])
         self.ER_h2 = float(data[25])
         self.ER_ker = float(data[26])
@@ -162,8 +161,8 @@ class Engine_Cycle(Constants):
                 self.mf_fuel = (self.mf_hot * self.cp_gas * (self.T04 - self.T03)) / (self.LHV_f * 10 ** 6 *
                                                                         self.eta_cc - self.cp_gas * self.T04)
                 self.cycle_after_cc()    # when loop ends, we have our final T04 and mf_fuel
-                print('T_total', self.T_total / 1000, 'T_core', self.T_core / 1000)
-                print('T04', self.T04, 'fuel flow', self.mf_fuel)
+                # print('T_total', self.T_total / 1000, 'T_core', self.T_core / 1000)
+                # print('T04', self.T04, 'fuel flow', self.mf_fuel)
 
         else:
             while m.isnan(self.T_total) or self.T_total < self.Thrust or self.T_total > self.Thrust + 1000 or self.T_core < 0 or m.isnan(self.T_core):
@@ -311,7 +310,7 @@ class Engine_Cycle(Constants):
         self.m_O2 = self.n_O2 * 32 * 10**-3
         self.m_N2 = self.n_N2 * self.molarmass_N2 * 10**-3
         self.stoichiometric_ratio = (self.mf_h2 + self.mf_ker) / (self.m_O2 + self.m_N2)
-        print('Stoic ratio:', self.stoichiometric_ratio)
+        # print('Stoic ratio:', self.stoichiometric_ratio)
 
 
     def plot_TS(self, aircraft, phase, alp):
@@ -408,37 +407,37 @@ if __name__ == '__main__':
             # print('\nInlet: T0 = ', round(ec.T0, 3), '[K]; rho0 = ', round(ec.rho0, 3), '[kg/m3]; v0 = ', round(ec.v0, 3),
             #       '[m/s]')
             # print('M0 =', round(ec.M0, 3), '[-]; h =', round(ec.h, 3), '[m]')
-            print('T00 = ', round(ec.T00, 3), '[K]; p00 = ', round(ec.p00/100000, 3), '[bar]')
-            print('Entrance of fan: T02 = ', round(ec.T02, 3), '[K]; p02 = ', round(ec.p02/100000,3), '[bar]')
-            print('Entrance of LPC: T021 = ', round(ec.T021, 3), '[K]; p021 = ', round(ec.p021/100000,3), '[bar]')
-            print('Mass flow of air: Total = ', round(ec.mf_air_init, 3), '[kg/s]; Core = ', round(ec.mf_hot, 3),
-                  '[kg/s]; Bypassed = ', round(ec.mf_cold, 3), '[kg/s]')
-            print('Entrance of HPC: T025 = ', round(ec.T025, 3), '[K]; p025 = ', round(ec.p025/100000, 3), '[bar]')
-            print('Entrance of CC: T03 = ', round(ec.T03, 3), '[K]; p03 = ', round(ec.p03/100000, 3), '[bar]; OPR = ',
-                   round(ec.OPR, 4))
-            print('Mass flow CC: Fuel = ', round(ec.mf_fuel, 3), '[kg/s]; mf_h2 = ', round(ec.mf_h2,3),
-                  '[kg/s]; mf_ker = ', round(ec.mf_ker, 3), '[kg/s]')
+            # print('T00 = ', round(ec.T00, 3), '[K]; p00 = ', round(ec.p00/100000, 3), '[bar]')
+            # print('Entrance of fan: T02 = ', round(ec.T02, 3), '[K]; p02 = ', round(ec.p02/100000,3), '[bar]')
+            # print('Entrance of LPC: T021 = ', round(ec.T021, 3), '[K]; p021 = ', round(ec.p021/100000,3), '[bar]')
+            # print('Mass flow of air: Total = ', round(ec.mf_air_init, 3), '[kg/s]; Core = ', round(ec.mf_hot, 3),
+            #       '[kg/s]; Bypassed = ', round(ec.mf_cold, 3), '[kg/s]')
+            # print('Entrance of HPC: T025 = ', round(ec.T025, 3), '[K]; p025 = ', round(ec.p025/100000, 3), '[bar]')
+            # print('Entrance of CC: T03 = ', round(ec.T03, 3), '[K]; p03 = ', round(ec.p03/100000, 3), '[bar]; OPR = ',
+            #        round(ec.OPR, 4))
+            # print('Mass flow CC: Fuel = ', round(ec.mf_fuel, 3), '[kg/s]; mf_h2 = ', round(ec.mf_h2,3),
+            #       '[kg/s]; mf_ker = ', round(ec.mf_ker, 3), '[kg/s]')
             # print('Moles reacting per second of kerosene:', round(ec.n_ker, 3), 'of H2:', round(ec.n_h2, 3), 'of O2:', round(ec.n_O2, 3), 'of N2:', round(ec.n_N2, 3))
             # print('LHV fuel = ', round(ec.LHV_f, 3))
             # print('TPZ = ', round(ec.TPZ, 3))
-            print('Power: Fan = ', round(ec.W_fan/1000, 3), '[kW]; LPC = ', round(ec.W_LPC/1000, 3), '[kW]; HPC = ',
-                  round(ec.W_HPC/1000, 3), '[kW]')
-            print('LPT = ', round(ec.W_LPT/1000, 3), '[kW]; HPT = ', round(ec.W_HPT/1000, 3), '[kW]')
-            print('Entrance of HPT: T04 = ', round(ec.T04, 3), '[K]; p04 = ', round(ec.p04/100000, 3), '[bar]')
-            print('Entrance of LPT: T045 = ', round(ec.T045, 3), '[K]; p045 = ', round(ec.p045/100000, 3), '[bar]')
-            print('Entrance of nozzle: T05 = ', round(ec.T05, 3), '[K]; p05 = ', round(ec.p05/100000, 3), '[bar]')
-            print('Exit of nozzle: T07 = ', round(ec.T07, 3), '[K]; p07 = ', round(ec.p07/100000, 3), '[bar]; PR_cr_noz = ',
-                  round(ec.PR_cr_noz_core, 3))
-            print('Exit of nozzle: T8 = ', round(ec.T8, 3), '[K]; p8 = ', round(ec.p8/100000, 3), '[bar]; v8 = ',
-                  round(ec.v8, 3), '[m/s]')
-            print('Exit of fan: T016 = ', round(ec.T016, 3), '[K]; p016 = ', round(ec.p016/100000, 3), '[bar]; PR_cr_fan = ',
-                  round(ec.PR_cr_fan, 3))
-            print('Exit of fan: T18 = ', round(ec.T18, 3), '[K]; p18 = ', round(ec.p18/100000, 3), '[bar]; v18 = ',
-                  round(ec.v18,3), '[m/s]')
+            # print('Power: Fan = ', round(ec.W_fan/1000, 3), '[kW]; LPC = ', round(ec.W_LPC/1000, 3), '[kW]; HPC = ',
+            #       round(ec.W_HPC/1000, 3), '[kW]')
+            # print('LPT = ', round(ec.W_LPT/1000, 3), '[kW]; HPT = ', round(ec.W_HPT/1000, 3), '[kW]')
+            # print('Entrance of HPT: T04 = ', round(ec.T04, 3), '[K]; p04 = ', round(ec.p04/100000, 3), '[bar]')
+            # print('Entrance of LPT: T045 = ', round(ec.T045, 3), '[K]; p045 = ', round(ec.p045/100000, 3), '[bar]')
+            # print('Entrance of nozzle: T05 = ', round(ec.T05, 3), '[K]; p05 = ', round(ec.p05/100000, 3), '[bar]')
+            # print('Exit of nozzle: T07 = ', round(ec.T07, 3), '[K]; p07 = ', round(ec.p07/100000, 3), '[bar]; PR_cr_noz = ',
+            #       round(ec.PR_cr_noz_core, 3))
+            # print('Exit of nozzle: T8 = ', round(ec.T8, 3), '[K]; p8 = ', round(ec.p8/100000, 3), '[bar]; v8 = ',
+            #       round(ec.v8, 3), '[m/s]')
+            # print('Exit of fan: T016 = ', round(ec.T016, 3), '[K]; p016 = ', round(ec.p016/100000, 3), '[bar]; PR_cr_fan = ',
+            #       round(ec.PR_cr_fan, 3))
+            # print('Exit of fan: T18 = ', round(ec.T18, 3), '[K]; p18 = ', round(ec.p18/100000, 3), '[bar]; v18 = ',
+            #       round(ec.v18,3), '[m/s]')
             # print('Required Thrust [kN]', round(ec.Thrust/1000))
             print('Provided Thrust: Fan = ', round(ec.T_fan/1000, 3), '[kN]; Core = ', round(ec.T_core/1000, 3), '[kN]; Total = ',
                   round(ec.T_total/1000, 3), '[kN]')
-            # print('Thrust SFC = ', round(ec.TSFC_m, 5), '[g/kN/s];', round(ec.TSFC_e, 5), '[MJ/kN/s]')
+            print('Thrust SFC = ', round(ec.TSFC_m, 5), '[g/kN/s];', round(ec.TSFC_e, 5), '[MJ/kN/s]')
             print('Eqr PZ:', round(ec.eqr_PZ, 3), 'Eqr Overall:', round(ec.eqr_overall, 3))
 
             amb = [['T0', round(ec.T0, 3), 'K'], ['p0', round(ec.p0, 3), 'Pa'], ['v0', round(ec.v0, 3), 'm/s']]
@@ -553,4 +552,4 @@ if __name__ == '__main__':
 
         print('\n', phase)
         print('\nThermal efficiency: NEO = ', eta_th_n, 'HACK = ', eta_th_h)
-        # print('Percentage change:', round(eta_th_h - eta_th_n, 3))
+        print('Percentage change:', round(eta_th_h - eta_th_n, 3))
