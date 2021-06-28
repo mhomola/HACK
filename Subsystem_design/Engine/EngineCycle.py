@@ -482,7 +482,7 @@ if __name__ == '__main__':
         plt.scatter(T, SFC, s=70, color=c, marker=m, label=l)
         plt.xlabel('Net Thrust [kN]', fontsize=15)
         plt.ylabel('TSFC [g/kN/s]', fontsize=15)
-        plt.xticks([20.97, 20.98, 20.99], fontsize=14)
+        plt.xticks(fontsize=14)
         plt.yticks(fontsize=14)
         plt.legend(fontsize=15)
 
@@ -490,32 +490,32 @@ if __name__ == '__main__':
         plt.scatter(T, SFC, s=70, color=c, marker=m, label=l)
         plt.xlabel('Net Thrust [kN]', fontsize=15)
         plt.ylabel('TSFC [MJ/kN/s]', fontsize=15)
-        plt.xticks([20.97, 20.98, 20.99], fontsize=14)
+        plt.xticks(fontsize=14)
         plt.yticks(fontsize=14)
         plt.legend(fontsize=15)
 
-    # ec.cycle_analysis('neo', 'take_off', flag=False, alph=1)
-    # Th_nto, SFC_m_nto, SFC_e_nto = ec.T_total/1000, ec.TSFC_m, ec.TSFC_e
-    # ec.cycle_analysis('hack', 'take_off', flag=False, alph=1)
-    # Th_hto, SFC_m_hto, SFC_e_hto = ec.T_total / 1000, ec.TSFC_m, ec.TSFC_e
-    # ec.cycle_analysis('neo', 'cruise', flag=False, alph=1)
-    # Th_nc, SFC_m_nc, SFC_e_nc = ec.T_total / 1000, ec.TSFC_m, ec.TSFC_e
-    # ec.cycle_analysis('hack', 'cruise', flag=False, alph=1)
-    # Th_hc, SFC_m_hc, SFC_e_hc = ec.T_total / 1000, ec.TSFC_m, ec.TSFC_e
+    ec.cycle_analysis('neo', 'take_off', flag=False, alph=1)
+    Th_nto, SFC_m_nto, SFC_e_nto = ec.T_total/1000, ec.TSFC_m, ec.TSFC_e
+    ec.cycle_analysis('hack', 'take_off', flag=False, alph=1)
+    Th_hto, SFC_m_hto, SFC_e_hto = ec.T_total / 1000, ec.TSFC_m, ec.TSFC_e
+    ec.cycle_analysis('neo', 'cruise', flag=False, alph=1)
+    Th_nc, SFC_m_nc, SFC_e_nc = ec.T_total / 1000, ec.TSFC_m, ec.TSFC_e
+    ec.cycle_analysis('hack', 'cruise', flag=False, alph=1)
+    Th_hc, SFC_m_hc, SFC_e_hc = ec.T_total / 1000, ec.TSFC_m, ec.TSFC_e
 
-    # plt.figure()
-    # plot_e('limegreen', 'x', 'A320neo', Th_nc, SFC_e_nc)
-    # plot_e('dodgerblue', 'o', 'A320-HACK', Th_hc, SFC_e_hc)
-    # plot_e('limegreen', '^', 'A320neo - Lift-off', Th_nto, SFC_e_nto)
-    # plot_e('dodgerblue', 's', 'A320-HACK - Lift-off', Th_hto, SFC_e_hto)
-    # plt.show()
-    #
-    # plt.figure()
-    # plot_m('limegreen', 'x',  'A320neo', Th_nc, SFC_m_nc)
-    # plot_m('dodgerblue', 'o', 'A320-HACK', Th_hc, SFC_m_hc)
-    # # plot_m('limegreen', '^', 'A320neo - Lift-off', Th_nto, SFC_m_nto)
-    # # plot_m('dodgerblue', 's', 'A320-HACK - Lift-off', Th_hto, SFC_m_hto)
-    # plt.show()
+    plt.figure()
+    plot_e('limegreen', 'x', 'A320neo', Th_nc, SFC_e_nc)
+    plot_e('dodgerblue', 'o', 'A320-HACK', Th_hc, SFC_e_hc)
+    plot_e('limegreen', '^', 'A320neo - Lift-off', Th_nto, SFC_e_nto)
+    plot_e('dodgerblue', 's', 'A320-HACK - Lift-off', Th_hto, SFC_e_hto)
+    plt.show()
+
+    plt.figure()
+    plot_m('limegreen', 'x',  'A320neo', Th_nc, SFC_m_nc)
+    plot_m('dodgerblue', 'o', 'A320-HACK', Th_hc, SFC_m_hc)
+    plot_m('limegreen', '^', 'A320neo - Lift-off', Th_nto, SFC_m_nto)
+    plot_m('dodgerblue', 's', 'A320-HACK - Lift-off', Th_hto, SFC_m_hto)
+    plt.show()
     #
     # plt.figure()
     # ec.cycle_analysis('neo', 'cruise', flag=True, alph=0.2)
@@ -542,15 +542,15 @@ if __name__ == '__main__':
 
 
 #####################################################################
-    for phase in phases:
-        ec.cycle_analysis('neo', phase, flag=True, alph=0.2)
-        work_n, lost_n = ec.work, ec.lost_heat
-        ec.cycle_analysis('hack', phase, flag=True, alph=1)
-        work_h, lost_h = ec.work, ec.lost_heat
-
-        eta_th_n = round(work_n/(work_n+lost_n)*100, 3)
-        eta_th_h = round(work_h / (work_h + lost_h) * 100, 3)
-
-        print('\n', phase)
-        print('\nThermal efficiency: NEO = ', eta_th_n, 'HACK = ', eta_th_h)
-        print('Percentage change:', round(eta_th_h - eta_th_n, 3))
+    # for phase in phases:
+    #     ec.cycle_analysis('neo', phase, flag=True, alph=0.2)
+    #     work_n, lost_n = ec.work, ec.lost_heat
+    #     ec.cycle_analysis('hack', phase, flag=True, alph=1)
+    #     work_h, lost_h = ec.work, ec.lost_heat
+    #
+    #     eta_th_n = round(work_n/(work_n+lost_n)*100, 3)
+    #     eta_th_h = round(work_h / (work_h + lost_h) * 100, 3)
+    #
+    #     print('\n', phase)
+    #     print('\nThermal efficiency: NEO = ', eta_th_n, 'HACK = ', eta_th_h)
+    #     print('Percentage change:', round(eta_th_h - eta_th_n, 3))
